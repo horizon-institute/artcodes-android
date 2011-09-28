@@ -1,0 +1,13 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<Project ToolsVersion="4.0" xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
+  <PropertyGroup>
+    <PublishUrlHistory>C:\Users\mpp\Desktop\CeramicsRelease\|C:\Users\mpp\|ftp://marian.cs.nott.ac.uk/public_html/files/ceramics/|H:\solaris\public_html\files\ceramics\|publish\</PublishUrlHistory>
+    <InstallUrlHistory>http://www.cs.nott.ac.uk/~mpp/files/ceramics/</InstallUrlHistory>
+    <SupportUrlHistory />
+    <UpdateUrlHistory />
+    <BootstrapperUrlHistory />
+    <ErrorReportUrlHistory />
+    <FallbackCulture>en-US</FallbackCulture>
+    <VerifyUploadedFiles>false</VerifyUploadedFiles>
+  </PropertyGroup>
+</Project>

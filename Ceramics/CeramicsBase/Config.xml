@@ -1,0 +1,21 @@
+﻿<?xml version="1.0" encoding="utf-8" ?>
+<!DOCTYPE Ceramics [
+
+<!ELEMENT Ceramics (Config)>
+<!ELEMENT Config (Setting+)>
+<!ELEMENT Setting (EMPTY)>
+
+<!ATTLIST Setting key CDATA #REQUIRED>
+<!ATTLIST Setting value CDATA #REQUIRED>
+
+]>
+
+<Ceramics>
+  <Config>
+    <Setting key="MinimumBranches" value="3"/>
+    <Setting key="MaximumBranches" value="12"/>
+    <Setting key="MaximumEmptyBranches" value="2"/>
+    <Setting key="MaximumLeaves" value="20"/>
+    <Setting key="RootLevelClass" value="Black"/>
+  </Config>
+</Ceramics>
