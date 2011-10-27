@@ -23,7 +23,6 @@ class TWSurfaceView extends TWSurfaceViewBase {
     private Mat mOtsu;
     private Mat mIntermediateMat;
     private ArrayList<Mat> mComponents;
-    private ComponentFinder mComponentFinder;
     private Mat mHierarchy;
     private MarkerDetector markerDetector;
 
@@ -45,7 +44,6 @@ class TWSurfaceView extends TWSurfaceViewBase {
             mIntermediateMat = new Mat();
             mComponents = new ArrayList<Mat>();
             mHierarchy = new Mat();
-            mComponentFinder = new ComponentFinder();
         }
     }
 
@@ -102,13 +100,17 @@ class TWSurfaceView extends TWSurfaceViewBase {
         		//Mat contour = mComponents.get(i);
     			//Imgproc.drawContours(mRgba, mComponents, i, color, 2, 8, mHierarchy, 0);
     			double[] values = mComponents.get(i).get(0, 0);
-    			Core.putText(mRgba, String.valueOf(i), new Point(values[0],values[1]), Core.FONT_HERSHEY_COMPLEX, 1, new Scalar(255,0,0,255),3);
+    			//Core.putText(mRgba, String.valueOf(i), new Point(values[0],values[1]), Core.FONT_HERSHEY_COMPLEX, 1, new Scalar(255,0,0,255),3);
         		//Scalar color = new Scalar(0, 0, 255);
     			//Imgproc.drawContours(mRgba, mComponents, i, color, 2, 8, mHierarchy, 0);
-        		if (markerDetector.verifyRoot(i, mHierarchy)){
+    			List<Integer> codes = new ArrayList<Integer>();
+    			
+        		if (markerDetector.verifyRoot(i, mHierarchy,codes)){
         			//Scalar color = new Scalar(range.nextInt(256), range.nextInt(256), range.nextInt(256));
         			//Scalar color = new Scalar(0, 0, 255);
+        			String code = codeArrayToString(codes);
         			Imgproc.drawContours(mRgba, mComponents, i, color, 2, 8, mHierarchy, 0);
+        			Core.putText(mRgba, code, new Point(values[0],values[1]), Core.FONT_HERSHEY_COMPLEX, 1, new Scalar(255,0,0,255),3);
         		}
         	}
         	
@@ -158,6 +160,16 @@ class TWSurfaceView extends TWSurfaceViewBase {
         return null;
     }
 
+    private String codeArrayToString(List<Integer> codes){
+    	StringBuffer code = new StringBuffer();
+    	for(int i = 0; i < codes.size(); i++){
+    		if (i > 0)
+    			code.append(":");
+    		code.append(codes.get(i));
+    	}
+    	return code.toString();
+    }
+    
     @Override
     public void run() {
         super.run();
@@ -181,7 +193,6 @@ class TWSurfaceView extends TWSurfaceViewBase {
             mIntermediateMat = null;
             mOtsu = null;
             mComponents = null;
-            mComponentFinder = null;
             mHierarchy = null;
         }
     }
