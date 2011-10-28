@@ -1,10 +1,10 @@
 package uk.ac.horizon.tableware;
 
-import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
 
 import org.opencv.core.Mat;
+import org.opencv.core.Point;
 
 class MarkerLabel{
     public int ID;
@@ -33,6 +33,7 @@ class MarkerDetector
 	private int maximumBranches;
 	private int maximumEmptyBranches;
 	private int maximumLeaves;
+	private double rootNodeRegionColor;
 	
 	public MarkerDetector()
 	{
@@ -41,52 +42,71 @@ class MarkerDetector
 		maximumBranches = 12;
 		maximumEmptyBranches = 3;
 		maximumLeaves = 20;
+		//0 means black, 1 is white.
+		rootNodeRegionColor = 0;
 	}
 	
-	public Boolean verifyRoot(int rootIndex, Mat hierarchy, List<Integer> codes){
+	public Boolean verifyRoot(int rootIndex, Mat rootNode, Mat hierarchy, Mat binaryImage, List<Integer> codes){
 		Boolean valid = false;
 		int branchCount = 0;
 		int emptyBranchCount = 0;
 		int currentBranchIndex = -1;
 		BranchStatus status;
 		
-		//get the nodes of the root node.
-		double[] nodes = hierarchy.get(0, rootIndex);
-		//get the first child node.
-		currentBranchIndex = (int)nodes[FIRST_NODE];
-		
-		//if there is a branch node then verify branches.
-		if (currentBranchIndex >= 0 ){
-			//loop until there is a branch node.
-			while(currentBranchIndex >= 0){
-				//verify current branch.
-				status = verifyBranch(currentBranchIndex, hierarchy, codes);
-				//if branch is valid or empty.
-				if (status == BranchStatus.VALID || status == BranchStatus.EMPTY ){
-					branchCount++;
-					if (status == BranchStatus.EMPTY){
-						emptyBranchCount++;
-						if (emptyBranchCount > maximumEmptyBranches){
-							return false;
+		//Check if the root region colour is according to the settings.
+		//if (checkRootNodeRegionColor(rootNode, binaryImage)){
+		if (true){
+			//get the nodes of the root node.
+			double[] nodes = hierarchy.get(0, rootIndex);
+			//get the first child node.
+			currentBranchIndex = (int)nodes[FIRST_NODE];
+
+			//if there is a branch node then verify branches.
+			if (currentBranchIndex >= 0 ){
+				//loop until there is a branch node.
+				while(currentBranchIndex >= 0){
+					//verify current branch.
+					status = verifyBranch(currentBranchIndex, hierarchy, codes);
+					//if branch is valid or empty.
+					if (status == BranchStatus.VALID || status == BranchStatus.EMPTY ){
+						branchCount++;
+						if (status == BranchStatus.EMPTY){
+							emptyBranchCount++;
+							if (emptyBranchCount > maximumEmptyBranches){
+								return false;
+							}
 						}
+						//get next node. 
+						nodes = hierarchy.get(0, currentBranchIndex);
+						currentBranchIndex = (int)nodes[NEXT_NODE];
 					}
-					//get next node. 
-					nodes = hierarchy.get(0, currentBranchIndex);
-					currentBranchIndex = (int)nodes[NEXT_NODE];
+					else if (status == BranchStatus.INVALID)
+						return false;
 				}
-				else if (status == BranchStatus.INVALID)
-					return false;
-			}
-			if (emptyBranchCount > maximumEmptyBranches)
-				valid = false;
-			else if (branchCount >= minimumBranches && branchCount <= maximumBranches){
-				Collections.sort(codes);
-				valid = true;
+				if (emptyBranchCount > maximumEmptyBranches)
+					valid = false;
+				else if (branchCount >= minimumBranches && branchCount <= maximumBranches){
+					Collections.sort(codes);
+					valid = true;
+				}
 			}
 		}
 		return valid;
 	}
 
+	
+	private Boolean checkRootNodeRegionColor(Mat rootNode, Mat binaryImage){
+		//Get the first point of this contour.
+		Point point = new Point(rootNode.get(0,0));
+		//Get the pixel value of this point from the binary image.
+		double pixelValue = binaryImage.get((int)point.x, (int)point.y)[0];
+		//check if it is equal to the desired color.
+		if (pixelValue == rootNodeRegionColor)
+			return true;
+		else
+			return false;
+	}
+	
 	private BranchStatus verifyBranch(int branchIndex, Mat hierarchy, List<Integer> codes){
 		 
 		int leafCount = 0;

@@ -21,6 +21,7 @@ class TWSurfaceView extends TWSurfaceViewBase {
     private Mat mRgba;
     private Mat mGray;
     private Mat mOtsu;
+    private Mat mContourImg;
     private Mat mIntermediateMat;
     private ArrayList<Mat> mComponents;
     private Mat mHierarchy;
@@ -40,6 +41,7 @@ class TWSurfaceView extends TWSurfaceViewBase {
             // initialize Mats before usage
             mGray = new Mat();
             mOtsu = new Mat();
+            mContourImg = new Mat();
             mRgba = new Mat();
             mIntermediateMat = new Mat();
             mComponents = new ArrayList<Mat>();
@@ -58,23 +60,32 @@ class TWSurfaceView extends TWSurfaceViewBase {
         	//Otsu threshold. It is used to reduce grey level image to a binary image. Not sure about
         	//thresh i.e 0 and maximum value i.e 255 used in this function call. Need to be verified.
         	Imgproc.threshold(mGray, mOtsu, 0, 255, Imgproc.THRESH_BINARY | Imgproc.THRESH_OTSU);
-        	Mat test = mOtsu.clone();
+        	Mat mContourImg = mOtsu.clone();
         	//Find blobs using connect component.
-        	Imgproc.findContours(test, mComponents, mHierarchy, Imgproc.RETR_TREE, Imgproc.CHAIN_APPROX_SIMPLE);
-        	        	
+        	Imgproc.findContours(mContourImg, mComponents, mHierarchy, Imgproc.RETR_TREE, Imgproc.CHAIN_APPROX_SIMPLE);
+        	
+        	/*
+        	double[][] imageArray = new double[mOtsu.rows()][mOtsu.cols()];
+        	for (int i = 0; i < mOtsu.rows(); i ++){
+        		for (int j = 0; j < mOtsu.cols(); j++){
+        			imageArray[i][j] = mOtsu.get(i, j)[0];
+        		}
+        	}*/
+        		
         	/*
         	String contourSize = "Total Contours: " + mComponents.size() + " in image";
         	Core.putText(test, contourSize, new Point(10,100), Core.FONT_HERSHEY_COMPLEX, 1, new Scalar(255,0,0,255),3);
         	Imgproc.cvtColor(test, mRgba, Imgproc.COLOR_GRAY2RGBA, 4);*/
-        	test.release();
+        	//test.release();
         	
+        	/*
         	for (int contourIndex = 0; contourIndex < mComponents.size(); contourIndex++){
         		double[] nodes = mHierarchy.get(0, contourIndex);
         		double next = nodes[0];
         		double prev = nodes[1];
         		double first = nodes[2];
         		double parent = nodes[3];
-        	}
+        	}*/
         	
         	/*
         	for (int contourIndex = 0; contourIndex < mComponents.size(); contourIndex++){
@@ -93,29 +104,44 @@ class TWSurfaceView extends TWSurfaceViewBase {
         	}*/
         	
         	
-        	Random range = new Random();
+        	//Random range = new Random();
         	//Draw contours
         	for (int i = 0; i < mComponents.size(); i++){
         		Scalar color = new Scalar(0, 0, 255);
-        		//Mat contour = mComponents.get(i);
-    			//Imgproc.drawContours(mRgba, mComponents, i, color, 2, 8, mHierarchy, 0);
+        		Mat contour = mComponents.get(i);
+        		
+        		/*
+        		for (int j = 0; j < contour.rows(); j++)
+        		{
+        			double[] cValues = null;
+        			for (int k = 0; k < contour.cols(); k++)
+        				//double[] data = new double[contour.cols];
+        				cValues = contour.get(j, k);
+        				double cValue = cValues[0];
+        				double[] pixels = mOtsu.get((int)cValues[0], (int)cValues[1]);
+        				double pixel = pixels[0];
+        		}*/
+        		//Imgproc.drawContours(mRgba, mComponents, i, color, 2, 8, mHierarchy, 0);
+        		
     			double[] values = mComponents.get(i).get(0, 0);
     			//Core.putText(mRgba, String.valueOf(i), new Point(values[0],values[1]), Core.FONT_HERSHEY_COMPLEX, 1, new Scalar(255,0,0,255),3);
         		//Scalar color = new Scalar(0, 0, 255);
     			//Imgproc.drawContours(mRgba, mComponents, i, color, 2, 8, mHierarchy, 0);
     			List<Integer> codes = new ArrayList<Integer>();
     			
-        		if (markerDetector.verifyRoot(i, mHierarchy,codes)){
-        			//Scalar color = new Scalar(range.nextInt(256), range.nextInt(256), range.nextInt(256));
-        			//Scalar color = new Scalar(0, 0, 255);
-        			String code = codeArrayToString(codes);
-        			Imgproc.drawContours(mRgba, mComponents, i, color, 2, 8, mHierarchy, 0);
-        			Core.putText(mRgba, code, new Point(values[0],values[1]), Core.FONT_HERSHEY_COMPLEX, 1, new Scalar(255,0,0,255),3);
-        		}
+    			if (checkRootNodeRegionColor(mComponents.get(i), mContourImg)){
+    				if (markerDetector.verifyRoot(i, mComponents.get(i), mHierarchy,mOtsu,codes)){
+    					//Scalar color = new Scalar(range.nextInt(256), range.nextInt(256), range.nextInt(256));
+    					//Scalar color = new Scalar(0, 0, 255);
+    					String code = codeArrayToString(codes);
+    					Imgproc.drawContours(mRgba, mComponents, i, color, 2, 8, mHierarchy, 0);
+    					//Core.putText(mRgba, code, new Point(values[0],values[1]), Core.FONT_HERSHEY_COMPLEX, 1, new Scalar(255,0,0,255),3);
+    				}
+    			}
         	}
         	
-        	String contourSize = "Total Contours: " + mComponents.size() + " in image";
-        	Core.putText(mRgba, contourSize, new Point(10,100), Core.FONT_HERSHEY_COMPLEX, 1, new Scalar(255,0,0,255),3);
+        	//String contourSize = "Total Contours: " + mComponents.size() + " in image";
+        	//Core.putText(mRgba, contourSize, new Point(10,100), Core.FONT_HERSHEY_COMPLEX, 1, new Scalar(255,0,0,255),3);
         	
         	//Draw contours
         	/*
@@ -170,6 +196,18 @@ class TWSurfaceView extends TWSurfaceViewBase {
     	return code.toString();
     }
     
+    private Boolean checkRootNodeRegionColor(Mat rootNode, Mat binaryImage){
+		//Get the first point of this contour.
+		Point point = new Point(rootNode.get(0,0));
+		//Get the pixel value of this point from the binary image.
+		double pixelValue = binaryImage.get((int)point.x, (int)point.y)[0];
+		//check if it is equal to the desired color.
+		if (pixelValue == 0.0)
+			return true;
+		else
+			return false;
+	}
+    
     @Override
     public void run() {
         super.run();
@@ -184,6 +222,8 @@ class TWSurfaceView extends TWSurfaceViewBase {
                 mIntermediateMat.release();
             if (mOtsu != null)
             	mOtsu.release();
+            if (mContourImg != null)
+            	mContourImg.release();
             if (mComponents != null)
             	mComponents.clear();
             if (mHierarchy != null)
@@ -192,6 +232,7 @@ class TWSurfaceView extends TWSurfaceViewBase {
             mGray = null;
             mIntermediateMat = null;
             mOtsu = null;
+            mContourImg = null;
             mComponents = null;
             mHierarchy = null;
         }
