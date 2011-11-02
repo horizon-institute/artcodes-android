@@ -95,7 +95,7 @@ public abstract class TWSurfaceViewBase extends SurfaceView implements SurfaceHo
                 bmp = processFrame(mCamera);
             }
 
-            if (bmp != null) {
+            if (bmp != null && mCamera != null) {
                 Canvas canvas = mHolder.lockCanvas();
                 if (canvas != null) {
                     canvas.drawBitmap(bmp, (canvas.getWidth() - bmp.getWidth()) / 2, (canvas.getHeight() - bmp.getHeight()) / 2, null);

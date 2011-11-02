@@ -592,10 +592,10 @@ namespace Ceramics
                             string markerCode = permittedMarkerList[marker].Code;
                             BoundingBox bb = componentFinder.ObjectBoundingBoxes[markerID];
 
-                            g.DrawLine(boundingBoxPen, new Point(bb.x1, bb.y1), new Point(bb.x1, bb.y2));
-                            g.DrawLine(boundingBoxPen, new Point(bb.x1, bb.y2), new Point(bb.x2, bb.y2));
-                            g.DrawLine(boundingBoxPen, new Point(bb.x2, bb.y2), new Point(bb.x2, bb.y1));
-                            g.DrawLine(boundingBoxPen, new Point(bb.x2, bb.y1), new Point(bb.x1, bb.y1));
+                            g.DrawLine(boundingBoxPen, new System.Drawing.Point(bb.x1, bb.y1), new System.Drawing.Point(bb.x1, bb.y2));
+                            g.DrawLine(boundingBoxPen, new System.Drawing.Point(bb.x1, bb.y2), new System.Drawing.Point(bb.x2, bb.y2));
+                            g.DrawLine(boundingBoxPen, new System.Drawing.Point(bb.x2, bb.y2), new System.Drawing.Point(bb.x2, bb.y1));
+                            g.DrawLine(boundingBoxPen, new System.Drawing.Point(bb.x2, bb.y1), new System.Drawing.Point(bb.x1, bb.y1));
                         }
 
                         for (int marker = 0; marker < permittedMarkerList.Count; marker++)

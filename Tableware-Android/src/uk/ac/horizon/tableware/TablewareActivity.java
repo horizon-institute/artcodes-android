@@ -31,6 +31,7 @@ public class TablewareActivity extends Activity {
         super.onCreate(savedInstanceState);
         requestWindowFeature(Window.FEATURE_NO_TITLE);
         setContentView(new TWSurfaceView(this));
+        //setContentView(new TWSyncSurfaceView(this));
     }
 
     @Override
