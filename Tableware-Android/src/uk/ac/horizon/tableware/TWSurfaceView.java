@@ -73,7 +73,7 @@ class TWSurfaceView extends TWSurfaceViewBase {
         		codes.clear();
         		if (markerDetector.verifyRoot(i, mComponents.get(i), mHierarchy,mOtsu,codes)){
         			String code = codeArrayToString(codes);
-        			Imgproc.drawContours(mRgba, mComponents, i, contourColor, 2, 8, mHierarchy, 2);
+        			Imgproc.drawContours(mRgba, mComponents, i, contourColor, 2, 8, mHierarchy, 0);
         			//Get contour location.
         			contourLocation = new Point(contour.get(0,0));
         			Core.putText(mRgba, code, contourLocation, Core.FONT_HERSHEY_COMPLEX, 1, codesColor,3);
