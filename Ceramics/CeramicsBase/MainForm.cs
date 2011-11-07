@@ -83,6 +83,7 @@ namespace Ceramics
         System.Threading.ReaderWriterLockSlim readerWriterLockThresholdedImage = new ReaderWriterLockSlim();
         System.Threading.ReaderWriterLockSlim readerWriterLockProcessedImage = new ReaderWriterLockSlim();
         ManualResetEvent resetEvent = null;
+        Mutex frameMutex = null; //RNM
         WorkerStatus workerStatus = WorkerStatus.Ready;
         float workerTicks;
 
@@ -129,6 +130,7 @@ namespace Ceramics
 
             // Worker
             resetEvent = new ManualResetEvent(false);
+            frameMutex = new Mutex(false);   //RNM
 
             // Image exporter
             imageExporter = new ImageExporter(this.ExportImage);
@@ -276,6 +278,9 @@ namespace Ceramics
         unsafe void videoSource_NewFrame(object sender, NewFrameEventArgs eArgs)
         {
             Bitmap image = eArgs.Frame;
+
+            frameMutex.WaitOne();  //RNM
+                
             try
             {
                 if (this.workerStatus == WorkerStatus.Finished)
@@ -337,8 +342,10 @@ namespace Ceramics
             catch (Exception e)
             {
                 MessageBox.Show("Exception occurred while handling new frame: " + e.Message);
+                frameMutex.ReleaseMutex();
                 throw;
             }
+            frameMutex.ReleaseMutex();
         }
 
         unsafe void videoSourcePlayer1_NewFrame(object sender, ref Bitmap image)
@@ -445,16 +452,21 @@ namespace Ceramics
                 capture2 = false;
             }
         }
+         
 
         public void RunWorker()
         {
+            
             while (true)
             {
                 resetEvent.WaitOne();
 
+                frameMutex.WaitOne(); //RNM
+
                 // Process image
                 this.workerStatus = WorkerStatus.Busy;
 
+                // RNM: Crashes every few minutes so move out of the loop!
                 if (processingImage.Width != grayBuffer.Width || processingImage.Height != grayBuffer.Height)
                     grayBuffer = new Bitmap(processingImage.Width, processingImage.Height, System.Drawing.Imaging.PixelFormat.Format8bppIndexed);
 
@@ -514,6 +526,7 @@ namespace Ceramics
                             permittedMarkerList.Clear();
                         this.workerStatus = WorkerStatus.Finished;
                         resetEvent.Reset();
+                        frameMutex.ReleaseMutex();
                         continue;
                     }
 
@@ -561,13 +574,16 @@ namespace Ceramics
                         newElement.Attributes.Append(y1);
                         newElement.Attributes.Append(x2);
                         newElement.Attributes.Append(y2);
-
                         xmlDocument.DocumentElement.AppendChild(newElement);
                     }
                 }
                 catch (Exception e)
                 {
+                    //RNM
+                    resetEvent.Reset();
+                    frameMutex.ReleaseMutex();
                     MessageBox.Show("An exception occurred during Marker Detection: " + e.Message);
+                    
                     throw;
                 }
                 finally
@@ -611,6 +627,7 @@ namespace Ceramics
                 this.workerStatus = WorkerStatus.Finished;
                 workerTicks++;
                 resetEvent.Reset();
+                frameMutex.ReleaseMutex();
             }
         }
 
