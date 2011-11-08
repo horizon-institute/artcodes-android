@@ -50,7 +50,7 @@ namespace Ceramics
             this.parentMainForm = ParentMainForm;
         }
 
-        public void SetSources(VideoCaptureDevice videoSource, VideoSourcePlayer.NewFrameHandler NFH, FormClosedEventHandler FCEH)
+        public void SetSources(IVideoSource videoSource, VideoSourcePlayer.NewFrameHandler NFH, FormClosedEventHandler FCEH)
         {
             this.videoSourcePlayer.VideoSource = videoSource;
             this.videoSourcePlayer.NewFrame += NFH;

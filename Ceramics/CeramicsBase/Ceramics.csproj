@@ -127,6 +127,12 @@
     <Compile Include="ThresholdTraining.Designer.cs">
       <DependentUpon>ThresholdTraining.cs</DependentUpon>
     </Compile>
+    <Compile Include="URLForm.cs">
+      <SubType>Form</SubType>
+    </Compile>
+    <Compile Include="URLForm.designer.cs">
+      <DependentUpon>URLForm.cs</DependentUpon>
+    </Compile>
     <EmbeddedResource Include="ChildWindow.resx">
       <DependentUpon>ChildWindow.cs</DependentUpon>
     </EmbeddedResource>
@@ -145,6 +151,9 @@
     </Compile>
     <EmbeddedResource Include="ThresholdTraining.resx">
       <DependentUpon>ThresholdTraining.cs</DependentUpon>
+    </EmbeddedResource>
+    <EmbeddedResource Include="URLForm.resx">
+      <DependentUpon>URLForm.cs</DependentUpon>
     </EmbeddedResource>
     <None Include="app.config" />
     <None Include="Ceramics_TemporaryKey.pfx" />

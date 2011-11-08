@@ -35,6 +35,7 @@ using AForge;
 using AForge.Video.DirectShow;
 using AForge.Controls;
 using AForge.Imaging.Filters;
+using System.Net;
 
 namespace Ceramics
 {
@@ -50,7 +51,7 @@ namespace Ceramics
         private delegate void ImageExporter(Bitmap bmp, SaveFileDialog openFileDialog);
 
         // list of video devices
-        FilterInfoCollection videoDevices;
+        FilterInfoCollection attachedUSBvideoDevices;
 
         // size
         private const int DesiredWidth = 640;
@@ -90,7 +91,7 @@ namespace Ceramics
         // Child window declarations
         ChildWindow CWViewer1;
         ChildWindow CWViewer2;
-        VideoCaptureDevice videoCaptureDevice;
+        IVideoSource currentVideoSource;
         volatile int screen1Switch = 0;
         volatile int screen2Switch = 0;
 
@@ -153,34 +154,36 @@ namespace Ceramics
 
             xmlDocument.Save(Environment.GetFolderPath(Environment.SpecialFolder.Desktop) + "\\dtd.xml");
 
+            displayDeviceList();
+        }
 
-
-
+        private void displayDeviceList()
+        {
             // show device list
-			try
-			{
+            try
+            {
                 // enumerate video devices
-                videoDevices = new FilterInfoCollection( FilterCategory.VideoInputDevice );
+                attachedUSBvideoDevices = new FilterInfoCollection(FilterCategory.VideoInputDevice);
 
-                if ( videoDevices.Count == 0 )
+                if (attachedUSBvideoDevices.Count == 0)
                 {
-                    throw new Exception( );
+                    throw new Exception();
                 }
 
-                for ( int i = 1, n = videoDevices.Count; i <= n; i++ )
+                for (int i = 1, n = attachedUSBvideoDevices.Count; i <= n; i++)
                 {
-                    string cameraName = i + " : " + videoDevices[i - 1].Name;
+                    string cameraName = i + " : " + attachedUSBvideoDevices[i - 1].Name;
 
-                    cameraCombo.Items.Add( cameraName );
+                    cameraCombo.Items.Add(cameraName);
                 }
 
                 cameraCombo.SelectedIndex = 0;
             }
             catch
             {
-                startButton.Enabled = false;
+                USBCameraBtn.Enabled = false;
 
-                cameraCombo.Items.Add( "No cameras found" );
+                cameraCombo.Items.Add("No cameras found");
 
                 cameraCombo.SelectedIndex = 0;
 
@@ -197,31 +200,74 @@ namespace Ceramics
             StopCameras( );
         }
 
-        // On "Start" button click
-        private void startButton_Click( object sender, EventArgs e )
+        // On USB Camera button click
+        private void USBCameraBtn_Click( object sender, EventArgs e )
         {
-            StartCameras( );
+            currentVideoSource = getUSBVideoDevice();
+            if (currentVideoSource != null)
+            {
+                StartCameras(currentVideoSource);
+                initStartCameraButtons();
+            }
+        }
 
-            startButton.Enabled = false;
+        private void IPCameraBtn_Click(object sender, EventArgs e)
+        {
+            URLForm form = new URLForm();
+            form.Description = "Enter URL of a JPEG video stream web camera:";
+            if (form.ShowDialog(this) == DialogResult.OK)
+            {
+                if (validateURL(form.URL))
+                {
+                    currentVideoSource = getIPVideoDevice(form.URL);
+                    if (currentVideoSource != null)
+                    {
+                        StartCameras(currentVideoSource);
+                        initStartCameraButtons();
+                    }
+                }
+                else
+                    MessageBox.Show("URL is not valid. Please enter valid URL");
+            }
+        }
+
+        private void initStartCameraButtons(){
+            USBCameraBtn.Enabled = false;
+            IPCameraBtn.Enabled = false;
             stopButton.Enabled = true;
-
             addCodesButton.Enabled = true;
-
             screenViewer1Button.Enabled = true;
             screenViewer2Button.Enabled = true;
-
             captureScreen1.Enabled = true;
             captureScreen2.Enabled = true;
-
             UpdatePermittedCodesUI();
         }
+        
+        private IVideoSource getUSBVideoDevice()
+        {
+            // create first video source
+            VideoCaptureDevice videoDevice = new VideoCaptureDevice(attachedUSBvideoDevices[cameraCombo.SelectedIndex].MonikerString);
+
+            videoDevice.DesiredFrameSize = new Size(DesiredWidth, DesiredHeight);
+            videoDevice.DesiredFrameRate = 25;
+
+            return videoDevice;
+        }
+
+        private IVideoSource getIPVideoDevice(string deviceURL)
+        {
+            return new MJPEGStream(deviceURL);
+        }
+
 
         // On "Stop" button click
         private void stopButton_Click( object sender, EventArgs e )
         {
             StopCameras( );
 
-            startButton.Enabled = true;
+            if (attachedUSBvideoDevices.Count > 0)
+                USBCameraBtn.Enabled = true;
+            IPCameraBtn.Enabled = true;
             stopButton.Enabled = false;
 
             addCodesButton.Enabled = false;
@@ -247,32 +293,45 @@ namespace Ceramics
         }
 
         // Start cameras
-        private void StartCameras( )
+        private void StartCameras(IVideoSource videoSource)
         {
             // create first video source
-            videoCaptureDevice = new VideoCaptureDevice( videoDevices[cameraCombo.SelectedIndex].MonikerString );
-
-            videoCaptureDevice.DesiredFrameSize = new Size(DesiredWidth, DesiredHeight);
-            videoCaptureDevice.DesiredFrameRate = 25;
-           
-            videoSourcePlayer1.VideoSource = videoCaptureDevice;
+                              
+            videoSourcePlayer1.VideoSource = videoSource;
 
             if (CWViewer1 == null || !CWViewer1.Visible)
-                videoSourcePlayer1.VideoSource = videoCaptureDevice;
+                videoSourcePlayer1.VideoSource = videoSource;
 
             if (CWViewer2 == null || !CWViewer2.Visible)
-                videoSourcePlayer2.VideoSource = videoCaptureDevice;
+                videoSourcePlayer2.VideoSource = videoSource;
             
             
             // Start feed
-            videoCaptureDevice.NewFrame += new NewFrameEventHandler(videoSource_NewFrame);
-            videoCaptureDevice.Start();
+            videoSource.NewFrame += new NewFrameEventHandler(videoSource_NewFrame);
+            videoSource.Start();
 
             // Start image processing worker
             new RunWorkerDelegate(this.RunWorker).BeginInvoke(null, this);
 
             // start timer
             timer.Start( );
+        }
+
+        // Stop cameras
+        private void StopCameras()
+        {
+            timer.Stop();
+
+            if (currentVideoSource != null)
+            {
+                currentVideoSource.SignalToStop();
+                currentVideoSource.WaitForStop();
+            }
+
+            if (CWViewer1 != null)
+                CWViewer1.Close();
+            if (CWViewer2 != null)
+                CWViewer2.Close();
         }
 
         unsafe void videoSource_NewFrame(object sender, NewFrameEventArgs eArgs)
@@ -459,6 +518,7 @@ namespace Ceramics
             
             while (true)
             {
+                bool ajSuccess = false;
                 resetEvent.WaitOne();
 
                 frameMutex.WaitOne(); //RNM
@@ -466,7 +526,6 @@ namespace Ceramics
                 // Process image
                 this.workerStatus = WorkerStatus.Busy;
 
-                // RNM: Crashes every few minutes so move out of the loop!
                 if (processingImage.Width != grayBuffer.Width || processingImage.Height != grayBuffer.Height)
                     grayBuffer = new Bitmap(processingImage.Width, processingImage.Height, System.Drawing.Imaging.PixelFormat.Format8bppIndexed);
 
@@ -511,7 +570,6 @@ namespace Ceramics
                     bool ccSuccess = componentFinder.FindBlobs(grayBufferUMI);
 
                     // Create adjacency matrix
-                    bool ajSuccess = false;
                     if (ccSuccess)
                     {
                         ajSuccess = regionAdjacencyGraph.ConstructGraph(componentFinder.ObjectLabels, componentFinder.ObjectCount, processingImage.Width, processingImage.Height);
@@ -525,8 +583,6 @@ namespace Ceramics
                         if (permittedMarkerList != null)
                             permittedMarkerList.Clear();
                         this.workerStatus = WorkerStatus.Finished;
-                        resetEvent.Reset();
-                        frameMutex.ReleaseMutex();
                         continue;
                     }
 
@@ -590,6 +646,13 @@ namespace Ceramics
                 {
                     processingImage.UnlockBits(imageBD);
                     grayBuffer.UnlockBits(grayBufferBD);
+
+                    if (!ajSuccess)
+                    {
+                        resetEvent.Reset();
+                        frameMutex.ReleaseMutex();
+                    }
+
                 }
 
                 // Draw other UI components
@@ -636,22 +699,7 @@ namespace Ceramics
             return image.LockBits(new Rectangle(0, 0, image.Width, image.Height), ILM, image.PixelFormat);
         }
 
-        // Stop cameras
-        private void StopCameras( )
-        {
-            timer.Stop( );
-
-            if (videoCaptureDevice != null)
-            {
-                videoCaptureDevice.SignalToStop();
-                videoCaptureDevice.WaitForStop();
-            }
-            
-            if (CWViewer1 != null)
-                CWViewer1.Close();
-            if (CWViewer2 != null)
-                CWViewer2.Close();
-        }
+        
 
         // On timer tick - collect statistics
         private void timer_Tick( object sender, EventArgs e )
@@ -722,7 +770,7 @@ namespace Ceramics
         private void screenViewer1Button_Click(object sender, EventArgs e)
         {
             CWViewer1 = new ChildWindow(this.videoSource1Selection.SelectedIndex, 1, this);
-            CWViewer1.SetSources((VideoCaptureDevice)videoSourcePlayer1.VideoSource,
+            CWViewer1.SetSources(videoSourcePlayer1.VideoSource,
                 new VideoSourcePlayer.NewFrameHandler(this.videoSourcePlayer1_NewFrame),
                 new FormClosedEventHandler(ChildWindow1_FormClosed));
             this.videoSourcePlayer1.VideoSource = null;
@@ -731,7 +779,8 @@ namespace Ceramics
 
         private void ChildWindow1_FormClosed(object sender, FormClosedEventArgs e)
         {
-            this.videoSourcePlayer1.VideoSource = videoCaptureDevice;
+            //this.videoSourcePlayer1.VideoSource = cameraUSB;
+            this.videoSourcePlayer1.VideoSource = currentVideoSource;
             CWViewer1.Dispose();
             CWViewer1 = null;
         }
@@ -739,7 +788,7 @@ namespace Ceramics
         private void screenViewer2Button_Click(object sender, EventArgs e)
         {
             CWViewer2 = new ChildWindow(this.videoSource2Selection.SelectedIndex, 2, this);
-            CWViewer2.SetSources((VideoCaptureDevice)videoSourcePlayer2.VideoSource,
+            CWViewer2.SetSources(videoSourcePlayer2.VideoSource,
                 new VideoSourcePlayer.NewFrameHandler(this.videoSourcePlayer2_NewFrame),
                 new FormClosedEventHandler(ChildWindow2_FormClosed));
             this.videoSourcePlayer2.VideoSource = null;
@@ -748,7 +797,8 @@ namespace Ceramics
 
         private void ChildWindow2_FormClosed(object sender, FormClosedEventArgs e)
         {
-            this.videoSourcePlayer2.VideoSource = videoCaptureDevice;
+            //this.videoSourcePlayer2.VideoSource = cameraUSB;
+            this.videoSourcePlayer2.VideoSource = currentVideoSource;
             CWViewer2.Dispose();
             CWViewer2 = null;
         }
@@ -812,6 +862,26 @@ namespace Ceramics
 
                 // Convert histograms into probability maps
                 this.probabilityMap.CreateMaps();
+            }
+        }
+
+        private bool validateURL(string url)
+        {
+            try
+            {
+                //Creating the HttpWebRequest
+                HttpWebRequest request = WebRequest.Create(url) as HttpWebRequest;
+                //Setting the Request method HEAD, you can also use GET too.
+                request.Method = "HEAD";
+                //Getting the Web Response.
+                HttpWebResponse response = request.GetResponse() as HttpWebResponse;
+                //Returns TURE if the Status code == 200
+                return (response.StatusCode == HttpStatusCode.OK);
+            }
+            catch
+            {
+                //Any exception will returns false.
+                return false;
             }
         }
     }

@@ -50,7 +50,7 @@
         private void InitializeComponent( )
         {
             this.components = new System.ComponentModel.Container();
-            this.startButton = new System.Windows.Forms.Button();
+            this.USBCameraBtn = new System.Windows.Forms.Button();
             this.stopButton = new System.Windows.Forms.Button();
             this.timer = new System.Windows.Forms.Timer(this.components);
             this.addCodesButton = new System.Windows.Forms.Button();
@@ -76,20 +76,21 @@
             this.trainingFileLabel = new System.Windows.Forms.Label();
             this.captureScreen1 = new System.Windows.Forms.Button();
             this.captureScreen2 = new System.Windows.Forms.Button();
+            this.IPCameraBtn = new System.Windows.Forms.Button();
             this.trainingGroupBox.SuspendLayout();
             this.screenGroupBox.SuspendLayout();
             this.groupBox1.SuspendLayout();
             this.SuspendLayout();
             // 
-            // startButton
+            // USBCameraBtn
             // 
-            this.startButton.Location = new System.Drawing.Point(791, 446);
-            this.startButton.Name = "startButton";
-            this.startButton.Size = new System.Drawing.Size(122, 77);
-            this.startButton.TabIndex = 4;
-            this.startButton.Text = "&Start";
-            this.startButton.UseVisualStyleBackColor = true;
-            this.startButton.Click += new System.EventHandler(this.startButton_Click);
+            this.USBCameraBtn.Location = new System.Drawing.Point(790, 447);
+            this.USBCameraBtn.Name = "USBCameraBtn";
+            this.USBCameraBtn.Size = new System.Drawing.Size(122, 32);
+            this.USBCameraBtn.TabIndex = 4;
+            this.USBCameraBtn.Text = "&Start USB Camera";
+            this.USBCameraBtn.UseVisualStyleBackColor = true;
+            this.USBCameraBtn.Click += new System.EventHandler(this.USBCameraBtn_Click);
             // 
             // stopButton
             // 
@@ -349,12 +350,23 @@
             this.captureScreen2.UseVisualStyleBackColor = true;
             this.captureScreen2.Click += new System.EventHandler(this.captureScreen2_Click);
             // 
+            // IPCameraBtn
+            // 
+            this.IPCameraBtn.Location = new System.Drawing.Point(790, 490);
+            this.IPCameraBtn.Name = "IPCameraBtn";
+            this.IPCameraBtn.Size = new System.Drawing.Size(122, 32);
+            this.IPCameraBtn.TabIndex = 16;
+            this.IPCameraBtn.Text = "Select &IP Camera";
+            this.IPCameraBtn.UseVisualStyleBackColor = true;
+            this.IPCameraBtn.Click += new System.EventHandler(this.IPCameraBtn_Click);
+            // 
             // MainForm
             // 
             this.AutoScaleDimensions = new System.Drawing.SizeF(6F, 13F);
             this.AutoScaleMode = System.Windows.Forms.AutoScaleMode.Font;
             this.BackColor = System.Drawing.SystemColors.Control;
             this.ClientSize = new System.Drawing.Size(1053, 533);
+            this.Controls.Add(this.IPCameraBtn);
             this.Controls.Add(this.captureScreen2);
             this.Controls.Add(this.captureScreen1);
             this.Controls.Add(this.groupBox1);
@@ -368,7 +380,7 @@
             this.Controls.Add(this.cameraCombo);
             this.Controls.Add(this.videoSourcePlayer1);
             this.Controls.Add(this.stopButton);
-            this.Controls.Add(this.startButton);
+            this.Controls.Add(this.USBCameraBtn);
             this.FormBorderStyle = System.Windows.Forms.FormBorderStyle.FixedDialog;
             this.MaximizeBox = false;
             this.Name = "MainForm";
@@ -383,7 +395,7 @@
 
         #endregion
 
-        private System.Windows.Forms.Button startButton;
+        private System.Windows.Forms.Button USBCameraBtn;
         private System.Windows.Forms.Button stopButton;
         private System.Windows.Forms.Timer timer;
         private System.Windows.Forms.Button addCodesButton;
@@ -409,6 +421,7 @@
         private System.Windows.Forms.Label thresholdMethodLabel;
         private System.Windows.Forms.Button captureScreen1;
         private System.Windows.Forms.Button captureScreen2;
+        private System.Windows.Forms.Button IPCameraBtn;
     }
 }
 
