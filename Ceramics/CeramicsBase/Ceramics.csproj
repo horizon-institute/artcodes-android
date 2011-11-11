@@ -121,6 +121,7 @@
     <Compile Include="Program.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
     <Compile Include="RegionAdjacencyGraph.cs" />
+    <Compile Include="MarkerStreamProducer.cs" />
     <Compile Include="ThresholdTraining.cs">
       <SubType>Form</SubType>
     </Compile>

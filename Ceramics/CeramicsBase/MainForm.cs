@@ -106,7 +106,11 @@ namespace Ceramics
 
         // XML output
         XmlDocument xmlDocument;
-
+        private const String xmlDef = "<!DOCTYPE CERAMICS [<!ELEMENT STREAMS (STREAM+)><!ELEMENT STREAM (MARKER+)><!ELEMENT MARKER (EMPTY)><!ATTLIST STREAM DATE CDATA #REQUIRED><!ATTLIST STREAM ID CDATA #REQUIRED><!ATTLIST MARKER CODE CDATA #REQUIRED><!ATTLIST MARKER TIMESTAMP CDATA #REQUIRED><!ATTLIST MARKER X1 CDATA #REQUIRED><!ATTLIST MARKER Y1 CDATA #REQUIRED><!ATTLIST MARKER X2 CDATA #REQUIRED><!ATTLIST MARKER Y2 CDATA #REQUIRED>]><stream></stream>";
+        //XML streaming
+        private const int PORT = 8221;
+        private MakerStreamProducer markerStreamProducer;
+        
         public MainForm( )
         {
             InitializeComponent( );
@@ -142,10 +146,12 @@ namespace Ceramics
             // Probability maps
             probabilityMap = null;
 
-
+            //xml
+            markerStreamProducer = new MakerStreamProducer(PORT);
+            markerStreamProducer.Start();
             xmlDocument = new XmlDocument();
             xmlDocument.LoadXml("<!DOCTYPE CERAMICS [<!ELEMENT STREAMS (STREAM+)><!ELEMENT STREAM (MARKER+)><!ELEMENT MARKER (EMPTY)><!ATTLIST STREAM DATE CDATA #REQUIRED><!ATTLIST STREAM ID CDATA #REQUIRED><!ATTLIST MARKER CODE CDATA #REQUIRED><!ATTLIST MARKER TIMESTAMP CDATA #REQUIRED><!ATTLIST MARKER X1 CDATA #REQUIRED><!ATTLIST MARKER Y1 CDATA #REQUIRED><!ATTLIST MARKER X2 CDATA #REQUIRED><!ATTLIST MARKER Y2 CDATA #REQUIRED>]><stream></stream>");
-
+            
             XmlElement root = xmlDocument.DocumentElement;
             root.SetAttribute("date",DateTime.Now.Date.ToString().Substring(0,10));
             root.SetAttribute("id", "0001");
@@ -198,6 +204,7 @@ namespace Ceramics
         private void MainForm_FormClosing(object sender, FormClosingEventArgs e)
         {
             StopCameras( );
+            markerStreamProducer.Stop();
         }
 
         // On USB Camera button click
@@ -265,6 +272,9 @@ namespace Ceramics
         {
             StopCameras( );
 
+            //Stop sockets.
+            markerStreamProducer.Stop();
+            
             if (attachedUSBvideoDevices.Count > 0)
                 USBCameraBtn.Enabled = true;
             IPCameraBtn.Enabled = true;
@@ -601,6 +611,7 @@ namespace Ceramics
                     root.AppendChild(newElem);
                     */
 
+                    /*
                     string TimeStamp = DateTime.Now.TimeOfDay.ToString().Substring(0,12);
                     foreach (MarkerLabel ml in permittedMarkerList)
                     {
@@ -631,6 +642,13 @@ namespace Ceramics
                         newElement.Attributes.Append(x2);
                         newElement.Attributes.Append(y2);
                         xmlDocument.DocumentElement.AppendChild(newElement);
+                    }
+                     */
+
+                    if (permittedMarkerList.Count > 0)
+                    {
+                        String markerXml = prepareXmlData(permittedMarkerList);
+                        markerStreamProducer.SendData(markerXml);
                     }
                 }
                 catch (Exception e)
@@ -883,6 +901,46 @@ namespace Ceramics
                 //Any exception will returns false.
                 return false;
             }
+        }
+
+        private String prepareXmlData(List<MarkerLabel> permittedMarkerList)
+        {
+            XmlDocument markersXml = new XmlDocument();
+            markersXml.LoadXml(xmlDef);
+
+            string TimeStamp = DateTime.Now.TimeOfDay.ToString().Substring(0, 12);
+            foreach (MarkerLabel ml in permittedMarkerList)
+            {
+                BoundingBox bb = componentFinder.ObjectBoundingBoxes[ml.ID];
+
+                XmlNode newElement;
+                newElement = markersXml.CreateNode(XmlNodeType.Element, "marker", "");
+
+                // Attributes
+                XmlAttribute x1 = markersXml.CreateAttribute("x1");
+                x1.InnerText = bb.x1.ToString();
+                XmlAttribute x2 = markersXml.CreateAttribute("x2");
+                x2.InnerText = bb.x2.ToString();
+                XmlAttribute y1 = markersXml.CreateAttribute("y1");
+                y1.InnerText = bb.y1.ToString();
+                XmlAttribute y2 = markersXml.CreateAttribute("y2");
+                y2.InnerText = bb.y2.ToString();
+
+                XmlAttribute code = markersXml.CreateAttribute("code");
+                code.InnerText = ml.Code;
+
+                XmlAttribute timestamp = markersXml.CreateAttribute("timestamp");
+                timestamp.InnerText = TimeStamp;
+
+                newElement.Attributes.Append(timestamp);
+                newElement.Attributes.Append(code);
+                newElement.Attributes.Append(x1);
+                newElement.Attributes.Append(y1);
+                newElement.Attributes.Append(x2);
+                newElement.Attributes.Append(y2);
+                markersXml.DocumentElement.AppendChild(newElement);
+            }
+            return markersXml.ToString();
         }
     }
 }
