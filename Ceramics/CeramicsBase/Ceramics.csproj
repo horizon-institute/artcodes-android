@@ -95,6 +95,9 @@
       <SpecificVersion>False</SpecificVersion>
       <HintPath>..\..\..\Release\AForge.Video.DirectShow.dll</HintPath>
     </Reference>
+    <Reference Include="Newtonsoft.Json">
+      <HintPath>..\..\..\..\JsonNet\Bin\Net\Newtonsoft.Json.dll</HintPath>
+    </Reference>
     <Reference Include="System" />
     <Reference Include="System.Data" />
     <Reference Include="System.Deployment" />
@@ -110,6 +113,7 @@
       <DependentUpon>ChildWindow.cs</DependentUpon>
     </Compile>
     <Compile Include="ComponentFinder.cs" />
+    <Compile Include="JsonMarker.cs" />
     <Compile Include="MainForm.cs">
       <SubType>Form</SubType>
     </Compile>

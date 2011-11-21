@@ -36,6 +36,7 @@ using AForge.Video.DirectShow;
 using AForge.Controls;
 using AForge.Imaging.Filters;
 using System.Net;
+using Newtonsoft.Json;
 
 namespace Ceramics
 {
@@ -598,58 +599,6 @@ namespace Ceramics
 
                     detectedMarkerList = markerDetector.FindMarkers(componentFinder, regionAdjacencyGraph);
                     permittedMarkerList = markerDetector.PermitMarkers(detectedMarkerList, permittedCodes);
-
-
-                    // Add markers to XML document
-                    /*
-                    XmlNode newElem;
-                    newElem = doc.CreateNode(XmlNodeType.Element, "pages", "");
-                    newElem.InnerText = "290";
-
-                    Console.WriteLine("Add the new element to the document...");
-                    root = doc.DocumentElement;
-                    root.AppendChild(newElem);
-                    */
-
-                    /*
-                    string TimeStamp = DateTime.Now.TimeOfDay.ToString().Substring(0,12);
-                    foreach (MarkerLabel ml in permittedMarkerList)
-                    {
-                        BoundingBox bb = componentFinder.ObjectBoundingBoxes[ml.ID];
-                        XmlNode newElement;
-                        newElement = xmlDocument.CreateNode(XmlNodeType.Element, "marker", "");
-
-                        // Attributes
-                        XmlAttribute x1 = xmlDocument.CreateAttribute("x1");
-                        x1.InnerText = bb.x1.ToString();
-                        XmlAttribute x2 = xmlDocument.CreateAttribute("x2");
-                        x2.InnerText = bb.x2.ToString();
-                        XmlAttribute y1 = xmlDocument.CreateAttribute("y1");
-                        y1.InnerText = bb.y1.ToString();
-                        XmlAttribute y2 = xmlDocument.CreateAttribute("y2");
-                        y2.InnerText = bb.y2.ToString();
-
-                        XmlAttribute code = xmlDocument.CreateAttribute("code");
-                        code.InnerText = ml.Code;
-
-                        XmlAttribute timestamp = xmlDocument.CreateAttribute("timestamp");
-                        timestamp.InnerText = TimeStamp;
-
-                        newElement.Attributes.Append(timestamp);
-                        newElement.Attributes.Append(code);
-                        newElement.Attributes.Append(x1);
-                        newElement.Attributes.Append(y1);
-                        newElement.Attributes.Append(x2);
-                        newElement.Attributes.Append(y2);
-                        xmlDocument.DocumentElement.AppendChild(newElement);
-                    }
-                     */
-
-                    if (permittedMarkerList.Count > 0)
-                    {
-                        String markerXml = prepareXmlData(permittedMarkerList);
-                        markerStreamProducer.SendData(markerXml);
-                    }
                 }
                 catch (Exception e)
                 {
@@ -673,9 +622,14 @@ namespace Ceramics
 
                 }
 
-                // Draw other UI components
+                
                 if (detectedMarkerList != null && permittedMarkerList.Count > 0)
                 {
+
+                    //send marker xml.
+                    sendMarkerXml(permittedMarkerList);
+
+                    // Draw other UI components
                     using (Graphics g = Graphics.FromImage(processingImage))
                     {
                         Pen boundingBoxPen = new Pen(Color.Blue, 4.0f);
@@ -903,44 +857,61 @@ namespace Ceramics
             }
         }
 
-        private String prepareXmlData(List<MarkerLabel> permittedMarkerList)
+        private void sendMarkerXml(List<MarkerLabel> markers)
         {
-            XmlDocument markersXml = new XmlDocument();
-            markersXml.LoadXml(xmlDef);
-
-            string TimeStamp = DateTime.Now.TimeOfDay.ToString().Substring(0, 12);
-            foreach (MarkerLabel ml in permittedMarkerList)
+            foreach (MarkerLabel marker in markers)
             {
-                BoundingBox bb = componentFinder.ObjectBoundingBoxes[ml.ID];
-
-                XmlNode newElement;
-                newElement = markersXml.CreateNode(XmlNodeType.Element, "marker", "");
-
-                // Attributes
-                XmlAttribute x1 = markersXml.CreateAttribute("x1");
-                x1.InnerText = bb.x1.ToString();
-                XmlAttribute x2 = markersXml.CreateAttribute("x2");
-                x2.InnerText = bb.x2.ToString();
-                XmlAttribute y1 = markersXml.CreateAttribute("y1");
-                y1.InnerText = bb.y1.ToString();
-                XmlAttribute y2 = markersXml.CreateAttribute("y2");
-                y2.InnerText = bb.y2.ToString();
-
-                XmlAttribute code = markersXml.CreateAttribute("code");
-                code.InnerText = ml.Code;
-
-                XmlAttribute timestamp = markersXml.CreateAttribute("timestamp");
-                timestamp.InnerText = TimeStamp;
-
-                newElement.Attributes.Append(timestamp);
-                newElement.Attributes.Append(code);
-                newElement.Attributes.Append(x1);
-                newElement.Attributes.Append(y1);
-                newElement.Attributes.Append(x2);
-                newElement.Attributes.Append(y2);
-                markersXml.DocumentElement.AppendChild(newElement);
+                String jsonMarker = prepareJsonData(marker);
+                markerStreamProducer.SendData(jsonMarker);
             }
-            return markersXml.ToString();
+        }
+
+        private String prepareJsonData(MarkerLabel marker)
+        {
+            JsonMarker jsonMarker = new JsonMarker();
+            jsonMarker.timeStamp = DateTime.Now.ToString();
+            BoundingBox bb = componentFinder.ObjectBoundingBoxes[marker.ID];
+            jsonMarker.x1 = bb.x1;
+            jsonMarker.x2 = bb.x2;
+            jsonMarker.y1 = bb.y1;
+            jsonMarker.y2 = bb.y2;
+            jsonMarker.code = marker.Code;
+            return JsonConvert.SerializeObject(jsonMarker);
+        }
+
+        private String prepareXmlData(MarkerLabel marker)
+        {
+            XmlNode newElement;
+            XmlDocument markersXml = new XmlDocument();
+            //string TimeStamp = DateTime.Now.TimeOfDay.ToString().Substring(0, 12);
+            string TimeStamp = DateTime.Now.ToString();
+            BoundingBox bb = componentFinder.ObjectBoundingBoxes[marker.ID];
+
+            newElement = markersXml.CreateNode(XmlNodeType.Element, "marker", "");
+
+            // Attributes
+            XmlAttribute x1 = markersXml.CreateAttribute("x1");
+            x1.InnerText = bb.x1.ToString();
+            XmlAttribute x2 = markersXml.CreateAttribute("x2");
+            x2.InnerText = bb.x2.ToString();
+            XmlAttribute y1 = markersXml.CreateAttribute("y1");
+            y1.InnerText = bb.y1.ToString();
+            XmlAttribute y2 = markersXml.CreateAttribute("y2");
+            y2.InnerText = bb.y2.ToString();
+
+            XmlAttribute code = markersXml.CreateAttribute("code");
+            code.InnerText = marker.Code;
+
+            XmlAttribute timestamp = markersXml.CreateAttribute("timestamp");
+            timestamp.InnerText = TimeStamp;
+
+            newElement.Attributes.Append(timestamp);
+            newElement.Attributes.Append(code);
+            newElement.Attributes.Append(x1);
+            newElement.Attributes.Append(y1);
+            newElement.Attributes.Append(x2);
+            newElement.Attributes.Append(y2);
+            return newElement.OuterXml;
         }
     }
 }
