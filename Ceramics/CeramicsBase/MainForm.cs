@@ -869,14 +869,19 @@ namespace Ceramics
         private String prepareJsonData(MarkerLabel marker)
         {
             JsonMarker jsonMarker = new JsonMarker();
-            jsonMarker.timeStamp = DateTime.Now.ToString();
+            DateTime currentDateTime = DateTime.Now;
+            StringBuilder timestamp = new StringBuilder(currentDateTime.Date.ToString("yyyy-MM-dd"));
+            timestamp.Append(" ");
+            timestamp.Append(currentDateTime.TimeOfDay.ToString().Substring(0, 12));
+            jsonMarker.timestamp = timestamp.ToString();
             BoundingBox bb = componentFinder.ObjectBoundingBoxes[marker.ID];
             jsonMarker.x1 = bb.x1;
             jsonMarker.x2 = bb.x2;
             jsonMarker.y1 = bb.y1;
             jsonMarker.y2 = bb.y2;
             jsonMarker.code = marker.Code;
-            return JsonConvert.SerializeObject(jsonMarker);
+            StringBuilder json = new StringBuilder();
+            return json.AppendLine(JsonConvert.SerializeObject(jsonMarker)).ToString();
         }
 
         private String prepareXmlData(MarkerLabel marker)
