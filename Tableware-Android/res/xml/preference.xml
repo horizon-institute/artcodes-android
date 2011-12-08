@@ -1,0 +1,51 @@
+<?xml version="1.0" encoding="utf-8"?>
+<PreferenceScreen
+  xmlns:android="http://schemas.android.com/apk/res/android">
+  
+  <PreferenceCategory
+  	android:title="Dtouch Markers"
+  	android:key="dtouch_markers">
+  
+  	<EditTextPreference
+  		android:key="min_branches"
+  		android:title="Minimum Branches"
+  		android:summary="Please enter minimum number of dtouch branches"
+  		android:dialogTitle="Minimum Branches"
+  		android:dialogMessage="Minimum Branches"
+  		android:numeric="integer"
+  		android:maxLength="2"
+  		android:defaultValue="3" />
+	
+  	<EditTextPreference
+ 		android:key="max_branches"
+ 		android:title="Maximum Branches"
+ 		android:summary="Please enter maximum number of dtouch branches"
+ 		android:dialogTitle="Maximum Branches"
+ 		android:dialogMessage="Maximum Branches"
+ 		android:defaultValue="12" 
+ 		android:numeric="integer"
+  		android:maxLength="2"/>
+	
+	<EditTextPreference
+ 		android:key="max_empty_branches"
+ 		android:title="Maximum Empty Branches"
+ 		android:summary="Please enter maximum number of empty dtouch branches"
+ 		android:dialogTitle="Maximum Empty Branches"
+ 		android:dialogMessage="Maximum Empty Branches"
+ 		android:defaultValue="2" 
+ 		android:numeric="integer"
+  		android:maxLength="1"/>
+ 	
+ 	<EditTextPreference
+ 		android:key="max_leaves"
+ 		android:title="Maximum Leaves"
+ 		android:summary="Please enter the maximum number of dtouch leaves"
+ 		android:dialogTitle="Maximum Leaves"
+ 		android:dialogMessage="Maximum Leaves"
+ 		android:defaultValue="20"
+ 		android:numeric="integer"
+  		android:maxLength="3"/>	
+  
+  </PreferenceCategory>
+     
+</PreferenceScreen>

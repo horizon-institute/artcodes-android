@@ -9,32 +9,38 @@ import org.opencv.highgui.Highgui;
 import android.content.Context;
 import android.graphics.Bitmap;
 import android.graphics.Canvas;
+import android.util.AttributeSet;
 import android.util.Log;
 import android.view.SurfaceHolder;
 import android.view.SurfaceView;
 
 public abstract class TWSurfaceViewBase extends SurfaceView implements SurfaceHolder.Callback, Runnable {
-    private static final String TAG = "Sample::SurfaceView";
+    private static final String TAG = "Tableware::SurfaceView";
 
-    private SurfaceHolder       mHolder;
-    private VideoCapture        mCamera;
-    private volatile Thread		mThread;
+    private SurfaceHolder	mHolder;
+    private VideoCapture    mCamera;
+    private volatile Thread	mThread;
 
     public TWSurfaceViewBase(Context context) {
         super(context);
-        mHolder = getHolder();
+        setHolder();
+   }
+    
+    public TWSurfaceViewBase(Context context, AttributeSet attrs){
+    	super(context, attrs);
+    	setHolder();
+    }
+    
+    private void setHolder(){
+    	mHolder = getHolder();
         mHolder.addCallback(this);
-        Log.i(TAG, "Instantiated new " + this.getClass());
     }
 
     public void surfaceChanged(SurfaceHolder _holder, int format, int width, int height) {
-        Log.i(TAG, "surfaceCreated");
         synchronized (this) {
             if (mCamera != null && mCamera.isOpened()) {
-                Log.i(TAG, "before mCamera.getSupportedPreviewSizes()");
                 List<Size> sizes = mCamera.getSupportedPreviewSizes();
-                Log.i(TAG, "after mCamera.getSupportedPreviewSizes()");
-                
+                                
                 int frameWidth = width;
                 int frameHeight = height;
                 // selecting optimal camera preview size
@@ -53,7 +59,6 @@ public abstract class TWSurfaceViewBase extends SurfaceView implements SurfaceHo
     }
 
     public void surfaceCreated(SurfaceHolder holder) {
-        Log.i(TAG, "surfaceCreated");
         synchronized (this) {
         	mCamera = new VideoCapture(Highgui.CV_CAP_ANDROID);
         	if (mCamera.isOpened()) {
@@ -66,7 +71,6 @@ public abstract class TWSurfaceViewBase extends SurfaceView implements SurfaceHo
     }
 
     public void surfaceDestroyed(SurfaceHolder holder){
-        Log.i(TAG, "surfaceDestroyed");
         synchronized (this) {
         if (mCamera != null)
             this.stopCamera();
@@ -102,8 +106,6 @@ public abstract class TWSurfaceViewBase extends SurfaceView implements SurfaceHo
     }
     
     public void run() {
-        Log.i(TAG, "Starting processing thread");
-               
         try
         {
         	while (Thread.currentThread() == mThread) {
@@ -114,7 +116,6 @@ public abstract class TWSurfaceViewBase extends SurfaceView implements SurfaceHo
         				break;
 
         			if (!mCamera.grab()) {
-        				Log.e(TAG, "mCamera.grab() failed");
         				break;
         			}
         			if (Thread.currentThread().isInterrupted()){

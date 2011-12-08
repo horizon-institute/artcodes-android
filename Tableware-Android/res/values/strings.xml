@@ -1,5 +1,6 @@
 <?xml version="1.0" encoding="utf-8"?>
 <resources>
-    <string name="hello">Hello World, TablewareActivity!</string>
+    <string name="title">Food Spotter</string>
     <string name="app_name">Tableware</string>
+    <string name="progress_msg">Scanning. Please wait</string>
 </resources>

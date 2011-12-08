@@ -3,7 +3,7 @@
       package="uk.ac.horizon.tableware"
       android:versionCode="1"
       android:versionName="1.0">
-    <uses-sdk android:minSdkVersion="10" />
+    <uses-sdk android:minSdkVersion="8" />
     <supports-screens android:resizeable="true"
                      android:smallScreens="true" 
                      android:normalScreens="true" 
@@ -20,6 +20,9 @@
                 <category android:name="android.intent.category.LAUNCHER" />
             </intent-filter>
         </activity>
+        <activity android:name=".TWPreferenceActivity"
+        		android:configChanges="keyboardHidden|orientation"
+        		android:screenOrientation="landscape"/>
     </application>
     <uses-permission android:name="android.permission.CAMERA"/>
     <uses-feature android:name="android.hardware.camera" />

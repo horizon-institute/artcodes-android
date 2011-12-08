@@ -5,6 +5,8 @@ import java.util.List;
 
 import org.opencv.core.Mat;
 
+import android.content.Context;
+
 class MarkerLabel{
     public int ID;
     public String Code;
@@ -27,19 +29,11 @@ class MarkerDetector
 	private static final int NEXT_NODE = 0;
 	private static final int FIRST_NODE = 2;
 		
-	// Constants
-	private int minimumBranches;
-	private int maximumBranches;
-	private int maximumEmptyBranches;
-	private int maximumLeaves;
-		
-	public MarkerDetector()
+	private TWPreference preference;
+			
+	public MarkerDetector(Context context)
 	{
-		// Defaults
-		minimumBranches = 3;
-		maximumBranches = 12;
-		maximumEmptyBranches = 2;
-		maximumLeaves = 20;
+		preference = new TWPreference(context);
 	}
 	
 	public Boolean verifyRoot(int rootIndex, Mat rootNode, Mat hierarchy, Mat binaryImage, List<Integer> codes){
@@ -49,49 +43,44 @@ class MarkerDetector
 		int currentBranchIndex = -1;
 		BranchStatus status;
 		
-		//Check if the root region colour is according to the settings.
-		//if (checkRootNodeRegionColor(rootNode, binaryImage)){
-		if (true){
-			//get the nodes of the root node.
-			double[] nodes = hierarchy.get(0, rootIndex);
-			//get the first child node.
-			currentBranchIndex = (int)nodes[FIRST_NODE];
+		//get the nodes of the root node.
+		double[] nodes = hierarchy.get(0, rootIndex);
+		//get the first child node.
+		currentBranchIndex = (int)nodes[FIRST_NODE];
 
-			//if there is a branch node then verify branches.
-			if (currentBranchIndex >= 0 ){
-				//loop until there is a branch node.
-				while(currentBranchIndex >= 0){
-					//verify current branch.
-					status = verifyBranch(currentBranchIndex, hierarchy, codes);
-					//if branch is valid or empty.
-					if (status == BranchStatus.VALID || status == BranchStatus.EMPTY ){
-						branchCount++;
-						if (status == BranchStatus.EMPTY){
-							emptyBranchCount++;
-							if (emptyBranchCount > maximumEmptyBranches){
-								return false;
-							}
+		//if there is a branch node then verify branches.
+		if (currentBranchIndex >= 0 ){
+			//loop until there is a branch node.
+			while(currentBranchIndex >= 0){
+				//verify current branch.
+				status = verifyBranch(currentBranchIndex, hierarchy, codes);
+				//if branch is valid or empty.
+				if (status == BranchStatus.VALID || status == BranchStatus.EMPTY ){
+					branchCount++;
+					if (status == BranchStatus.EMPTY){
+						emptyBranchCount++;
+						if (emptyBranchCount > preference.getMaxEmptyBranches()){
+							return false;
 						}
-						//get next node. 
-						nodes = hierarchy.get(0, currentBranchIndex);
-						currentBranchIndex = (int)nodes[NEXT_NODE];
 					}
-					else if (status == BranchStatus.INVALID)
-						return false;
+					//get next node. 
+					nodes = hierarchy.get(0, currentBranchIndex);
+					currentBranchIndex = (int)nodes[NEXT_NODE];
 				}
-				if (emptyBranchCount > maximumEmptyBranches)
-					valid = false;
-				else if (branchCount >= minimumBranches && branchCount <= maximumBranches){
-					Collections.sort(codes);
-					valid = true;
-				}
+				else if (status == BranchStatus.INVALID)
+					return false;
+			}
+			if (emptyBranchCount > preference.getMaxEmptyBranches())
+				valid = false;
+			else if (branchCount >= preference.getMinBranches() && branchCount <= preference.getMaxBranches()){
+				Collections.sort(codes);
+				valid = true;
 			}
 		}
 		return valid;
 	}
-
+	
 	private BranchStatus verifyBranch(int branchIndex, Mat hierarchy, List<Integer> codes){
-		 
 		int leafCount = 0;
 		int currentLeafIndex = -1;
 		BranchStatus status = BranchStatus.INVALID;
@@ -116,7 +105,7 @@ class MarkerDetector
 		//if no leaf then the branch is empty.
 		if (leafCount == 0)
 			status = BranchStatus.EMPTY;
-		else if (leafCount <= maximumLeaves)
+		else if (leafCount <= preference.getMaxLeaves())
 			status = BranchStatus.VALID;
 		//add branch code.
 		codes.add(leafCount);
@@ -132,6 +121,5 @@ class MarkerDetector
 			valid = false;
 		}	
 		return valid;
-	}
-	
+	}	
 }
