@@ -15,9 +15,11 @@ import android.widget.ProgressBar;
 public class TablewareActivity extends Activity {
         
     public static final int	VIEW_MODE_MARKER  = 0;
+    public static final int	VIEW_MODE_TILE  = 1;
     public static final int VIEW_MODE_EDGES = 2;
         
     private MenuItem	mItemDetectMarkers;
+    private MenuItem	mItemTileImage;
     private MenuItem    mItemPreviewEdges;
     private MenuItem	mItemPreference;
     
@@ -48,6 +50,7 @@ public class TablewareActivity extends Activity {
     @Override
     public boolean onCreateOptionsMenu(Menu menu) {
         mItemDetectMarkers = menu.add("Detect Markers");
+        mItemTileImage = menu.add("Tile Image");
         mItemPreviewEdges = menu.add("Preview Edges");
         mItemPreference = menu.add("View Preferences");
         return true;
@@ -67,6 +70,8 @@ public class TablewareActivity extends Activity {
     public boolean onOptionsItemSelected(MenuItem item) {
         if (item == mItemDetectMarkers)
             viewMode = VIEW_MODE_MARKER;
+        else if (item == mItemTileImage)
+        	viewMode = VIEW_MODE_TILE;
         else if (item == mItemPreviewEdges)
             viewMode = VIEW_MODE_EDGES;
         else if (item == mItemPreference)
