@@ -14,12 +14,13 @@ import org.opencv.imgproc.Imgproc;
 
 import android.content.Context;
 import android.graphics.Bitmap;
+import android.graphics.Rect;
 import android.util.AttributeSet;
 import android.view.SurfaceHolder;
 
 class TWSurfaceView extends TWSurfaceViewBase {
-    private static final int NO_OF_TILES = 25; 
-	private Mat mRgba;
+    private static final int NO_OF_TILES = 2;
+    private Mat mRgba;
     private Mat mGray;
     private ArrayList<Mat> mComponents;
     private Mat mHierarchy;
@@ -61,6 +62,9 @@ class TWSurfaceView extends TWSurfaceViewBase {
 	       case TablewareActivity.VIEW_MODE_EDGES:
 	    	   	processFrameForEdges(capture);
 	    	   	break;
+	       case TablewareActivity.VIEW_MODE_TILE_SMALL_REGION:
+	    	   processFrameForTilesWithSmallRegion(capture);
+	    	   	break;
         }
 
         Bitmap bmp = Bitmap.createBitmap(mRgba.cols(), mRgba.rows(), Bitmap.Config.ARGB_8888);
@@ -78,6 +82,7 @@ class TWSurfaceView extends TWSurfaceViewBase {
     	Mat otsuMat = new Mat();
     	//Imgproc.threshold(mGray, otsuMat, 0, 255, Imgproc.THRESH_BINARY | Imgproc.THRESH_OTSU);
     	Mat thresholdedImgMat = new Mat(mGray.size(), mGray.type());
+    	
     	//Mat thresholdedImgMat = mGray.clone();
     	ArrayList<Double> localThresholds = thresholdImageTiles(mGray,thresholdedImgMat);
     	Imgproc.cvtColor(thresholdedImgMat, mRgba, Imgproc.COLOR_GRAY2BGRA, 4);    	
@@ -107,12 +112,69 @@ class TWSurfaceView extends TWSurfaceViewBase {
     	otsuMat.release();
     }
     
+    private void processFrameForTilesWithSmallRegion(VideoCapture capture){
+    	capture.retrieve(mRgba, Highgui.CV_CAP_ANDROID_COLOR_FRAME_RGBA);
+        //Get gray scale image.
+    	capture.retrieve(mGray, Highgui.CV_CAP_ANDROID_GREY_FRAME);
+    	    	
+    	Mat processInputMat = calculateImageToProcess(mGray);
+    	Mat thresholdedImgMat = new Mat(processInputMat.size(), processInputMat.type());
+    	    	
+    	ArrayList<Double> localThresholds = thresholdImageTiles(processInputMat,thresholdedImgMat);
+    	
+    	Mat smallRegionImg = new Mat();
+    	Imgproc.cvtColor(thresholdedImgMat, smallRegionImg, Imgproc.COLOR_GRAY2BGRA, 4);
+    	
+    	copyThresholdedImageToImgMat(smallRegionImg, mRgba);
+    	smallRegionImg.release();
+    	
+    	Scalar contourColor = new Scalar(0, 0, 255);
+    	Scalar codesColor = new Scalar(255,0,0,255);
+    	displayMarkers(thresholdedImgMat, contourColor, codesColor);
+    	displayThresholds(mRgba, codesColor, localThresholds);
+    	
+    	//Imgproc.cvtColor(thresholdedImgMat, mRgba, Imgproc.COLOR_GRAY2BGRA, 4);
+    	
+    	    	
+    	/*
+    	Scalar contourColor = new Scalar(0, 0, 255);
+    	Scalar codesColor = new Scalar(255,0,0,255);
+    	displayMarkers(thresholdedImgMat, contourColor, codesColor);
+    	displayThresholds(mRgba, codesColor, localThresholds);*/
+    	//Imgproc.cvtColor(thresholdedImgMat, mRgba, Imgproc.COLOR_GRAY2BGRA, 4);
+    	//displayMarkers(otsuMat, contourColor, codesColor);
+    	
+    	thresholdedImgMat.release();
+    }
+    
     private void processFrameForEdges(VideoCapture capture){
 	   	Mat cannyMat = new Mat();
 	   	capture.retrieve(mGray, Highgui.CV_CAP_ANDROID_GREY_FRAME);
 	   	Imgproc.Canny(mGray, cannyMat, 80, 100);
 	   	Imgproc.cvtColor(cannyMat, mRgba, Imgproc.COLOR_GRAY2BGRA, 4);
 	   	cannyMat.release();
+    }
+    
+    private Mat calculateImageToProcess(Mat imgMat){
+    	Rect rect = calculateImageProcessArea(imgMat);
+        Mat calculatedImg = imgMat.submat(rect.top, rect.bottom,rect.left,rect.right);
+    	return calculatedImg.clone();
+    }
+    
+    private Rect calculateImageProcessArea(Mat imgMat){
+       	int left = imgMat.cols() / 4;
+        int top = imgMat.rows() / 4;
+
+        int right = left + imgMat.cols() / 2 ;
+        int bottom =  top + imgMat.rows() / 2;
+        
+        return new Rect(left, top, right, bottom);
+    }
+    
+    private void copyThresholdedImageToImgMat(Mat src, Mat dest){
+    	Rect rect = calculateImageProcessArea(dest);
+    	Mat destsubMat = dest.submat(rect.top,rect.bottom, rect.left, rect.right);
+    	src.copyTo(destsubMat);
     }
     
     private ArrayList<Double> thresholdImageTiles(Mat ImgMat, Mat outputImgMat){
