@@ -7,6 +7,7 @@ import org.opencv.android.Utils;
 import org.opencv.core.Core;
 import org.opencv.core.Mat;
 import org.opencv.core.Point;
+import org.opencv.core.Rect;
 import org.opencv.core.Scalar;
 import org.opencv.highgui.Highgui;
 import org.opencv.highgui.VideoCapture;
@@ -14,7 +15,6 @@ import org.opencv.imgproc.Imgproc;
 
 import android.content.Context;
 import android.graphics.Bitmap;
-import android.graphics.Rect;
 import android.util.AttributeSet;
 import android.view.SurfaceHolder;
 
@@ -51,20 +51,15 @@ class TWSurfaceView extends TWSurfaceViewBase {
 
     @Override
     protected Bitmap processFrame(VideoCapture capture) {
-        
-    	switch (TablewareActivity.viewMode) {
+      	switch (TablewareActivity.viewMode) {
            case TablewareActivity.VIEW_MODE_MARKER:
 	        	processFrameForMarkers(capture);
 	            break;
-           case TablewareActivity.VIEW_MODE_TILE:
-	        	processFrameForTiles(capture);
+           case TablewareActivity.VIEW_MODE_MARKER_DEBUG:
+        	   processFrameForMarkersDebug(capture);
 	            break;
-	       case TablewareActivity.VIEW_MODE_EDGES:
-	    	   	processFrameForEdges(capture);
-	    	   	break;
-	       case TablewareActivity.VIEW_MODE_TILE_SMALL_REGION:
-	    	   processFrameForTilesWithSmallRegion(capture);
-	    	   	break;
+	       default:
+	    	    break;
         }
 
         Bitmap bmp = Bitmap.createBitmap(mRgba.cols(), mRgba.rows(), Bitmap.Config.ARGB_8888);
@@ -74,110 +69,89 @@ class TWSurfaceView extends TWSurfaceViewBase {
         return null;
     }
     
-    private void processFrameForTiles(VideoCapture capture){
-    	capture.retrieve(mRgba, Highgui.CV_CAP_ANDROID_COLOR_FRAME_RGBA);
-        //Get gray scale image.
-    	capture.retrieve(mGray, Highgui.CV_CAP_ANDROID_GREY_FRAME);
-    	//Otsu threshold. Threshold values are ignored if Otsu threshold is used.
-    	Mat otsuMat = new Mat();
-    	//Imgproc.threshold(mGray, otsuMat, 0, 255, Imgproc.THRESH_BINARY | Imgproc.THRESH_OTSU);
-    	Mat thresholdedImgMat = new Mat(mGray.size(), mGray.type());
-    	
-    	//Mat thresholdedImgMat = mGray.clone();
-    	ArrayList<Double> localThresholds = thresholdImageTiles(mGray,thresholdedImgMat);
-    	Imgproc.cvtColor(thresholdedImgMat, mRgba, Imgproc.COLOR_GRAY2BGRA, 4);    	
-    	    	
-    	
-    	Scalar contourColor = new Scalar(0, 0, 255);
-    	Scalar codesColor = new Scalar(255,0,0,255);
-    	displayMarkers(thresholdedImgMat, contourColor, codesColor);
-    	displayThresholds(mRgba, codesColor, localThresholds);
-    	//Imgproc.cvtColor(thresholdedImgMat, mRgba, Imgproc.COLOR_GRAY2BGRA, 4);
-    	//displayMarkers(otsuMat, contourColor, codesColor);
-    	otsuMat.release();
-    	thresholdedImgMat.release();
-    }
-    
     private void processFrameForMarkers(VideoCapture capture){
+    	//Get original image.
     	capture.retrieve(mRgba, Highgui.CV_CAP_ANDROID_COLOR_FRAME_RGBA);
         //Get gray scale image.
-    	capture.retrieve(mGray, Highgui.CV_CAP_ANDROID_GREY_FRAME);
-    	//Otsu threshold. Threshold values are ignored if Otsu threshold is used.
-    	Mat otsuMat = new Mat();
-    	Imgproc.threshold(mGray, otsuMat, 0, 255, Imgproc.THRESH_BINARY | Imgproc.THRESH_OTSU);
-    	Imgproc.cvtColor(otsuMat, mRgba, Imgproc.COLOR_GRAY2BGRA, 4);
-    	Scalar contourColor = new Scalar(0, 0, 255);
-    	Scalar codesColor = new Scalar(255,0,0,255);
-    	displayMarkers(otsuMat, contourColor, codesColor);
-    	otsuMat.release();
-    }
-    
-    private void processFrameForTilesWithSmallRegion(VideoCapture capture){
-    	capture.retrieve(mRgba, Highgui.CV_CAP_ANDROID_COLOR_FRAME_RGBA);
-        //Get gray scale image.
-    	capture.retrieve(mGray, Highgui.CV_CAP_ANDROID_GREY_FRAME);
-    	    	
-    	Mat processInputMat = calculateImageToProcess(mGray);
-    	Mat thresholdedImgMat = new Mat(processInputMat.size(), processInputMat.type());
-    	    	
-    	ArrayList<Double> localThresholds = thresholdImageTiles(processInputMat,thresholdedImgMat);
+       	capture.retrieve(mGray, Highgui.CV_CAP_ANDROID_GREY_FRAME);
+       	displayRectOnImageSegment(mRgba);
+    	//Get image segment to detect marker. 	
+    	Mat imgSegmentMat = cloneImageSegmentToDetectMarker(mGray);
+    	//apply threshold.
+    	Mat thresholdedImgMat = new Mat(imgSegmentMat.size(), imgSegmentMat.type());
+    	ArrayList<Double> localThresholds = applyThresholdOnImage(imgSegmentMat,thresholdedImgMat);
+    	imgSegmentMat.release();
     	
-    	Mat smallRegionImg = new Mat();
-    	Imgproc.cvtColor(thresholdedImgMat, smallRegionImg, Imgproc.COLOR_GRAY2BGRA, 4);
+    	/*********************************************************************************
+    	//find markers.
+    	 * TO DO
+    	 *************************************************************************************/
+    	List<DtouchMarker> dtouchMarkers = findMarkers(thresholdedImgMat);
     	
-    	copyThresholdedImageToImgMat(smallRegionImg, mRgba);
-    	smallRegionImg.release();
-    	
-    	Scalar contourColor = new Scalar(0, 0, 255);
+      	Scalar contourColor = new Scalar(0, 0, 255);
     	Scalar codesColor = new Scalar(255,0,0,255);
     	displayMarkers(thresholdedImgMat, contourColor, codesColor);
-    	displayThresholds(mRgba, codesColor, localThresholds);
-    	
-    	//Imgproc.cvtColor(thresholdedImgMat, mRgba, Imgproc.COLOR_GRAY2BGRA, 4);
-    	
-    	    	
-    	/*
-    	Scalar contourColor = new Scalar(0, 0, 255);
-    	Scalar codesColor = new Scalar(255,0,0,255);
-    	displayMarkers(thresholdedImgMat, contourColor, codesColor);
-    	displayThresholds(mRgba, codesColor, localThresholds);*/
-    	//Imgproc.cvtColor(thresholdedImgMat, mRgba, Imgproc.COLOR_GRAY2BGRA, 4);
-    	//displayMarkers(otsuMat, contourColor, codesColor);
     	
     	thresholdedImgMat.release();
     }
     
-    private void processFrameForEdges(VideoCapture capture){
-	   	Mat cannyMat = new Mat();
-	   	capture.retrieve(mGray, Highgui.CV_CAP_ANDROID_GREY_FRAME);
-	   	Imgproc.Canny(mGray, cannyMat, 80, 100);
-	   	Imgproc.cvtColor(cannyMat, mRgba, Imgproc.COLOR_GRAY2BGRA, 4);
-	   	cannyMat.release();
+    private void processFrameForMarkersDebug(VideoCapture capture){
+    	//Get original image.
+    	capture.retrieve(mRgba, Highgui.CV_CAP_ANDROID_COLOR_FRAME_RGBA);
+        //Get gray scale image.
+    	capture.retrieve(mGray, Highgui.CV_CAP_ANDROID_GREY_FRAME);
+    	//Get image segment to detect marker.    	
+    	Mat imgSegmentMat = cloneImageSegmentToDetectMarker(mGray);
+    	//apply threshold.
+    	Mat thresholdedImgMat = new Mat(imgSegmentMat.size(), imgSegmentMat.type());
+    	ArrayList<Double> localThresholds = applyThresholdOnImage(imgSegmentMat,thresholdedImgMat);
+    	imgSegmentMat.release();
+    	
+      	copyThresholdedImageToRgbImgMat(thresholdedImgMat, mRgba);
+      	  	
+    	Scalar contourColor = new Scalar(0, 0, 255);
+    	Scalar codesColor = new Scalar(255,0,0,255);
+    	displayMarkersDebug(thresholdedImgMat, contourColor, codesColor);
+    	displayThresholds(mRgba, codesColor, localThresholds);
+    	
+    	thresholdedImgMat.release();
     }
     
-    private Mat calculateImageToProcess(Mat imgMat){
-    	Rect rect = calculateImageProcessArea(imgMat);
-        Mat calculatedImg = imgMat.submat(rect.top, rect.bottom,rect.left,rect.right);
+    private Mat cloneImageSegmentToDetectMarker(Mat imgMat){
+    	Rect rect = calculateImageSegmentArea(imgMat);
+        Mat calculatedImg = imgMat.submat(rect.y, rect.y + rect.height,rect.x,rect.x + rect.width);
     	return calculatedImg.clone();
     }
-    
-    private Rect calculateImageProcessArea(Mat imgMat){
-       	int left = imgMat.cols() / 4;
-        int top = imgMat.rows() / 4;
-
-        int right = left + imgMat.cols() / 2 ;
-        int bottom =  top + imgMat.rows() / 2;
         
-        return new Rect(left, top, right, bottom);
+    private Rect calculateImageSegmentArea(Mat imgMat){
+       	int x = imgMat.cols() / 4;
+        int y = imgMat.rows() / 4;
+
+        int width = imgMat.cols() / 2 ;
+        int height = imgMat.rows() / 2;
+        
+        return new Rect(x, y, width, height);
     }
     
-    private void copyThresholdedImageToImgMat(Mat src, Mat dest){
-    	Rect rect = calculateImageProcessArea(dest);
-    	Mat destsubMat = dest.submat(rect.top,rect.bottom, rect.left, rect.right);
-    	src.copyTo(destsubMat);
+    private void displayRectOnImageSegment(Mat imgMat){
+    	Scalar color = new Scalar(255,0,0,255);
+    	Rect rect = calculateImageSegmentArea(imgMat);
+    	Core.rectangle(imgMat, rect.tl(), rect.br(), color, 3, Core.LINE_AA);
     }
     
-    private ArrayList<Double> thresholdImageTiles(Mat ImgMat, Mat outputImgMat){
+    private void copyThresholdedImageToRgbImgMat(Mat thresholdedImgMat, Mat dest){
+    	//convert thresholded image segment to RGB. 
+    	Mat smallRegionImg = new Mat();
+    	Imgproc.cvtColor(thresholdedImgMat, smallRegionImg, Imgproc.COLOR_GRAY2BGRA, 4);
+    	//find location of image segment to be replaced in the destination image.
+    	Rect rect = calculateImageSegmentArea(dest);
+    	Mat destSubmat = dest.submat(rect.y,rect.y + rect.height, rect.x, rect.x + rect.width);
+    	//copy image.
+    	smallRegionImg.copyTo(destSubmat);
+    	smallRegionImg.release();
+    }
+    
+    private ArrayList<Double> applyThresholdOnImage(Mat srcImgMat, Mat outputImgMat){
     	double localThreshold;
     	int startRow;
     	int endRow;
@@ -186,8 +160,10 @@ class TWSurfaceView extends TWSurfaceViewBase {
     	    	
     	ArrayList<Double> localThresholds = new ArrayList<Double>();
     	
-    	int tileWidth = (int)ImgMat.size().height / NO_OF_TILES;
-    	int tileHeight = (int)ImgMat.size().width / NO_OF_TILES;
+    	int tileWidth = (int)srcImgMat.size().height / NO_OF_TILES;
+    	int tileHeight = (int)srcImgMat.size().width / NO_OF_TILES;
+    	
+    	//Split image into tiles and apply threshold on each image tile separately.
     	
     	//process image tiles other than the last one.
     	for (int tileRowCount = 0; tileRowCount < NO_OF_TILES; tileRowCount++){
@@ -195,17 +171,17 @@ class TWSurfaceView extends TWSurfaceViewBase {
     		if (tileRowCount < NO_OF_TILES - 1)
     			endRow = (tileRowCount + 1) * tileWidth;
     		else
-    			endRow = (int)ImgMat.size().height;
+    			endRow = (int)srcImgMat.size().height;
     		
     		for (int tileColCount = 0; tileColCount < NO_OF_TILES; tileColCount++){
     			startCol = tileColCount * tileHeight;
     			if (tileColCount < NO_OF_TILES -1 )
     				endCol = (tileColCount + 1) * tileHeight;
     			else
-    				endCol = (int)ImgMat.size().width;
+    				endCol = (int)srcImgMat.size().width;
     			
     			Mat tileThreshold = new Mat();
-    			Mat tileMat = ImgMat.submat(startRow, endRow, startCol, endCol);
+    			Mat tileMat = srcImgMat.submat(startRow, endRow, startCol, endCol);
     			localThreshold = Imgproc.threshold(tileMat, tileThreshold, 0, 255, Imgproc.THRESH_BINARY | Imgproc.THRESH_OTSU);
     			Mat copyMat = outputImgMat.submat(startRow, endRow, startCol, endCol);
     			tileThreshold.copyTo(copyMat);
@@ -217,31 +193,53 @@ class TWSurfaceView extends TWSurfaceViewBase {
     	return localThresholds;
     }
     
-    private void displayMarkers(Mat inputMat, Scalar contourColor, Scalar codesColor){
-    	Mat contourImg = inputMat.clone();
+    private List<DtouchMarker> findMarkers(Mat imgMat){
+    	List<DtouchMarker> dtouchMarkers = new ArrayList<DtouchMarker>();
+    	Mat contourImg = imgMat.clone();
     	//Find blobs using connect component.
     	Imgproc.findContours(contourImg, mComponents, mHierarchy, Imgproc.RETR_TREE, Imgproc.CHAIN_APPROX_NONE);
     	//No need to use contourImg so release it.
     	contourImg.release();
-        
-    	List<Integer> codes = new ArrayList<Integer>();
-    	Mat contour = null;
-    	Point contourLocation = null;
     	
+    	List<Integer> codes = new ArrayList<Integer>();
+    	    	
     	for (int i = 0; i < mComponents.size(); i++){
-    		contour = mComponents.get(i);
     		//clean this list.
     		codes.clear();
-    		if (markerDetector.verifyRoot(i, mComponents.get(i), mHierarchy,inputMat,codes)){
-    			String code = codeArrayToString(codes);
-    			Imgproc.drawContours(mRgba, mComponents, i, contourColor, 3, 8, mHierarchy, 0);
-    			//Get contour location.
-    			contourLocation = new Point(contour.get(0,0));
-    			Core.putText(mRgba, code, contourLocation, Core.FONT_HERSHEY_COMPLEX, 1, codesColor,3);
+    		if (markerDetector.verifyRoot(i, mComponents.get(i), mHierarchy,imgMat,codes)){
+    			//if marker found then add in return list.
+    			if (dtouchMarkers == null){
+    				dtouchMarkers = new ArrayList<DtouchMarker>();
+    			}
+    			dtouchMarkers.add(new DtouchMarker(mComponents.get(i),i, codes));
     		}
 		}
+    	return dtouchMarkers;
     }
     
+    private void displayMarkers(Mat imgMat, Scalar contourColor, Scalar codesColor){
+    	List<DtouchMarker> markers = findMarkers(imgMat);
+    	
+    	for (DtouchMarker marker : markers){
+    		String code = codeArrayToString(marker.getCode());
+    		//Get contour location.
+    		Point contourLocation = new Point(marker.getComponent().get(0,0));
+    		Core.putText(mRgba, code, contourLocation, Core.FONT_HERSHEY_COMPLEX, 1, codesColor,3);
+    	}
+    }
+    
+    private void displayMarkersDebug(Mat imgMat, Scalar contourColor, Scalar codesColor){
+    	List<DtouchMarker> markers = findMarkers(imgMat);
+    	
+    	for (DtouchMarker marker : markers){
+    		String code = codeArrayToString(marker.getCode());
+    		Imgproc.drawContours(mRgba, mComponents, marker.getComponentIndex(), contourColor, 3, 8, mHierarchy, 0);
+    		//Get contour location.
+    		Point contourLocation = new Point(marker.getComponent().get(0,0));
+    		Core.putText(mRgba, code, contourLocation, Core.FONT_HERSHEY_COMPLEX, 1, codesColor,3);
+    	}
+    }
+
     private void displayThresholds(Mat ImgMat, Scalar thresholdColor, ArrayList<Double> thresholds){
     	Point thresholdLocation = new Point(10.0,20.0);
     	int yOffset = 30;
@@ -253,7 +251,6 @@ class TWSurfaceView extends TWSurfaceViewBase {
     		i++;
     	}
     }
-    
     
     private String codeArrayToString(List<Integer> codes){
     	StringBuffer code = new StringBuffer();

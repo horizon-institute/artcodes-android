@@ -42,7 +42,7 @@ class MarkerDetector
 		int emptyBranchCount = 0;
 		int currentBranchIndex = -1;
 		BranchStatus status;
-		
+				
 		//get the nodes of the root node.
 		double[] nodes = hierarchy.get(0, rootIndex);
 		//get the first child node.
@@ -73,13 +73,17 @@ class MarkerDetector
 			if (emptyBranchCount > preference.getMaxEmptyBranches())
 				valid = false;
 			else if (branchCount >= preference.getMinBranches() && branchCount <= preference.getMaxBranches()){
-				Collections.sort(codes);
-				valid = true;
+				if (verifyMarkerConstraint(codes)){
+					Collections.sort(codes);
+					valid = true;
+				}else
+					valid = false;
 			}
 		}
 		return valid;
 	}
 	
+		
 	private BranchStatus verifyBranch(int branchIndex, Mat hierarchy, List<Integer> codes){
 		int leafCount = 0;
 		int currentLeafIndex = -1;
@@ -121,5 +125,10 @@ class MarkerDetector
 			valid = false;
 		}	
 		return valid;
-	}	
+	}
+	
+	private Boolean verifyMarkerConstraint(List<Integer> codes){
+		MarkerConstraint markerConstraint = new MarkerConstraint(preference,codes);
+		return markerConstraint.verifyMarkerCode();
+	}
 }

@@ -5,16 +5,24 @@ import android.content.SharedPreferences;
 import android.preference.PreferenceManager;
 
 public class TWPreference {
-		
-	private static int DEFAULT_MIN_BRANCHES = 3;
-	private static int DEFAULT_MAX_BRANCHES = 12;
-	private static int DEFAULT_MAX_EMPTY_BRANCHES = 2;
-	private static int DEFAULT_MAX_LEAVES = 20;
+	
+	//branches default values
+	private static int DEFAULT_MIN_BRANCHES = 8;
+	private static int DEFAULT_MAX_BRANCHES = 8;
+	private static int DEFAULT_MAX_EMPTY_BRANCHES = 0;
+	private static int DEFAULT_VALIDATION_BRANCHES = 4;
+	//leaves default values
+	private static int DEFAULT_MAX_LEAVES = 10;
+	private static int DEFAULT_VALIDATION_BRANCH_LEAVES = 1;
+	private static int DEFAULT_CHECKSUM_MODULO = 10;
 	
 	private static String MIN_BRANCHES = "min_branches";
 	private static String MAX_BRANCHES = "max_branches";
-	private static String MAX_EMPTY_BRANCHES = "max_empty_branches";
+	private static String EMPTY_BRANCHES = "empty_branches";
 	private static String MAX_LEAVES = "max_leaves";
+	private static String VALIDATION_BRANCHES = "validation_branches";
+	private static String VALIDATION_BRANCH_LEAVES = "validation_branch_leaves";
+	private static String CHECKSUM_MODULO = "checksum_modulo";
 	
 	private Context mContext;
 	
@@ -45,10 +53,20 @@ public class TWPreference {
 	public int getMaxEmptyBranches(){
 		int value = -1;
 		SharedPreferences sharedPrefs  = PreferenceManager.getDefaultSharedPreferences(mContext);
-		if (sharedPrefs.contains(MAX_EMPTY_BRANCHES))
-			value = Integer.parseInt(sharedPrefs.getString(MAX_EMPTY_BRANCHES, Integer.toString(DEFAULT_MAX_EMPTY_BRANCHES)));
+		if (sharedPrefs.contains(EMPTY_BRANCHES))
+			value = Integer.parseInt(sharedPrefs.getString(EMPTY_BRANCHES, Integer.toString(DEFAULT_MAX_EMPTY_BRANCHES)));
 		else
 			value = DEFAULT_MAX_EMPTY_BRANCHES;
+		return value;
+	}
+	
+	public int getValidationBranches(){
+		int value = -1;
+		SharedPreferences sharedPrefs  = PreferenceManager.getDefaultSharedPreferences(mContext);
+		if (sharedPrefs.contains(VALIDATION_BRANCHES))
+			value = Integer.parseInt(sharedPrefs.getString(VALIDATION_BRANCHES, Integer.toString(DEFAULT_VALIDATION_BRANCHES)));
+		else
+			value = DEFAULT_VALIDATION_BRANCHES;
 		return value;
 	}
 	
@@ -59,6 +77,26 @@ public class TWPreference {
 			value = Integer.parseInt(sharedPrefs.getString(MAX_LEAVES, Integer.toString(DEFAULT_MAX_LEAVES)));
 		else
 			value = DEFAULT_MAX_LEAVES;
+		return value;
+	}
+		
+	public int getValidationBranchLeaves(){
+		int value = -1;
+		SharedPreferences sharedPrefs  = PreferenceManager.getDefaultSharedPreferences(mContext);
+		if (sharedPrefs.contains(VALIDATION_BRANCH_LEAVES))
+			value = Integer.parseInt(sharedPrefs.getString(VALIDATION_BRANCH_LEAVES, Integer.toString(DEFAULT_VALIDATION_BRANCH_LEAVES)));
+		else
+			value = DEFAULT_VALIDATION_BRANCH_LEAVES;
+		return value;
+	}
+	
+	public int getChecksumModulo(){
+		int value = -1;
+		SharedPreferences sharedPrefs  = PreferenceManager.getDefaultSharedPreferences(mContext);
+		if (sharedPrefs.contains(CHECKSUM_MODULO))
+			value = Integer.parseInt(sharedPrefs.getString(CHECKSUM_MODULO, Integer.toString(DEFAULT_CHECKSUM_MODULO)));
+		else
+			value = DEFAULT_CHECKSUM_MODULO;
 		return value;
 	}
 	

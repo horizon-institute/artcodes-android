@@ -3,59 +3,34 @@ package uk.ac.horizon.tableware;
 import android.app.Activity;
 import android.content.Intent;
 import android.os.Bundle;
-import android.view.LayoutInflater;
 import android.view.Menu;
 import android.view.MenuItem;
-import android.view.View;
 import android.view.Window;
-import android.widget.Button;
-import android.widget.FrameLayout;
-import android.widget.ProgressBar;
 
 public class TablewareActivity extends Activity {
         
     public static final int	VIEW_MODE_MARKER  = 0;
-    public static final int	VIEW_MODE_TILE  = 1;
-    public static final int	VIEW_MODE_TILE_SMALL_REGION  = 2;
-    public static final int VIEW_MODE_EDGES = 3;
-        
-    private MenuItem	mItemDetectMarkers;
-    private MenuItem	mItemTileImage;
-    private MenuItem	mItemTileImageWithSmallRegion;
-    private MenuItem    mItemPreviewEdges;
+    public static final int	VIEW_MODE_MARKER_DEBUG  = 1;
+            
+    private MenuItem	mItemDetectMarker;
+    private MenuItem	mItemDetectMarkerDebug;
     private MenuItem	mItemPreference;
     
     public static int viewMode  = VIEW_MODE_MARKER;
-    private boolean mVisible;
-
+    
     
     @Override
     public void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         requestWindowFeature(Window.FEATURE_NO_TITLE);
         setContentView(R.layout.main);
-        initScan();
-    }
-    
-    private void initScan(){
-    	final Button scanButton = (Button) findViewById(R.id.scanButton);
-    	scanButton.setOnClickListener(new View.OnClickListener() {
-    	    public void onClick(View v) {
-    	    	if (mVisible)
-    	    		hideProgressControls();
-    	    	else
-    	    		showProgressControls();
-     	    }
-    	});
     }
     
     @Override
     public boolean onCreateOptionsMenu(Menu menu) {
-        mItemDetectMarkers = menu.add("Detect Markers");
-        mItemTileImage = menu.add("Tile Image");
-        mItemTileImageWithSmallRegion = menu.add("Tile Image with Small Region");
-        mItemPreviewEdges = menu.add("Preview Edges");
-        mItemPreference = menu.add("View Preferences");
+        mItemDetectMarker = menu.add(R.string.detect_marker);
+        mItemDetectMarkerDebug = menu.add(R.string.detect_marker_debug);
+        mItemPreference = menu.add(R.string.view_preferences);
         return true;
     }
     
@@ -71,14 +46,10 @@ public class TablewareActivity extends Activity {
 
     @Override
     public boolean onOptionsItemSelected(MenuItem item) {
-        if (item == mItemDetectMarkers)
+        if (item == mItemDetectMarker)
             viewMode = VIEW_MODE_MARKER;
-        else if (item == mItemTileImage)
-        	viewMode = VIEW_MODE_TILE;
-        else if (item == mItemTileImageWithSmallRegion)
-        	viewMode = VIEW_MODE_TILE_SMALL_REGION;
-        else if (item == mItemPreviewEdges)
-            viewMode = VIEW_MODE_EDGES;
+        else if (item == mItemDetectMarkerDebug)
+        	viewMode = VIEW_MODE_MARKER_DEBUG;
         else if (item == mItemPreference)
         {
         	
@@ -90,21 +61,6 @@ public class TablewareActivity extends Activity {
     private void displayPreferences(){
     	Intent intent = new Intent(this, TWPreferenceActivity.class);
 		startActivity(intent);
-    }
-    
-    private void showProgressControls(){
-    	FrameLayout frameLayout = (FrameLayout) findViewById(R.id.frameLayout1);
-    	LayoutInflater inflater = getLayoutInflater();
-    	inflater.inflate(R.layout.scanprogress, frameLayout);
-    	mVisible = true;
-   }
-    
-    private void hideProgressControls(){
-    	FrameLayout frameLayout = (FrameLayout) findViewById(R.id.frameLayout1);
-    	ProgressBar progressBar = (ProgressBar) findViewById(R.id.scanProgressBar);
-    	frameLayout.removeView(progressBar);
-    	progressBar = null;
-    	mVisible = false;
     }
     
 }

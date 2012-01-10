@@ -21,21 +21,26 @@ public final class R {
         public static final int title=0x7f020007;
     }
     public static final class id {
-        public static final int MainLayout=0x7f060000;
-        public static final int MarkerSurfaceView=0x7f060003;
-        public static final int RelativeLayout2=0x7f060002;
-        public static final int frameLayout1=0x7f060001;
-        public static final int scanButton=0x7f060004;
-        public static final int scanProgressBar=0x7f060005;
+        public static final int MarkerLayout=0x7f060000;
+        public static final int MarkerSurfaceView=0x7f060001;
     }
     public static final class layout {
         public static final int main=0x7f030000;
-        public static final int scanprogress=0x7f030001;
     }
     public static final class string {
         public static final int app_name=0x7f050001;
+        public static final int checksum_modulo=0x7f050009;
+        public static final int detect_marker=0x7f05000a;
+        public static final int detect_marker_debug=0x7f05000b;
+        public static final int empty_branches=0x7f050005;
+        public static final int max_branches=0x7f050004;
+        public static final int max_leaves=0x7f050007;
+        public static final int min_branches=0x7f050003;
         public static final int progress_msg=0x7f050002;
         public static final int title=0x7f050000;
+        public static final int validation_branch_leaves=0x7f050008;
+        public static final int validation_branches=0x7f050006;
+        public static final int view_preferences=0x7f05000c;
     }
     public static final class xml {
         public static final int preference=0x7f040000;
