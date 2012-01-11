@@ -100,9 +100,14 @@ public abstract class TWSurfaceViewBase extends SurfaceView implements SurfaceHo
     	}
     }
     
+        
     private synchronized void stopCamera(){
     	mCamera.release();
         mCamera = null;
+    }
+    
+    public void stopProcessing(){
+    	stopThread();
     }
     
     public void run() {

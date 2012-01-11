@@ -25,13 +25,25 @@ class TWSurfaceView extends TWSurfaceViewBase {
     private ArrayList<Mat> mComponents;
     private Mat mHierarchy;
     private MarkerDetector markerDetector;
+    private OnMarkerDetectedListener markerListener;
 
+    /*Define interface to call back when marker is detected:
+     * 
+     */
+    public interface OnMarkerDetectedListener{
+    		void onMarkerDetected(List<DtouchMarker> markers);
+    }
+    
     public TWSurfaceView(Context context) {
         super(context);
     }
     
     public TWSurfaceView(Context context, AttributeSet attrs){
     	super(context, attrs);
+    }
+    
+    public void setOnMarkerDetectedListener(OnMarkerDetectedListener listener){
+    	this.markerListener = listener;
     }
 
     @Override
@@ -79,20 +91,19 @@ class TWSurfaceView extends TWSurfaceViewBase {
     	Mat imgSegmentMat = cloneImageSegmentToDetectMarker(mGray);
     	//apply threshold.
     	Mat thresholdedImgMat = new Mat(imgSegmentMat.size(), imgSegmentMat.type());
-    	ArrayList<Double> localThresholds = applyThresholdOnImage(imgSegmentMat,thresholdedImgMat);
+    	applyThresholdOnImage(imgSegmentMat,thresholdedImgMat);
     	imgSegmentMat.release();
-    	
-    	/*********************************************************************************
     	//find markers.
-    	 * TO DO
-    	 *************************************************************************************/
     	List<DtouchMarker> dtouchMarkers = findMarkers(thresholdedImgMat);
-    	
-      	Scalar contourColor = new Scalar(0, 0, 255);
-    	Scalar codesColor = new Scalar(255,0,0,255);
-    	displayMarkers(thresholdedImgMat, contourColor, codesColor);
-    	
     	thresholdedImgMat.release();
+    	//Marker detected.
+    	if (dtouchMarkers.size() > 0){
+    		//display codes on the original image.
+    		displayMarkerCodes(mRgba, dtouchMarkers);
+    		if (markerListener != null){
+    			markerListener.onMarkerDetected(dtouchMarkers);
+    		}
+    	}
     }
     
     private void processFrameForMarkersDebug(VideoCapture capture){
@@ -217,14 +228,12 @@ class TWSurfaceView extends TWSurfaceViewBase {
     	return dtouchMarkers;
     }
     
-    private void displayMarkers(Mat imgMat, Scalar contourColor, Scalar codesColor){
-    	List<DtouchMarker> markers = findMarkers(imgMat);
-    	
+    private void displayMarkerCodes(Mat imgMat, List<DtouchMarker> markers){
+    	Scalar codesColor = new Scalar(255,0,0,255);
     	for (DtouchMarker marker : markers){
     		String code = codeArrayToString(marker.getCode());
-    		//Get contour location.
-    		Point contourLocation = new Point(marker.getComponent().get(0,0));
-    		Core.putText(mRgba, code, contourLocation, Core.FONT_HERSHEY_COMPLEX, 1, codesColor,3);
+    		Point codeLocation = new Point(imgMat.cols() / 4, imgMat.rows()/8);
+    		Core.putText(imgMat, code, codeLocation, Core.FONT_HERSHEY_COMPLEX, 1, codesColor,3);
     	}
     }
     

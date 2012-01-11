@@ -1,5 +1,8 @@
 package uk.ac.horizon.tableware;
 
+import java.util.List;
+
+import uk.ac.horizon.tableware.TWSurfaceView.OnMarkerDetectedListener;
 import android.app.Activity;
 import android.content.Intent;
 import android.os.Bundle;
@@ -7,7 +10,7 @@ import android.view.Menu;
 import android.view.MenuItem;
 import android.view.Window;
 
-public class TablewareActivity extends Activity {
+public class TablewareActivity extends Activity implements OnMarkerDetectedListener{
         
     public static final int	VIEW_MODE_MARKER  = 0;
     public static final int	VIEW_MODE_MARKER_DEBUG  = 1;
@@ -24,6 +27,7 @@ public class TablewareActivity extends Activity {
         super.onCreate(savedInstanceState);
         requestWindowFeature(Window.FEATURE_NO_TITLE);
         setContentView(R.layout.main);
+        initTWSurfaceViewListener();
     }
     
     @Override
@@ -36,11 +40,14 @@ public class TablewareActivity extends Activity {
     
     @Override
     public void onPause(){
+    	stopMarkerDetectionProcess();
     	super.onPause();
+    	
     }
     
     @Override
     public void onStop(){
+    	stopMarkerDetectionProcess();
     	super.onStop();
     }
 
@@ -62,5 +69,22 @@ public class TablewareActivity extends Activity {
     	Intent intent = new Intent(this, TWPreferenceActivity.class);
 		startActivity(intent);
     }
+    
+    private void stopMarkerDetectionProcess(){
+    	TWSurfaceView surfaceView = (TWSurfaceView) findViewById(R.id.MarkerSurfaceView);
+    	surfaceView.stopProcessing();
+    }
+   
+    public void onMarkerDetected(List<DtouchMarker> markers){
+		Intent intent = new Intent(this, TWBrowseMarkerActivity.class);
+		startActivity(intent);
+	}
+      
+    private void initTWSurfaceViewListener(){
+    	TWSurfaceView surfaceView = (TWSurfaceView) findViewById(R.id.MarkerSurfaceView);
+    	surfaceView.setOnMarkerDetectedListener(this);
+    }
+    
+    
     
 }
