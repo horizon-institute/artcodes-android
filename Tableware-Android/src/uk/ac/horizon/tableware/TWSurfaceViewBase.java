@@ -7,20 +7,18 @@ import org.opencv.highgui.VideoCapture;
 import org.opencv.highgui.Highgui;
 
 import android.content.Context;
-import android.graphics.Bitmap;
-import android.graphics.Canvas;
 import android.util.AttributeSet;
-import android.util.Log;
 import android.view.SurfaceHolder;
 import android.view.SurfaceView;
 
 public abstract class TWSurfaceViewBase extends SurfaceView implements SurfaceHolder.Callback, Runnable {
-    private static final String TAG = "Tableware::SurfaceView";
-
-    private SurfaceHolder	mHolder;
-    private VideoCapture    mCamera;
-    private volatile Thread	mThread;
-
+    protected static final String TAG = "Tableware::SurfaceView";
+ 
+    protected SurfaceHolder	mHolder;
+    protected VideoCapture    mCamera;
+    protected volatile Thread	mThread;
+    protected boolean mIsSurfaceValid;
+        
     public TWSurfaceViewBase(Context context) {
         super(context);
         setHolder();
@@ -38,6 +36,7 @@ public abstract class TWSurfaceViewBase extends SurfaceView implements SurfaceHo
 
     public void surfaceChanged(SurfaceHolder _holder, int format, int width, int height) {
         synchronized (this) {
+        	mIsSurfaceValid = true;
             if (mCamera != null && mCamera.isOpened()) {
                 List<Size> sizes = mCamera.getSupportedPreviewSizes();
                                 
@@ -59,28 +58,16 @@ public abstract class TWSurfaceViewBase extends SurfaceView implements SurfaceHo
     }
 
     public void surfaceCreated(SurfaceHolder holder) {
-        synchronized (this) {
-        	mCamera = new VideoCapture(Highgui.CV_CAP_ANDROID);
-        	if (mCamera.isOpened()) {
-        		this.startThread();
-        	} else {
-        		this.stopCamera();
-        		Log.e(TAG, "Failed to open native camera");
-        	}
-        }
+    	mIsSurfaceValid = true;
+    	this.startProcessing();
     }
 
     public void surfaceDestroyed(SurfaceHolder holder){
-        synchronized (this) {
-        if (mCamera != null)
-            this.stopCamera();
-         if (mThread != null)
-            this.stopThread();
-        }
+    	mIsSurfaceValid = false;
+    	this.stopProcessing();
     }
 
-    protected abstract Bitmap processFrame(VideoCapture capture);
-    
+    //protected abstract Bitmap processFrame(VideoCapture capture);
     private synchronized void startThread(){
     	if (mThread != null){
     		this.stopThread();
@@ -106,41 +93,34 @@ public abstract class TWSurfaceViewBase extends SurfaceView implements SurfaceHo
         mCamera = null;
     }
     
-    public void stopProcessing(){
-    	stopThread();
+    protected abstract void initData();
+    protected abstract void releaseData();
+    
+    public boolean startProcessing(){
+    	boolean started;
+    	synchronized (this) {
+    		initData();
+    		if (mIsSurfaceValid){
+    			if (mCamera == null)
+    				mCamera = new VideoCapture(Highgui.CV_CAP_ANDROID);
+    			if (mCamera.isOpened()){
+    				this.startThread();
+    				started = true;
+    			}else
+    				started = false;
+    		}else
+    			started = false;
+    	}
+    	return started;
     }
     
-    public void run() {
-        try
-        {
-        	while (Thread.currentThread() == mThread) {
-        		Bitmap bmp = null;
-        		
-        		synchronized (this) {
-        			if (mCamera == null)
-        				break;
-
-        			if (!mCamera.grab()) {
-        				break;
-        			}
-        			if (Thread.currentThread().isInterrupted()){
-        				throw new InterruptedException("Thread interrupted.");
-        			}
-        			bmp = processFrame(mCamera);
-        		}
-        		if (bmp != null && mCamera != null) {
-        			Canvas canvas = mHolder.lockCanvas();
-        			if (canvas != null) {
-        				canvas.drawBitmap(bmp, (canvas.getWidth() - bmp.getWidth()) / 2, (canvas.getHeight() - bmp.getHeight()) / 2, null);
-        				mHolder.unlockCanvasAndPost(canvas);
-        			}
-        			bmp.recycle();
-        		}
-        	}
-        } catch(Throwable t){
-        	Log.i(TAG, "Camera processing stopped due to interrupt");
-        }
-
-        Log.i(TAG, "Finishing processing thread");
+    public void stopProcessing(){
+    	synchronized (this) {
+    		if (mThread != null)
+    			this.stopThread();
+    		if (mCamera != null)
+    			this.stopCamera();
+    		releaseData();
+    	}
     }
 }

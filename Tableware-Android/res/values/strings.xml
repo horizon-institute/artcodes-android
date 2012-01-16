@@ -13,4 +13,7 @@
 	<string name="detect_marker">Detect Marker</string>
 	<string name="detect_marker_debug">Detect Marker Debug</string>
 	<string name="view_preferences">View Preferences</string>
+	<string name="marker_identified_msg">Marker identified. Do you want to know more about it?</string>
+	<string name="marker_alert_yes">Yes</string>
+	<string name="marker_alert_no">No</string>
 </resources>

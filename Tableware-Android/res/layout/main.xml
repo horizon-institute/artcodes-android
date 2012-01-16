@@ -1,7 +1,7 @@
 <LinearLayout android:id="@+id/MarkerLayout"
 	android:layout_width="fill_parent" android:layout_height="fill_parent"
 	xmlns:android="http://schemas.android.com/apk/res/android">
-	<view class="uk.ac.horizon.tableware.TWSurfaceView" 
+	<view class="uk.ac.horizon.tableware.TWMarkerSurfaceView" 
 		android:id="@+id/MarkerSurfaceView"
 		android:layout_width="wrap_content" 
 		android:layout_height="wrap_content"/>

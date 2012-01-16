@@ -2,18 +2,20 @@ package uk.ac.horizon.tableware;
 
 import java.util.List;
 
-import uk.ac.horizon.tableware.TWSurfaceView.OnMarkerDetectedListener;
-import android.app.Activity;
+import uk.ac.horizon.tableware.TWMarkerSurfaceView.OnMarkerDetectedListener;
 import android.content.Intent;
+import android.net.Uri;
 import android.os.Bundle;
+import android.support.v4.app.FragmentActivity;
 import android.view.Menu;
 import android.view.MenuItem;
 import android.view.Window;
 
-public class TablewareActivity extends Activity implements OnMarkerDetectedListener{
+public class TablewareActivity extends FragmentActivity implements OnMarkerDetectedListener{
         
     public static final int	VIEW_MODE_MARKER  = 0;
     public static final int	VIEW_MODE_MARKER_DEBUG  = 1;
+    static final int DIALOG_MARKER_DETECTION_ID = 0;
             
     private MenuItem	mItemDetectMarker;
     private MenuItem	mItemDetectMarkerDebug;
@@ -71,20 +73,44 @@ public class TablewareActivity extends Activity implements OnMarkerDetectedListe
     }
     
     private void stopMarkerDetectionProcess(){
-    	TWSurfaceView surfaceView = (TWSurfaceView) findViewById(R.id.MarkerSurfaceView);
+    	TWMarkerSurfaceView surfaceView = (TWMarkerSurfaceView) findViewById(R.id.MarkerSurfaceView);
     	surfaceView.stopProcessing();
+    }
+    
+    private void resumeMarkerDetectionProcess(){
+    	TWMarkerSurfaceView surfaceView = (TWMarkerSurfaceView) findViewById(R.id.MarkerSurfaceView);
+    	surfaceView.startProcessing();
     }
    
     public void onMarkerDetected(List<DtouchMarker> markers){
-		Intent intent = new Intent(this, TWBrowseMarkerActivity.class);
-		startActivity(intent);
+    	stopMarkerDetectionProcess();
+    	
+    	/*TWMarkerAlertDialogFragment frag = TWMarkerAlertDialogFragment.newInstance(R.string.app_name);
+    	frag.show(this.getSupportFragmentManager(), "DIALOG");*/
+    	Intent intent = new Intent(this,TWMarkerResultActivity.class);
+    	DtouchMarker marker = markers.get(0);
+    	Bundle markerBundle = marker.createMarkerBundleFromCode(marker);
+       	intent.putExtras(markerBundle);
+    	startActivity(intent);
 	}
-      
+    
+ 
+    
+    public void displayMarkerDetail(TWMarkerAlertDialogFragment frag){
+     	frag.dismiss();
+    	Intent intent = new Intent(this, TWBrowseMarkerActivity.class);
+    	startActivity(intent);
+    }
+    
+    public void cancelAlertDialogFragment(TWMarkerAlertDialogFragment frag){
+    	frag.dismiss();
+    	resumeMarkerDetectionProcess();
+    }
+    
     private void initTWSurfaceViewListener(){
-    	TWSurfaceView surfaceView = (TWSurfaceView) findViewById(R.id.MarkerSurfaceView);
+    	TWMarkerSurfaceView surfaceView = (TWMarkerSurfaceView) findViewById(R.id.MarkerSurfaceView);
     	surfaceView.setOnMarkerDetectedListener(this);
     }
     
-    
-    
+   
 }
