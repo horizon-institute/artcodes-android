@@ -91,7 +91,7 @@ public class DtouchMarker {
 		return mDesc;
 	}
 	
-	public Bundle createMarkerBundleFromCode(DtouchMarker marker){
+	public static Bundle createMarkerBundleFromCode(DtouchMarker marker){
 	   	Bundle markerBundle = new Bundle();
 	   	markerBundle.putString("Code", marker.getCodeKey());
 	   	return markerBundle;

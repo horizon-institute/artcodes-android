@@ -30,6 +30,9 @@
         <activity android:name=".TWMarkerResultActivity"
         		android:label="@string/app_name"
         		android:screenOrientation="unspecified"/>
+        <activity android:name=".TWMemberActivity"
+        		android:label="@string/menu_member_info"
+        		android:screenOrientation="unspecified"/>
     </application>
     <uses-permission android:name="android.permission.CAMERA"/>
     <uses-permission android:name="android.permission.INTERNET"/>

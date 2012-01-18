@@ -15,10 +15,12 @@ import org.opencv.imgproc.Imgproc;
 
 import android.content.Context;
 import android.graphics.Bitmap;
+import android.graphics.Canvas;
 import android.util.AttributeSet;
+import android.util.Log;
 import android.view.SurfaceHolder;
 
-class TWSurfaceView extends TWSurfaceViewBase {
+class TWMarkerSurfaceView extends TWSurfaceViewBase {
     private static final int NO_OF_TILES = 2;
     private Mat mRgba;
     private Mat mGray;
@@ -26,7 +28,7 @@ class TWSurfaceView extends TWSurfaceViewBase {
     private Mat mHierarchy;
     private MarkerDetector markerDetector;
     private OnMarkerDetectedListener markerListener;
-
+            
     /*Define interface to call back when marker is detected:
      * 
      */
@@ -34,11 +36,11 @@ class TWSurfaceView extends TWSurfaceViewBase {
     		void onMarkerDetected(List<DtouchMarker> markers);
     }
     
-    public TWSurfaceView(Context context) {
+    public TWMarkerSurfaceView(Context context) {
         super(context);
     }
     
-    public TWSurfaceView(Context context, AttributeSet attrs){
+    public TWMarkerSurfaceView(Context context, AttributeSet attrs){
     	super(context, attrs);
     }
     
@@ -51,21 +53,10 @@ class TWSurfaceView extends TWSurfaceViewBase {
         super.surfaceChanged(_holder, format, width, height);
     }
     
-    public void surfaceCreated(SurfaceHolder holder) {
-    	super.surfaceCreated(holder);
-    	initData();
-    }
-    
-    public void surfaceDestroyed(SurfaceHolder holder) {
-    	super.surfaceDestroyed(holder);
-    	releaseData();
-    }
-
-    @Override
-    protected Bitmap processFrame(VideoCapture capture) {
+    private Bitmap processFrame(VideoCapture capture, List<DtouchMarker> markers) {
       	switch (TablewareActivity.viewMode) {
            case TablewareActivity.VIEW_MODE_MARKER:
-	        	processFrameForMarkers(capture);
+	        	processFrameForMarkers(capture, markers);
 	            break;
            case TablewareActivity.VIEW_MODE_MARKER_DEBUG:
         	   processFrameForMarkersDebug(capture);
@@ -81,7 +72,7 @@ class TWSurfaceView extends TWSurfaceViewBase {
         return null;
     }
     
-    private void processFrameForMarkers(VideoCapture capture){
+    private List<DtouchMarker> processFrameForMarkers(VideoCapture capture, List<DtouchMarker> markers){
     	//Get original image.
     	capture.retrieve(mRgba, Highgui.CV_CAP_ANDROID_COLOR_FRAME_RGBA);
         //Get gray scale image.
@@ -94,16 +85,14 @@ class TWSurfaceView extends TWSurfaceViewBase {
     	applyThresholdOnImage(imgSegmentMat,thresholdedImgMat);
     	imgSegmentMat.release();
     	//find markers.
-    	List<DtouchMarker> dtouchMarkers = findMarkers(thresholdedImgMat);
+    	findMarkers(thresholdedImgMat, markers);
     	thresholdedImgMat.release();
     	//Marker detected.
-    	if (dtouchMarkers.size() > 0){
+    	if (markers.size() > 0){
     		//display codes on the original image.
-    		displayMarkerCodes(mRgba, dtouchMarkers);
-    		if (markerListener != null){
-    			markerListener.onMarkerDetected(dtouchMarkers);
-    		}
+    		displayMarkerCodes(mRgba, markers);
     	}
+    	return markers;
     }
     
     private void processFrameForMarkersDebug(VideoCapture capture){
@@ -204,8 +193,7 @@ class TWSurfaceView extends TWSurfaceViewBase {
     	return localThresholds;
     }
     
-    private List<DtouchMarker> findMarkers(Mat imgMat){
-    	List<DtouchMarker> dtouchMarkers = new ArrayList<DtouchMarker>();
+    private void findMarkers(Mat imgMat, List<DtouchMarker> markers){
     	Mat contourImg = imgMat.clone();
     	//Find blobs using connect component.
     	Imgproc.findContours(contourImg, mComponents, mHierarchy, Imgproc.RETR_TREE, Imgproc.CHAIN_APPROX_NONE);
@@ -219,13 +207,14 @@ class TWSurfaceView extends TWSurfaceViewBase {
     		codes.clear();
     		if (markerDetector.verifyRoot(i, mComponents.get(i), mHierarchy,imgMat,codes)){
     			//if marker found then add in return list.
-    			if (dtouchMarkers == null){
-    				dtouchMarkers = new ArrayList<DtouchMarker>();
+    			if (markers != null){
+    				DtouchMarker marker = new DtouchMarker(codes);
+    				marker.setComponent(mComponents.get(i));
+    				marker.setComponentIndex(i);
+    				markers.add(marker);
     			}
-    			dtouchMarkers.add(new DtouchMarker(mComponents.get(i),i, codes));
     		}
 		}
-    	return dtouchMarkers;
     }
     
     private void displayMarkerCodes(Mat imgMat, List<DtouchMarker> markers){
@@ -238,7 +227,8 @@ class TWSurfaceView extends TWSurfaceViewBase {
     }
     
     private void displayMarkersDebug(Mat imgMat, Scalar contourColor, Scalar codesColor){
-    	List<DtouchMarker> markers = findMarkers(imgMat);
+    	List<DtouchMarker> markers = new ArrayList<DtouchMarker>();
+    	findMarkers(imgMat, markers);
     	
     	for (DtouchMarker marker : markers){
     		String code = codeArrayToString(marker.getCode());
@@ -271,13 +261,50 @@ class TWSurfaceView extends TWSurfaceViewBase {
     	return code.toString();
     }
     
-    @Override
     public void run() {
-        super.run();
+        try
+        {
+        	while (Thread.currentThread() == mThread) {
+        		Bitmap bmp = null;
+        		List<DtouchMarker> dtouchMarkers = new ArrayList<DtouchMarker>();
+        		
+        		synchronized (this) {
+        			if (mCamera == null)
+        				break;
+
+        			if (!mCamera.grab()) {
+        				break;
+        			}
+        			if (Thread.currentThread().isInterrupted()){
+        				throw new InterruptedException("Thread interrupted.");
+        			}
+        			bmp = processFrame(mCamera, dtouchMarkers);
+        		}
+        		if (bmp != null && mCamera != null) {
+        			Canvas canvas = mHolder.lockCanvas();
+        			if (canvas != null) {
+        				canvas.drawBitmap(bmp, (canvas.getWidth() - bmp.getWidth()) / 2, (canvas.getHeight() - bmp.getHeight()) / 2, null);
+        				mHolder.unlockCanvasAndPost(canvas);
+        			}
+        			bmp.recycle();
+        		}
+        		if (dtouchMarkers != null && dtouchMarkers.size() > 0){
+        			if (markerListener != null){
+            			markerListener.onMarkerDetected(dtouchMarkers);
+            			break;
+            		}
+        		}
+        	}
+        } catch(Throwable t){
+        	Log.i(TAG, "Camera processing stopped due to interrupt");
+        }
+        
+        Log.i(TAG, "Finishing processing thread");
         releaseData();
-    }
+    }    
     
-    private void initData(){
+    @Override
+    protected void initData(){
     	releaseData();
         
     	synchronized (this) {
@@ -290,7 +317,8 @@ class TWSurfaceView extends TWSurfaceViewBase {
     	markerDetector = new MarkerDetector(this.getContext());
     }
     
-    private void releaseData(){
+    @Override
+    protected void releaseData(){
         synchronized (this) {
             // Explicitly deallocate Mats
             if (mRgba != null)

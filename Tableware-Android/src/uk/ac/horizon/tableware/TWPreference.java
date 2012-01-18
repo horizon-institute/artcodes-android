@@ -23,6 +23,7 @@ public class TWPreference {
 	private static String VALIDATION_BRANCHES = "validation_branches";
 	private static String VALIDATION_BRANCH_LEAVES = "validation_branch_leaves";
 	private static String CHECKSUM_MODULO = "checksum_modulo";
+	private static String MEMBER_NAME = "member_name";
 	
 	private Context mContext;
 	
@@ -97,6 +98,14 @@ public class TWPreference {
 			value = Integer.parseInt(sharedPrefs.getString(CHECKSUM_MODULO, Integer.toString(DEFAULT_CHECKSUM_MODULO)));
 		else
 			value = DEFAULT_CHECKSUM_MODULO;
+		return value;
+	}
+	
+	public String getMemberName(){
+		String value = "";
+		SharedPreferences sharedPrefs  = PreferenceManager.getDefaultSharedPreferences(mContext);
+		if (sharedPrefs.contains(MEMBER_NAME))
+			value = sharedPrefs.getString(MEMBER_NAME, "");
 		return value;
 	}
 	

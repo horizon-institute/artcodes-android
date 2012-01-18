@@ -1,7 +1,7 @@
 <?xml version="1.0" encoding="utf-8"?>
 <resources>
-    <string name="title">Food Spotter</string>
-    <string name="app_name">Tableware</string>
+    <string name="title">Busaba Eathai</string>
+    <string name="app_name">Busaba Eathai</string>
     <string name="progress_msg">Scanning. Please wait</string>
     <string name="min_branches">min_branches</string>
     <string name="max_branches">max_branches</string>
@@ -16,4 +16,7 @@
 	<string name="marker_identified_msg">Marker identified. Do you want to know more about it?</string>
 	<string name="marker_alert_yes">Yes</string>
 	<string name="marker_alert_no">No</string>
+	<string name="marker_desc_undefined">Marker is not defined.</string>
+	<string name="member_name">member_name</string>
+	<string name="menu_member_info">Member Card</string>
 </resources>

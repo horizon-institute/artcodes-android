@@ -1,0 +1,12 @@
+<?xml version="1.0" encoding="utf-8"?>
+<RelativeLayout android:id="@+id/relativeLayout1"
+	android:layout_width="fill_parent" android:layout_height="fill_parent"
+	xmlns:android="http://schemas.android.com/apk/res/android">
+	<TextView android:layout_height="wrap_content" android:id="@+id/markerDescription" android:textAppearance="?android:attr/textAppearanceMedium" android:text="Prawn" android:layout_width="wrap_content" android:layout_below="@+id/markerDescriptionCaption" android:layout_centerHorizontal="true"></TextView>
+	<TextView android:layout_height="wrap_content" android:id="@+id/markerCodeCaption" android:textAppearance="?android:attr/textAppearanceMedium" android:text="Marker Code" android:layout_width="wrap_content" android:layout_alignParentTop="true" android:layout_centerHorizontal="true" android:layout_marginTop="10dp"></TextView>
+	<TextView android:textAppearance="?android:attr/textAppearanceMedium" android:id="@+id/markerCode" android:layout_height="wrap_content" android:text="1:1:1:1:4:6:6:6" android:layout_width="wrap_content" android:layout_below="@+id/markerCodeCaption" android:layout_alignLeft="@+id/markerCodeCaption"></TextView>
+	<TextView android:textAppearance="?android:attr/textAppearanceMedium" android:id="@+id/markerDescriptionCaption" android:layout_height="wrap_content" android:text="Marker Description" android:layout_width="wrap_content" android:layout_below="@+id/markerCode" android:layout_centerHorizontal="true" android:layout_marginTop="23dp"></TextView>
+	<TextView android:textAppearance="?android:attr/textAppearanceMedium" android:id="@+id/confirmationMessage" android:layout_height="wrap_content" android:text="Would you like to know more about this marker?" android:layout_width="wrap_content" android:layout_below="@+id/markerDescription" android:layout_alignParentLeft="true" android:layout_marginTop="37dp"></TextView>
+	<Button android:text="Yes" android:layout_height="wrap_content" android:id="@+id/yesbtn" android:layout_width="wrap_content" android:onClick="displayMarkerInformation" android:layout_below="@+id/confirmationMessage" android:layout_toLeftOf="@+id/markerDescription"></Button>
+	<Button android:text="No" android:layout_height="wrap_content" android:id="@+id/nobtn" android:layout_width="wrap_content" android:onClick="closeActivity" android:layout_alignBaseline="@+id/yesbtn" android:layout_alignBottom="@+id/yesbtn" android:layout_toRightOf="@+id/markerDescription"></Button>
+</RelativeLayout>

@@ -2,6 +2,16 @@
 <PreferenceScreen
   xmlns:android="http://schemas.android.com/apk/res/android">
   
+  <PreferenceCategory android:title="Memebership" android:key="member_info">
+  	  	<EditTextPreference
+  		android:key="@string/member_name"
+  		android:title="Member name"
+  		android:summary="Please enter the member name"
+  		android:dialogTitle="Member name"
+  		android:dialogMessage="Member name"
+  		android:maxLength="20"/> 
+  </PreferenceCategory>
+  
   <PreferenceCategory
   	android:title="Dtouch Markers"
   	android:key="dtouch_markers">
