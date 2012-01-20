@@ -5,6 +5,7 @@ import java.util.List;
 import uk.ac.horizon.tableware.TWMarkerSurfaceView.OnMarkerDetectedListener;
 import android.content.Intent;
 import android.os.Bundle;
+import android.os.Handler;
 import android.support.v4.app.FragmentActivity;
 import android.view.Menu;
 import android.view.MenuItem;
@@ -20,7 +21,7 @@ public class TablewareActivity extends FragmentActivity implements OnMarkerDetec
     private MenuItem	mItemDetectMarker;
     private MenuItem	mItemDetectMarkerDebug;
     private MenuItem	mItemPreference;
-    private MenuItem	mItemMember;
+    private MenuItem	mItemMember;    //private List<DtouchMarker> mCurrentMarkers;
     
     public static int viewMode  = VIEW_MODE_MARKER;
     
@@ -29,6 +30,7 @@ public class TablewareActivity extends FragmentActivity implements OnMarkerDetec
     public void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         requestWindowFeature(Window.FEATURE_NO_TITLE);
+        displaySplashScreen();
         setContentView(R.layout.main);
         initTWSurfaceViewListener();
     }
@@ -83,10 +85,23 @@ public class TablewareActivity extends FragmentActivity implements OnMarkerDetec
     	surfaceView.stopProcessing();
     }
     
-    public void onMarkerDetected(List<DtouchMarker> markers){
-    	stopMarkerDetectionProcess();
-    	displayMarkerResult(markers);
-	}
+    public void onMarkerDetected(final List<DtouchMarker> markers){
+    	this.runOnUiThread(new Runnable(){
+    	public void run(){
+    		stopMarkerDetectionProcess();
+    		displayMarkerResult(markers);
+    		//mCurrentMarkers = markers;
+    	}
+    	});
+    }
+    
+    /*
+    public void onMarkerDetailBtnClick(View view){
+    	if (mCurrentMarkers != null && mCurrentMarkers.size() > 0){
+    		stopMarkerDetectionProcess();
+    		displayMarkerResult(mCurrentMarkers);
+    	}
+    }*/
     
     private void displayMarkerResult(List<DtouchMarker> markers){
      	Intent intent = new Intent(this,TWMarkerResultActivity.class);
@@ -99,6 +114,17 @@ public class TablewareActivity extends FragmentActivity implements OnMarkerDetec
     private void initTWSurfaceViewListener(){
     	TWMarkerSurfaceView surfaceView = (TWMarkerSurfaceView) findViewById(R.id.MarkerSurfaceView);
     	surfaceView.setOnMarkerDetectedListener(this);
+    }
+    
+    private void displaySplashScreen(){
+    	final TWSplashScreenFragment frag = TWSplashScreenFragment.newInstance();
+    	frag.show(this.getSupportFragmentManager(), "SPLASH_SCREEN");
+    	final Handler handler = new Handler();
+    	handler.postDelayed(new Runnable(){
+    		public void run(){
+    			frag.dismiss();
+    		}
+    	}, 2000);
     }
     
 }

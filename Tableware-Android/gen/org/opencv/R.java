@@ -14,18 +14,21 @@ public final class R {
         public static final int background=0x7f020000;
         public static final int food=0x7f020001;
         public static final int icon=0x7f020002;
-        public static final int scan_button=0x7f020003;
-        public static final int scan_focused=0x7f020004;
-        public static final int scan_normal=0x7f020005;
-        public static final int scan_pressed=0x7f020006;
-        public static final int title=0x7f020007;
-        public static final int userblankface=0x7f020008;
+        public static final int markerdetailbtn=0x7f020003;
+        public static final int markerdetailbtn_disabled=0x7f020004;
+        public static final int markerdetailbtn_focused=0x7f020005;
+        public static final int markerdetailbtn_normal=0x7f020006;
+        public static final int markerdetailbtn_pressed=0x7f020007;
+        public static final int splashscreen=0x7f020008;
+        public static final int title=0x7f020009;
+        public static final int userblankface=0x7f02000a;
     }
     public static final class id {
         public static final int MarkerLayout=0x7f060001;
         public static final int MarkerSurfaceView=0x7f060002;
         public static final int MarkerwebView=0x7f060000;
         public static final int confirmationMessage=0x7f060008;
+        public static final int imageView1=0x7f060016;
         public static final int markerCode=0x7f060007;
         public static final int markerCodeCaption=0x7f060006;
         public static final int markerDescription=0x7f060004;
@@ -50,6 +53,7 @@ public final class R {
         public static final int main=0x7f030001;
         public static final int markeridentificationresult=0x7f030002;
         public static final int memberinfo=0x7f030003;
+        public static final int splashscreen=0x7f030004;
     }
     public static final class string {
         public static final int app_name=0x7f050001;

@@ -22,6 +22,7 @@ import android.view.SurfaceHolder;
 
 class TWMarkerSurfaceView extends TWSurfaceViewBase {
     private static final int NO_OF_TILES = 2;
+    private static final int FIRST_MARKER_INDEX = 0;
     private Mat mRgba;
     private Mat mGray;
     private ArrayList<Mat> mComponents;
@@ -90,7 +91,7 @@ class TWMarkerSurfaceView extends TWSurfaceViewBase {
     	//Marker detected.
     	if (markers.size() > 0){
     		//display codes on the original image.
-    		displayMarkerCodes(mRgba, markers);
+    		displayMarkerCodes(mRgba, markers.get(FIRST_MARKER_INDEX));
     	}
     	return markers;
     }
@@ -112,8 +113,7 @@ class TWMarkerSurfaceView extends TWSurfaceViewBase {
     	Scalar contourColor = new Scalar(0, 0, 255);
     	Scalar codesColor = new Scalar(255,0,0,255);
     	displayMarkersDebug(thresholdedImgMat, contourColor, codesColor);
-    	displayThresholds(mRgba, codesColor, localThresholds);
-    	
+    	//displayThresholds(mRgba, codesColor, localThresholds);
     	thresholdedImgMat.release();
     }
     
@@ -217,26 +217,37 @@ class TWMarkerSurfaceView extends TWSurfaceViewBase {
 		}
     }
     
-    private void displayMarkerCodes(Mat imgMat, List<DtouchMarker> markers){
+    private void displayMarkerCodes(Mat imgMat, DtouchMarker marker){
     	Scalar codesColor = new Scalar(255,0,0,255);
-    	for (DtouchMarker marker : markers){
+    	String code = codeArrayToString(marker.getCode());
+		Point codeLocation = new Point(imgMat.cols() / 4, imgMat.rows()/8);
+		Core.putText(imgMat, code, codeLocation, Core.FONT_HERSHEY_COMPLEX, 1, codesColor,3);
+    	
+    	/*for (DtouchMarker marker : markers){
     		String code = codeArrayToString(marker.getCode());
     		Point codeLocation = new Point(imgMat.cols() / 4, imgMat.rows()/8);
     		Core.putText(imgMat, code, codeLocation, Core.FONT_HERSHEY_COMPLEX, 1, codesColor,3);
-    	}
+    	}*/
     }
     
     private void displayMarkersDebug(Mat imgMat, Scalar contourColor, Scalar codesColor){
     	List<DtouchMarker> markers = new ArrayList<DtouchMarker>();
     	findMarkers(imgMat, markers);
     	
+    	if (markers.size() > 0){
+    		DtouchMarker marker = markers.get(FIRST_MARKER_INDEX);
+    		String code = codeArrayToString(marker.getCode());
+    		Point codeLocation = new Point(imgMat.cols() / 4, imgMat.rows()/8);
+    		Core.putText(mRgba, code, codeLocation, Core.FONT_HERSHEY_COMPLEX, 1, codesColor,3);
+    		Imgproc.drawContours(mRgba, mComponents, marker.getComponentIndex(), contourColor, 3, 8, mHierarchy, 0);
+    	}
+    	/*
     	for (DtouchMarker marker : markers){
     		String code = codeArrayToString(marker.getCode());
+    		Point codeLocation = new Point(imgMat.cols() / 4, imgMat.rows()/8);
+    		Core.putText(mRgba, code, codeLocation, Core.FONT_HERSHEY_COMPLEX, 1, codesColor,3);
     		Imgproc.drawContours(mRgba, mComponents, marker.getComponentIndex(), contourColor, 3, 8, mHierarchy, 0);
-    		//Get contour location.
-    		Point contourLocation = new Point(marker.getComponent().get(0,0));
-    		Core.putText(mRgba, code, contourLocation, Core.FONT_HERSHEY_COMPLEX, 1, codesColor,3);
-    	}
+    	}*/
     }
 
     private void displayThresholds(Mat ImgMat, Scalar thresholdColor, ArrayList<Double> thresholds){
