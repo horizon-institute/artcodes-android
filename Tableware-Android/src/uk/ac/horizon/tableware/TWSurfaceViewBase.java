@@ -7,17 +7,21 @@ import org.opencv.highgui.VideoCapture;
 import org.opencv.highgui.Highgui;
 
 import android.content.Context;
+import android.graphics.Bitmap;
+import android.graphics.Canvas;
+import android.graphics.Color;
 import android.util.AttributeSet;
+import android.util.Log;
 import android.view.SurfaceHolder;
 import android.view.SurfaceView;
 
 public abstract class TWSurfaceViewBase extends SurfaceView implements SurfaceHolder.Callback, Runnable {
-    protected static final String TAG = "Tableware::SurfaceView";
- 
+    protected static final String TAG = "Tableware::TWSurfaceViewBase";
     protected SurfaceHolder	mHolder;
     protected VideoCapture    mCamera;
     protected volatile Thread	mThread;
     protected boolean mIsSurfaceValid;
+
         
     public TWSurfaceViewBase(Context context) {
         super(context);
@@ -58,6 +62,7 @@ public abstract class TWSurfaceViewBase extends SurfaceView implements SurfaceHo
     }
 
     public void surfaceCreated(SurfaceHolder holder) {
+    	this.stopProcessing();
     	mIsSurfaceValid = true;
     	this.startProcessing();
     }
@@ -97,10 +102,12 @@ public abstract class TWSurfaceViewBase extends SurfaceView implements SurfaceHo
     protected abstract void releaseData();
     
     public boolean startProcessing(){
+    	Log.d(TAG, "Start processing");
     	boolean started;
     	synchronized (this) {
-    		initData();
     		if (mIsSurfaceValid){
+    			//initData();
+    			clearCanvas();
     			if (mCamera == null)
     				mCamera = new VideoCapture(Highgui.CV_CAP_ANDROID);
     			if (mCamera.isOpened()){
@@ -114,13 +121,33 @@ public abstract class TWSurfaceViewBase extends SurfaceView implements SurfaceHo
     	return started;
     }
     
+    private void clearCanvas(){
+    	Canvas canvas = null;
+    	try{
+       		canvas = mHolder.lockCanvas();
+       		if (canvas != null) {
+       			//clear the screen.
+       			canvas.drawColor(Color.BLACK);
+       		}
+        }finally{
+       		if (canvas != null)
+       			mHolder.unlockCanvasAndPost(canvas);
+       	}
+    }
+    
     public void stopProcessing(){
+    	Log.d(TAG, "Stop processing");
+    	if (mIsSurfaceValid)
+    		clearCanvas();
     	synchronized (this) {
-    		if (mThread != null)
-    			this.stopThread();
     		if (mCamera != null)
     			this.stopCamera();
+    		if (mThread != null)
+    			this.stopThread();
     		releaseData();
     	}
     }
+    
+
+    
 }

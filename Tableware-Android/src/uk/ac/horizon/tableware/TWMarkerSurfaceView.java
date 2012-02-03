@@ -22,19 +22,22 @@ import android.view.SurfaceHolder;
 
 class TWMarkerSurfaceView extends TWSurfaceViewBase {
     private static final int NO_OF_TILES = 2;
-    private static final int FIRST_MARKER_INDEX = 0;
     private Mat mRgba;
     private Mat mGray;
     private ArrayList<Mat> mComponents;
     private Mat mHierarchy;
     private MarkerDetector markerDetector;
+    private Mat mMarkerImage;
     private OnMarkerDetectedListener markerListener;
-            
+    private boolean mMarkerDetected;
+    
+    
     /*Define interface to call back when marker is detected:
      * 
      */
     public interface OnMarkerDetectedListener{
-    		void onMarkerDetected(List<DtouchMarker> markers);
+    		void onMarkerDetected(DtouchMarker marker);
+    		void onMarkerScanned(DtouchMarker marker);
     }
     
     public TWMarkerSurfaceView(Context context) {
@@ -54,10 +57,10 @@ class TWMarkerSurfaceView extends TWSurfaceViewBase {
         super.surfaceChanged(_holder, format, width, height);
     }
     
-    private Bitmap processFrame(VideoCapture capture, List<DtouchMarker> markers) {
+    private Bitmap processFrameForMarker(VideoCapture capture, DtouchMarker marker) {
       	switch (TablewareActivity.viewMode) {
            case TablewareActivity.VIEW_MODE_MARKER:
-	        	processFrameForMarkers(capture, markers);
+	        	processFrameForMarkers(capture, marker);
 	            break;
            case TablewareActivity.VIEW_MODE_MARKER_DEBUG:
         	   processFrameForMarkersDebug(capture);
@@ -73,27 +76,46 @@ class TWMarkerSurfaceView extends TWSurfaceViewBase {
         return null;
     }
     
-    private List<DtouchMarker> processFrameForMarkers(VideoCapture capture, List<DtouchMarker> markers){
+    private Bitmap displayDetectedMarker(VideoCapture capture, Mat markerImage){
+    	//Get original image.
+    	capture.retrieve(mRgba, Highgui.CV_CAP_ANDROID_COLOR_FRAME_RGBA);
+    	displayRectOnImageSegment(mRgba,true);
+    	displayMarkerImage(mMarkerImage, mRgba);
+    	
+    	 Bitmap bmp = Bitmap.createBitmap(mRgba.cols(), mRgba.rows(), Bitmap.Config.ARGB_8888);
+         if (Utils.matToBitmap(mRgba, bmp))
+             return bmp;
+         bmp.recycle();
+         return null;
+    }
+    
+    private void processFrameForMarkers(VideoCapture capture, DtouchMarker marker){
     	//Get original image.
     	capture.retrieve(mRgba, Highgui.CV_CAP_ANDROID_COLOR_FRAME_RGBA);
         //Get gray scale image.
        	capture.retrieve(mGray, Highgui.CV_CAP_ANDROID_GREY_FRAME);
-       	displayRectOnImageSegment(mRgba);
-    	//Get image segment to detect marker. 	
-    	Mat imgSegmentMat = cloneImageSegmentToDetectMarker(mGray);
+       	//Get image segment to detect marker. 	
+    	Mat imgSegmentMat = cloneMarkerImageSegment(mGray);
     	//apply threshold.
     	Mat thresholdedImgMat = new Mat(imgSegmentMat.size(), imgSegmentMat.type());
     	applyThresholdOnImage(imgSegmentMat,thresholdedImgMat);
     	imgSegmentMat.release();
     	//find markers.
-    	findMarkers(thresholdedImgMat, markers);
+    	boolean markerFound = findMarkers(thresholdedImgMat, marker);
     	thresholdedImgMat.release();
     	//Marker detected.
-    	if (markers.size() > 0){
+    	if (markerFound){
+    		setMarkerDetected(true);
+    		//if marker is found then copy the marker image segment.
+    		mMarkerImage = cloneMarkerImageSegment(mRgba);
     		//display codes on the original image.
-    		displayMarkerCodes(mRgba, markers.get(FIRST_MARKER_INDEX));
-    	}
-    	return markers;
+    		displayMarkerCodes(mRgba, marker);
+    		//display rect with indication that a marker is identified.
+    		displayRectOnImageSegment(mRgba,true);
+    		//display marker image
+    		displayMarkerImage(mMarkerImage, mRgba);
+    	}else
+    		displayRectOnImageSegment(mRgba,false);
     }
     
     private void processFrameForMarkersDebug(VideoCapture capture){
@@ -102,7 +124,7 @@ class TWMarkerSurfaceView extends TWSurfaceViewBase {
         //Get gray scale image.
     	capture.retrieve(mGray, Highgui.CV_CAP_ANDROID_GREY_FRAME);
     	//Get image segment to detect marker.    	
-    	Mat imgSegmentMat = cloneImageSegmentToDetectMarker(mGray);
+    	Mat imgSegmentMat = cloneMarkerImageSegment(mGray);
     	//apply threshold.
     	Mat thresholdedImgMat = new Mat(imgSegmentMat.size(), imgSegmentMat.type());
     	ArrayList<Double> localThresholds = applyThresholdOnImage(imgSegmentMat,thresholdedImgMat);
@@ -117,7 +139,7 @@ class TWMarkerSurfaceView extends TWSurfaceViewBase {
     	thresholdedImgMat.release();
     }
     
-    private Mat cloneImageSegmentToDetectMarker(Mat imgMat){
+    private Mat cloneMarkerImageSegment(Mat imgMat){
     	Rect rect = calculateImageSegmentArea(imgMat);
         Mat calculatedImg = imgMat.submat(rect.y, rect.y + rect.height,rect.x,rect.x + rect.width);
     	return calculatedImg.clone();
@@ -133,10 +155,22 @@ class TWMarkerSurfaceView extends TWSurfaceViewBase {
         return new Rect(x, y, width, height);
     }
     
-    private void displayRectOnImageSegment(Mat imgMat){
-    	Scalar color = new Scalar(255,0,0,255);
+    private void displayRectOnImageSegment(Mat imgMat, boolean markerFound){
+    	Scalar color = null;
+    	if (markerFound)
+    		color = new Scalar(0,255,0,255);
+    	else
+    		color = new Scalar(255,0,0,255);
     	Rect rect = calculateImageSegmentArea(imgMat);
     	Core.rectangle(imgMat, rect.tl(), rect.br(), color, 3, Core.LINE_AA);
+    }
+    
+    private void displayMarkerImage(Mat srcImgMat, Mat destImageMat){
+    	//find location of image segment to be replaced in the destination image.
+    	Rect rect = calculateImageSegmentArea(destImageMat);
+    	Mat destSubmat = destImageMat.submat(rect.y,rect.y + rect.height, rect.x, rect.x + rect.width);
+    	//copy image.
+    	srcImgMat.copyTo(destSubmat);
     }
     
     private void copyThresholdedImageToRgbImgMat(Mat thresholdedImgMat, Mat dest){
@@ -150,6 +184,7 @@ class TWMarkerSurfaceView extends TWSurfaceViewBase {
     	smallRegionImg.copyTo(destSubmat);
     	smallRegionImg.release();
     }
+    
     
     private ArrayList<Double> applyThresholdOnImage(Mat srcImgMat, Mat outputImgMat){
     	double localThreshold;
@@ -193,28 +228,29 @@ class TWMarkerSurfaceView extends TWSurfaceViewBase {
     	return localThresholds;
     }
     
-    private void findMarkers(Mat imgMat, List<DtouchMarker> markers){
+    private boolean findMarkers(Mat imgMat, DtouchMarker marker){
+    	boolean markerFound = false;
     	Mat contourImg = imgMat.clone();
     	//Find blobs using connect component.
     	Imgproc.findContours(contourImg, mComponents, mHierarchy, Imgproc.RETR_TREE, Imgproc.CHAIN_APPROX_NONE);
     	//No need to use contourImg so release it.
     	contourImg.release();
     	
-    	List<Integer> codes = new ArrayList<Integer>();
+    	List<Integer> code = new ArrayList<Integer>();
     	    	
     	for (int i = 0; i < mComponents.size(); i++){
     		//clean this list.
-    		codes.clear();
-    		if (markerDetector.verifyRoot(i, mComponents.get(i), mHierarchy,imgMat,codes)){
-    			//if marker found then add in return list.
-    			if (markers != null){
-    				DtouchMarker marker = new DtouchMarker(codes);
-    				marker.setComponent(mComponents.get(i));
-    				marker.setComponentIndex(i);
-    				markers.add(marker);
-    			}
+    		code.clear();
+    		if (markerDetector.verifyRoot(i, mComponents.get(i), mHierarchy,imgMat,code)){
+    			//if marker found.
+    			marker.setCode(code);
+    			marker.setComponent(mComponents.get(i));
+    			marker.setComponentIndex(i);
+    			markerFound = true;
+    			break;
     		}
 		}
+    	return markerFound;
     }
     
     private void displayMarkerCodes(Mat imgMat, DtouchMarker marker){
@@ -231,11 +267,9 @@ class TWMarkerSurfaceView extends TWSurfaceViewBase {
     }
     
     private void displayMarkersDebug(Mat imgMat, Scalar contourColor, Scalar codesColor){
-    	List<DtouchMarker> markers = new ArrayList<DtouchMarker>();
-    	findMarkers(imgMat, markers);
-    	
-    	if (markers.size() > 0){
-    		DtouchMarker marker = markers.get(FIRST_MARKER_INDEX);
+    	DtouchMarker marker = new DtouchMarker();
+    	boolean markerFound = findMarkers(imgMat, marker);
+    	if (markerFound){    	
     		String code = codeArrayToString(marker.getCode());
     		Point codeLocation = new Point(imgMat.cols() / 4, imgMat.rows()/8);
     		Core.putText(mRgba, code, codeLocation, Core.FONT_HERSHEY_COMPLEX, 1, codesColor,3);
@@ -275,9 +309,10 @@ class TWMarkerSurfaceView extends TWSurfaceViewBase {
     public void run() {
         try
         {
+        	initData();
         	while (Thread.currentThread() == mThread) {
         		Bitmap bmp = null;
-        		List<DtouchMarker> dtouchMarkers = new ArrayList<DtouchMarker>();
+        		DtouchMarker dtouchMarker = new DtouchMarker();
         		
         		synchronized (this) {
         			if (mCamera == null)
@@ -289,7 +324,12 @@ class TWMarkerSurfaceView extends TWSurfaceViewBase {
         			if (Thread.currentThread().isInterrupted()){
         				throw new InterruptedException("Thread interrupted.");
         			}
-        			bmp = processFrame(mCamera, dtouchMarkers);
+        			
+        			if(!mMarkerDetected){
+        				bmp = processFrameForMarker(mCamera, dtouchMarker);
+        			}else{
+        				bmp = displayDetectedMarker(mCamera,mMarkerImage); 
+        			}
         		}
         		if (bmp != null && mCamera != null) {
         			Canvas canvas = mHolder.lockCanvas();
@@ -299,10 +339,11 @@ class TWMarkerSurfaceView extends TWSurfaceViewBase {
         			}
         			bmp.recycle();
         		}
-        		if (dtouchMarkers != null && dtouchMarkers.size() > 0){
+        	  	
+        		if (dtouchMarker.getCode() != null){
         			if (markerListener != null){
-            			markerListener.onMarkerDetected(dtouchMarkers);
-            			break;
+        				markerListener.onMarkerDetected(dtouchMarker);
+            			//break;
             		}
         		}
         	}
@@ -322,10 +363,12 @@ class TWMarkerSurfaceView extends TWSurfaceViewBase {
             // initialise Mats before usage
             mGray = new Mat();
             mRgba = new Mat();
+            mMarkerImage = new Mat();
             mComponents = new ArrayList<Mat>();
             mHierarchy = new Mat();
         }
     	markerDetector = new MarkerDetector(this.getContext());
+    	mMarkerDetected = false;
     }
     
     @Override
@@ -334,6 +377,8 @@ class TWMarkerSurfaceView extends TWSurfaceViewBase {
             // Explicitly deallocate Mats
             if (mRgba != null)
                 mRgba.release();
+            if (mMarkerImage != null)
+            	mMarkerImage.release();
             if (mGray != null)
                 mGray.release();
             if (mComponents != null)
@@ -347,4 +392,9 @@ class TWMarkerSurfaceView extends TWSurfaceViewBase {
         }
         markerDetector = null;
     }
+    
+    private void setMarkerDetected(boolean detected){
+    	mMarkerDetected = detected;
+    }
+ 
 }

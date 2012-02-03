@@ -1,6 +1,7 @@
 package uk.ac.horizon.tableware;
 
 import java.util.ArrayList;
+import java.util.Collections;
 import java.util.List;
 
 import org.opencv.core.Mat;
@@ -14,7 +15,12 @@ public class DtouchMarker {
 	private String mURL;
 	private String mDesc;
 
-
+	
+	//constructors
+	DtouchMarker(){
+		super();
+	}
+	
 	DtouchMarker(List<Integer> code){
 		mCode = new ArrayList<Integer>(code);
 	}
@@ -31,10 +37,15 @@ public class DtouchMarker {
 		mDesc = desc;
 	}
 	
+	//set and get functions.
 	public void setComponent(Mat component){
 		if (mComponent != null)
 			mComponent.release();
 		mComponent = component.clone();
+	}
+	
+	public Mat getComponent(){
+		return mComponent;
 	}
 	
 	public int getComponentIndex(){
@@ -44,13 +55,33 @@ public class DtouchMarker {
 	public void setComponentIndex(int componentIndex){
 		mIndex = componentIndex;
 	}
-	
-	public Mat getComponent(){
-		return mComponent;
-	}
-	
+		
 	public List<Integer> getCode(){
 		return mCode;
+	}
+	
+	public void setCode(List<Integer> code){
+		if (mCode != null){
+			mCode.clear();
+			mCode = null;
+		}
+		mCode = new ArrayList<Integer>(code);
+	}
+	
+	public String getURL(){
+		return mURL;
+	}
+	
+	public void setURL(String url){
+		mURL = url;
+	}
+	
+	public String getDescription(){
+		return mDesc;
+	}
+	
+	public void setDescription(String desc){
+		mDesc = desc;
 	}
 	
 	public String getCodeKey(){
@@ -79,18 +110,15 @@ public class DtouchMarker {
     	return codes;	
     }
     
-	public String getURL(){
-		return mURL;
-	}
-	
-	public void setURL(String url){
-		mURL = url;
-	}
-	
-	public String getDescription(){
-		return mDesc;
-	}
-	
+    public boolean isCodeEqual(DtouchMarker marker){
+    	String thisCode = this.getCodeKey();
+    	String compareCode = marker.getCodeKey();
+    	if (thisCode.compareTo(compareCode) == 0)
+    		return true;
+    	else
+    		return false;
+    }
+    
 	public static Bundle createMarkerBundleFromCode(DtouchMarker marker){
 	   	Bundle markerBundle = new Bundle();
 	   	markerBundle.putString("Code", marker.getCodeKey());

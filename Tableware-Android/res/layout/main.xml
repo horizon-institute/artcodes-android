@@ -2,10 +2,20 @@
 <LinearLayout android:id="@+id/MarkerLayout"
 	android:layout_width="fill_parent" android:layout_height="fill_parent"
 	xmlns:android="http://schemas.android.com/apk/res/android">
+	<FrameLayout android:layout_height="wrap_content" android:layout_width="wrap_content" 
+		android:id="@+id/frameLayout">
 	<view class="uk.ac.horizon.tableware.TWMarkerSurfaceView" 
 		android:id="@+id/MarkerSurfaceView"
 		android:layout_width="wrap_content" 
 		android:layout_height="wrap_content"/>
+	<!-- <Button android:text="" 
+         android:id="@+id/scanMarkerBtn" 
+         android:layout_width="wrap_content" 
+         android:layout_height="wrap_content"
+         android:background="@drawable/markerdetailbtn"
+         android:onClick="onScanMarkerBtnClick"
+         android:layout_gravity="top|right"/>-->	
+	</FrameLayout>
 </LinearLayout>
 <!-- 
 <RelativeLayout android:id="@+id/MarkerLayout" android:layout_width="fill_parent" android:layout_height="fill_parent" xmlns:android="http://schemas.android.com/apk/res/android">
