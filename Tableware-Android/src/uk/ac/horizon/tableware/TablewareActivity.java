@@ -1,5 +1,7 @@
 package uk.ac.horizon.tableware;
 
+import org.opencv.core.Rect;
+
 import uk.ac.horizon.tableware.MarkerPopupWindow.OnMarkerPopupWindowListener;
 import uk.ac.horizon.tableware.TWMarkerSurfaceView.OnMarkerDetectedListener;
 import android.content.Intent;
@@ -12,11 +14,10 @@ import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.Menu;
 import android.view.MenuItem;
-import android.view.View;
 import android.view.Window;
+import android.view.WindowManager;
 import android.widget.FrameLayout;
 import android.widget.ProgressBar;
-import android.widget.TextView;
 
 public class TablewareActivity extends FragmentActivity implements OnMarkerDetectedListener, OnMarkerPopupWindowListener{
     
@@ -29,6 +30,7 @@ public class TablewareActivity extends FragmentActivity implements OnMarkerDetec
     private MenuItem	mItemDetectMarkerDebug;
     private MenuItem	mItemPreference;
     private MenuItem	mItemMember;    //private List<DtouchMarker> mCurrentMarkers;
+    private TWMarkerSurfaceView mMarkerSurfaceView;
         
     public static int viewMode  = VIEW_MODE_MARKER;
     
@@ -37,6 +39,7 @@ public class TablewareActivity extends FragmentActivity implements OnMarkerDetec
     public void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         requestWindowFeature(Window.FEATURE_NO_TITLE);
+        getWindow().setFlags(WindowManager.LayoutParams.FLAG_FULLSCREEN, WindowManager.LayoutParams.FLAG_FULLSCREEN);
         displaySplashScreen();
         setContentView(R.layout.main);
         initTWSurfaceViewListener();
@@ -48,7 +51,6 @@ public class TablewareActivity extends FragmentActivity implements OnMarkerDetec
         mItemDetectMarkerDebug = menu.add(R.string.detect_marker_debug);
         mItemMember = menu.add(R.string.menu_member_info);
         mItemPreference = menu.add(R.string.view_preferences);
-        
         return true;
     }
     
@@ -67,18 +69,6 @@ public class TablewareActivity extends FragmentActivity implements OnMarkerDetec
     	super.onPause();
     }
     
-    public void onScanMarkerBtnClick(View view){
-    	TWMarkerSurfaceView surfaceView = (TWMarkerSurfaceView) findViewById(R.id.MarkerSurfaceView);
-    	//surfaceView.startScan();
-    }
-    
-    /*
-    @Override
-    public void onStop(){
-    	stopMarkerDetectionProcess();
-    	super.onStop();
-    }*/
-
     @Override
     public boolean onOptionsItemSelected(MenuItem item) {
         if (item == mItemDetectMarker)
@@ -103,13 +93,11 @@ public class TablewareActivity extends FragmentActivity implements OnMarkerDetec
     }
     
     private void stopMarkerDetectionProcess(){
-    	TWMarkerSurfaceView surfaceView = (TWMarkerSurfaceView) findViewById(R.id.MarkerSurfaceView);
-    	surfaceView.stopProcessing();
+    	mMarkerSurfaceView.stopProcessing();
     }
     
     private void startMarkerDetectionProcess(){
-    	TWMarkerSurfaceView surfaceView = (TWMarkerSurfaceView) findViewById(R.id.MarkerSurfaceView);
-    	surfaceView.startProcessing();
+    	mMarkerSurfaceView.startProcessing();
     }
     
     public void onMarkerDetected(final DtouchMarker marker){
@@ -117,40 +105,20 @@ public class TablewareActivity extends FragmentActivity implements OnMarkerDetec
     		public void run(){
     			showProgressControls();
     			new DtouchMarkerWebServicesTask().execute(marker.getCodeKey());
-    			//stopMarkerDetectionProcess();
-    			//displayMarkerResult(markers);
-    			//mCurrentMarkers = markers;
     		}
     	});
     }
     
-    public void onMarkerScanned(final DtouchMarker marker){
-    	this.runOnUiThread(new Runnable(){
-    	public void run(){
-    		//stopMarkerDetectionProcess();
-    		//displayMarkerResult(marker);
-    		//mCurrentMarkers = markers;
-    	}
-    	});
-    }
-    /*
-    public void onMarkerDetailBtnClick(View view){
-    	if (mCurrentMarkers != null && mCurrentMarkers.size() > 0){
-    		stopMarkerDetectionProcess();
-    		displayMarkerResult(mCurrentMarkers);
-    	}
-    }*/
-    
-    private void displayMarkerResult(DtouchMarker marker){
-     	Intent intent = new Intent(this,TWMarkerResultActivity.class);
-    	Bundle markerBundle = DtouchMarker.createMarkerBundleFromCode(marker);
-       	intent.putExtras(markerBundle);
-    	startActivity(intent);
-    }
+    public void displayMarkerDetailFromWebService(DtouchMarker marker){
+		Intent intent = new Intent(this, TWBrowseMarkerActivity.class);
+		Bundle markerBundle = DtouchMarker.createMarkerBundleFromCode(marker);
+		intent.putExtras(markerBundle);
+		startActivity(intent);
+	}
     
     private void initTWSurfaceViewListener(){
-    	TWMarkerSurfaceView surfaceView = (TWMarkerSurfaceView) findViewById(R.id.MarkerSurfaceView);
-    	surfaceView.setOnMarkerDetectedListener(this);
+    	mMarkerSurfaceView = (TWMarkerSurfaceView) findViewById(R.id.MarkerSurfaceView);
+    	mMarkerSurfaceView.setOnMarkerDetectedListener(this);
     }
     
     private void displaySplashScreen(){
@@ -177,34 +145,31 @@ public class TablewareActivity extends FragmentActivity implements OnMarkerDetec
     	progressBar = null;
     }
     
-    private void showMarkerLabel(String markerDesc){
-    	FrameLayout frameLayout = (FrameLayout) findViewById(R.id.frameLayout);
-    	LayoutInflater inflater = getLayoutInflater();
-    	inflater.inflate(R.layout.markerlabel, frameLayout);
-    	TextView markerLabel = (TextView) findViewById(R.id.markerLabel);
-    	markerLabel.setText(markerDesc);
-    }
-    
     private void onMarkerDownloaded(DtouchMarker marker){
-    	showMarkerLabel(marker.getDescription());
     	hideProgressControls();
     	displayMarkerPopupWindow(marker);
     }
     
     private void displayMarkerPopupWindow(DtouchMarker marker){
+    	Rect rect = mMarkerSurfaceView.getMarkerPosition();
     	FrameLayout frameLayout = (FrameLayout) findViewById(R.id.frameLayout);
     	MarkerPopupWindow markerPopupWindow = new MarkerPopupWindow(frameLayout,marker);
     	markerPopupWindow.setOnMarkerPopupWindowListener(this);
-    	markerPopupWindow.show(new Point(0,0));
+    	Point location = new Point(rect.x,rect.y);
+    	Point size = new Point(rect.width, rect.height);
+    	markerPopupWindow.show(location, size);
     }
+    
     
     //OnMarkerPopupWindowListener methods.
     public void onDismissedSelected(DtouchMarker marker){
-    	
+    	mMarkerSurfaceView.stopDisplayingDetectedMarker();
     }
     
 	public void onBrowseMarkerSelected(DtouchMarker marker){
-		
+		mMarkerSurfaceView.stopDisplayingDetectedMarker();
+		stopMarkerDetectionProcess();
+		displayMarkerDetailFromWebService(marker);
 	}
     
     class DtouchMarkerWebServicesTask extends AsyncTask<String, Void, DtouchMarker> {

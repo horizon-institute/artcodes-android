@@ -7,7 +7,6 @@ import org.opencv.highgui.VideoCapture;
 import org.opencv.highgui.Highgui;
 
 import android.content.Context;
-import android.graphics.Bitmap;
 import android.graphics.Canvas;
 import android.graphics.Color;
 import android.util.AttributeSet;
@@ -43,22 +42,44 @@ public abstract class TWSurfaceViewBase extends SurfaceView implements SurfaceHo
         	mIsSurfaceValid = true;
             if (mCamera != null && mCamera.isOpened()) {
                 List<Size> sizes = mCamera.getSupportedPreviewSizes();
-                                
-                int frameWidth = width;
-                int frameHeight = height;
-                // selecting optimal camera preview size
-                double minDiff = Double.MAX_VALUE;
-                for (Size size : sizes) {
-                	if (Math.abs(size.height - height) < minDiff) {
-                		frameWidth = (int) size.width;
-                		frameHeight = (int) size.height;
-                		minDiff = Math.abs(size.height - height);
-                	}
-                }
-                mCamera.set(Highgui.CV_CAP_PROP_FRAME_WIDTH, frameWidth);
-                mCamera.set(Highgui.CV_CAP_PROP_FRAME_HEIGHT, frameHeight);
+                Size size = getOptimalPreviewSize(sizes, width, height);
+                mCamera.set(Highgui.CV_CAP_PROP_FRAME_WIDTH, size.width);
+                mCamera.set(Highgui.CV_CAP_PROP_FRAME_HEIGHT, size.height);
             }
         }
+    }
+    
+    private Size getOptimalPreviewSize(List<Size> sizes, int w, int h) {
+        final double ASPECT_TOLERANCE = 0.1;
+        double targetRatio = (double) w / h;
+        if (sizes == null) return null;
+
+        Size optimalSize = null;
+        double minDiff = Double.MAX_VALUE;
+
+        int targetHeight = h;
+
+        // Try to find an size match aspect ratio and size
+        for (Size size : sizes) {
+            double ratio = (double) size.width / size.height;
+            if (Math.abs(ratio - targetRatio) > ASPECT_TOLERANCE) continue;
+            if (Math.abs(size.height - targetHeight) < minDiff) {
+                optimalSize = size;
+                minDiff = Math.abs(size.height - targetHeight);
+            }
+        }
+
+        // Cannot find the one match the aspect ratio, ignore the requirement
+        if (optimalSize == null) {
+            minDiff = Double.MAX_VALUE;
+            for (Size size : sizes) {
+                if (Math.abs(size.height - targetHeight) < minDiff) {
+                    optimalSize = size;
+                    minDiff = Math.abs(size.height - targetHeight);
+                }
+            }
+        }
+        return optimalSize;
     }
 
     public void surfaceCreated(SurfaceHolder holder) {

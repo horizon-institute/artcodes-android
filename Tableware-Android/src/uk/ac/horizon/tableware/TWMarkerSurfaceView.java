@@ -30,6 +30,7 @@ class TWMarkerSurfaceView extends TWSurfaceViewBase {
     private Mat mMarkerImage;
     private OnMarkerDetectedListener markerListener;
     private boolean mMarkerDetected;
+    private Rect markerPosition;
     
     
     /*Define interface to call back when marker is detected:
@@ -37,7 +38,6 @@ class TWMarkerSurfaceView extends TWSurfaceViewBase {
      */
     public interface OnMarkerDetectedListener{
     		void onMarkerDetected(DtouchMarker marker);
-    		void onMarkerScanned(DtouchMarker marker);
     }
     
     public TWMarkerSurfaceView(Context context) {
@@ -94,8 +94,9 @@ class TWMarkerSurfaceView extends TWSurfaceViewBase {
     	capture.retrieve(mRgba, Highgui.CV_CAP_ANDROID_COLOR_FRAME_RGBA);
         //Get gray scale image.
        	capture.retrieve(mGray, Highgui.CV_CAP_ANDROID_GREY_FRAME);
-       	//Get image segment to detect marker. 	
-    	Mat imgSegmentMat = cloneMarkerImageSegment(mGray);
+       	//Get image segment to detect marker.
+    	markerPosition = calculateImageSegmentArea(mGray);
+       	Mat imgSegmentMat = cloneMarkerImageSegment(mGray);
     	//apply threshold.
     	Mat thresholdedImgMat = new Mat(imgSegmentMat.size(), imgSegmentMat.type());
     	applyThresholdOnImage(imgSegmentMat,thresholdedImgMat);
@@ -144,15 +145,39 @@ class TWMarkerSurfaceView extends TWSurfaceViewBase {
         Mat calculatedImg = imgMat.submat(rect.y, rect.y + rect.height,rect.x,rect.x + rect.width);
     	return calculatedImg.clone();
     }
-        
+    
+    /**
+     * Returns square area for image segment.
+     * @param imgMat Source image from which to compute image segment.
+     * @return square area which contains image segment.
+     */
     private Rect calculateImageSegmentArea(Mat imgMat){
-       	int x = imgMat.cols() / 4;
-        int y = imgMat.rows() / 4;
-
-        int width = imgMat.cols() / 2 ;
-        int height = imgMat.rows() / 2;
+        int width = imgMat.cols();
+        int height = imgMat.rows();
+        double aspectRatio = (double)width /(double)height;
+       
+        int imgWidth = width / 2;
+    	int imgHeight = height / 2;
+    	
+    	//Size of width and height varies of input image can vary. Make the image segment width and height equal in order to make
+    	//the image segment square.
         
-        return new Rect(x, y, width, height);
+    	//if width is more than the height.
+        if (aspectRatio > 1){
+        	//if total height is greater than imgWidth.
+        	if (height > imgWidth)
+        		imgHeight = imgWidth;
+        }else if (aspectRatio < 1){ //height is more than the width.
+        	//if total width is greater than the imgHeight.
+        	if (width > imgHeight)
+        		imgWidth = imgHeight;
+        }
+        
+        //find the centre position in the source image.
+        int x = (width - imgWidth) / 2;
+        int y = (height - imgHeight) / 2;
+        
+        return new Rect(x, y, imgWidth, imgHeight);
     }
     
     private void displayRectOnImageSegment(Mat imgMat, boolean markerFound){
@@ -395,6 +420,14 @@ class TWMarkerSurfaceView extends TWSurfaceViewBase {
     
     private void setMarkerDetected(boolean detected){
     	mMarkerDetected = detected;
+    }
+    
+    public Rect getMarkerPosition(){
+    	return markerPosition;
+    }
+    
+    public void stopDisplayingDetectedMarker(){
+    	setMarkerDetected(false);
     }
  
 }

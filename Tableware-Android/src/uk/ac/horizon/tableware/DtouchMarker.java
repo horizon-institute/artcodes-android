@@ -1,7 +1,6 @@
 package uk.ac.horizon.tableware;
 
 import java.util.ArrayList;
-import java.util.Collections;
 import java.util.List;
 
 import org.opencv.core.Mat;

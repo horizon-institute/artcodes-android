@@ -53,7 +53,6 @@ public class TWBrowseMarkerActivity extends Activity {
 	private String appendMemberNameWithURL(String url){
 		String encodedURL = null; 
 		String memberName = new TWPreference(this).getMemberName();
-			
 		try{
 			url = url.concat(memberName.replaceAll(" ", "%20"));
 			URI uri = new URI(url);
