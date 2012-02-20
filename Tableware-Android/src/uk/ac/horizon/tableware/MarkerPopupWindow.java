@@ -9,7 +9,6 @@ import android.view.View;
 import android.view.View.OnTouchListener;
 import android.view.ViewGroup;
 import android.widget.PopupWindow;
-import android.widget.RelativeLayout;
 import android.widget.TextView;
 
 public class MarkerPopupWindow{
@@ -33,18 +32,13 @@ public class MarkerPopupWindow{
 	private void initContentView(){
 		LayoutInflater inflater = (LayoutInflater)this.anchor.getContext().getSystemService(Context.LAYOUT_INFLATER_SERVICE);
     	ViewGroup layout = (ViewGroup)inflater.inflate(R.layout.markerpopup, null);
+    	int rotation = WindowRotation.getCameraRotation(this.anchor.getContext());
+    	if (rotation == 0)
+    		WindowRotation.rotateViewGroup(this.anchor.getContext(),layout);
     	this.window.setContentView(layout);
     	TextView markerDesc = (TextView) layout.findViewById(R.id.markerDesc);
     	markerDesc.setText(dtouchMarker.getDescription());
     }
-	
-	/****
-	 * TO DO
-	 * @param layout
-	 */
-	private void rotateWindow(ViewGroup layout){
-		
-	}
 	
 	private void initPopupWindow(Context context){
 		this.window = new PopupWindow(context);

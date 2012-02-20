@@ -1,39 +1,64 @@
 <?xml version="1.0" encoding="utf-8"?>
-<LinearLayout android:id="@+id/MarkerLayout"
-	android:layout_width="fill_parent" android:layout_height="fill_parent"
-	xmlns:android="http://schemas.android.com/apk/res/android">
-	<FrameLayout android:layout_height="wrap_content" android:layout_width="wrap_content" 
-		android:id="@+id/frameLayout">
-	<view class="uk.ac.horizon.tableware.TWMarkerSurfaceView" 
-		android:id="@+id/MarkerSurfaceView"
-		android:layout_width="wrap_content" 
-		android:layout_height="wrap_content"/>
-	<!-- <Button android:text="" 
-         android:id="@+id/scanMarkerBtn" 
-         android:layout_width="wrap_content" 
-         android:layout_height="wrap_content"
-         android:background="@drawable/markerdetailbtn"
-         android:onClick="onScanMarkerBtnClick"
-         android:layout_gravity="top|right"/>-->	
-	</FrameLayout>
-</LinearLayout>
-<!-- 
-<RelativeLayout android:id="@+id/MarkerLayout" android:layout_width="fill_parent" android:layout_height="fill_parent" xmlns:android="http://schemas.android.com/apk/res/android">
-     <FrameLayout android:layout_height="wrap_content" android:layout_width="wrap_content" android:id="@+id/frameLayout1" android:layout_alignParentTop="true" android:layout_alignParentLeft="true" android:layout_toLeftOf="@+id/RelativeLayout2" android:layout_alignParentBottom="true">
-     	<view class = "uk.ac.horizon.tableware.TWMarkerSurfaceView" 
-     	android:id="@+id/MarkerSurfaceView" 
-     	android:layout_width="wrap_content" 
-     	android:layout_height="wrap_content" 
-     	android:layout_gravity="top"/>
-     </FrameLayout>
-     <RelativeLayout android:paddingLeft="5dp" android:paddingRight="5dp" android:id="@+id/RelativeLayout2" android:layout_width="wrap_content" android:background="#787878" android:layout_height="fill_parent" android:orientation="vertical" android:layout_alignParentTop="true" android:layout_alignParentRight="true">
-        <Button android:text="" 
-         android:id="@+id/markerDetailBtn" 
-         android:layout_width="wrap_content" 
-         android:layout_height="wrap_content"
-         android:background="@drawable/markerdetailbtn"
-         android:onClick="onMarkerDetailBtnClick"
-         android:layout_centerInParent ="true"/>
-     </RelativeLayout>
+<RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
+	android:orientation="vertical" android:layout_width="fill_parent"
+	android:layout_height="fill_parent" android:background="#ffffffff">
+	<RelativeLayout android:id="@+id/relativeLayout1"
+		android:layout_height="44dp" android:layout_width="fill_parent"
+		android:layout_alignParentTop="true" android:layout_alignParentLeft="true"
+		android:layout_alignParentRight="true" android:background="#ff0000ff">
+		<TextView android:textAppearance="?android:attr/textAppearanceLarge"
+			android:id="@+id/textView2" android:text="Busaba" android:textStyle="bold"
+			android:layout_height="wrap_content" android:layout_width="wrap_content"
+			android:layout_centerVertical="true" android:layout_centerHorizontal="true"></TextView>
+	</RelativeLayout>
+	<LinearLayout android:layout_width="120dp"
+		android:id="@+id/linearLayout1" android:layout_height="wrap_content"
+		android:orientation="vertical" android:layout_below="@+id/relativeLayout1"
+		android:layout_alignParentLeft="true" android:layout_marginLeft="20dp"
+		android:layout_marginTop="58dp" android:gravity="center">
+		<ImageButton android:layout_width="wrap_content"
+			android:layout_height="wrap_content" android:id="@+id/scanBtn"
+			android:background="@drawable/scan_button"></ImageButton>
+		<TextView android:text="Scan Marker" android:textColor="#000000"
+			android:id="@+id/textView2" android:textAppearance="?android:attr/textAppearanceMedium"
+			android:layout_width="120dp" android:layout_height="wrap_content" android:gravity="center"></TextView>
+	</LinearLayout>
+	<LinearLayout android:layout_width="120dp"
+		android:id="@+id/linearLayout2" android:layout_height="wrap_content"
+		android:orientation="vertical" android:layout_alignParentRight="true"
+		android:layout_marginRight="20dp" android:layout_below="@+id/relativeLayout1"
+		android:layout_marginTop="58dp" android:gravity="center">
+		<ImageButton android:layout_width="wrap_content"
+			android:layout_height="wrap_content" android:id="@+id/memberBtn"
+			android:background="@drawable/scan_button" android:gravity="center"></ImageButton>
+		<TextView android:text="Member Card" android:id="@+id/textView2"
+			android:textAppearance="?android:attr/textAppearanceMedium"
+			android:layout_width="wrap_content" android:layout_height="wrap_content"
+			android:textColor="#000000" android:gravity="center"></TextView>
+	</LinearLayout>
+	<LinearLayout android:layout_width="120dp"
+		android:id="@+id/linearLayout3" android:layout_height="wrap_content"
+		android:orientation="vertical" android:layout_below="@+id/linearLayout1"
+		android:layout_alignParentLeft="true" android:layout_marginLeft="20dp"
+		android:layout_marginTop="50dp" android:gravity="center">
+		<ImageButton android:layout_width="wrap_content"
+			android:layout_height="wrap_content" android:id="@+id/specialoffer"
+			android:background="@drawable/scan_button" android:gravity="center"></ImageButton>
+		<TextView android:text="Special offers" android:textColor="#000000"
+			android:id="@+id/textView2" android:textAppearance="?android:attr/textAppearanceMedium"
+			android:layout_width="wrap_content" android:layout_height="wrap_content" android:gravity="center"></TextView>
+	</LinearLayout>
+	<LinearLayout android:layout_width="120dp"
+		android:id="@+id/linearLayout4" android:layout_height="wrap_content"
+		android:orientation="vertical" android:layout_alignParentRight="true"
+		android:layout_marginRight="20dp" android:layout_below="@+id/linearLayout2"
+		android:layout_marginTop="50dp" android:gravity="center">
+		<ImageButton android:layout_width="wrap_content"
+			android:layout_height="wrap_content" android:id="@+id/settings"
+			android:background="@drawable/scan_button" android:gravity="center"></ImageButton>
+		<TextView android:text="Settings" android:id="@+id/textView2"
+			android:textAppearance="?android:attr/textAppearanceMedium"
+			android:layout_width="100dp" android:layout_height="wrap_content"
+			android:textColor="#000000" android:gravity="center"></TextView>
+	</LinearLayout>
 </RelativeLayout>
--->

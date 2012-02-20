@@ -1,6 +1,8 @@
 <?xml version="1.0" encoding="utf-8"?>
+<RelativeLayout android:layout_width="wrap_content" android:layout_height="wrap_content"
+	xmlns:android="http://schemas.android.com/apk/res/android">
 <RelativeLayout android:id="@+id/markerpopupLayout"
-	android:layout_width="wrap_content" android:layout_height="wrap_content"
+	android:layout_width="fill_parent" android:layout_height="fill_parent"
 	android:background="#20FFFFFF" xmlns:android="http://schemas.android.com/apk/res/android">
 	<TextView android:text="Chargrilled duck"
 		android:layout_height="wrap_content" android:layout_width="wrap_content"
@@ -12,4 +14,5 @@
 		android:textAppearance="?android:attr/textAppearanceMedium"
 		android:layout_width="wrap_content" android:id="@+id/textView2"
 		android:layout_alignParentBottom="true" android:layout_centerInParent="true"></TextView>
+</RelativeLayout>
 </RelativeLayout>

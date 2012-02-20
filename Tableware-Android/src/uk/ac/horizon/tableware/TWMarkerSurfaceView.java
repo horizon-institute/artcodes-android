@@ -13,6 +13,7 @@ import org.opencv.highgui.Highgui;
 import org.opencv.highgui.VideoCapture;
 import org.opencv.imgproc.Imgproc;
 
+
 import android.content.Context;
 import android.graphics.Bitmap;
 import android.graphics.Canvas;
@@ -58,11 +59,11 @@ class TWMarkerSurfaceView extends TWSurfaceViewBase {
     }
     
     private Bitmap processFrameForMarker(VideoCapture capture, DtouchMarker marker) {
-      	switch (TablewareActivity.viewMode) {
-           case TablewareActivity.VIEW_MODE_MARKER:
+      	switch (TWCameraActivity.viewMode) {
+           case TWCameraActivity.VIEW_MODE_MARKER:
 	        	processFrameForMarkers(capture, marker);
 	            break;
-           case TablewareActivity.VIEW_MODE_MARKER_DEBUG:
+           case TWCameraActivity.VIEW_MODE_MARKER_DEBUG:
         	   processFrameForMarkersDebug(capture);
 	            break;
 	       default:

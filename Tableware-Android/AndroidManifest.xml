@@ -11,7 +11,7 @@
                      android:anyDensity="true" />
 
     <application android:icon="@drawable/icon" android:label="@string/app_name">
-        <activity android:name=".TablewareActivity"
+        <activity android:name=".TWCameraActivity"
                   android:label="@string/app_name"
                   android:screenOrientation="landscape"
                   android:configChanges="keyboardHidden|orientation">
