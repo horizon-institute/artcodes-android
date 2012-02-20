@@ -1,0 +1,23 @@
+<?xml version="1.0" encoding="utf-8"?>
+<RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
+	android:orientation="vertical" android:layout_width="fill_parent"
+	android:layout_height="fill_parent"
+	android:background="#ffffffff">
+	<!-- <View android:id="@+id/view1" android:layout_height="44dp"
+	android:layout_width="fill_parent" android:layout_alignParentTop="true"
+	android:layout_alignParentLeft="true"
+	android:background="#ff0000ff"></View>-->
+	<RelativeLayout android:id="@+id/relativeLayout1"
+	android:layout_height="44dp" android:layout_width="fill_parent"
+	android:layout_alignParentTop="true" android:layout_alignParentLeft="true"
+	android:layout_alignParentRight="true"
+	android:background="#ff0000ff">
+	<TextView android:textAppearance="?android:attr/textAppearanceLarge"
+		android:id="@+id/textView2" android:text="Membership Card"
+		android:layout_height="wrap_content" android:layout_width="wrap_content"
+		android:layout_centerVertical="true" android:layout_centerHorizontal="true"></TextView>
+	
+	</RelativeLayout>
+	<TextView android:textAppearance="?android:attr/textAppearanceMedium" android:id="@+id/membername" android:text="Welcome!" android:textColor="#000000" android:layout_height="wrap_content" android:layout_width="wrap_content" android:layout_below="@+id/relativeLayout1" android:layout_alignParentLeft="true" android:layout_marginLeft="15dp" android:layout_marginTop="19dp"></TextView>
+	<ImageView android:layout_height="wrap_content" android:id="@+id/memberphoto" android:layout_width="wrap_content" android:src="@drawable/userblankface" android:layout_below="@+id/membername" android:layout_alignParentRight="true" android:layout_marginRight="18dp"></ImageView>
+</RelativeLayout>

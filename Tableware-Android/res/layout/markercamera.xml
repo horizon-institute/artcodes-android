@@ -1,0 +1,39 @@
+<?xml version="1.0" encoding="utf-8"?>
+<LinearLayout android:id="@+id/MarkerLayout"
+	android:layout_width="fill_parent" android:layout_height="fill_parent"
+	xmlns:android="http://schemas.android.com/apk/res/android">
+	<FrameLayout android:layout_height="wrap_content" android:layout_width="wrap_content" 
+		android:id="@+id/frameLayout">
+	<view class="uk.ac.horizon.tableware.TWMarkerSurfaceView" 
+		android:id="@+id/MarkerSurfaceView"
+		android:layout_width="wrap_content" 
+		android:layout_height="wrap_content"/>
+	<!-- <Button android:text="" 
+         android:id="@+id/scanMarkerBtn" 
+         android:layout_width="wrap_content" 
+         android:layout_height="wrap_content"
+         android:background="@drawable/markerdetailbtn"
+         android:onClick="onScanMarkerBtnClick"
+         android:layout_gravity="top|right"/>-->	
+	</FrameLayout>
+</LinearLayout>
+<!-- 
+<RelativeLayout android:id="@+id/MarkerLayout" android:layout_width="fill_parent" android:layout_height="fill_parent" xmlns:android="http://schemas.android.com/apk/res/android">
+     <FrameLayout android:layout_height="wrap_content" android:layout_width="wrap_content" android:id="@+id/frameLayout1" android:layout_alignParentTop="true" android:layout_alignParentLeft="true" android:layout_toLeftOf="@+id/RelativeLayout2" android:layout_alignParentBottom="true">
+     	<view class = "uk.ac.horizon.tableware.TWMarkerSurfaceView" 
+     	android:id="@+id/MarkerSurfaceView" 
+     	android:layout_width="wrap_content" 
+     	android:layout_height="wrap_content" 
+     	android:layout_gravity="top"/>
+     </FrameLayout>
+     <RelativeLayout android:paddingLeft="5dp" android:paddingRight="5dp" android:id="@+id/RelativeLayout2" android:layout_width="wrap_content" android:background="#787878" android:layout_height="fill_parent" android:orientation="vertical" android:layout_alignParentTop="true" android:layout_alignParentRight="true">
+        <Button android:text="" 
+         android:id="@+id/markerDetailBtn" 
+         android:layout_width="wrap_content" 
+         android:layout_height="wrap_content"
+         android:background="@drawable/markerdetailbtn"
+         android:onClick="onMarkerDetailBtnClick"
+         android:layout_centerInParent ="true"/>
+     </RelativeLayout>
+</RelativeLayout>
+-->
