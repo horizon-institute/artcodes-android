@@ -1,5 +1,7 @@
 package uk.ac.horizon.tableware;
 
+import uk.ac.horizon.dtouch.DtouchMarker;
+import uk.ac.horizon.tableware.R;
 import android.content.Context;
 import android.graphics.Point;
 import android.view.Gravity;
@@ -11,7 +13,7 @@ import android.view.ViewGroup;
 import android.widget.PopupWindow;
 import android.widget.TextView;
 
-public class MarkerPopupWindow{
+class MarkerPopupWindow{
 	private View anchor;
 	private PopupWindow window;
 	private DtouchMarker dtouchMarker;

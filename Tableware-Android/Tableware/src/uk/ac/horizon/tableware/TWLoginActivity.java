@@ -14,8 +14,7 @@ import android.app.Activity;
 import android.content.Intent;
 import android.os.Bundle;
 
-public class TWLogin extends Activity {
-	public static final String APP_ID = "255277451215543";
+public class TWLoginActivity extends Activity {
 	final static int AUTHORIZE_ACTIVITY_RESULT_CODE = 0;
 	String[] permissions = {"publish_stream"};
 	private LoginButton mLoginButton;
@@ -42,15 +41,15 @@ public class TWLogin extends Activity {
 			}else{
 				Utility.mFacebook.extendAccessTokenIfNeeded(this, null);
 				//display membership data.
-				displayMembershipActivity();
+				displayMainActivity();
 				this.finish();
 			}
 			
 		}
 	}
 	
-	private void displayMembershipActivity(){
-		Intent intent = new Intent(this, TWMembershipActivity.class);
+	private void displayMainActivity(){
+		Intent intent = new Intent(this.getApplicationContext(), TWMainActivity.class);
 		startActivity(intent);
 	}
 	
@@ -76,7 +75,7 @@ public class TWLogin extends Activity {
 		 // Instantiate the asynrunner object for asynchronous api calls.
         Utility.mAsyncRunner = new AsyncFacebookRunner(Utility.mFacebook);
         // restore session if one exists
-        SessionStore.restore(Utility.mFacebook, this);
+        SessionStore.restore(Utility.mFacebook, this.getApplicationContext());
         SessionEvents.addAuthListener(new FbAPIsAuthListener());
         SessionEvents.addLogoutListener(new FbAPIsLogoutListener());
 	}

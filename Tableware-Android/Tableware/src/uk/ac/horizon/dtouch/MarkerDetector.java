@@ -1,9 +1,11 @@
-package uk.ac.horizon.tableware;
+package uk.ac.horizon.dtouch;
 
 import java.util.Collections;
 import java.util.List;
 
 import org.opencv.core.Mat;
+
+import uk.ac.horizon.tableware.TWPreference;
 
 import android.content.Context;
 
@@ -23,7 +25,7 @@ enum BranchStatus{
 	VALID
 }
 
-class MarkerDetector
+public class MarkerDetector
 {
 	//indexes of leaf nodes in contour tree hierarchy.
 	private static final int NEXT_NODE = 0;

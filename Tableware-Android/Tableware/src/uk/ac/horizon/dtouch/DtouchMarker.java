@@ -1,4 +1,4 @@
-package uk.ac.horizon.tableware;
+package uk.ac.horizon.dtouch;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -16,21 +16,21 @@ public class DtouchMarker {
 
 	
 	//constructors
-	DtouchMarker(){
+	public DtouchMarker(){
 		super();
 	}
 	
-	DtouchMarker(List<Integer> code){
+	public DtouchMarker(List<Integer> code){
 		mCode = new ArrayList<Integer>(code);
 	}
 	
-	DtouchMarker(List<Integer> code, String url, String desc){
+	public DtouchMarker(List<Integer> code, String url, String desc){
 		mCode = new ArrayList<Integer>(code);
 		mURL = url;
 		mDesc = desc;
 	}
 	
-	DtouchMarker(String code, String url, String desc){
+	public DtouchMarker(String code, String url, String desc){
 		mCode = getCodeArrayFromString(code);
 		mURL = url;
 		mDesc = desc;

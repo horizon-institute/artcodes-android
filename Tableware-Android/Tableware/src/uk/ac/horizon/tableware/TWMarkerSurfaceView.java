@@ -13,6 +13,9 @@ import org.opencv.highgui.Highgui;
 import org.opencv.highgui.VideoCapture;
 import org.opencv.imgproc.Imgproc;
 
+import uk.ac.horizon.dtouch.DtouchMarker;
+import uk.ac.horizon.dtouch.MarkerDetector;
+
 
 import android.content.Context;
 import android.graphics.Bitmap;

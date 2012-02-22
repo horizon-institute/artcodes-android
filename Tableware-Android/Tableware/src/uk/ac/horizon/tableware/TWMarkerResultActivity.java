@@ -1,5 +1,7 @@
 package uk.ac.horizon.tableware;
 
+import uk.ac.horizon.dtouch.DtouchMarker;
+import uk.ac.horizon.dtouch.DtouchMarkersDataSource;
 import android.app.Activity;
 import android.content.Intent;
 import android.os.Bundle;

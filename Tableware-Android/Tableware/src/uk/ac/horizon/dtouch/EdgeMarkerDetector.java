@@ -1,9 +1,11 @@
-package uk.ac.horizon.tableware;
+package uk.ac.horizon.dtouch;
 
 import java.util.Collections;
 import java.util.List;
 
 import org.opencv.core.Mat;
+
+import uk.ac.horizon.tableware.TWPreference;
 
 import android.content.Context;
 

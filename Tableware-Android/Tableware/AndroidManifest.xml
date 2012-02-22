@@ -11,14 +11,26 @@
                      android:anyDensity="true" />
 
     <application android:icon="@drawable/icon" android:label="@string/app_name">
+        <activity android:name=".TWSpalshScreenActivity"
+        		  android:label="@string/app_name">
+        	<intent-filter>
+        		<action android:name="android.intent.action.MAIN"/>
+        		<category android:name="android.intent.category.LAUNCHER" />
+        	</intent-filter>	  
+        </activity>
+        <activity android:name=".TWMainActivity"
+        		android:label="@string/app_name"
+        		android:screenOrientation="portrait"/>
+        <activity android:name=".TWMembershipActivity"
+        		android:label="@string/app_name"
+        		android:screenOrientation="portrait"/>
+       	<activity android:name=".TWLoginActivity"
+        		android:label="@string/app_name"
+        		android:screenOrientation="unspecified"/>
         <activity android:name=".TWCameraActivity"
                   android:label="@string/app_name"
                   android:screenOrientation="landscape"
                   android:configChanges="keyboardHidden|orientation">
-            <intent-filter>
-                <action android:name="android.intent.action.MAIN" />
-                <category android:name="android.intent.category.LAUNCHER" />
-            </intent-filter>
         </activity>
         <activity android:name=".TWPreferenceActivity"
         		android:configChanges="keyboardHidden|orientation"

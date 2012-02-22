@@ -1,6 +1,8 @@
-package uk.ac.horizon.tableware;
+package uk.ac.horizon.dtouch;
 
 import java.util.List;
+
+import uk.ac.horizon.tableware.TWPreference;
 
 public class MarkerConstraint {
 	private List<Integer> markerCodes;

@@ -18,7 +18,8 @@
 		android:layout_marginTop="58dp" android:gravity="center">
 		<ImageButton android:layout_width="wrap_content"
 			android:layout_height="wrap_content" android:id="@+id/scanBtn"
-			android:background="@drawable/scan_button"></ImageButton>
+			android:background="@drawable/scan_button"
+			android:onClick="onScanBtnClick"></ImageButton>
 		<TextView android:text="Scan Marker" android:textColor="#000000"
 			android:id="@+id/textView2" android:textAppearance="?android:attr/textAppearanceMedium"
 			android:layout_width="120dp" android:layout_height="wrap_content" android:gravity="center"></TextView>
@@ -30,7 +31,8 @@
 		android:layout_marginTop="58dp" android:gravity="center">
 		<ImageButton android:layout_width="wrap_content"
 			android:layout_height="wrap_content" android:id="@+id/memberBtn"
-			android:background="@drawable/scan_button" android:gravity="center"></ImageButton>
+			android:background="@drawable/scan_button" android:gravity="center"
+			android:onClick="onMemberBtnClick"></ImageButton>
 		<TextView android:text="Member Card" android:id="@+id/textView2"
 			android:textAppearance="?android:attr/textAppearanceMedium"
 			android:layout_width="wrap_content" android:layout_height="wrap_content"
@@ -43,7 +45,8 @@
 		android:layout_marginTop="50dp" android:gravity="center">
 		<ImageButton android:layout_width="wrap_content"
 			android:layout_height="wrap_content" android:id="@+id/specialoffer"
-			android:background="@drawable/scan_button" android:gravity="center"></ImageButton>
+			android:background="@drawable/scan_button" android:gravity="center"
+			android:onClick="onSpecialOffersBtnClick"></ImageButton>
 		<TextView android:text="Special offers" android:textColor="#000000"
 			android:id="@+id/textView2" android:textAppearance="?android:attr/textAppearanceMedium"
 			android:layout_width="wrap_content" android:layout_height="wrap_content" android:gravity="center"></TextView>
@@ -55,7 +58,8 @@
 		android:layout_marginTop="50dp" android:gravity="center">
 		<ImageButton android:layout_width="wrap_content"
 			android:layout_height="wrap_content" android:id="@+id/settings"
-			android:background="@drawable/scan_button" android:gravity="center"></ImageButton>
+			android:background="@drawable/scan_button" android:gravity="center"
+			android:onClick="onSettingsBtnClick"></ImageButton>
 		<TextView android:text="Settings" android:id="@+id/textView2"
 			android:textAppearance="?android:attr/textAppearanceMedium"
 			android:layout_width="100dp" android:layout_height="wrap_content"

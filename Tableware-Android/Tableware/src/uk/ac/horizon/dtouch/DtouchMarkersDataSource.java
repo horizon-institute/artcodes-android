@@ -1,6 +1,9 @@
-package uk.ac.horizon.tableware;
+package uk.ac.horizon.dtouch;
 
 import java.util.Hashtable;
+
+
+
 
 public class DtouchMarkersDataSource {
 	private static Hashtable<String, DtouchMarker> dtouchMarkers;
@@ -24,6 +27,8 @@ public class DtouchMarkersDataSource {
 			initMarkers();
 		if (dtouchMarkers.containsKey(codeKey)){
 			marker = dtouchMarkers.get(codeKey);
+		}else{
+			marker = new DtouchMarker(codeKey, null, "Marker not in the system.");
 		}
 		return marker;		
 	}

@@ -2,14 +2,16 @@ package uk.ac.horizon.tableware;
 
 import org.opencv.core.Rect;
 
+import uk.ac.horizon.dtouch.DtouchMarker;
+import uk.ac.horizon.dtouch.DtouchMarkersDataSource;
+import uk.ac.horizon.tableware.R;
 import uk.ac.horizon.tableware.MarkerPopupWindow.OnMarkerPopupWindowListener;
 import uk.ac.horizon.tableware.TWMarkerSurfaceView.OnMarkerDetectedListener;
+import android.app.Activity;
 import android.content.Intent;
 import android.graphics.Point;
 import android.os.AsyncTask;
 import android.os.Bundle;
-import android.os.Handler;
-import android.support.v4.app.FragmentActivity;
 import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.Menu;
@@ -19,7 +21,7 @@ import android.view.WindowManager;
 import android.widget.FrameLayout;
 import android.widget.ProgressBar;
 
-public class TWCameraActivity extends FragmentActivity implements OnMarkerDetectedListener, OnMarkerPopupWindowListener{
+public class TWCameraActivity extends Activity implements OnMarkerDetectedListener, OnMarkerPopupWindowListener{
     
     public static final int	VIEW_MODE_MARKER  = 0;
     public static final int	VIEW_MODE_MARKER_DEBUG  = 1;
@@ -40,7 +42,7 @@ public class TWCameraActivity extends FragmentActivity implements OnMarkerDetect
         super.onCreate(savedInstanceState);
         requestWindowFeature(Window.FEATURE_NO_TITLE);
         getWindow().setFlags(WindowManager.LayoutParams.FLAG_FULLSCREEN, WindowManager.LayoutParams.FLAG_FULLSCREEN);
-        displaySplashScreen();
+        //displaySplashScreen();
         setContentView(R.layout.markercamera);
         initTWSurfaceViewListener();
     }
@@ -119,17 +121,7 @@ public class TWCameraActivity extends FragmentActivity implements OnMarkerDetect
     	mMarkerSurfaceView = (TWMarkerSurfaceView) findViewById(R.id.MarkerSurfaceView);
     	mMarkerSurfaceView.setOnMarkerDetectedListener(this);
     }
-    
-    private void displaySplashScreen(){
-    	final TWSplashScreenFragment frag = TWSplashScreenFragment.newInstance();
-    	frag.show(this.getSupportFragmentManager(), "SPLASH_SCREEN");
-    	final Handler handler = new Handler();
-    	handler.postDelayed(new Runnable(){
-    		public void run(){
-    			frag.dismiss();
-    		}
-    	}, 2000);
-    }
+
     
     private void showProgressControls(){
     	FrameLayout frameLayout = (FrameLayout) findViewById(R.id.frameLayout);
@@ -146,7 +138,8 @@ public class TWCameraActivity extends FragmentActivity implements OnMarkerDetect
     
     private void onMarkerDownloaded(DtouchMarker marker){
     	hideProgressControls();
-    	displayMarkerPopupWindow(marker);
+    	if (marker != null)
+    		displayMarkerPopupWindow(marker);
     }
     
     private void displayMarkerPopupWindow(DtouchMarker marker){
@@ -167,8 +160,10 @@ public class TWCameraActivity extends FragmentActivity implements OnMarkerDetect
     
 	public void onBrowseMarkerSelected(DtouchMarker marker){
 		mMarkerSurfaceView.stopDisplayingDetectedMarker();
-		stopMarkerDetectionProcess();
-		displayMarkerDetailFromWebService(marker);
+		if (marker.getURL() != null){
+			stopMarkerDetectionProcess();
+			displayMarkerDetailFromWebService(marker);
+		}
 	}
     
     class DtouchMarkerWebServicesTask extends AsyncTask<String, Void, DtouchMarker> {
