@@ -1,15 +1,9 @@
 <?xml version="1.0" encoding="utf-8"?>
 <RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
-	android:orientation="vertical" android:layout_width="fill_parent"
-	android:layout_height="fill_parent" android:background="#ffffffff">
-	<RelativeLayout android:id="@+id/relativeLayout1"
-		android:layout_height="44dp" android:layout_width="fill_parent"
-		android:layout_alignParentTop="true" android:layout_alignParentLeft="true"
-		android:layout_alignParentRight="true" android:background="#ff0000ff">
-		<TextView android:textAppearance="?android:attr/textAppearanceLarge"
-			android:id="@+id/textView2" android:text="Busaba" android:textStyle="bold"
-			android:layout_height="wrap_content" android:layout_width="wrap_content"
-			android:layout_centerVertical="true" android:layout_centerHorizontal="true"></TextView>
+	style="@style/ActivityView">
+	<RelativeLayout android:id="@+id/relativeLayout1" style="@style/ActivityBar">
+	<TextView style="@style/ActivityBarText" android:id="@+id/textView2"
+	android:text="Busaba"/>
 	</RelativeLayout>
 	<LinearLayout android:layout_width="120dp"
 		android:id="@+id/linearLayout1" android:layout_height="wrap_content"

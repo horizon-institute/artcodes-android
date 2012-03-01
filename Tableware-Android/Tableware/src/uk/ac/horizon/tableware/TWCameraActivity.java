@@ -3,14 +3,14 @@ package uk.ac.horizon.tableware;
 import org.opencv.core.Rect;
 
 import uk.ac.horizon.dtouch.DtouchMarker;
-import uk.ac.horizon.dtouch.DtouchMarkersDataSource;
+import uk.ac.horizon.dtouch.DtouchMarkerDataWebServices;
+import uk.ac.horizon.dtouch.DtouchMarkerDataWebServices.MarkerDownloadRequestListener;
 import uk.ac.horizon.tableware.R;
 import uk.ac.horizon.tableware.MarkerPopupWindow.OnMarkerPopupWindowListener;
 import uk.ac.horizon.tableware.TWMarkerSurfaceView.OnMarkerDetectedListener;
 import android.app.Activity;
 import android.content.Intent;
 import android.graphics.Point;
-import android.os.AsyncTask;
 import android.os.Bundle;
 import android.util.Log;
 import android.view.LayoutInflater;
@@ -25,6 +25,8 @@ public class TWCameraActivity extends Activity implements OnMarkerDetectedListen
     
     public static final int	VIEW_MODE_MARKER  = 0;
     public static final int	VIEW_MODE_MARKER_DEBUG  = 1;
+    private static final String MARKER_TYPE_FOOD = "food";
+    private static final String MARKER_TYPE_OFFER = "offer";
     static final int DIALOG_MARKER_DETECTION_ID = 0;
     private static final String TAG = "Tableware::TablewareActivity";
             
@@ -105,18 +107,43 @@ public class TWCameraActivity extends Activity implements OnMarkerDetectedListen
     	this.runOnUiThread(new Runnable(){
     		public void run(){
     			showProgressControls();
-    			new DtouchMarkerWebServicesTask().execute(marker.getCodeKey());
+    			getMarker(marker.getCodeKey());
+    			//new DtouchMarkerWebServicesTask().execute(marker.getCodeKey());
     		}
     	});
     }
     
-    public void displayMarkerDetailFromWebService(DtouchMarker marker){
-		Intent intent = new Intent(this, TWBrowseMarkerActivity.class);
-		Bundle markerBundle = DtouchMarker.createMarkerBundleFromCode(marker);
+    void getMarker(String code){
+    	DtouchMarkerDataWebServices dtouchMarkerWebServices = new DtouchMarkerDataWebServices(new MarkerDownloadRequestListener(){
+    		public void onMarkerDownloaded(DtouchMarker marker){
+    			markerDownloaded(marker);
+    		}
+    	});
+    	dtouchMarkerWebServices.executeMarkerRequest(code);
+    }
+    
+    public void displayMarkerDetail(DtouchMarker marker){
+    	if (marker.getType().compareToIgnoreCase(MARKER_TYPE_FOOD) == 0){
+    		displayDish(marker);
+    	}else if (marker.getType().compareToIgnoreCase(MARKER_TYPE_OFFER) == 0){
+    		displayOffer(marker);
+    	}
+    }
+    
+    private void displayDish(DtouchMarker marker){
+		Intent intent = new Intent(this, TWDishActivity.class);
+		Bundle markerBundle = DtouchMarker.createMarkerBundle(marker);
 		intent.putExtras(markerBundle);
 		startActivity(intent);
 	}
     
+    private void displayOffer(DtouchMarker marker){
+    	Intent intent = new Intent(this, TWOfferActivity.class);
+		Bundle markerBundle = DtouchMarker.createMarkerBundle(marker);
+		intent.putExtras(markerBundle);
+		startActivity(intent);
+    }
+        
     private void initTWSurfaceViewListener(){
     	mMarkerSurfaceView = (TWMarkerSurfaceView) findViewById(R.id.MarkerSurfaceView);
     	mMarkerSurfaceView.setOnMarkerDetectedListener(this);
@@ -136,7 +163,7 @@ public class TWCameraActivity extends Activity implements OnMarkerDetectedListen
     	progressBar = null;
     }
     
-    private void onMarkerDownloaded(DtouchMarker marker){
+    private void markerDownloaded(DtouchMarker marker){
     	hideProgressControls();
     	if (marker != null)
     		displayMarkerPopupWindow(marker);
@@ -160,20 +187,8 @@ public class TWCameraActivity extends Activity implements OnMarkerDetectedListen
     
 	public void onBrowseMarkerSelected(DtouchMarker marker){
 		mMarkerSurfaceView.stopDisplayingDetectedMarker();
-		if (marker.getURL() != null){
-			stopMarkerDetectionProcess();
-			displayMarkerDetailFromWebService(marker);
-		}
+		stopMarkerDetectionProcess();
+		displayMarkerDetail(marker);
 	}
     
-    class DtouchMarkerWebServicesTask extends AsyncTask<String, Void, DtouchMarker> {
-	   
-	   protected DtouchMarker doInBackground(String... codes){
-		   return DtouchMarkersDataSource.getDtouchMarkerUsingKey(codes[0]);
-	   }
-
-	   protected void onPostExecute(DtouchMarker marker){
-		   onMarkerDownloaded(marker);
-	   }
-   }
 }

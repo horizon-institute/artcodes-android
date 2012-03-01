@@ -16,7 +16,8 @@ import android.os.Bundle;
 
 public class TWLoginActivity extends Activity {
 	final static int AUTHORIZE_ACTIVITY_RESULT_CODE = 0;
-	String[] permissions = {"publish_stream"};
+	String[] permissions =  { "offline_access", "publish_stream", "user_photos", "publish_checkins",
+    "photo_upload" };
 	private LoginButton mLoginButton;
 		
 	@Override

@@ -12,7 +12,6 @@ import android.net.Uri;
 import android.os.AsyncTask;
 import android.os.Bundle;
 import android.os.Handler;
-import android.view.Window;
 import android.widget.ImageView;
 import android.widget.TextView;
 
@@ -25,7 +24,7 @@ public class TWMembershipActivity extends Activity {
 	@Override
 	public void onCreate(Bundle savedInstanceState){
 		super.onCreate(savedInstanceState);
-		requestWindowFeature(Window.FEATURE_NO_TITLE);
+		//requestWindowFeature(Window.FEATURE_NO_TITLE);
 		setContentView(R.layout.membership);
 		mHandler = new Handler();
 	}

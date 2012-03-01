@@ -2,9 +2,6 @@ package uk.ac.horizon.dtouch;
 
 import java.util.Hashtable;
 
-
-
-
 public class DtouchMarkersDataSource {
 	private static Hashtable<String, DtouchMarker> dtouchMarkers;
 	
@@ -32,4 +29,5 @@ public class DtouchMarkersDataSource {
 		}
 		return marker;		
 	}
+	
 }

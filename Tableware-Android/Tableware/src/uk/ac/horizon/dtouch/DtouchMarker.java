@@ -11,9 +11,11 @@ public class DtouchMarker {
 	private Mat mComponent;
 	private int mIndex;
 	private List<Integer> mCode;
-	private String mURL;
+	private String mURL1;
+	private String mURL2;
+	private String mURL3;
 	private String mDesc;
-
+	private String mType;
 	
 	//constructors
 	public DtouchMarker(){
@@ -26,13 +28,13 @@ public class DtouchMarker {
 	
 	public DtouchMarker(List<Integer> code, String url, String desc){
 		mCode = new ArrayList<Integer>(code);
-		mURL = url;
+		mURL1 = url;
 		mDesc = desc;
 	}
 	
 	public DtouchMarker(String code, String url, String desc){
 		mCode = getCodeArrayFromString(code);
-		mURL = url;
+		mURL1 = url;
 		mDesc = desc;
 	}
 	
@@ -67,14 +69,34 @@ public class DtouchMarker {
 		mCode = new ArrayList<Integer>(code);
 	}
 	
-	public String getURL(){
-		return mURL;
+	public void setCode(String code){
+		this.setCode(getCodeArrayFromString(code));
 	}
 	
-	public void setURL(String url){
-		mURL = url;
+	public String getURL1(){
+		return mURL1;
 	}
 	
+	public void setURL1(String url){
+		mURL1 = url;
+	}
+	
+	public String getURL2(){
+		return mURL2;
+	}
+	
+	public void setURL2(String url){
+		mURL2 = url;
+	}
+	
+	public String getURL3(){
+		return mURL3;
+	}
+	
+	public void setURL3(String url){
+		mURL3 = url;
+	}
+		
 	public String getDescription(){
 		return mDesc;
 	}
@@ -124,8 +146,53 @@ public class DtouchMarker {
 	   	return markerBundle;
 	}
 	
+	public static Bundle createMarkerBundle(DtouchMarker marker){
+		Bundle markerBundle = new Bundle();
+		if (marker.getCodeKey() != null){
+			markerBundle.putString("Code", marker.getCodeKey());
+			if (marker.getDescription() != null){
+				markerBundle.putString("Desc", marker.getDescription());
+			}
+			if (marker.getType() != null){
+				markerBundle.putString("Type", marker.getType());
+			}
+			if (marker.getURL1() != null){
+				markerBundle.putString("URL1", marker.getURL1());
+			}
+			if (marker.getURL2() != null){
+				markerBundle.putString("URL2", marker.getURL2());
+			}
+			if (marker.getURL3() != null){
+				markerBundle.putString("URL3", marker.getURL3());
+			}
+		}
+		return markerBundle;
+	}
+	
 	public static DtouchMarker createMarkerFromBundle(Bundle markerBundle){
-		String markerCode = markerBundle.getString("Code");
-		return new DtouchMarker(getCodeArrayFromString(markerCode));
+		DtouchMarker marker = null;
+		if (markerBundle.getString("Code") != null){
+			marker = new DtouchMarker();
+			marker.setCode(markerBundle.getString("Code"));
+			if (markerBundle.getString("Desc") != null)
+				marker.setDescription(markerBundle.getString("Desc"));
+			if (markerBundle.getString("Type") != null)
+				marker.setType(markerBundle.getString("Type"));
+			if (markerBundle.getString("URL1") != null)
+				marker.setURL1(markerBundle.getString("URL1"));
+			if (markerBundle.getString("URL2") != null)
+				marker.setURL2(markerBundle.getString("URL2"));
+			if (markerBundle.getString("URL3") != null)
+				marker.setURL3(markerBundle.getString("URL3"));
+		}
+		return marker;
+	}
+	
+	public void setType(String type){
+		mType = type;
+	}
+	
+	public String getType(){
+		return mType;
 	}
 }

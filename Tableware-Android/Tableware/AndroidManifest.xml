@@ -1,53 +1,46 @@
 <?xml version="1.0" encoding="utf-8"?>
 <manifest xmlns:android="http://schemas.android.com/apk/res/android"
-      package="uk.ac.horizon.tableware"
-      android:versionCode="1"
-      android:versionName="1.0">
-    <uses-sdk android:minSdkVersion="8" />
-    <supports-screens android:resizeable="true"
-                     android:smallScreens="true" 
-                     android:normalScreens="true" 
-                     android:largeScreens="true" 
-                     android:anyDensity="true" />
+	package="uk.ac.horizon.tableware" android:versionCode="1"
+	android:versionName="1.0">
+	<uses-sdk android:minSdkVersion="8" />
+	<supports-screens android:resizeable="true"
+		android:smallScreens="true" android:normalScreens="true"
+		android:largeScreens="true" android:anyDensity="true" />
 
-    <application android:icon="@drawable/icon" android:label="@string/app_name">
-        <activity android:name=".TWSpalshScreenActivity"
-        		  android:label="@string/app_name">
-        	<intent-filter>
-        		<action android:name="android.intent.action.MAIN"/>
-        		<category android:name="android.intent.category.LAUNCHER" />
-        	</intent-filter>	  
-        </activity>
-        <activity android:name=".TWMainActivity"
-        		android:label="@string/app_name"
-        		android:screenOrientation="portrait"/>
-        <activity android:name=".TWMembershipActivity"
-        		android:label="@string/app_name"
-        		android:screenOrientation="portrait"/>
-       	<activity android:name=".TWLoginActivity"
-        		android:label="@string/app_name"
-        		android:screenOrientation="unspecified"/>
-        <activity android:name=".TWCameraActivity"
-                  android:label="@string/app_name"
-                  android:screenOrientation="landscape"
-                  android:configChanges="keyboardHidden|orientation">
-        </activity>
-        <activity android:name=".TWPreferenceActivity"
-        		android:configChanges="keyboardHidden|orientation"
-        		android:screenOrientation="unspecified"/>
-        <activity android:name=".TWBrowseMarkerActivity"
-        		android:label="@string/app_name" 
-        		android:theme="@android:style/Theme.Black.NoTitleBar"
-        		android:screenOrientation="unspecified"/>
-        <activity android:name=".TWMarkerResultActivity"
-        		android:label="@string/app_name"
-        		android:screenOrientation="unspecified"/>
-        <activity android:name=".TWMemberActivity"
-        		android:label="@string/menu_member_info"
-        		android:screenOrientation="unspecified"/>
-    </application>
-    <uses-permission android:name="android.permission.CAMERA"/>
-    <uses-permission android:name="android.permission.INTERNET"/>
-    <uses-feature android:name="android.hardware.camera" />
-    <uses-feature android:name="android.hardware.camera.autofocus" />
+	<application android:icon="@drawable/icon" android:label="@string/app_name">
+		<activity android:name=".TWSpalshScreenActivity"
+			android:label="@string/app_name">
+			<intent-filter>
+				<action android:name="android.intent.action.MAIN" />
+				<category android:name="android.intent.category.LAUNCHER" />
+			</intent-filter>
+		</activity>
+		<activity android:name=".TWMainActivity" android:label="@string/app_name"
+			android:screenOrientation="portrait" android:theme="@android:style/Theme.NoTitleBar" />
+		<activity android:name=".TWMembershipActivity" android:label="@string/app_name"
+			android:screenOrientation="portrait" android:theme="@android:style/Theme.NoTitleBar" />
+		<activity android:name=".TWDishActivity" android:label="@string/app_name"
+			android:screenOrientation="portrait" android:theme="@android:style/Theme.NoTitleBar" />
+		<activity android:name=".TWOfferActivity" android:label="@string/app_name"
+			android:screenOrientation="portrait" android:theme="@android:style/Theme.NoTitleBar" />
+		<activity android:name=".TWLoginActivity" android:label="@string/app_name"
+			android:screenOrientation="unspecified" />
+		<activity android:name=".TWCameraActivity" android:label="@string/app_name"
+			android:screenOrientation="landscape" android:configChanges="keyboardHidden|orientation">
+		</activity>
+		<activity android:name=".TWPreferenceActivity"
+			android:configChanges="keyboardHidden|orientation"
+			android:screenOrientation="unspecified" />
+		<activity android:name=".TWBrowseMarkerActivity"
+			android:label="@string/app_name" android:theme="@android:style/Theme.Black.NoTitleBar"
+			android:screenOrientation="unspecified" />
+		<activity android:name=".TWMarkerResultActivity"
+			android:label="@string/app_name" android:screenOrientation="unspecified" />
+		<activity android:name=".TWMemberActivity" android:label="@string/menu_member_info"
+			android:screenOrientation="unspecified" />
+	</application>
+	<uses-permission android:name="android.permission.CAMERA" />
+	<uses-permission android:name="android.permission.INTERNET" />
+	<uses-feature android:name="android.hardware.camera" />
+	<uses-feature android:name="android.hardware.camera.autofocus" />
 </manifest>

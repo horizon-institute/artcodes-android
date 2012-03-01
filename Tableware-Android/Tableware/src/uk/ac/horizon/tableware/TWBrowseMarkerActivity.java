@@ -3,8 +3,6 @@ package uk.ac.horizon.tableware;
 import java.net.URI;
 
 import uk.ac.horizon.dtouch.DtouchMarker;
-import uk.ac.horizon.dtouch.DtouchMarkersDataSource;
-
 
 import android.app.Activity;
 import android.content.Intent;
@@ -14,7 +12,8 @@ import android.webkit.WebView;
 public class TWBrowseMarkerActivity extends Activity {
 	
 	private WebView mWebView;
-	private DtouchMarker mDtouchMarker; 
+	private DtouchMarker mDtouchMarker;
+	private String mUrl;
 		
 	@Override
     public void onCreate(Bundle savedInstanceState) {
@@ -28,12 +27,9 @@ public class TWBrowseMarkerActivity extends Activity {
 	private void initDtouchMarker(){
 		Intent intent = this.getIntent();
 		Bundle markerBundle = intent.getExtras();
-		DtouchMarker bundleMarker = DtouchMarker.createMarkerFromBundle(markerBundle);
-		DtouchMarker dataSourceMarker = DtouchMarkersDataSource.getDtouchMarkerUsingKey(bundleMarker.getCodeKey());
-		if (dataSourceMarker != null)
-			mDtouchMarker = dataSourceMarker;
-		else
-			mDtouchMarker = dataSourceMarker;
+		if (markerBundle.getString("URLToDisplay") != null)
+			mUrl = markerBundle.getString("URLToDisplay");
+		mDtouchMarker = DtouchMarker.createMarkerFromBundle(markerBundle);
 	}
 	
 	private void initWebView(){
@@ -43,7 +39,7 @@ public class TWBrowseMarkerActivity extends Activity {
 			mWebView.getSettings().setLoadWithOverviewMode(true);
 			mWebView.getSettings().setUseWideViewPort(true);
 			mWebView.getSettings().setBuiltInZoomControls(true);
-			String encodedURL = appendMemberNameWithURL(mDtouchMarker.getURL());
+			String encodedURL = appendMemberNameWithURL(mUrl);
 			if (encodedURL != null)
 				mWebView.loadUrl(encodedURL);
 		}

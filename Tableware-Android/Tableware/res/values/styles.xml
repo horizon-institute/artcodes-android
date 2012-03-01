@@ -5,4 +5,26 @@
 		<item name="@android:windowEnterAnimation">@anim/grow_from_centre</item>
 		<item name="@android:windowExitAnimation">@anim/shrink_to_centre</item>
 	</style>
+	<color name="activity_view_color">#ffffffff</color>
+	<style name="ActivityView">
+		<item name="android:layout_width">fill_parent</item>
+		<item name="android:layout_height">fill_parent</item>
+		<item name="android:background">@color/activity_view_color</item>
+	</style>
+	<color name="activity_bar_color">#ff0000ff</color>
+	<style name="ActivityBar">
+		<item name="android:layout_width">fill_parent</item>
+		<item name="android:layout_height">44dp</item>
+		<item name="android:layout_alignParentTop">true</item>
+		<item name="android:background">@color/activity_bar_color</item>
+	</style>
+	<color name="activity_bar_text_color">#ffffff</color>
+	<style name="ActivityBarText" parent="@android:style/TextAppearance.Large">
+		<item name="android:layout_height">wrap_content</item>
+		<item name="android:layout_width">wrap_content</item>
+		<item name="android:layout_centerVertical">true</item>
+		<item name="android:layout_centerHorizontal">true</item>
+		<item name="android:textColor">@color/activity_bar_text_color</item>
+		<item name="android:textStyle">bold</item>
+	</style>
 </resources>
