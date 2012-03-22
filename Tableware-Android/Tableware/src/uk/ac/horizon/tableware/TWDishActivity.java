@@ -1,40 +1,49 @@
 package uk.ac.horizon.tableware;
 
-import com.facebook.android.BaseDialogListener;
-import com.facebook.android.FacebookError;
+import java.util.ArrayList;
+import com.facebook.android.FacebookPostDialogListener;
 import com.facebook.android.R;
 import com.facebook.android.Utility;
 
-
 import uk.ac.horizon.dtouch.DtouchMarker;
+import uk.ac.horizon.dtouch.DtouchMarkerDataWebServices;
 import uk.ac.horizon.dtouch.DtouchMarkerImageWebServices;
+import uk.ac.horizon.dtouch.DtouchMarkerDataWebServices.MarkerDownloadRequestListener;
 import uk.ac.horizon.dtouch.DtouchMarkerImageWebServices.MarkerImageDownloadRequestListener;
 import uk.ac.horizon.dtouch.DtouchMarkerWebServicesURL;
 import android.app.Activity;
+import android.app.ProgressDialog;
 import android.content.Intent;
 import android.graphics.Bitmap;
 import android.os.Bundle;
 import android.os.Handler;
+import android.os.Parcelable;
 import android.view.LayoutInflater;
 import android.view.View;
+import android.view.Window;
 import android.widget.FrameLayout;
+import android.widget.ImageButton;
 import android.widget.ImageView;
 import android.widget.ProgressBar;
+import android.widget.RelativeLayout;
 import android.widget.TextView;
-import android.widget.Toast;
 
 public class TWDishActivity extends Activity {
 	private DtouchMarker dtouchMarker;
-	private Handler mHandler;
-		
+	ProgressDialog mSpinner;
+			
 	@Override
 	public void onCreate(Bundle savedInstanceState){
 		super.onCreate(savedInstanceState);
 		setContentView(R.layout.dish);
+		setupUserControls();
+		setupSpinner();
 		initMarker();
-		mHandler = new Handler();
 		setActivityCaption();
-		getMarkerImage(dtouchMarker.getCodeKey());
+		if (Utility.userUID != null)
+			getPersonMarkerDetail(dtouchMarker.getCodeKey(), dtouchMarker.getTitle(), Utility.userUID);
+		else
+			getPersonMarkerDetail(dtouchMarker.getCodeKey(), dtouchMarker.getTitle(), null);
 	}
 	
 	private void initMarker(){
@@ -43,13 +52,13 @@ public class TWDishActivity extends Activity {
 		dtouchMarker = DtouchMarker.createMarkerFromBundle(markerBundle);
 	}
 	
-    void showProgressControls(){
+    void showInLineProgressControls(){
     	FrameLayout frameLayout = (FrameLayout) findViewById(R.id.dishImageframeLayout);
     	LayoutInflater inflater = getLayoutInflater();
     	inflater.inflate(R.layout.scanprogress, frameLayout);
     }
     
-    void hideProgressControls(){
+    void hideInLineProgressControls(){
     	FrameLayout frameLayout = (FrameLayout) findViewById(R.id.dishImageframeLayout);
     	ProgressBar progressBar = (ProgressBar) findViewById(R.id.scanProgressBar);
     	frameLayout.removeView(progressBar);
@@ -65,19 +74,52 @@ public class TWDishActivity extends Activity {
 	private void setActivityCaption(){
 		TextView activityCaptionTextView = (TextView) findViewById(R.id.activityCaptionTextView);
 		if (dtouchMarker != null){
-			activityCaptionTextView.setText(dtouchMarker.getDescription());
+			activityCaptionTextView.setText(dtouchMarker.getTitle());
 		}
 	}
 	
 	private void getMarkerImage(String markerCode){
 		DtouchMarkerImageWebServices dtouchMarkerImageWebServices = new DtouchMarkerImageWebServices(new MarkerImageDownloadRequestListener(){
 			public void onMarkerImageDownloaded(Bitmap bmp){
-				hideProgressControls();
+				hideInLineProgressControls();
 				setDishImageView(bmp);
 			}
+
+			@Override
+			public void onMarkerImageDownloadError() {
+				hideInLineProgressControls();
+				MessageDialog.showMessage(R.string.dish_image_download_error,TWDishActivity.this);
+			}
 		});
-		showProgressControls();
-		dtouchMarkerImageWebServices.executeMarkerRequest(markerCode);
+		showInLineProgressControls();
+		dtouchMarkerImageWebServices.executeMarkerImageRequest(markerCode);
+	}
+	
+	private void getDishImage(String dishTitle){
+		DtouchMarkerImageWebServices dtouchMarkerImageWebServices = new DtouchMarkerImageWebServices(new MarkerImageDownloadRequestListener(){
+			public void onMarkerImageDownloaded(Bitmap bmp){
+				hideInLineProgressControls();
+				setDishImageView(bmp);
+			}
+
+			@Override
+			public void onMarkerImageDownloadError() {
+				hideInLineProgressControls();
+				MessageDialog.showMessage(R.string.dish_image_download_error,TWDishActivity.this);
+			}
+		});
+		showInLineProgressControls();
+		dtouchMarkerImageWebServices.executeDishImageRequest(dishTitle);
+	}
+	
+	private void setupUserControls(){
+		if (Utility.mFacebook == null  || !Utility.mFacebook.isSessionValid()){
+			ImageButton shareBtn = (ImageButton) findViewById(R.id.shareImageButton);
+			shareBtn.setEnabled(false);
+			
+			RelativeLayout diningHistoryLayout = (RelativeLayout) findViewById(R.id.diningHistorybarrelativeLayout);
+			diningHistoryLayout.setVisibility(View.INVISIBLE);
+		}
 	}
 	
 	void setDishImageView(Bitmap bmp){
@@ -88,10 +130,13 @@ public class TWDishActivity extends Activity {
 	
 	public void onShareBtnClick(View sender){
 		Bundle params = new Bundle();
-        params.putString("caption", dtouchMarker.getDescription());
+        params.putString("caption", dtouchMarker.getTitle());
         params.putString("description", "Busaba");
-        params.putString("picture", DtouchMarkerWebServicesURL.getMarkerThumbnailURL(dtouchMarker.getCodeKey()).toString());
-        Utility.mFacebook.dialog(TWDishActivity.this, "feed", params, new FacebookPostDialogListener());
+        if (dtouchMarker.getCodeKey() != null)
+        	params.putString("picture", DtouchMarkerWebServicesURL.getMarkerThumbnailURL(dtouchMarker.getCodeKey()).toString());
+        else
+        	params.putString("picture", DtouchMarkerWebServicesURL.getDishThumbnailURL(dtouchMarker.getTitle()).toString());
+        Utility.mFacebook.dialog(TWDishActivity.this, "feed", params, new FacebookPostDialogListener(this, new Handler()));
 	}
 	
 	public void onRecipeBtnClick(View sender){
@@ -110,41 +155,72 @@ public class TWDishActivity extends Activity {
 		startActivity(intent);
 	}
 	
-    /*
-     * Callback after the message has been posted on friend's wall.
-     */
-    public class FacebookPostDialogListener extends BaseDialogListener {
-        @Override
-        public void onComplete(Bundle values) {
-            final String postId = values.getString("post_id");
-            if (postId != null) {
-                showToast("Message posted on the wall.");
-            } else {
-                showToast("No message posted on the wall.");
-            }
-        }
-       
-        @Override
-        public void onFacebookError(FacebookError error) {
-            Toast.makeText(getApplicationContext(), "Facebook Error: " + error.getMessage(),
-                    Toast.LENGTH_SHORT).show();
-        }
+	public void onDiningHistoryBtnClick(View sender){
+		displayDiningHistoryListActivity();
+	}
+	
+    void getPersonMarkerDetail(String code, String title, String userId){
+    	showSpinner();
+    	DtouchMarkerDataWebServices dtouchMarkerWebServices = new DtouchMarkerDataWebServices(new MarkerDownloadRequestListener(){
+    		public void onMarkerDownloaded(DtouchMarker marker){
+    			markerPersonDetailDownloaded(marker);
+    		}
 
-        @Override
-        public void onCancel() {
-            Toast toast = Toast.makeText(getApplicationContext(), "Update status cancelled",
-                    Toast.LENGTH_SHORT);
-            toast.show();
-        }
+			@Override
+			public void onMarkerDownloadError() {
+				markerPersonDetailDownloadError();			
+			}
+    	});
+    	if (code != null)
+    		dtouchMarkerWebServices.executeMarkerRequestUsingCode(code, userId);
+    	else if (title != null)
+    		dtouchMarkerWebServices.executeDishRequestUsingDishName(title, userId);
     }
-
-    public void showToast(final String msg) {
-        mHandler.post(new Runnable() {
-            @Override
-            public void run() {
-                Toast toast = Toast.makeText(TWDishActivity.this, msg, Toast.LENGTH_LONG);
-                toast.show();
-            }
-        });
+    
+    private void markerPersonDetailDownloaded(DtouchMarker marker){
+    	dtouchMarker = marker;
+    	hideSpinner();
+    	ImageButton accessoryBtn = (ImageButton) findViewById(R.id.dininghistoryaccessorybtn);
+    	if (dtouchMarker.getDiningHistory() != null)
+    		accessoryBtn.setEnabled(true);
+    	else
+    		accessoryBtn.setEnabled(false);
+    	if (dtouchMarker.getCodeKey() != null)
+    		getMarkerImage(dtouchMarker.getCodeKey());
+    	else if (dtouchMarker.getTitle() != null)
+    		getDishImage(dtouchMarker.getTitle());
+    		
     }
+    
+    private void markerPersonDetailDownloadError(){
+    	hideSpinner();
+    	MessageDialog.showMessage(R.string.marker_download_error, this);
+    }
+	
+	/*spinner functions.*/
+	void showSpinner(){
+		if (mSpinner != null)
+			mSpinner.show();
+	}
+	
+	void hideSpinner(){
+		if (mSpinner != null)
+			mSpinner.dismiss();
+	}
+	
+	private void setupSpinner(){
+		mSpinner = new ProgressDialog(this);
+		mSpinner.requestWindowFeature(Window.FEATURE_NO_TITLE);
+		mSpinner.setMessage("Loading...");
+	}
+	
+	
+	private void displayDiningHistoryListActivity(){
+		Intent intent = new Intent(this, TWDiningHistoryListActivity.class);
+		intent.putParcelableArrayListExtra(getString(R.string.dining_history), (ArrayList<? extends Parcelable>) dtouchMarker.getDiningHistory());
+		startActivity(intent);
+	}
+	
+	
+	
 }

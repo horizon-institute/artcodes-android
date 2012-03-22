@@ -1,7 +1,6 @@
 <?xml version="1.0" encoding="utf-8"?>
 <RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
-	android:orientation="vertical" android:layout_width="match_parent"
-	android:layout_height="match_parent" android:background="#ffffffff">
+	android:orientation="vertical" style="@style/ActivityView">
 	<ImageView android:layout_height="wrap_content" android:id="@+id/imageView1"
 		android:layout_width="wrap_content" android:src="@drawable/login_logo"
 		android:layout_alignParentTop="true" android:layout_centerHorizontal="true"
@@ -14,5 +13,7 @@
 	<ImageButton android:background="@drawable/guest_login"
 	android:layout_height="wrap_content" android:id="@+id/guestloginBtn"
 	android:layout_width="wrap_content" android:layout_below="@+id/facebookloginBtn"
-	android:layout_centerHorizontal="true" android:layout_marginTop="36dp" />
+	android:layout_centerHorizontal="true" 
+	android:onClick="onGuestBtnClick"
+	android:layout_marginTop="36dp" />
 </RelativeLayout>

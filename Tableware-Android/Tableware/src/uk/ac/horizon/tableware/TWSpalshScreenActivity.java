@@ -30,6 +30,6 @@ public class TWSpalshScreenActivity extends FragmentActivity {
     			frag.dismiss();
     			displayMainActivity();
     		}
-    	}, 2000);
+    	}, 1000);
     }
 }

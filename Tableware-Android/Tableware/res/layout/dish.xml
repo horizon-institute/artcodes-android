@@ -6,33 +6,48 @@
 			android:text="Dish" />
 	</RelativeLayout>
 	<FrameLayout android:layout_height="wrap_content"
-		android:layout_width="wrap_content" android:id="@+id/dishImageframeLayout"
-		android:layout_below="@+id/relativeLayout1" android:layout_marginTop="40dp"
-		android:layout_alignParentLeft="true">
+		android:layout_width="fill_parent" android:id="@+id/dishImageframeLayout"
+		android:layout_below="@+id/relativeLayout1"
+		android:layout_alignParentLeft="true"
+		android:layout_marginTop="20dp">
 		<ImageView android:src="@drawable/food_background"
-			android:layout_height="260dp" android:id="@+id/recipeImageView"
+			android:layout_height="240dp" android:id="@+id/recipeImageView"
 			android:layout_width="320dp" android:layout_gravity="center"></ImageView>
 	</FrameLayout>
-	<ImageButton android:layout_width="wrap_content"
-		android:id="@+id/recipeImageButton" android:layout_height="wrap_content"
-		android:layout_below="@+id/dishImageframeLayout"
-		android:layout_alignParentLeft="true" android:layout_marginLeft="44dp"
-		android:background="@drawable/recipe_button" android:layout_marginTop="24dp"
-		android:onClick="onRecipeBtnClick"></ImageButton>
-	<ImageButton android:layout_width="wrap_content"
+	<RelativeLayout android:id="@+id/diningHistorybarrelativeLayout" style="@style/ButtonBarWithText"
+	android:layout_below="@+id/dishImageframeLayout" android:layout_marginTop="10dp"> 
+	<TextView style="@style/subHeadingBarText" android:id="@+id/textView2"
+	android:text="My Dining History" android:layout_marginLeft="10dp"/>
+	<ImageButton android:id="@+id/dininghistoryaccessorybtn"
+	android:layout_width="wrap_content" android:layout_height="wrap_content"
+	android:background="@drawable/accessory_button"
+	android:layout_alignParentRight="true"
+	android:layout_marginRight="10dp"
+	android:onClick="onDiningHistoryBtnClick"
+	android:enabled="false"
+	android:layout_centerVertical="true"></ImageButton>
+	</RelativeLayout>
+	<RelativeLayout android:id="@+id/dishButtonBar" style="@style/ButtonBar"
+		android:layout_alignParentBottom="true">
+		<ImageButton android:layout_width="wrap_content"
+			android:id="@+id/recipeImageButton" android:layout_height="wrap_content"
+			android:layout_alignParentLeft="true" android:layout_marginLeft="10dp"
+			android:layout_centerVertical="true" android:background="@drawable/recipe_button"
+			android:onClick="onRecipeBtnClick"/>
+		<ImageButton android:layout_width="wrap_content"
 		android:id="@+id/storyImageButton" android:layout_height="wrap_content"
-		android:layout_below="@+id/dishImageframeLayout"
-		android:layout_alignParentRight="true" android:layout_marginRight="44dp"
-		android:background="@drawable/story_button" android:layout_marginTop="24dp"
+		android:layout_toRightOf="@+id/recipeImageButton"
+		android:layout_marginLeft="30dp"
+		android:layout_centerVertical="true"
+		android:background="@drawable/story_button"
 		android:onClick="onStoryBtnClick"></ImageButton>
-	<ImageButton android:layout_width="wrap_content"
+		<ImageButton android:layout_width="wrap_content"
 		android:id="@+id/shareImageButton" android:background="@drawable/share_button"
-		android:layout_height="wrap_content" android:layout_alignParentLeft="true"
-		android:layout_marginLeft="44dp" android:layout_marginTop="40dp"
-		android:layout_below="@+id/recipeImageButton" android:onClick="onShareBtnClick"></ImageButton>
-	<ImageButton android:layout_width="wrap_content"
-		android:id="@+id/likeImageButton" android:background="@drawable/like_button"
-		android:layout_height="wrap_content" android:layout_alignParentRight="true"
-		android:layout_marginRight="44dp" android:layout_marginTop="40dp"
-		android:layout_below="@+id/storyImageButton"></ImageButton>
+		android:layout_height="wrap_content"
+		android:layout_alignParentRight="true"
+		android:layout_marginRight="10dp"
+		android:layout_centerVertical="true"
+		android:onClick="onShareBtnClick"></ImageButton>
+	</RelativeLayout>
+
 </RelativeLayout>

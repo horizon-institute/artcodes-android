@@ -31,8 +31,9 @@ public class Utility extends Application {
     public static final String APP_ID = "255277451215543";
     public static JSONObject mFriendsList;
     public static String userUID = null;
+    public static String userName = null;
     public static String objectID = null;
-    public static FriendsGetProfilePics model;
+    //public static FriendsGetProfilePics model;
     public static AndroidHttpClient httpclient = null;
     public static Hashtable<String, String> currentPermissions = new Hashtable<String, String>();
 
@@ -43,7 +44,7 @@ public class Utility extends Application {
     	return new Facebook(APP_ID);
     }
     
-    public static Bitmap getBitmap(String url) {
+    public static Bitmap getBitmap(String url) throws IOException {
         Bitmap bm = null;
         try {
             URL aURL = new URL(url);
@@ -54,9 +55,7 @@ public class Utility extends Application {
             bm = BitmapFactory.decodeStream(new FlushedInputStream(is));
             bis.close();
             is.close();
-        } catch (Exception e) {
-            e.printStackTrace();
-        } finally {
+         } finally {
             if (httpclient != null) {
                 httpclient.close();
             }

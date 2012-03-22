@@ -19,4 +19,23 @@
 	<string name="marker_desc_undefined">Marker is not defined.</string>
 	<string name="member_name">member_name</string>
 	<string name="menu_member_info">Member Card</string>
+	<string name="dining_history">dining_history</string>
+	<string name="settings_title">Settings</string>
+	<!-- facebook messages -->
+	<string name="facebookErrMsg">Can not download data from the Facebook.</string>
+	<string name="alert_dialog_ok">OK</string>
+	<string name="alert_dialog_cancel">Cancel</string>
+	<string name="pic_download_error">Error in downloading member picture from the facebook.</string>
+	<!-- webservices data download -->
+	<string name="marker_download_error">Error in downloading marker data.</string>
+	<string name="dish_download_error">Error in downloading dish data.</string>
+	<string name="dish_pic_download_error">Error in downloading dish picture</string>
+	<string name="offer_image_download_error">Error in downloading offer image.</string>
+	<string name="dish_image_download_error">Error in downloading dish image.</string>
+	<string name="member_data_download_error">Error in downloading member data.</string>
+	<string name="member_data_retrieve_error">Can not retrieve member data from phone</string>
+	<string name="member_data_save_error">Can not save member data on the phone</string>
+	<string name="member_pic_save_error">Error in saving member picture on the phone</string>
+	<string name="web_loading_title">Loading...</string>
+	<string name="news_web_title">News</string>
 </resources>

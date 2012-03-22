@@ -5,80 +5,156 @@ import java.io.IOException;
 import java.io.InputStream;
 import java.io.InputStreamReader;
 import java.net.HttpURLConnection;
-import java.net.MalformedURLException;
 import java.net.URL;
+import java.util.ArrayList;
+import java.util.List;
 
+import org.json.JSONArray;
 import org.json.JSONException;
 import org.json.JSONObject;
+
 import android.os.AsyncTask;
 
 public class DtouchMarkerDataWebServices{
 	private MarkerDownloadRequestListener mListener;
-	DtouchMarker dtouchMarker;
-	
+		
 	public DtouchMarkerDataWebServices(MarkerDownloadRequestListener listener){
 		mListener = listener;
 	}
 	
-	public void executeMarkerRequest(String code){
-		String[] params = new String[1];
+	public void executeMarkerRequestUsingCode(String code, String userId){
+		String[] params = new String[2];
 		params[0] = code;
-		new DtouchMarkerDownloadDataTask().execute(code);
+		params[1] = userId;
+		new DtouchMarkerDownloadDataTask().execute(params);
 	}
 	
-	void downloadMarkerPrimaryData(String markerCode){
-		URL url = DtouchMarkerWebServicesURL.getMarkerPrimaryURL(markerCode);
+	public void executeDishRequestUsingDishName(String dishName, String userId){
+		String[] params = new String[2];
+		params[0] = dishName;
+		params[1] = userId;
+		new DishDownloadDataTask().execute(params);
+	}
+	
+	DtouchMarker downloadMarkerData(String markerCode, String userId) throws JSONException, IOException{
+		URL url;
+		DtouchMarker marker = null;
+		if (userId != null){
+			url = DtouchMarkerWebServicesURL.getUserMarkerURL(markerCode, userId);
+		}else{
+			url = DtouchMarkerWebServicesURL.getMarkerPrimaryURL(markerCode);
+		}
 		HttpURLConnection urlConnection = null;
 		try{
 			urlConnection = (HttpURLConnection) url.openConnection();
 			String jsonData = read(urlConnection.getInputStream());
-			dtouchMarker = getMarkerObjFromJsonData(markerCode, jsonData);
+			marker = getMarkerObjFromJsonData(markerCode, jsonData);
+		}catch(JSONException e){
+			marker = null;
+			throw new JSONException(e.getMessage());
 		}catch(IOException e){
-			e.printStackTrace();
+			marker = null;
+			throw new IOException(e.getMessage());
 		}finally{
 			if (urlConnection != null)
 				urlConnection.disconnect();
 		}
+		return marker;
+	}
+	
+	DtouchMarker downloadDishData(String dishName, String userId) throws JSONException, IOException{
+		URL url;
+		DtouchMarker marker = null;
 		
-	}
-	
-	void downloadMarkerURLs(String markerCode){
-		URL url = DtouchMarkerWebServicesURL.getMarkerURL1(markerCode);
-		dtouchMarker.setURL1(getURLContent(url));
-		url = DtouchMarkerWebServicesURL.getMarkerURL2(markerCode);
-		dtouchMarker.setURL2(getURLContent(url));
-		url = DtouchMarkerWebServicesURL.getMarkerURL3(markerCode);
-		dtouchMarker.setURL3(getURLContent(url));
-	}
-	
-	private String getURLContent(URL url){
-		String data = null;
+		if (userId != null){
+			url = DtouchMarkerWebServicesURL.getUserDishURL(dishName, userId);
+		}else{
+			url = DtouchMarkerWebServicesURL.getDishURL(dishName);
+		}
 		HttpURLConnection urlConnection = null;
 		try{
 			urlConnection = (HttpURLConnection) url.openConnection();
-			data = read(urlConnection.getInputStream());
+			String jsonData = read(urlConnection.getInputStream());
+			marker = getDishObjFromJsonData(dishName, jsonData);
+		}catch(JSONException e){
+			marker = null;
+			throw new JSONException(e.getMessage());
 		}catch(IOException e){
-			e.printStackTrace();
+			marker = null;
+			throw new IOException(e.getMessage());
 		}finally{
 			if (urlConnection != null)
 				urlConnection.disconnect();
 		}
-		return data;
+		return marker;
 	}
 	
-	DtouchMarker getMarkerObjFromJsonData(String code, String jsonData){
+	DtouchMarker getDishObjFromJsonData(String code, String jsonData) throws JSONException{
 		JSONObject jsonObject;
+		JSONArray history = null;
 		DtouchMarker marker = null;
-		try {
-			jsonObject = new JSONObject(jsonData);
-			String name = jsonObject.getString("name");
-			String type = jsonObject.getString("type");
-			marker = new DtouchMarker();
-			marker.setCode(code);
-			marker.setType(type);
-			marker.setDescription(name);
-		} catch (JSONException e) {
-			e.printStackTrace();
+		
+		jsonObject = new JSONObject(jsonData);
+		String title = jsonObject.getString("name");
+		String url1 = jsonObject.getString("url1");
+		String url2 = jsonObject.getString("url2");
+		String url3 = jsonObject.getString("url3");
+		try{
+			history = jsonObject.getJSONArray("history");
+		}catch (JSONException e){
+			history = null;
+		}
+		marker = new DtouchMarker();
+		marker.setURL1(url1);
+		marker.setURL2(url2);
+		marker.setURL3(url3);
+		marker.setTitle(title);
+		if (history != null && history.length() > 0){
+			List<TWDiningHistoryItem> diningHistory = new ArrayList<TWDiningHistoryItem>();
+			for (int i = 0; i < history.length(); i++){
+				JSONObject jsonHistoryItem = history.getJSONObject(i);
+				TWDiningHistoryItem diningHistoryItem = new TWDiningHistoryItem(jsonHistoryItem.getString("date"),
+						jsonHistoryItem.getInt("rating"), jsonHistoryItem.getString("comment"));
+				diningHistory.add(diningHistoryItem);
+			}
+			marker.setDiningHistory(diningHistory);
+		}
+
+		return marker;
+	}
+	
+	DtouchMarker getMarkerObjFromJsonData(String code, String jsonData) throws JSONException{
+		JSONObject jsonObject;
+		JSONArray history = null;
+		DtouchMarker marker = null;
+		
+		jsonObject = new JSONObject(jsonData);
+		String title = jsonObject.getString("name");
+		String type = jsonObject.getString("type");
+		String url1 = jsonObject.getString("url1");
+		String url2 = jsonObject.getString("url2");
+		String url3 = jsonObject.getString("url3");
+		try{
+			history = jsonObject.getJSONArray("history");
+		}catch (JSONException e){
+			history = null;
+		}
+		marker = new DtouchMarker();
+		marker.setCode(code);
+		marker.setType(type);
+		marker.setURL1(url1);
+		marker.setURL2(url2);
+		marker.setURL3(url3);
+		marker.setTitle(title);
+		if (history != null && history.length() > 0){
+			List<TWDiningHistoryItem> diningHistory = new ArrayList<TWDiningHistoryItem>();
+			for (int i = 0; i < history.length(); i++){
+				JSONObject jsonHistoryItem = history.getJSONObject(i);
+				TWDiningHistoryItem diningHistoryItem = new TWDiningHistoryItem(jsonHistoryItem.getString("date"),
+						jsonHistoryItem.getInt("rating"), jsonHistoryItem.getString("comment"));
+				diningHistory.add(diningHistoryItem);
+			}
+			marker.setDiningHistory(diningHistory);
 		}
 		return marker;
 	}
@@ -94,15 +170,50 @@ public class DtouchMarkerDataWebServices{
 	}
 	
 	private class DtouchMarkerDownloadDataTask extends AsyncTask<String, Void, DtouchMarker> {
-
-		protected DtouchMarker doInBackground(String... codes){
-			downloadMarkerPrimaryData(codes[0]);
-			downloadMarkerURLs(codes[0]);
-			return dtouchMarker;
+		protected DtouchMarker doInBackground(String... data){
+			DtouchMarker marker = null;
+			// if marker code is given
+			if (data[0] != null){
+				try {
+					marker = downloadMarkerData(data[0], data[1]);
+				} catch (JSONException e) {
+					marker = null;
+				} catch (IOException e) {
+					marker = null;
+				}
+			}
+			return marker;
 		}
 		
 		protected void onPostExecute(DtouchMarker marker){
-			mListener.onMarkerDownloaded(marker);
+			if (marker != null)
+				mListener.onMarkerDownloaded(marker);
+			else
+				mListener.onMarkerDownloadError();
+		}
+	}
+	
+	private class DishDownloadDataTask extends AsyncTask<String, Void, DtouchMarker> {
+		protected DtouchMarker doInBackground(String... data){
+			DtouchMarker marker = null;
+			// if marker name is given.
+			if (data[0] != null){
+				try {
+					marker = downloadDishData(data[0], data[1]);
+				} catch (JSONException e) {
+					marker = null;
+				} catch (IOException e) {
+					marker = null;
+				}
+			}
+			return marker;
+		}
+		
+		protected void onPostExecute(DtouchMarker marker){
+			if (marker != null)
+				mListener.onMarkerDownloaded(marker);
+			else
+				mListener.onMarkerDownloadError();
 		}
 	}
 	
@@ -113,8 +224,8 @@ public class DtouchMarkerDataWebServices{
 	 */
 	public static interface MarkerDownloadRequestListener{
 		public void onMarkerDownloaded(DtouchMarker marker);
+		public void onMarkerDownloadError();
 		
-	}
-	
+	}	
 }
 

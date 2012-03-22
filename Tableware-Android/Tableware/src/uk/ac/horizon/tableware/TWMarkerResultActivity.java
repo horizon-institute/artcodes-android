@@ -46,8 +46,8 @@ public class TWMarkerResultActivity extends Activity {
 	
 	private void setMarkerDescription(){
 		TextView markerDescTextView = (TextView) findViewById(R.id.markerDescription);
-		if (mDtouchMarker.getDescription() != null)
-			markerDescTextView.setText(mDtouchMarker.getDescription());
+		if (mDtouchMarker.getTitle() != null)
+			markerDescTextView.setText(mDtouchMarker.getTitle());
 		else
 			markerDescTextView.setText(R.string.marker_desc_undefined);
 	}
@@ -65,7 +65,7 @@ public class TWMarkerResultActivity extends Activity {
 	}
 	
 	private void initActivityTitle(){
-		if (mDtouchMarker != null && mDtouchMarker.getDescription() != null)
-			this.setTitle(mDtouchMarker.getDescription());
+		if (mDtouchMarker != null && mDtouchMarker.getTitle() != null)
+			this.setTitle(mDtouchMarker.getTitle());
 	}
 }

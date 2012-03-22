@@ -14,8 +14,9 @@ public class DtouchMarker {
 	private String mURL1;
 	private String mURL2;
 	private String mURL3;
-	private String mDesc;
+	private String mTitle;
 	private String mType;
+	private List<TWDiningHistoryItem> mDiningHistory;
 	
 	//constructors
 	public DtouchMarker(){
@@ -26,16 +27,16 @@ public class DtouchMarker {
 		mCode = new ArrayList<Integer>(code);
 	}
 	
-	public DtouchMarker(List<Integer> code, String url, String desc){
+	public DtouchMarker(List<Integer> code, String url, String title){
 		mCode = new ArrayList<Integer>(code);
 		mURL1 = url;
-		mDesc = desc;
+		mTitle = title;
 	}
 	
-	public DtouchMarker(String code, String url, String desc){
+	public DtouchMarker(String code, String url, String title){
 		mCode = getCodeArrayFromString(code);
 		mURL1 = url;
-		mDesc = desc;
+		mTitle = title;
 	}
 	
 	//set and get functions.
@@ -97,12 +98,12 @@ public class DtouchMarker {
 		mURL3 = url;
 	}
 		
-	public String getDescription(){
-		return mDesc;
+	public String getTitle(){
+		return mTitle;
 	}
 	
-	public void setDescription(String desc){
-		mDesc = desc;
+	public void setTitle(String title){
+		mTitle = title;
 	}
 	
 	public String getCodeKey(){
@@ -148,10 +149,11 @@ public class DtouchMarker {
 	
 	public static Bundle createMarkerBundle(DtouchMarker marker){
 		Bundle markerBundle = new Bundle();
-		if (marker.getCodeKey() != null){
-			markerBundle.putString("Code", marker.getCodeKey());
-			if (marker.getDescription() != null){
-				markerBundle.putString("Desc", marker.getDescription());
+		if ((marker.getCodeKey() != null) || (marker.getTitle() != null)){
+			if (marker.getCode() != null)
+				markerBundle.putString("Code", marker.getCodeKey());
+			if (marker.getTitle() != null){
+				markerBundle.putString("Title", marker.getTitle());
 			}
 			if (marker.getType() != null){
 				markerBundle.putString("Type", marker.getType());
@@ -171,11 +173,12 @@ public class DtouchMarker {
 	
 	public static DtouchMarker createMarkerFromBundle(Bundle markerBundle){
 		DtouchMarker marker = null;
-		if (markerBundle.getString("Code") != null){
+		if (markerBundle.getString("Code") != null || markerBundle.getString("Title") != null){
 			marker = new DtouchMarker();
-			marker.setCode(markerBundle.getString("Code"));
-			if (markerBundle.getString("Desc") != null)
-				marker.setDescription(markerBundle.getString("Desc"));
+			if (markerBundle.getString("Code") != null)
+				marker.setCode(markerBundle.getString("Code"));
+			if (markerBundle.getString("Title") != null)
+				marker.setTitle(markerBundle.getString("Title"));
 			if (markerBundle.getString("Type") != null)
 				marker.setType(markerBundle.getString("Type"));
 			if (markerBundle.getString("URL1") != null)
@@ -194,5 +197,13 @@ public class DtouchMarker {
 	
 	public String getType(){
 		return mType;
+	}
+	
+	public void setDiningHistory(List<TWDiningHistoryItem> history){
+		mDiningHistory = new ArrayList<TWDiningHistoryItem>(history);
+	}
+	
+	public List<TWDiningHistoryItem> getDiningHistory(){
+		return mDiningHistory;
 	}
 }

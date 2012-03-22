@@ -9,16 +9,17 @@ import com.facebook.android.Utility;
 import com.facebook.android.SessionEvents.AuthListener;
 import com.facebook.android.SessionEvents.LogoutListener;
 
-
 import android.app.Activity;
 import android.content.Intent;
 import android.os.Bundle;
+import android.view.View;
+
 
 public class TWLoginActivity extends Activity {
 	final static int AUTHORIZE_ACTIVITY_RESULT_CODE = 0;
-	String[] permissions =  { "offline_access", "publish_stream", "user_photos", "publish_checkins",
-    "photo_upload" };
+	String[] permissions =  { "offline_access", "publish_stream"};
 	private LoginButton mLoginButton;
+	private FbAPIsAuthListener mFbAPIsAuthListener;
 		
 	@Override
 	public void onCreate(Bundle savedInstanceState){
@@ -41,17 +42,26 @@ public class TWLoginActivity extends Activity {
 				//logout
 			}else{
 				Utility.mFacebook.extendAccessTokenIfNeeded(this, null);
-				//display membership data.
+				//remove authentication listener before calling activity to make sure that there is no dangling pointer to the activity is left.
+				if (mFbAPIsAuthListener != null)
+					SessionEvents.removeAuthListener(mFbAPIsAuthListener);
 				displayMainActivity();
-				this.finish();
+				//requestUserData();
+				//display membership data.
+				
 			}
 			
 		}
 	}
 	
-	private void displayMainActivity(){
+	public void onGuestBtnClick(View sender){
+		displayMainActivity();
+	}
+	
+	void displayMainActivity(){
 		Intent intent = new Intent(this.getApplicationContext(), TWMainActivity.class);
 		startActivity(intent);
+		this.finish();
 	}
 	
  	@Override
@@ -77,7 +87,8 @@ public class TWLoginActivity extends Activity {
         Utility.mAsyncRunner = new AsyncFacebookRunner(Utility.mFacebook);
         // restore session if one exists
         SessionStore.restore(Utility.mFacebook, this.getApplicationContext());
-        SessionEvents.addAuthListener(new FbAPIsAuthListener());
+        mFbAPIsAuthListener = new FbAPIsAuthListener();
+        SessionEvents.addAuthListener(mFbAPIsAuthListener);
         SessionEvents.addLogoutListener(new FbAPIsLogoutListener());
 	}
 	
@@ -104,7 +115,6 @@ public class TWLoginActivity extends Activity {
         }
     }
 
-    
     /*
      * The Callback for notifying the application when log out starts and
      * finishes.

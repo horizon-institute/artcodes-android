@@ -39,7 +39,7 @@ class MarkerPopupWindow{
     		WindowRotation.rotateViewGroup(this.anchor.getContext(),layout);
     	this.window.setContentView(layout);
     	TextView markerDesc = (TextView) layout.findViewById(R.id.markerDesc);
-    	markerDesc.setText(dtouchMarker.getDescription());
+    	markerDesc.setText(dtouchMarker.getTitle());
     }
 	
 	private void initPopupWindow(Context context){

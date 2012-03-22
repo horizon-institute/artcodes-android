@@ -34,7 +34,7 @@ public class TWOfferActivity extends Activity {
 		initMarker();
 		mHandler = new Handler();
 		setActivityCaption();
-		getMarkerImage(dtouchMarker.getCodeKey());
+		getOfferImage(dtouchMarker.getCodeKey());
 	}
 	
 	private void initMarker(){
@@ -65,19 +65,25 @@ public class TWOfferActivity extends Activity {
 	private void setActivityCaption(){
 		TextView activityCaptionTextView = (TextView) findViewById(R.id.activityCaptionTextView);
 		if (dtouchMarker != null){
-			activityCaptionTextView.setText(dtouchMarker.getDescription());
+			activityCaptionTextView.setText(dtouchMarker.getTitle());
 		}
 	}
 	
-	private void getMarkerImage(String markerCode){
+	private void getOfferImage(String markerCode){
 		DtouchMarkerImageWebServices dtouchMarkerImageWebServices = new DtouchMarkerImageWebServices(new MarkerImageDownloadRequestListener(){
 			public void onMarkerImageDownloaded(Bitmap bmp){
 				hideProgressControls();
 				setOfferImageView(bmp);
 			}
+
+			@Override
+			public void onMarkerImageDownloadError() {
+				hideProgressControls();
+				MessageDialog.showMessage(R.string.offer_image_download_error, TWOfferActivity.this);
+			}
 		});
 		showProgressControls();
-		dtouchMarkerImageWebServices.executeMarkerRequest(markerCode);
+		dtouchMarkerImageWebServices.executeMarkerImageRequest(markerCode);
 	}
 	
 	void setOfferImageView(Bitmap bmp){
@@ -88,7 +94,7 @@ public class TWOfferActivity extends Activity {
 	
 	public void onShareBtnClick(View sender){
 		Bundle params = new Bundle();
-        params.putString("caption", dtouchMarker.getDescription());
+        params.putString("caption", dtouchMarker.getTitle());
         params.putString("description", "Busaba");
         params.putString("picture", DtouchMarkerWebServicesURL.getMarkerThumbnailURL(dtouchMarker.getCodeKey()).toString());
         Utility.mFacebook.dialog(TWOfferActivity.this, "feed", params, new FacebookPostDialogListener());

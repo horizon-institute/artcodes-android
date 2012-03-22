@@ -3,6 +3,7 @@ package uk.ac.horizon.dtouch;
 import java.net.MalformedURLException;
 import java.net.URL;
 
+
 public class DtouchMarkerWebServicesURL {
 	private static final String BASE_URL = "http://data.horizon.ac.uk/v1";
 	private static final String IMAGE_POSTFIX = "image";
@@ -14,7 +15,17 @@ public class DtouchMarkerWebServicesURL {
 	public static URL getMarkerPrimaryURL(String codeKey){
 		URL url = null;
 		try{
-			url = new URL(BASE_URL + "/" + codeKey);
+			url = new URL(BASE_URL + "/" + encodeString(codeKey));
+		}catch(MalformedURLException e){
+			
+		}
+		return url;
+	}
+	
+	public static URL getUserMarkerURL(String codeKey, String userId){
+		URL url = null;
+		try{
+			url = new URL(BASE_URL + "/" + encodeString(codeKey) + "/person/" + userId);
 		}catch(MalformedURLException e){
 			
 		}
@@ -24,7 +35,7 @@ public class DtouchMarkerWebServicesURL {
 	public static URL getMarkerImageURL(String codeKey){
 		URL url = null;
 		try{
-			url = new URL(BASE_URL + "/" + codeKey + "/" + IMAGE_POSTFIX);
+			url = new URL(BASE_URL + "/" + encodeString(codeKey) + "/" + IMAGE_POSTFIX);
 		}catch(MalformedURLException e){
 			
 		}
@@ -34,7 +45,7 @@ public class DtouchMarkerWebServicesURL {
 	public static URL getMarkerThumbnailURL(String codeKey){
 		URL url = null;
 		try{
-			url = new URL(BASE_URL + "/" + codeKey + "/" + THUMBNAIL_POSTFIX);
+			url = new URL(BASE_URL + "/" + encodeString(codeKey) + "/" + THUMBNAIL_POSTFIX);
 		}catch(MalformedURLException e){
 			
 		}
@@ -44,7 +55,7 @@ public class DtouchMarkerWebServicesURL {
 	public static URL getMarkerURL1(String codeKey){
 		URL url = null;
 		try{
-			url = new URL(BASE_URL + "/" + codeKey + "/" + URL1_POSTFIX);
+			url = new URL(BASE_URL + "/" + encodeString(codeKey) + "/" + URL1_POSTFIX);
 		}catch(MalformedURLException e){
 			
 		}
@@ -54,7 +65,7 @@ public class DtouchMarkerWebServicesURL {
 	public static URL getMarkerURL2(String codeKey){
 		URL url = null;
 		try{
-			url = new URL(BASE_URL + "/" + codeKey + "/" + URL2_POSTFIX);
+			url = new URL(BASE_URL + "/" + encodeString(codeKey) + "/" + URL2_POSTFIX);
 		}catch(MalformedURLException e){
 			
 		}
@@ -64,11 +75,65 @@ public class DtouchMarkerWebServicesURL {
 	public static URL getMarkerURL3(String codeKey){
 		URL url = null;
 		try{
-			url = new URL(BASE_URL + "/" + codeKey + "/" + URL3_POSTFIX);
+			url = new URL(BASE_URL + "/" + encodeString(codeKey) + "/" + URL3_POSTFIX);
 		}catch(MalformedURLException e){
 			
 		}
 		return url;
+	}
+	
+	public static URL getUserURL(String userID){
+		URL url = null;
+		try{
+			url = new URL(BASE_URL + "/person/" + userID);
+		}catch(MalformedURLException e){
+			
+		}
+		return url;
+	}
+	
+	public static URL getDishThumbnailURL(String dishName){
+		URL url = null;
+		try{
+			url = new URL(BASE_URL + "/dish/" +  encodeString(dishName) + "/" + THUMBNAIL_POSTFIX);
+		}catch(MalformedURLException e){
+			
+		}
+		return url;
+	}
+	
+	public static URL getDishImageURL(String dishName){
+		URL url = null;
+		try{
+			url = new URL(BASE_URL + "/dish/" +  encodeString(dishName) + "/" + IMAGE_POSTFIX);
+		}catch(MalformedURLException e){
+			
+		}
+		return url;
+	}
+	
+	public static URL getDishURL(String dishName){
+		URL url = null;
+		try{
+			url = new URL(BASE_URL + "/dish/" + encodeString(dishName));
+		}catch(MalformedURLException e){
+			
+		}
+		return url;
+	}
+	
+	public static URL getUserDishURL(String dishName, String userId){
+		URL url = null;
+		try{
+			url = new URL(BASE_URL + "/dish/" + encodeString(dishName) + "/person/" + userId);
+		}catch(MalformedURLException e){
+			
+		}
+		return url;
+	}
+	
+	private static String encodeString(String stringToEncode){
+		return stringToEncode.replaceAll(" ", "%20");
 	}
 
 

@@ -33,7 +33,6 @@ public class TWCameraActivity extends Activity implements OnMarkerDetectedListen
     private MenuItem	mItemDetectMarker;
     private MenuItem	mItemDetectMarkerDebug;
     private MenuItem	mItemPreference;
-    private MenuItem	mItemMember;    //private List<DtouchMarker> mCurrentMarkers;
     private TWMarkerSurfaceView mMarkerSurfaceView;
         
     public static int viewMode  = VIEW_MODE_MARKER;
@@ -53,7 +52,6 @@ public class TWCameraActivity extends Activity implements OnMarkerDetectedListen
     public boolean onCreateOptionsMenu(Menu menu) {
         mItemDetectMarker = menu.add(R.string.detect_marker);
         mItemDetectMarkerDebug = menu.add(R.string.detect_marker_debug);
-        mItemMember = menu.add(R.string.menu_member_info);
         mItemPreference = menu.add(R.string.view_preferences);
         return true;
     }
@@ -80,19 +78,12 @@ public class TWCameraActivity extends Activity implements OnMarkerDetectedListen
         	viewMode = VIEW_MODE_MARKER_DEBUG;
         else if (item == mItemPreference)
            	displayPreferences();
-        else if (item == mItemMember)
-        	displayMemberInfo();
         return true;
     }
     
     private void displayPreferences(){
     	Intent intent = new Intent(this, TWPreferenceActivity.class);
 		startActivity(intent);
-    }
-    
-    private void displayMemberInfo(){
-    	Intent intent = new Intent(this, TWMemberActivity.class);
-    	startActivity(intent);
     }
     
     private void stopMarkerDetectionProcess(){
@@ -118,8 +109,14 @@ public class TWCameraActivity extends Activity implements OnMarkerDetectedListen
     		public void onMarkerDownloaded(DtouchMarker marker){
     			markerDownloaded(marker);
     		}
+
+			@Override
+			public void onMarkerDownloadError() {
+				markerDownloadWithError();
+				
+			}
     	});
-    	dtouchMarkerWebServices.executeMarkerRequest(code);
+    	dtouchMarkerWebServices.executeMarkerRequestUsingCode(code, null);
     }
     
     public void displayMarkerDetail(DtouchMarker marker){
@@ -167,6 +164,12 @@ public class TWCameraActivity extends Activity implements OnMarkerDetectedListen
     	hideProgressControls();
     	if (marker != null)
     		displayMarkerPopupWindow(marker);
+    }
+    
+    private void markerDownloadWithError(){
+    	hideProgressControls();
+    	MessageDialog.showMessage(R.string.marker_download_error, this);
+    	
     }
     
     private void displayMarkerPopupWindow(DtouchMarker marker){

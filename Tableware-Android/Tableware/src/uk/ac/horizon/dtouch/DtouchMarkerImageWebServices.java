@@ -1,5 +1,6 @@
 package uk.ac.horizon.dtouch;
 
+import java.io.IOException;
 import java.net.URL;
 import android.graphics.Bitmap;
 import android.os.AsyncTask;
@@ -14,23 +15,38 @@ public class DtouchMarkerImageWebServices{
 		mListener = listener;
 	}
 	
-	public void executeMarkerRequest(String code){
-		String[] params = new String[1];
-		params[0] = code;
-		new DtouchMarkerDownloadImageTask().execute(code);
+	public void executeMarkerImageRequest(String code){
+		URL[] params = new URL[1];
+		params[0] = DtouchMarkerWebServicesURL.getMarkerImageURL(code);
+		new DtouchMarkerDownloadImageTask().execute(params);
+	}
+	
+	public void executeDishImageRequest(String title){
+		URL[] params = new URL[1];
+		params[0] = DtouchMarkerWebServicesURL.getDishImageURL(title);
+		new DtouchMarkerDownloadImageTask().execute(params);
 	}
 		
-	private class DtouchMarkerDownloadImageTask extends AsyncTask<String, Void, Bitmap>{
-
+	private class DtouchMarkerDownloadImageTask extends AsyncTask<URL, Void, Bitmap>{
 		@Override
-		protected Bitmap doInBackground(String... codes) {
-			String code = codes[0];
-			URL url = DtouchMarkerWebServicesURL.getMarkerImageURL(code);
-			return Utility.getBitmap(url.toString());
+		protected Bitmap doInBackground(URL... params) {
+			Bitmap bmp = null;
+			URL url = params[0];
+			if (url != null){
+				try {
+					bmp = Utility.getBitmap(url.toString());
+				} catch (IOException e) {
+					bmp = null;
+				}
+			}
+			return bmp;
 		}
 		
 		protected void onPostExecute(Bitmap bmp){
-			mListener.onMarkerImageDownloaded(bmp);
+			if (bmp != null)
+				mListener.onMarkerImageDownloaded(bmp);
+			else
+				mListener.onMarkerImageDownloadError();
 		}
 	}
 	
@@ -41,6 +57,7 @@ public class DtouchMarkerImageWebServices{
 	 */
 	public static interface MarkerImageDownloadRequestListener{
 		public void onMarkerImageDownloaded(Bitmap bmp);
+		public void onMarkerImageDownloadError();
 	}
 	
 }

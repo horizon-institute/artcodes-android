@@ -1,0 +1,8 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <!-- used in settings dialog -->
+    <string-array name="settings">
+    	<item>Logout</item>
+    	<item>Cancel</item>
+    </string-array>
+</resources>

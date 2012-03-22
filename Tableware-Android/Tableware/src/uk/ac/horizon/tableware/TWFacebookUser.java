@@ -3,14 +3,16 @@ package uk.ac.horizon.tableware;
 import java.io.BufferedOutputStream;
 import java.io.ByteArrayOutputStream;
 import java.io.FileInputStream;
+import java.io.FileNotFoundException;
 import java.io.FileOutputStream;
+import java.io.IOException;
 
 import android.content.Context;
 import android.content.SharedPreferences;
 import android.graphics.Bitmap;
 import android.graphics.BitmapFactory;
 
-public class TWMember {
+public class TWFacebookUser {
 	private static final String PREF_KEY = "membership";
 	private static final String ID = "id";
 	private static final String NAME = "name";
@@ -39,12 +41,17 @@ public class TWMember {
 		return bitmap;
 	}
 	
-	public void saveMember(Context context){
+	public void saveMember(Context context) throws IOException{
 		saveMemberInPreferences(context);
 		saveMemberPhoto(context);
 	}
-		
-	private void saveMemberInPreferences(Context context){
+	
+	public void removeMember(Context context){
+		removeMemberFromPreferences(context);
+		removeMemberPhoto(context);
+	}
+	
+	public void saveMemberInPreferences(Context context){
 		SharedPreferences pref = context.getSharedPreferences(PREF_KEY, Context.MODE_PRIVATE);
 		SharedPreferences.Editor editor = pref.edit();
 		editor.putString(ID, this.id);
@@ -52,7 +59,15 @@ public class TWMember {
 		editor.commit();
 	}
 	
-	public void saveMemberPhoto(Context context){
+	private void removeMemberFromPreferences(Context context){
+		SharedPreferences pref = context.getSharedPreferences(PREF_KEY, Context.MODE_PRIVATE);
+		SharedPreferences.Editor editor = pref.edit();
+		editor.remove(ID);
+		editor.remove(NAME);
+		editor.commit();
+	}
+	
+	public void saveMemberPhoto(Context context) throws IOException{
 		Bitmap srcBitmap = this.pic;
 		FileOutputStream fos = null;
 		BufferedOutputStream buf = null;
@@ -71,8 +86,6 @@ public class TWMember {
 				buf = new BufferedOutputStream(fos);
 				buf.write(baos.toByteArray());
 			}
-		}catch(Exception e){
-			e.printStackTrace();
 		}finally{
 			try{
 				if (buf != null){
@@ -94,8 +107,12 @@ public class TWMember {
 			}
 		}
 	}
+	
+	private void removeMemberPhoto(Context context){
+		context.deleteFile(MEMBER_PIC_FILE);
+	}
 
-	public boolean restoreMember(Context context){
+	public boolean restoreMember(Context context) throws FileNotFoundException{
 		//try to restore member data.
 		restoreMemberFromPreferences(context);
 		// if data exist.
@@ -107,13 +124,13 @@ public class TWMember {
 			return false;
 	}
 	
-	private void restoreMemberFromPreferences(Context context){
+	public void restoreMemberFromPreferences(Context context){
 		SharedPreferences pref = context.getSharedPreferences(PREF_KEY, Context.MODE_PRIVATE);
 		this.id = pref.getString(ID, "");
 		this.name = pref.getString(NAME, "");
 	}
 	
-	private void restoreMemberPhoto(Context context){
+	private void restoreMemberPhoto(Context context) throws FileNotFoundException{
 		FileInputStream fis = null;
 		try{
 			fis = context.openFileInput(MEMBER_PIC_FILE);
@@ -122,8 +139,6 @@ public class TWMember {
 				this.setPicture(bmp);
 				bmp.recycle();
 			}
-		}catch(Exception e){
-			e.printStackTrace();
 		}finally{
 			try{
 				if (fis != null){
