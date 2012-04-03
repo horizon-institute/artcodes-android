@@ -1,0 +1,19 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <string name="app_name">DtouchImages</string>
+    <!-- Marker constraint preferences -->
+    <string name="min_branches">min_branches</string>
+    <string name="max_branches">max_branches</string>
+    <string name="empty_branches">empty_branches</string>
+    <string name="validation_branches">validation_branches</string>
+    <string name="max_leaves">max_leaves</string>
+    <string name="validation_branch_leaves">validation_branch_leaves</string>
+	<string name="checksum_modulo">checksum_modulo</string>
+	<!--  menus -->
+	<string name="detect_marker">Detect Marker</string>
+	<string name="detect_marker_debug">Detect Marker Debug</string>
+	<string name="view_preferences">View Preferences</string>
+	<!--  dialog -->
+	<string name="downloadErrorMsg">There is an error in downloading the data.</string>
+	<string name="alert_dialog_ok">OK</string>	
+</resources>

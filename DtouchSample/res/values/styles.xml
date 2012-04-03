@@ -1,0 +1,8 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <style name="Animations" />
+	<style name="Animations.GrowFromCentre">
+		<item name="@android:windowEnterAnimation">@anim/grow_from_centre</item>
+		<item name="@android:windowExitAnimation">@anim/shrink_to_centre</item>
+	</style>
+</resources>
