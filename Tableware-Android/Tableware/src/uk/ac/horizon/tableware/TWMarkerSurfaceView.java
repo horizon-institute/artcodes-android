@@ -13,8 +13,9 @@ import org.opencv.highgui.Highgui;
 import org.opencv.highgui.VideoCapture;
 import org.opencv.imgproc.Imgproc;
 
-import uk.ac.horizon.dtouch.DtouchMarker;
-import uk.ac.horizon.dtouch.MarkerDetector;
+import uk.ac.horizon.data.HIPreferenceTableware;
+import uk.ac.horizon.dtouchMobile.DtouchMarker;
+import uk.ac.horizon.dtouchMobile.MarkerDetector;
 
 
 import android.content.Context;
@@ -273,7 +274,7 @@ class TWMarkerSurfaceView extends TWSurfaceViewBase {
     		if (markerDetector.verifyRoot(i, mComponents.get(i), mHierarchy,imgMat,code)){
     			//if marker found.
     			marker.setCode(code);
-    			marker.setComponent(mComponents.get(i));
+    			//marker.setComponent(mComponents.get(i));
     			marker.setComponentIndex(i);
     			markerFound = true;
     			break;
@@ -396,7 +397,7 @@ class TWMarkerSurfaceView extends TWSurfaceViewBase {
             mComponents = new ArrayList<Mat>();
             mHierarchy = new Mat();
         }
-    	markerDetector = new MarkerDetector(this.getContext());
+    	markerDetector = new MarkerDetector(this.getContext(), new HIPreferenceTableware(this.getContext()));
     	mMarkerDetected = false;
     }
     

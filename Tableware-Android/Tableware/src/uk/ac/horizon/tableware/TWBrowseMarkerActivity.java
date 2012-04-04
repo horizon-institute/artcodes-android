@@ -2,7 +2,8 @@ package uk.ac.horizon.tableware;
 
 import java.net.URI;
 
-import uk.ac.horizon.dtouch.DtouchMarker;
+import uk.ac.horizon.data.DataMarker;
+import uk.ac.horizon.dtouchMobile.HIPreference;
 
 import android.app.Activity;
 import android.content.Intent;
@@ -14,7 +15,7 @@ import android.webkit.WebView;
 public class TWBrowseMarkerActivity extends Activity {
 	
 	private WebView mWebView;
-	private DtouchMarker mDtouchMarker;
+	private DataMarker mDataMarker;
 	private String mUrl;
 		
 	@Override
@@ -33,11 +34,11 @@ public class TWBrowseMarkerActivity extends Activity {
 		Bundle markerBundle = intent.getExtras();
 		if (markerBundle.getString("URLToDisplay") != null)
 			mUrl = markerBundle.getString("URLToDisplay");
-		mDtouchMarker = DtouchMarker.createMarkerFromBundle(markerBundle);
+		mDataMarker = DataMarker.createMarkerFromBundle(markerBundle);
 	}
 	
 	private void initWebView(){
-		if (mDtouchMarker != null && mDtouchMarker.getClass() != null){
+		if (mDataMarker != null && mDataMarker.getClass() != null){
 			mWebView = (WebView) findViewById(R.id.MarkerwebView);
 			mWebView.getSettings().setJavaScriptEnabled(true);
 			mWebView.getSettings().setLoadWithOverviewMode(true);
@@ -51,8 +52,8 @@ public class TWBrowseMarkerActivity extends Activity {
 					activity.setProgress(progress * 1000);
 					
 					if (progress == 100){
-						if (mDtouchMarker != null && mDtouchMarker.getTitle() != null)
-							activity.setTitle(mDtouchMarker.getTitle());
+						if (mDataMarker != null && mDataMarker.getTitle() != null)
+							activity.setTitle(mDataMarker.getTitle());
 						
 					}
 				}
@@ -66,7 +67,7 @@ public class TWBrowseMarkerActivity extends Activity {
 	
 	private String appendMemberNameWithURL(String url){
 		String encodedURL = null; 
-		String memberName = new TWPreference(this).getMemberName();
+		String memberName = new HIPreference(this).getMemberName();
 		try{
 			url = url.concat(memberName.replaceAll(" ", "%20"));
 			URI uri = new URI(url);

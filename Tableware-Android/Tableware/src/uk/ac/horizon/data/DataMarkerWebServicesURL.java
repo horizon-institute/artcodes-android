@@ -1,10 +1,10 @@
-package uk.ac.horizon.dtouch;
+package uk.ac.horizon.data;
 
 import java.net.MalformedURLException;
 import java.net.URL;
 
 
-public class DtouchMarkerWebServicesURL {
+public class DataMarkerWebServicesURL {
 	private static final String BASE_URL = "http://data.horizon.ac.uk/v1";
 	private static final String IMAGE_POSTFIX = "image";
 	private static final String THUMBNAIL_POSTFIX = "thumb";

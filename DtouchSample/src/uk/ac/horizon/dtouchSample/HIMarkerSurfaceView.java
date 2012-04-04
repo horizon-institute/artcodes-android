@@ -14,6 +14,7 @@ import org.opencv.highgui.VideoCapture;
 import org.opencv.imgproc.Imgproc;
 
 import uk.ac.horizon.dtouchMobile.DtouchMarker;
+import uk.ac.horizon.dtouchMobile.HIPreference;
 import uk.ac.horizon.dtouchMobile.MarkerDetector;
 
 
@@ -376,7 +377,7 @@ class HIMarkerSurfaceView extends HISurfaceViewBase {
             mComponents = new ArrayList<Mat>();
             mHierarchy = new Mat();
         }
-    	markerDetector = new MarkerDetector(this.getContext());
+    	markerDetector = new MarkerDetector(this.getContext(), new HIPreference(this.getContext()));
     	mMarkerDetected = false;
     }
     

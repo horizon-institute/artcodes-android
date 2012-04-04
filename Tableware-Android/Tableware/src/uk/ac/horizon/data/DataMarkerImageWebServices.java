@@ -1,4 +1,4 @@
-package uk.ac.horizon.dtouch;
+package uk.ac.horizon.data;
 
 import java.io.IOException;
 import java.net.URL;
@@ -7,23 +7,23 @@ import android.os.AsyncTask;
 
 import com.facebook.android.Utility;
 
-public class DtouchMarkerImageWebServices{
+public class DataMarkerImageWebServices{
 	
 	private MarkerImageDownloadRequestListener mListener;
 	
-	public DtouchMarkerImageWebServices(MarkerImageDownloadRequestListener listener){
+	public DataMarkerImageWebServices(MarkerImageDownloadRequestListener listener){
 		mListener = listener;
 	}
 	
 	public void executeMarkerImageRequest(String code){
 		URL[] params = new URL[1];
-		params[0] = DtouchMarkerWebServicesURL.getMarkerImageURL(code);
+		params[0] = DataMarkerWebServicesURL.getMarkerImageURL(code);
 		new DtouchMarkerDownloadImageTask().execute(params);
 	}
 	
 	public void executeDishImageRequest(String title){
 		URL[] params = new URL[1];
-		params[0] = DtouchMarkerWebServicesURL.getDishImageURL(title);
+		params[0] = DataMarkerWebServicesURL.getDishImageURL(title);
 		new DtouchMarkerDownloadImageTask().execute(params);
 	}
 		

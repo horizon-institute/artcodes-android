@@ -19,11 +19,11 @@ public class MarkerDetector
 	private static final int NEXT_NODE = 0;
 	private static final int FIRST_NODE = 2;
 		
-	private HIPreference preference;
+	private HIPreference mPreference;
 			
-	public MarkerDetector(Context context)
+	public MarkerDetector(Context context, HIPreference preference)
 	{
-		preference = new HIPreference(context);
+		mPreference = preference;
 	}
 	
 	public Boolean verifyRoot(int rootIndex, Mat rootNode, Mat hierarchy, Mat binaryImage, List<Integer> codes){
@@ -49,7 +49,7 @@ public class MarkerDetector
 					branchCount++;
 					if (status == BranchStatus.EMPTY){
 						emptyBranchCount++;
-						if (emptyBranchCount > preference.getMaxEmptyBranches()){
+						if (emptyBranchCount > mPreference.getMaxEmptyBranches()){
 							return false;
 						}
 					}
@@ -60,12 +60,12 @@ public class MarkerDetector
 				else if (status == BranchStatus.INVALID)
 					return false;
 			}
-			if (emptyBranchCount > preference.getMaxEmptyBranches())
+			if (emptyBranchCount > mPreference.getMaxEmptyBranches())
 				valid = false;
 			//Marker should have one non-empty branch. If all branches are empty then return false.
 			else if ((emptyBranchCount - branchCount) == 0)
 				valid = false;
-			else if (branchCount >= preference.getMinBranches() && branchCount <= preference.getMaxBranches()){
+			else if (branchCount >= mPreference.getMinBranches() && branchCount <= mPreference.getMaxBranches()){
 				if (verifyMarkerConstraint(codes)){
 					Collections.sort(codes);
 					valid = true;
@@ -101,7 +101,7 @@ public class MarkerDetector
 		//if no leaf then the branch is empty.
 		if (leafCount == 0)
 			status = BranchStatus.EMPTY;
-		else if (leafCount <= preference.getMaxLeaves())
+		else if (leafCount <= mPreference.getMaxLeaves())
 			status = BranchStatus.VALID;
 		//add leaf count in branch code. Only add it when leaf count is greater than 0.
 		//if(leafCount > 0 ) 
@@ -121,7 +121,7 @@ public class MarkerDetector
 	}
 	
 	private Boolean verifyMarkerConstraint(List<Integer> codes){
-		MarkerConstraint markerConstraint = new MarkerConstraint(preference,codes);
+		MarkerConstraint markerConstraint = new MarkerConstraint(mPreference,codes);
 		return markerConstraint.verifyMarkerCode();
 	}
 	

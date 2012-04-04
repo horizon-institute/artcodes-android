@@ -4,7 +4,7 @@ import java.util.List;
 
 import com.facebook.android.R;
 
-import uk.ac.horizon.dtouch.TWDiningHistoryItem;
+import uk.ac.horizon.data.TWDiningHistoryItem;
 
 import android.app.ListActivity;
 import android.content.Intent;

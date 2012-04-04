@@ -1,9 +1,9 @@
 package uk.ac.horizon.tableware;
 
-import uk.ac.horizon.dtouch.DtouchMarker;
-import uk.ac.horizon.dtouch.DtouchMarkerImageWebServices;
-import uk.ac.horizon.dtouch.DtouchMarkerWebServicesURL;
-import uk.ac.horizon.dtouch.DtouchMarkerImageWebServices.MarkerImageDownloadRequestListener;
+import uk.ac.horizon.data.DataMarker;
+import uk.ac.horizon.data.DataMarkerImageWebServices;
+import uk.ac.horizon.data.DataMarkerWebServicesURL;
+import uk.ac.horizon.data.DataMarkerImageWebServices.MarkerImageDownloadRequestListener;
 
 import com.facebook.android.BaseDialogListener;
 import com.facebook.android.FacebookError;
@@ -24,7 +24,7 @@ import android.widget.TextView;
 import android.widget.Toast;
 
 public class TWOfferActivity extends Activity {
-	private DtouchMarker dtouchMarker;
+	private DataMarker dtouchMarker;
 	private Handler mHandler;
 		
 	@Override
@@ -34,13 +34,13 @@ public class TWOfferActivity extends Activity {
 		initMarker();
 		mHandler = new Handler();
 		setActivityCaption();
-		getOfferImage(dtouchMarker.getCodeKey());
+		getOfferImage(dtouchMarker.getCode());
 	}
 	
 	private void initMarker(){
 		Intent intent = getIntent();
 		Bundle markerBundle = intent.getExtras();
-		dtouchMarker = DtouchMarker.createMarkerFromBundle(markerBundle);
+		dtouchMarker = DataMarker.createMarkerFromBundle(markerBundle);
 	}
 	
     void showProgressControls(){
@@ -70,7 +70,7 @@ public class TWOfferActivity extends Activity {
 	}
 	
 	private void getOfferImage(String markerCode){
-		DtouchMarkerImageWebServices dtouchMarkerImageWebServices = new DtouchMarkerImageWebServices(new MarkerImageDownloadRequestListener(){
+		DataMarkerImageWebServices dtouchMarkerImageWebServices = new DataMarkerImageWebServices(new MarkerImageDownloadRequestListener(){
 			public void onMarkerImageDownloaded(Bitmap bmp){
 				hideProgressControls();
 				setOfferImageView(bmp);
@@ -96,12 +96,12 @@ public class TWOfferActivity extends Activity {
 		Bundle params = new Bundle();
         params.putString("caption", dtouchMarker.getTitle());
         params.putString("description", "Busaba");
-        params.putString("picture", DtouchMarkerWebServicesURL.getMarkerThumbnailURL(dtouchMarker.getCodeKey()).toString());
+        params.putString("picture", DataMarkerWebServicesURL.getMarkerThumbnailURL(dtouchMarker.getCode()).toString());
         Utility.mFacebook.dialog(TWOfferActivity.this, "feed", params, new FacebookPostDialogListener());
 	}
 	
 	public void onOfferDetailBtnClick(View sender){
-		Bundle bundle = DtouchMarker.createMarkerBundle(dtouchMarker);
+		Bundle bundle = DataMarker.createMarkerBundle(dtouchMarker);
 		bundle.putString("URLToDisplay", dtouchMarker.getURL1());
 		Intent intent = new Intent(this, TWBrowseMarkerActivity.class);
 		intent.putExtras(bundle);

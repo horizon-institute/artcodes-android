@@ -5,12 +5,12 @@ import com.facebook.android.FacebookPostDialogListener;
 import com.facebook.android.R;
 import com.facebook.android.Utility;
 
-import uk.ac.horizon.dtouch.DtouchMarker;
-import uk.ac.horizon.dtouch.DtouchMarkerDataWebServices;
-import uk.ac.horizon.dtouch.DtouchMarkerImageWebServices;
-import uk.ac.horizon.dtouch.DtouchMarkerDataWebServices.MarkerDownloadRequestListener;
-import uk.ac.horizon.dtouch.DtouchMarkerImageWebServices.MarkerImageDownloadRequestListener;
-import uk.ac.horizon.dtouch.DtouchMarkerWebServicesURL;
+import uk.ac.horizon.data.DataMarker;
+import uk.ac.horizon.data.DataMarkerImageWebServices;
+import uk.ac.horizon.data.DataMarkerWebServices;
+import uk.ac.horizon.data.DataMarkerWebServicesURL;
+import uk.ac.horizon.data.DataMarkerImageWebServices.MarkerImageDownloadRequestListener;
+import uk.ac.horizon.data.DataMarkerWebServices.MarkerDownloadRequestListener;
 import android.app.Activity;
 import android.app.ProgressDialog;
 import android.content.Intent;
@@ -29,7 +29,7 @@ import android.widget.RelativeLayout;
 import android.widget.TextView;
 
 public class TWDishActivity extends Activity {
-	private DtouchMarker dtouchMarker;
+	private DataMarker mDataMarker;
 	ProgressDialog mSpinner;
 			
 	@Override
@@ -41,15 +41,15 @@ public class TWDishActivity extends Activity {
 		initMarker();
 		setActivityCaption();
 		if (Utility.userUID != null)
-			getPersonMarkerDetail(dtouchMarker.getCodeKey(), dtouchMarker.getTitle(), Utility.userUID);
+			getPersonMarkerDetail(mDataMarker.getCode(), mDataMarker.getTitle(), Utility.userUID);
 		else
-			getPersonMarkerDetail(dtouchMarker.getCodeKey(), dtouchMarker.getTitle(), null);
+			getPersonMarkerDetail(mDataMarker.getCode(), mDataMarker.getTitle(), null);
 	}
 	
 	private void initMarker(){
 		Intent intent = getIntent();
 		Bundle markerBundle = intent.getExtras();
-		dtouchMarker = DtouchMarker.createMarkerFromBundle(markerBundle);
+		mDataMarker = DataMarker.createMarkerFromBundle(markerBundle);
 	}
 	
     void showInLineProgressControls(){
@@ -73,13 +73,13 @@ public class TWDishActivity extends Activity {
 	
 	private void setActivityCaption(){
 		TextView activityCaptionTextView = (TextView) findViewById(R.id.activityCaptionTextView);
-		if (dtouchMarker != null){
-			activityCaptionTextView.setText(dtouchMarker.getTitle());
+		if (mDataMarker != null){
+			activityCaptionTextView.setText(mDataMarker.getTitle());
 		}
 	}
 	
 	private void getMarkerImage(String markerCode){
-		DtouchMarkerImageWebServices dtouchMarkerImageWebServices = new DtouchMarkerImageWebServices(new MarkerImageDownloadRequestListener(){
+		DataMarkerImageWebServices dtouchMarkerImageWebServices = new DataMarkerImageWebServices(new MarkerImageDownloadRequestListener(){
 			public void onMarkerImageDownloaded(Bitmap bmp){
 				hideInLineProgressControls();
 				setDishImageView(bmp);
@@ -96,7 +96,7 @@ public class TWDishActivity extends Activity {
 	}
 	
 	private void getDishImage(String dishTitle){
-		DtouchMarkerImageWebServices dtouchMarkerImageWebServices = new DtouchMarkerImageWebServices(new MarkerImageDownloadRequestListener(){
+		DataMarkerImageWebServices dtouchMarkerImageWebServices = new DataMarkerImageWebServices(new MarkerImageDownloadRequestListener(){
 			public void onMarkerImageDownloaded(Bitmap bmp){
 				hideInLineProgressControls();
 				setDishImageView(bmp);
@@ -130,26 +130,26 @@ public class TWDishActivity extends Activity {
 	
 	public void onShareBtnClick(View sender){
 		Bundle params = new Bundle();
-        params.putString("caption", dtouchMarker.getTitle());
+        params.putString("caption", mDataMarker.getTitle());
         params.putString("description", "Busaba");
-        if (dtouchMarker.getCodeKey() != null)
-        	params.putString("picture", DtouchMarkerWebServicesURL.getMarkerThumbnailURL(dtouchMarker.getCodeKey()).toString());
+        if (mDataMarker.getCode() != null)
+        	params.putString("picture", DataMarkerWebServicesURL.getMarkerThumbnailURL(mDataMarker.getCode()).toString());
         else
-        	params.putString("picture", DtouchMarkerWebServicesURL.getDishThumbnailURL(dtouchMarker.getTitle()).toString());
+        	params.putString("picture", DataMarkerWebServicesURL.getDishThumbnailURL(mDataMarker.getTitle()).toString());
         Utility.mFacebook.dialog(TWDishActivity.this, "feed", params, new FacebookPostDialogListener(this, new Handler()));
 	}
 	
 	public void onRecipeBtnClick(View sender){
-		Bundle bundle = DtouchMarker.createMarkerBundle(dtouchMarker);
-		bundle.putString("URLToDisplay", dtouchMarker.getURL1());
+		Bundle bundle = DataMarker.createMarkerBundle(mDataMarker);
+		bundle.putString("URLToDisplay", mDataMarker.getURL1());
 		Intent intent = new Intent(this, TWBrowseMarkerActivity.class);
 		intent.putExtras(bundle);
 		startActivity(intent);
 	}
 	
 	public void onStoryBtnClick(View sender){
-		Bundle bundle = DtouchMarker.createMarkerBundle(dtouchMarker);
-		bundle.putString("URLToDisplay", dtouchMarker.getURL2());
+		Bundle bundle = DataMarker.createMarkerBundle(mDataMarker);
+		bundle.putString("URLToDisplay", mDataMarker.getURL2());
 		Intent intent = new Intent(this, TWBrowseMarkerActivity.class);
 		intent.putExtras(bundle);
 		startActivity(intent);
@@ -161,8 +161,8 @@ public class TWDishActivity extends Activity {
 	
     void getPersonMarkerDetail(String code, String title, String userId){
     	showSpinner();
-    	DtouchMarkerDataWebServices dtouchMarkerWebServices = new DtouchMarkerDataWebServices(new MarkerDownloadRequestListener(){
-    		public void onMarkerDownloaded(DtouchMarker marker){
+    	DataMarkerWebServices dtouchMarkerWebServices = new DataMarkerWebServices(new MarkerDownloadRequestListener(){
+    		public void onMarkerDownloaded(DataMarker marker){
     			markerPersonDetailDownloaded(marker);
     		}
 
@@ -177,18 +177,18 @@ public class TWDishActivity extends Activity {
     		dtouchMarkerWebServices.executeDishRequestUsingDishName(title, userId);
     }
     
-    private void markerPersonDetailDownloaded(DtouchMarker marker){
-    	dtouchMarker = marker;
+    private void markerPersonDetailDownloaded(DataMarker marker){
+    	mDataMarker = marker;
     	hideSpinner();
     	ImageButton accessoryBtn = (ImageButton) findViewById(R.id.dininghistoryaccessorybtn);
-    	if (dtouchMarker.getDiningHistory() != null)
+    	if (mDataMarker.getDiningHistory() != null)
     		accessoryBtn.setEnabled(true);
     	else
     		accessoryBtn.setEnabled(false);
-    	if (dtouchMarker.getCodeKey() != null)
-    		getMarkerImage(dtouchMarker.getCodeKey());
-    	else if (dtouchMarker.getTitle() != null)
-    		getDishImage(dtouchMarker.getTitle());
+    	if (mDataMarker.getCode() != null)
+    		getMarkerImage(mDataMarker.getCode());
+    	else if (mDataMarker.getTitle() != null)
+    		getDishImage(mDataMarker.getTitle());
     		
     }
     
@@ -217,7 +217,7 @@ public class TWDishActivity extends Activity {
 	
 	private void displayDiningHistoryListActivity(){
 		Intent intent = new Intent(this, TWDiningHistoryListActivity.class);
-		intent.putParcelableArrayListExtra(getString(R.string.dining_history), (ArrayList<? extends Parcelable>) dtouchMarker.getDiningHistory());
+		intent.putParcelableArrayListExtra(getString(R.string.dining_history), (ArrayList<? extends Parcelable>) mDataMarker.getDiningHistory());
 		startActivity(intent);
 	}
 	

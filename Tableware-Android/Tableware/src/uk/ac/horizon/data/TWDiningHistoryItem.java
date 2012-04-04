@@ -1,4 +1,4 @@
-package uk.ac.horizon.dtouch;
+package uk.ac.horizon.data;
 
 import android.os.Parcel;
 import android.os.Parcelable;

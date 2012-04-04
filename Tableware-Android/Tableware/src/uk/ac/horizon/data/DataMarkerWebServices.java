@@ -1,4 +1,4 @@
-package uk.ac.horizon.dtouch;
+package uk.ac.horizon.data;
 
 import java.io.BufferedReader;
 import java.io.IOException;
@@ -15,10 +15,10 @@ import org.json.JSONObject;
 
 import android.os.AsyncTask;
 
-public class DtouchMarkerDataWebServices{
+public class DataMarkerWebServices{
 	private MarkerDownloadRequestListener mListener;
 		
-	public DtouchMarkerDataWebServices(MarkerDownloadRequestListener listener){
+	public DataMarkerWebServices(MarkerDownloadRequestListener listener){
 		mListener = listener;
 	}
 	
@@ -36,13 +36,13 @@ public class DtouchMarkerDataWebServices{
 		new DishDownloadDataTask().execute(params);
 	}
 	
-	DtouchMarker downloadMarkerData(String markerCode, String userId) throws JSONException, IOException{
+	DataMarker downloadMarkerData(String markerCode, String userId) throws JSONException, IOException{
 		URL url;
-		DtouchMarker marker = null;
+		DataMarker marker = null;
 		if (userId != null){
-			url = DtouchMarkerWebServicesURL.getUserMarkerURL(markerCode, userId);
+			url = DataMarkerWebServicesURL.getUserMarkerURL(markerCode, userId);
 		}else{
-			url = DtouchMarkerWebServicesURL.getMarkerPrimaryURL(markerCode);
+			url = DataMarkerWebServicesURL.getMarkerPrimaryURL(markerCode);
 		}
 		HttpURLConnection urlConnection = null;
 		try{
@@ -62,14 +62,14 @@ public class DtouchMarkerDataWebServices{
 		return marker;
 	}
 	
-	DtouchMarker downloadDishData(String dishName, String userId) throws JSONException, IOException{
+	DataMarker downloadDishData(String dishName, String userId) throws JSONException, IOException{
 		URL url;
-		DtouchMarker marker = null;
+		DataMarker marker = null;
 		
 		if (userId != null){
-			url = DtouchMarkerWebServicesURL.getUserDishURL(dishName, userId);
+			url = DataMarkerWebServicesURL.getUserDishURL(dishName, userId);
 		}else{
-			url = DtouchMarkerWebServicesURL.getDishURL(dishName);
+			url = DataMarkerWebServicesURL.getDishURL(dishName);
 		}
 		HttpURLConnection urlConnection = null;
 		try{
@@ -89,10 +89,10 @@ public class DtouchMarkerDataWebServices{
 		return marker;
 	}
 	
-	DtouchMarker getDishObjFromJsonData(String code, String jsonData) throws JSONException{
+	DataMarker getDishObjFromJsonData(String code, String jsonData) throws JSONException{
 		JSONObject jsonObject;
 		JSONArray history = null;
-		DtouchMarker marker = null;
+		DataMarker marker = null;
 		
 		jsonObject = new JSONObject(jsonData);
 		String title = jsonObject.getString("name");
@@ -104,7 +104,7 @@ public class DtouchMarkerDataWebServices{
 		}catch (JSONException e){
 			history = null;
 		}
-		marker = new DtouchMarker();
+		marker = new DataMarker();
 		marker.setURL1(url1);
 		marker.setURL2(url2);
 		marker.setURL3(url3);
@@ -123,10 +123,10 @@ public class DtouchMarkerDataWebServices{
 		return marker;
 	}
 	
-	DtouchMarker getMarkerObjFromJsonData(String code, String jsonData) throws JSONException{
+	DataMarker getMarkerObjFromJsonData(String code, String jsonData) throws JSONException{
 		JSONObject jsonObject;
 		JSONArray history = null;
-		DtouchMarker marker = null;
+		DataMarker marker = null;
 		
 		jsonObject = new JSONObject(jsonData);
 		String title = jsonObject.getString("name");
@@ -139,7 +139,7 @@ public class DtouchMarkerDataWebServices{
 		}catch (JSONException e){
 			history = null;
 		}
-		marker = new DtouchMarker();
+		marker = new DataMarker();
 		marker.setCode(code);
 		marker.setType(type);
 		marker.setURL1(url1);
@@ -169,9 +169,9 @@ public class DtouchMarkerDataWebServices{
 		return sb.toString();
 	}
 	
-	private class DtouchMarkerDownloadDataTask extends AsyncTask<String, Void, DtouchMarker> {
-		protected DtouchMarker doInBackground(String... data){
-			DtouchMarker marker = null;
+	private class DtouchMarkerDownloadDataTask extends AsyncTask<String, Void, DataMarker> {
+		protected DataMarker doInBackground(String... data){
+			DataMarker marker = null;
 			// if marker code is given
 			if (data[0] != null){
 				try {
@@ -185,7 +185,7 @@ public class DtouchMarkerDataWebServices{
 			return marker;
 		}
 		
-		protected void onPostExecute(DtouchMarker marker){
+		protected void onPostExecute(DataMarker marker){
 			if (marker != null)
 				mListener.onMarkerDownloaded(marker);
 			else
@@ -193,9 +193,9 @@ public class DtouchMarkerDataWebServices{
 		}
 	}
 	
-	private class DishDownloadDataTask extends AsyncTask<String, Void, DtouchMarker> {
-		protected DtouchMarker doInBackground(String... data){
-			DtouchMarker marker = null;
+	private class DishDownloadDataTask extends AsyncTask<String, Void, DataMarker> {
+		protected DataMarker doInBackground(String... data){
+			DataMarker marker = null;
 			// if marker name is given.
 			if (data[0] != null){
 				try {
@@ -209,7 +209,7 @@ public class DtouchMarkerDataWebServices{
 			return marker;
 		}
 		
-		protected void onPostExecute(DtouchMarker marker){
+		protected void onPostExecute(DataMarker marker){
 			if (marker != null)
 				mListener.onMarkerDownloaded(marker);
 			else
@@ -223,7 +223,7 @@ public class DtouchMarkerDataWebServices{
 	 *
 	 */
 	public static interface MarkerDownloadRequestListener{
-		public void onMarkerDownloaded(DtouchMarker marker);
+		public void onMarkerDownloaded(DataMarker marker);
 		public void onMarkerDownloadError();
 		
 	}	

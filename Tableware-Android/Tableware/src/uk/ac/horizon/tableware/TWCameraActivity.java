@@ -2,9 +2,10 @@ package uk.ac.horizon.tableware;
 
 import org.opencv.core.Rect;
 
-import uk.ac.horizon.dtouch.DtouchMarker;
-import uk.ac.horizon.dtouch.DtouchMarkerDataWebServices;
-import uk.ac.horizon.dtouch.DtouchMarkerDataWebServices.MarkerDownloadRequestListener;
+import uk.ac.horizon.data.DataMarker;
+import uk.ac.horizon.data.DataMarkerWebServices;
+import uk.ac.horizon.data.DataMarkerWebServices.MarkerDownloadRequestListener;
+import uk.ac.horizon.dtouchMobile.DtouchMarker;
 import uk.ac.horizon.tableware.R;
 import uk.ac.horizon.tableware.MarkerPopupWindow.OnMarkerPopupWindowListener;
 import uk.ac.horizon.tableware.TWMarkerSurfaceView.OnMarkerDetectedListener;
@@ -105,21 +106,22 @@ public class TWCameraActivity extends Activity implements OnMarkerDetectedListen
     }
     
     void getMarker(String code){
-    	DtouchMarkerDataWebServices dtouchMarkerWebServices = new DtouchMarkerDataWebServices(new MarkerDownloadRequestListener(){
-    		public void onMarkerDownloaded(DtouchMarker marker){
-    			markerDownloaded(marker);
-    		}
-
-			@Override
+    	DataMarkerWebServices dtouchMarkerWebServices = new DataMarkerWebServices(new MarkerDownloadRequestListener(){
+    		@Override
 			public void onMarkerDownloadError() {
 				markerDownloadWithError();
 				
+			}
+
+			@Override
+			public void onMarkerDownloaded(DataMarker marker) {
+				markerDownloaded(marker);
 			}
     	});
     	dtouchMarkerWebServices.executeMarkerRequestUsingCode(code, null);
     }
     
-    public void displayMarkerDetail(DtouchMarker marker){
+    public void displayMarkerDetail(DataMarker marker){
     	if (marker.getType().compareToIgnoreCase(MARKER_TYPE_FOOD) == 0){
     		displayDish(marker);
     	}else if (marker.getType().compareToIgnoreCase(MARKER_TYPE_OFFER) == 0){
@@ -127,16 +129,16 @@ public class TWCameraActivity extends Activity implements OnMarkerDetectedListen
     	}
     }
     
-    private void displayDish(DtouchMarker marker){
+    private void displayDish(DataMarker marker){
 		Intent intent = new Intent(this, TWDishActivity.class);
-		Bundle markerBundle = DtouchMarker.createMarkerBundle(marker);
+		Bundle markerBundle = DataMarker.createMarkerBundle(marker);
 		intent.putExtras(markerBundle);
 		startActivity(intent);
 	}
     
-    private void displayOffer(DtouchMarker marker){
+    private void displayOffer(DataMarker marker){
     	Intent intent = new Intent(this, TWOfferActivity.class);
-		Bundle markerBundle = DtouchMarker.createMarkerBundle(marker);
+		Bundle markerBundle = DataMarker.createMarkerBundle(marker);
 		intent.putExtras(markerBundle);
 		startActivity(intent);
     }
@@ -160,7 +162,7 @@ public class TWCameraActivity extends Activity implements OnMarkerDetectedListen
     	progressBar = null;
     }
     
-    private void markerDownloaded(DtouchMarker marker){
+    private void markerDownloaded(DataMarker marker){
     	hideProgressControls();
     	if (marker != null)
     		displayMarkerPopupWindow(marker);
@@ -172,7 +174,7 @@ public class TWCameraActivity extends Activity implements OnMarkerDetectedListen
     	
     }
     
-    private void displayMarkerPopupWindow(DtouchMarker marker){
+    private void displayMarkerPopupWindow(DataMarker marker){
     	Rect rect = mMarkerSurfaceView.getMarkerPosition();
     	FrameLayout frameLayout = (FrameLayout) findViewById(R.id.frameLayout);
     	MarkerPopupWindow markerPopupWindow = new MarkerPopupWindow(frameLayout,marker);
@@ -184,11 +186,11 @@ public class TWCameraActivity extends Activity implements OnMarkerDetectedListen
     
     
     //OnMarkerPopupWindowListener methods.
-    public void onDismissedSelected(DtouchMarker marker){
+    public void onDismissedSelected(DataMarker marker){
     	mMarkerSurfaceView.stopDisplayingDetectedMarker();
     }
     
-	public void onBrowseMarkerSelected(DtouchMarker marker){
+	public void onBrowseMarkerSelected(DataMarker marker){
 		mMarkerSurfaceView.stopDisplayingDetectedMarker();
 		stopMarkerDetectionProcess();
 		displayMarkerDetail(marker);

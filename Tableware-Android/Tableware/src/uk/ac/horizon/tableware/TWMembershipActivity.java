@@ -11,14 +11,14 @@ import java.util.Map.Entry;
 import org.json.JSONException;
 import org.json.JSONObject;
 
-import uk.ac.horizon.dtouch.DtouchMarker;
-import uk.ac.horizon.dtouch.DtouchMarkerDataWebServices;
-import uk.ac.horizon.dtouch.FavouriteDishThumbnailsWebService;
-import uk.ac.horizon.dtouch.DtouchMarkerDataWebServices.MarkerDownloadRequestListener;
-import uk.ac.horizon.dtouch.FavouriteDishThumbnailsWebService.FavouriteDishThumbnailsDownloadRequestListener;
-import uk.ac.horizon.dtouch.TWMember;
-import uk.ac.horizon.dtouch.TWUserDataWebServices;
-import uk.ac.horizon.dtouch.TWUserDataWebServices.UserDataDownloadRequestListener;
+import uk.ac.horizon.data.DataMarker;
+import uk.ac.horizon.data.DataMarkerWebServices;
+import uk.ac.horizon.data.FavouriteDishThumbnailsWebService;
+import uk.ac.horizon.data.TWMember;
+import uk.ac.horizon.data.TWUserDataWebServices;
+import uk.ac.horizon.data.DataMarkerWebServices.MarkerDownloadRequestListener;
+import uk.ac.horizon.data.FavouriteDishThumbnailsWebService.FavouriteDishThumbnailsDownloadRequestListener;
+import uk.ac.horizon.data.TWUserDataWebServices.UserDataDownloadRequestListener;
 
 import com.example.coverflow.CoverFlow;
 import com.example.coverflow.CoverFlowImageAdapter;
@@ -241,8 +241,8 @@ public class TWMembershipActivity extends Activity{
 	}
 	
 	void getMarker(String dishName){
-		DtouchMarkerDataWebServices dtouchMarkerWebServices = new DtouchMarkerDataWebServices(new MarkerDownloadRequestListener(){
-			public void onMarkerDownloaded(DtouchMarker marker){
+		DataMarkerWebServices dtouchMarkerWebServices = new DataMarkerWebServices(new MarkerDownloadRequestListener(){
+			public void onMarkerDownloaded(DataMarker marker){
 				hideProgress();
 				displayDish(marker);
 			}
@@ -256,9 +256,9 @@ public class TWMembershipActivity extends Activity{
 		dtouchMarkerWebServices.executeDishRequestUsingDishName(dishName, Utility.userUID);
 	}
 	
-	private void displayDish(DtouchMarker marker){
+	private void displayDish(DataMarker marker){
 		Intent intent = new Intent(this, TWDishActivity.class);
-		Bundle markerBundle = DtouchMarker.createMarkerBundle(marker);
+		Bundle markerBundle = DataMarker.createMarkerBundle(marker);
 		intent.putExtras(markerBundle);
 		startActivity(intent);
 	}

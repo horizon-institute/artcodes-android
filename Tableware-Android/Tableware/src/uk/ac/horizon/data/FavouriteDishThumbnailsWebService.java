@@ -1,4 +1,4 @@
-package uk.ac.horizon.dtouch;
+package uk.ac.horizon.data;
 
 import java.io.IOException;
 import java.net.URL;
@@ -25,7 +25,7 @@ public class FavouriteDishThumbnailsWebService {
 		protected HashMap<String,Bitmap> doInBackground(String... dishNames) {
 			HashMap<String,Bitmap> thumbnailsMap = new HashMap<String, Bitmap>();
 			for (String dishName:dishNames){
-				URL url = DtouchMarkerWebServicesURL.getDishThumbnailURL(dishName);
+				URL url = DataMarkerWebServicesURL.getDishThumbnailURL(dishName);
 				Bitmap bmp = null;
 				try {
 					bmp = Utility.getBitmap(url.toString());

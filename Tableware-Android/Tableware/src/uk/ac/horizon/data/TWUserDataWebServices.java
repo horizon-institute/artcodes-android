@@ -1,4 +1,4 @@
-package uk.ac.horizon.dtouch;
+package uk.ac.horizon.data;
 
 import java.io.BufferedReader;
 import java.io.IOException;
@@ -38,7 +38,7 @@ public class TWUserDataWebServices {
 		protected TWMember doInBackground(String... data){
 			TWMember member = null;
 			String userId = data[0];
-			URL url = DtouchMarkerWebServicesURL.getUserURL(userId);
+			URL url = DataMarkerWebServicesURL.getUserURL(userId);
 			HttpURLConnection urlConnection = null;
 			try{
 				urlConnection = (HttpURLConnection) url.openConnection();

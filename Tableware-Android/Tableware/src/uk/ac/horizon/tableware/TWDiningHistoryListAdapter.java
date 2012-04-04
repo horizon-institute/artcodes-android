@@ -5,7 +5,7 @@ import java.util.ArrayList;
 import java.util.Date;
 import java.util.List;
 
-import uk.ac.horizon.dtouch.TWDiningHistoryItem;
+import uk.ac.horizon.data.TWDiningHistoryItem;
 
 import android.content.Context;
 import android.view.LayoutInflater;

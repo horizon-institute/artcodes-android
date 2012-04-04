@@ -1,6 +1,6 @@
 package uk.ac.horizon.tableware;
 
-import uk.ac.horizon.dtouch.DtouchMarker;
+import uk.ac.horizon.data.DataMarker;
 import uk.ac.horizon.tableware.R;
 import android.content.Context;
 import android.graphics.Point;
@@ -16,16 +16,16 @@ import android.widget.TextView;
 class MarkerPopupWindow{
 	private View anchor;
 	private PopupWindow window;
-	private DtouchMarker dtouchMarker;
+	private DataMarker dataMarker;
 	private OnMarkerPopupWindowListener listener;
 	
 	public interface OnMarkerPopupWindowListener{
-		public void onDismissedSelected(DtouchMarker marker);
-		public void onBrowseMarkerSelected(DtouchMarker marker);
+		public void onDismissedSelected(DataMarker marker);
+		public void onBrowseMarkerSelected(DataMarker marker);
 	}
 	
-	MarkerPopupWindow(View anchor, DtouchMarker marker){
-		this.dtouchMarker = marker;
+	MarkerPopupWindow(View anchor, DataMarker marker){
+		this.dataMarker = marker;
 		this.anchor = anchor;
 		initPopupWindow(anchor.getContext());
 		initContentView();		
@@ -39,7 +39,7 @@ class MarkerPopupWindow{
     		WindowRotation.rotateViewGroup(this.anchor.getContext(),layout);
     	this.window.setContentView(layout);
     	TextView markerDesc = (TextView) layout.findViewById(R.id.markerDesc);
-    	markerDesc.setText(dtouchMarker.getTitle());
+    	markerDesc.setText(dataMarker.getTitle());
     }
 	
 	private void initPopupWindow(Context context){
@@ -82,14 +82,14 @@ class MarkerPopupWindow{
 	private void dismissPopupWindow(){
 		this.window.dismiss();
 		if (listener != null){
-			listener.onDismissedSelected(dtouchMarker);
+			listener.onDismissedSelected(dataMarker);
 		}
 	}
 	
 	private void browseMarker(){
 		this.window.dismiss();
 		if (listener != null){
-			listener.onBrowseMarkerSelected(dtouchMarker);
+			listener.onBrowseMarkerSelected(dataMarker);
 		}
 	}
 }
