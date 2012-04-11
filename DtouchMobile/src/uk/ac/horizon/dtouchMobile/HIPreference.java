@@ -7,14 +7,14 @@ import android.preference.PreferenceManager;
 public class HIPreference {
 	
 	//branches default values
-	protected static int DEFAULT_MIN_BRANCHES = 2;
-	protected static int DEFAULT_MAX_BRANCHES = 5;
-	protected static int DEFAULT_MAX_EMPTY_BRANCHES = 0;
-	protected static int DEFAULT_VALIDATION_BRANCHES = 0;
+	protected int DEFAULT_MIN_BRANCHES = 2;
+	protected int DEFAULT_MAX_BRANCHES = 5;
+	protected int DEFAULT_MAX_EMPTY_BRANCHES = 0;
+	protected int DEFAULT_VALIDATION_BRANCHES = 0;
 	//leaves default values
-	protected static int DEFAULT_MAX_LEAVES = 10;
-	protected static int DEFAULT_VALIDATION_BRANCH_LEAVES = 0;
-	protected static int DEFAULT_CHECKSUM_MODULO = 1;
+	protected int DEFAULT_MAX_LEAVES = 10;
+	protected int DEFAULT_VALIDATION_BRANCH_LEAVES = 0;
+	protected int DEFAULT_CHECKSUM_MODULO = 1;
 	
 	private static String MIN_BRANCHES = "min_branches";
 	private static String MAX_BRANCHES = "max_branches";
@@ -110,26 +110,26 @@ public class HIPreference {
 	}
 	
 	public void setDefaultMinBranches(int minBranches){
-		
+		this.DEFAULT_MIN_BRANCHES = minBranches;
 	}
 	
 	public void setDefaultMaxBranches(int maxBranches){
-		
+		this.DEFAULT_MAX_BRANCHES = maxBranches;
 	}
 	
 	public void setDefaultEmptyBranches(int emptyBranches){
-		
+		this.DEFAULT_MAX_EMPTY_BRANCHES = emptyBranches;
 	}
 	
 	public void setDefaultValidationBranches(int validationBranches){
-		
+		this.DEFAULT_VALIDATION_BRANCHES = validationBranches;
 	}
 	
 	public void setDefaultMaxLeaves(int maxLeaves){
-		
+		this.DEFAULT_MAX_LEAVES = maxLeaves;
 	}
 	
 	public void setDefaultChecksumModulo(int checksumModulo){
-		
+		this.DEFAULT_CHECKSUM_MODULO = checksumModulo;
 	}
 }

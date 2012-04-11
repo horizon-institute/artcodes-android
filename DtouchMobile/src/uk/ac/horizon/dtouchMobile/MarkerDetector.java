@@ -104,8 +104,8 @@ public class MarkerDetector
 		else if (leafCount <= mPreference.getMaxLeaves())
 			status = BranchStatus.VALID;
 		//add leaf count in branch code. Only add it when leaf count is greater than 0.
-		//if(leafCount > 0 ) 
-		codes.add(leafCount);
+		if(leafCount > 0 ) 
+			codes.add(leafCount);
 		return status;
 	}
 
