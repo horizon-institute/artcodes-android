@@ -3,7 +3,16 @@ package uk.ac.horizon.dtouchMobile;
 import android.content.Context;
 import android.content.SharedPreferences;
 import android.preference.PreferenceManager;
-
+/**
+ * This class defines the constraints for d-touch markers.It contains two sets of parameters. 
+ * The first set defines the d-touch markers which needs to be identified. For example max & min
+ * branches in a marker, empty branches and max leaves in a branch. 
+ * The second set of parameters are used to define to validate a marker. It defines 
+ * the number of validation branches, leaves in a validation branch and the checksum modulo.
+ *    
+ * @author pszsa1
+ *
+ */
 public class HIPreference {
 	
 	//branches default values
@@ -16,15 +25,20 @@ public class HIPreference {
 	protected int DEFAULT_VALIDATION_BRANCH_LEAVES = 0;
 	protected int DEFAULT_CHECKSUM_MODULO = 1;
 	
+	//Minimum & Maximum number of branches.
 	private static String MIN_BRANCHES = "min_branches";
 	private static String MAX_BRANCHES = "max_branches";
+	//Empty branches. A d-touch marker can not have all empty branches.
 	private static String EMPTY_BRANCHES = "empty_branches";
+	//Maximum leaves in a branch.
 	private static String MAX_LEAVES = "max_leaves";
+	//Maximum validation branches.
 	private static String VALIDATION_BRANCHES = "validation_branches";
+	//Maximum leaves in a validation branch.
 	private static String VALIDATION_BRANCH_LEAVES = "validation_branch_leaves";
+	//The total number of leaves in a marker should be divisible by the checksum modulo.
 	private static String CHECKSUM_MODULO = "checksum_modulo";
-	private static String MEMBER_NAME = "member_name";
-	
+		
 	private Context mContext;
 	
 	public HIPreference(Context context){
@@ -98,14 +112,6 @@ public class HIPreference {
 			value = Integer.parseInt(sharedPrefs.getString(CHECKSUM_MODULO, Integer.toString(DEFAULT_CHECKSUM_MODULO)));
 		else
 			value = DEFAULT_CHECKSUM_MODULO;
-		return value;
-	}
-	
-	public String getMemberName(){
-		String value = "";
-		SharedPreferences sharedPrefs  = PreferenceManager.getDefaultSharedPreferences(mContext);
-		if (sharedPrefs.contains(MEMBER_NAME))
-			value = sharedPrefs.getString(MEMBER_NAME, "");
 		return value;
 	}
 	

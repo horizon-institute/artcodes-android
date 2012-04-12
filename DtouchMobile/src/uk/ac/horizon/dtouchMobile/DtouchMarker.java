@@ -3,6 +3,11 @@ package uk.ac.horizon.dtouchMobile;
 import java.util.ArrayList;
 import java.util.List;
 
+/**
+ * This class holds the d-touch code and the index of the root component.
+ * @author pszsa1
+ *
+ */
 public class DtouchMarker {
 	private int mIndex;
 	private List<Integer> mCode;

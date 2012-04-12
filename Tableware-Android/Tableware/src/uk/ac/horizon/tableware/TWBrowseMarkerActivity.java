@@ -3,7 +3,6 @@ package uk.ac.horizon.tableware;
 import java.net.URI;
 
 import uk.ac.horizon.data.DataMarker;
-import uk.ac.horizon.dtouchMobile.HIPreference;
 
 import android.app.Activity;
 import android.content.Intent;
@@ -59,22 +58,28 @@ public class TWBrowseMarkerActivity extends Activity {
 				}
 			});
 			
+			mWebView.loadUrl(mUrl);
 			String encodedURL = appendMemberNameWithURL(mUrl);
 			if (encodedURL != null)
 				mWebView.loadUrl(encodedURL);
 		}
 	}
 	
+	
 	private String appendMemberNameWithURL(String url){
-		String encodedURL = null; 
-		String memberName = new HIPreference(this).getMemberName();
-		try{
-			url = url.concat(memberName.replaceAll(" ", "%20"));
-			URI uri = new URI(url);
-			encodedURL = uri.toString();
-		}
-		catch(Exception e){
-			encodedURL = null;
+		String encodedURL = null;
+		TWFacebookUser user = new TWFacebookUser();
+		user.restoreMemberFromPreferences(this);
+		if (user.name != null){ 
+			try{
+				url = url.concat("#");
+				url = url.concat(user.name.replaceAll(" ", "%20"));
+				URI uri = new URI(url);
+				encodedURL = uri.toString();
+			}
+			catch(Exception e){
+				encodedURL = null;
+			}
 		}
 		return encodedURL;
 	}

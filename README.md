@@ -3,4 +3,8 @@ Trackable Tableware
 
 This repository holds code associated with the Horizon Digital Economy Research Trackable Tableware project.
 
-Contact Richard Mortier <richard.mortier@nottingham.ac.uk> for information.
+For documentation please refer to:
+http://horizoncloud.blogspot.co.uk
+
+Contact for information:
+Richard Mortier <richard.mortier@nottingham.ac.uk>

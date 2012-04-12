@@ -270,7 +270,7 @@ class HIMarkerSurfaceView extends HISurfaceViewBase {
     	for (int i = 0; i < mComponents.size(); i++){
     		//clean this list.
     		code.clear();
-    		if (markerDetector.verifyRoot(i, mComponents.get(i), mHierarchy,imgMat,code)){
+    		if (markerDetector.verifyRoot(i, mComponents.get(i), mHierarchy,code)){
     			//if marker found.
     			marker.setCode(code);
     			//marker.setComponent(mComponents.get(i));
