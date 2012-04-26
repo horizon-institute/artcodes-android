@@ -5,6 +5,7 @@ import org.opencv.core.Rect;
 import uk.ac.horizon.data.DataMarker;
 import uk.ac.horizon.data.DataMarkerWebServices;
 import uk.ac.horizon.data.DataMarkerWebServices.MarkerDownloadRequestListener;
+import uk.ac.horizon.data.HIPreferenceTableware;
 import uk.ac.horizon.dtouchMobile.DtouchMarker;
 import uk.ac.horizon.tableware.R;
 import uk.ac.horizon.tableware.MarkerPopupWindow.OnMarkerPopupWindowListener;
@@ -46,7 +47,7 @@ public class TWCameraActivity extends Activity implements OnMarkerDetectedListen
         getWindow().setFlags(WindowManager.LayoutParams.FLAG_FULLSCREEN, WindowManager.LayoutParams.FLAG_FULLSCREEN);
         //displaySplashScreen();
         setContentView(R.layout.markercamera);
-        initTWSurfaceViewListener();
+        initTWSurfaceView();
     }
     
     @Override
@@ -143,9 +144,10 @@ public class TWCameraActivity extends Activity implements OnMarkerDetectedListen
 		startActivity(intent);
     }
         
-    private void initTWSurfaceViewListener(){
+    private void initTWSurfaceView(){
     	mMarkerSurfaceView = (TWMarkerSurfaceView) findViewById(R.id.MarkerSurfaceView);
     	mMarkerSurfaceView.setOnMarkerDetectedListener(this);
+    	mMarkerSurfaceView.setPreference(new HIPreferenceTableware(this));
     }
 
     
@@ -166,10 +168,13 @@ public class TWCameraActivity extends Activity implements OnMarkerDetectedListen
     	hideProgressControls();
     	if (marker != null)
     		displayMarkerPopupWindow(marker);
+    	else
+    		mMarkerSurfaceView.stopDisplayingDetectedMarker();
     }
     
     private void markerDownloadWithError(){
     	hideProgressControls();
+    	mMarkerSurfaceView.stopDisplayingDetectedMarker();
     	MessageDialog.showMessage(R.string.marker_download_error, this);
     	
     }

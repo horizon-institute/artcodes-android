@@ -76,6 +76,28 @@
  		android:numeric="integer"
   		android:maxLength="2"/>
   	
+  	<EditTextPreference
+ 		android:key="@string/marker_occurrence"
+ 		android:title="Marker occurrence"
+ 		android:summary="Please enter the minimum number of marker occurrence"
+ 		android:dialogTitle="Marker occurrence"
+ 		android:dialogMessage="Marker occurrence"
+ 		android:defaultValue="2"
+ 		android:numeric="integer"
+  		android:maxLength="2"/>
+  		
   </PreferenceCategory>
-     
+  
+  <PreferenceCategory android:title="CameraSurface Preview"
+	android:key="camerasurface">
+	<EditTextPreference
+ 		android:key="@string/no_of_tiles"
+ 		android:title="Camera Tiles"
+ 		android:summary="Please enter the number of camera tiles"
+ 		android:dialogTitle="Camera Tiles"
+ 		android:dialogMessage="Camera Tiles"
+ 		android:defaultValue="2"
+ 		android:numeric="integer"
+  		android:maxLength="1"/>
+  </PreferenceCategory>
 </PreferenceScreen>

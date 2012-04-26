@@ -26,7 +26,7 @@ import android.util.Log;
 import android.view.SurfaceHolder;
 
 class TWMarkerSurfaceView extends TWSurfaceViewBase {
-    private static final int NO_OF_TILES = 2;
+    private static final int NO_OF_TILES = 6;
     private Mat mRgba;
     private Mat mGray;
     private ArrayList<Mat> mComponents;
@@ -36,6 +36,7 @@ class TWMarkerSurfaceView extends TWSurfaceViewBase {
     private OnMarkerDetectedListener markerListener;
     private boolean mMarkerDetected;
     private Rect markerPosition;
+    private HIPreferenceTableware mPreference;
     
     
     /*Define interface to call back when marker is detected:
@@ -55,6 +56,10 @@ class TWMarkerSurfaceView extends TWSurfaceViewBase {
     
     public void setOnMarkerDetectedListener(OnMarkerDetectedListener listener){
     	this.markerListener = listener;
+    }
+    
+    public void setPreference(HIPreferenceTableware preference){
+    	mPreference = preference;
     }
 
     @Override
@@ -225,22 +230,23 @@ class TWMarkerSurfaceView extends TWSurfaceViewBase {
     	    	
     	ArrayList<Double> localThresholds = new ArrayList<Double>();
     	
-    	int tileWidth = (int)srcImgMat.size().height / NO_OF_TILES;
-    	int tileHeight = (int)srcImgMat.size().width / NO_OF_TILES;
+    	int numberOfTiles = mPreference.getNumberOfTiles();
+    	int tileWidth = (int)srcImgMat.size().height / numberOfTiles;
+    	int tileHeight = (int)srcImgMat.size().width / numberOfTiles;
     	
     	//Split image into tiles and apply threshold on each image tile separately.
     	
     	//process image tiles other than the last one.
-    	for (int tileRowCount = 0; tileRowCount < NO_OF_TILES; tileRowCount++){
+    	for (int tileRowCount = 0; tileRowCount < numberOfTiles; tileRowCount++){
     		startRow = tileRowCount * tileWidth;
-    		if (tileRowCount < NO_OF_TILES - 1)
+    		if (tileRowCount < numberOfTiles - 1)
     			endRow = (tileRowCount + 1) * tileWidth;
     		else
     			endRow = (int)srcImgMat.size().height;
     		
-    		for (int tileColCount = 0; tileColCount < NO_OF_TILES; tileColCount++){
+    		for (int tileColCount = 0; tileColCount < numberOfTiles; tileColCount++){
     			startCol = tileColCount * tileHeight;
-    			if (tileColCount < NO_OF_TILES -1 )
+    			if (tileColCount < numberOfTiles -1 )
     				endCol = (tileColCount + 1) * tileHeight;
     			else
     				endCol = (int)srcImgMat.size().width;
@@ -260,6 +266,8 @@ class TWMarkerSurfaceView extends TWSurfaceViewBase {
     
     private boolean findMarkers(Mat imgMat, DtouchMarker marker){
     	boolean markerFound = false;
+    	//holds all the markers identified in the camera.
+    	List<DtouchMarker> markersDetected = new ArrayList<DtouchMarker>();
     	Mat contourImg = imgMat.clone();
     	//Find blobs using connect component.
     	Imgproc.findContours(contourImg, mComponents, mHierarchy, Imgproc.RETR_TREE, Imgproc.CHAIN_APPROX_NONE);
@@ -272,14 +280,22 @@ class TWMarkerSurfaceView extends TWSurfaceViewBase {
     		//clean this list.
     		code.clear();
     		if (markerDetector.verifyRoot(i, mComponents.get(i), mHierarchy,code)){
-    			//if marker found.
-    			marker.setCode(code);
-    			//marker.setComponent(mComponents.get(i));
-    			marker.setComponentIndex(i);
-    			markerFound = true;
-    			break;
+    			//if marker found then add in the list.
+    			DtouchMarker markerDetected = new DtouchMarker();
+    			markerDetected.setCode(code);
+    			markerDetected.setComponentIndex(i);
+    			markersDetected.add(markerDetected);
     		}
 		}
+    	//if markers are found then decide which marker code occurred most.  
+    	if (markersDetected.size() > 0){
+    		DtouchMarker markerSelected = markerDetector.compareDetectedMarkers(markersDetected);
+    		if (markerSelected != null){
+    			marker.setCode(markerSelected.getCode());
+    			marker.setComponentIndex(markerSelected.getComponentIndex());
+    			markerFound = true;
+    		}
+    	}
     	return markerFound;
     }
     

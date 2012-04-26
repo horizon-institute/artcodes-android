@@ -24,6 +24,8 @@ public class HIPreference {
 	protected int DEFAULT_MAX_LEAVES = 10;
 	protected int DEFAULT_VALIDATION_BRANCH_LEAVES = 0;
 	protected int DEFAULT_CHECKSUM_MODULO = 1;
+	//marker occurrence value
+	protected int DEFAULT_MARKER_OCCURRENCE = 1;
 	
 	//Minimum & Maximum number of branches.
 	private static String MIN_BRANCHES = "min_branches";
@@ -38,8 +40,10 @@ public class HIPreference {
 	private static String VALIDATION_BRANCH_LEAVES = "validation_branch_leaves";
 	//The total number of leaves in a marker should be divisible by the checksum modulo.
 	private static String CHECKSUM_MODULO = "checksum_modulo";
-		
-	private Context mContext;
+	//Maximum number of marker occurrence.
+	private static String MARKER_OCCURRENCE = "marker_occurence"; 
+	
+	protected Context mContext;
 	
 	public HIPreference(Context context){
 		this.mContext = context;
@@ -115,6 +119,16 @@ public class HIPreference {
 		return value;
 	}
 	
+	public int getMarkerOccurrence(){
+		int value = -1;
+		SharedPreferences sharedPrefs  = PreferenceManager.getDefaultSharedPreferences(mContext);
+		if (sharedPrefs.contains(MARKER_OCCURRENCE))
+			value = Integer.parseInt(sharedPrefs.getString(MARKER_OCCURRENCE, Integer.toString(this.DEFAULT_MARKER_OCCURRENCE)));
+		else
+			value = this.DEFAULT_MARKER_OCCURRENCE;
+		return value;
+	}
+	
 	public void setDefaultMinBranches(int minBranches){
 		this.DEFAULT_MIN_BRANCHES = minBranches;
 	}
@@ -131,11 +145,19 @@ public class HIPreference {
 		this.DEFAULT_VALIDATION_BRANCHES = validationBranches;
 	}
 	
+	public void setDefaultValidationBranchLeaves(int validationBranchLeaves){
+		this.DEFAULT_VALIDATION_BRANCH_LEAVES = validationBranchLeaves;
+	}
+	
 	public void setDefaultMaxLeaves(int maxLeaves){
 		this.DEFAULT_MAX_LEAVES = maxLeaves;
 	}
 	
 	public void setDefaultChecksumModulo(int checksumModulo){
 		this.DEFAULT_CHECKSUM_MODULO = checksumModulo;
+	}
+	
+	public void setDefaultMarkerOccurrence(int markerOccurrence){
+		this.DEFAULT_MARKER_OCCURRENCE = markerOccurrence;
 	}
 }

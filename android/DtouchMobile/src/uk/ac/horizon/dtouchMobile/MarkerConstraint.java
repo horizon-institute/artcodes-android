@@ -1,6 +1,7 @@
 package uk.ac.horizon.dtouchMobile;
 
 import java.util.List;
+
 /**
  * This class is used to check the constraints defined by the preference class. 
  * @author pszsa1
@@ -67,5 +68,4 @@ public class MarkerConstraint {
 		}
 		return valid;
 	}
-	
 }

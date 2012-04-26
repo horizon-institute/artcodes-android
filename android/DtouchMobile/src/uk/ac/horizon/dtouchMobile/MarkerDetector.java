@@ -1,7 +1,9 @@
 package uk.ac.horizon.dtouchMobile;
 
 import java.util.Collections;
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 
 import org.opencv.core.Mat;
 
@@ -163,5 +165,45 @@ public class MarkerDetector
 		MarkerConstraint markerConstraint = new MarkerConstraint(mPreference,codes);
 		return markerConstraint.verifyMarkerCode();
 	}
+	
+	
+    /**
+     * This function iterates through the list of markers which are identified as the valid markers. It filters 
+     * the list based on the marker occurrence value specified in the preference.
+     * @param markers List of markers which are identified as valid markers. 
+     * @return DtouchMarker which has occurred most in the input list.
+     */
+    public DtouchMarker compareDetectedMarkers(List<DtouchMarker> markers){
+    	Map<String,Integer> map = new HashMap<String, Integer>(); 
+    	DtouchMarker markerSelected = null;
+    	//Record occurrence of each marker.
+    	for (DtouchMarker marker : markers){
+    		if (map.containsKey(marker.getCodeKey())){
+    			Integer value = map.get(marker.getCodeKey());
+    			value = value + 1;
+    			map.put(marker.getCodeKey(), value);
+    		}else{
+    			map.put(marker.getCodeKey(), 1);
+    		}
+    	}
+    	//Find out the marker with the occurrences equal or more than the value specified in the preference.
+    	Map.Entry<String, Integer> maxMarker = null;
+    	for (Map.Entry<String, Integer> entry : map.entrySet()){
+    		if ((maxMarker == null) && (entry.getValue() >= mPreference.getMarkerOccurrence()))
+    			maxMarker = entry;
+    		else if ( (maxMarker !=null) && (maxMarker.getValue() < entry.getValue()) && (entry.getValue() >= mPreference.getMarkerOccurrence()))
+    			maxMarker = entry;
+    	}
+    	if (maxMarker != null){
+    		//Find out the identified marker in the original list.
+    		for (DtouchMarker marker : markers){
+    			if (marker.getCodeKey().compareTo(maxMarker.getKey()) == 0){
+    				markerSelected = marker;
+    				break;
+    			}
+    		}
+    	}
+    	return markerSelected;
+    }
 	
 }

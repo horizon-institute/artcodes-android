@@ -10,6 +10,8 @@
     <string name="max_leaves">max_leaves</string>
     <string name="validation_branch_leaves">validation_branch_leaves</string>
 	<string name="checksum_modulo">checksum_modulo</string>
+	<string name="marker_occurrence">marker_occurrence</string>
+	<string name="no_of_tiles">no_of_tiles</string>
 	<string name="detect_marker">Detect Marker</string>
 	<string name="detect_marker_debug">Detect Marker Debug</string>
 	<string name="view_preferences">View Preferences</string>

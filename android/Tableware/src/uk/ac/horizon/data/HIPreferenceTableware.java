@@ -1,21 +1,34 @@
 package uk.ac.horizon.data;
 
 import android.content.Context;
+import android.content.SharedPreferences;
+import android.preference.PreferenceManager;
 import uk.ac.horizon.dtouchMobile.HIPreference;
 
 public class HIPreferenceTableware extends HIPreference {
 	
-	//branches default values
-	protected static int DEFAULT_MIN_BRANCHES = 8;
-	protected static int DEFAULT_MAX_BRANCHES = 8;
-	protected static int DEFAULT_MAX_EMPTY_BRANCHES = 0;
-	protected static int DEFAULT_VALIDATION_BRANCHES = 4;
-	//leaves default values
-	protected static int DEFAULT_MAX_LEAVES = 10;
-	protected static int DEFAULT_VALIDATION_BRANCH_LEAVES = 1;
-	protected static int DEFAULT_CHECKSUM_MODULO = 10;
+	private static String NO_OF_TILES = "no_of_tiles";
+	private static final int DEFAULT_NO_OF_TILES = 2;
 	
 	public HIPreferenceTableware(Context context){
 		super(context);
+		this.setDefaultMinBranches(4);
+		this.setDefaultMaxBranches(4);
+		this.setDefaultEmptyBranches(0);
+		this.setDefaultValidationBranches(0);
+		this.setDefaultValidationBranchLeaves(0);
+		this.setDefaultMaxLeaves(10);
+		this.setDefaultChecksumModulo(1);
+		this.setDefaultMarkerOccurrence(2);
+	}
+	
+	public int getNumberOfTiles(){
+		int value = -1;
+		SharedPreferences sharedPrefs  = PreferenceManager.getDefaultSharedPreferences(mContext);
+		if (sharedPrefs.contains(NO_OF_TILES))
+			value = Integer.parseInt(sharedPrefs.getString(NO_OF_TILES, Integer.toString(DEFAULT_NO_OF_TILES)));
+		else
+			value = DEFAULT_NO_OF_TILES;
+		return value;
 	}
 }
