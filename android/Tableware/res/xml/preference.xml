@@ -8,71 +8,72 @@
   
   	<EditTextPreference
   		android:key="@string/min_branches"
-  		android:title="Minimum Branches"
-  		android:summary="Please enter the minimum number of branches"
-  		android:dialogTitle="Minimum Branches"
-  		android:dialogMessage="Minimum Branches"
+  		android:title="Minimum Regions"
+  		android:summary="Please enter the minimum number of regions"
+  		android:dialogTitle="Minimum Regions"
+  		android:dialogMessage="Minimum Regions"
   		android:numeric="integer"
   		android:maxLength="2"
-  		android:defaultValue="8" />
+  		android:defaultValue="4" />
 	
   	<EditTextPreference
  		android:key="@string/max_branches"
- 		android:title="Maximum Branches"
- 		android:summary="Please enter the maximum number of branches"
- 		android:dialogTitle="Maximum Branches"
- 		android:dialogMessage="Maximum Branches"
- 		android:defaultValue="8" 
+ 		android:title="Maximum Regions"
+ 		android:summary="Please enter the maximum number of regions"
+ 		android:dialogTitle="Maximum Regions"
+ 		android:dialogMessage="Maximum Regions"
+ 		android:defaultValue="4" 
  		android:numeric="integer"
   		android:maxLength="2"/>
 	
 	<EditTextPreference
- 		android:key="@string/empty_branches"
- 		android:title="Empty Branches"
- 		android:summary="Please enter the number of empty branches"
- 		android:dialogTitle="Empty Branches"
- 		android:dialogMessage="Empty Branches"
- 		android:defaultValue="0" 
- 		android:numeric="integer"
-  		android:maxLength="1"/>
- 	
- 	<EditTextPreference
- 		android:key="@string/validation_branches"
- 		android:title="Maximum Validation Branches"
- 		android:summary="Please enter the maximum number of validation branches"
- 		android:dialogTitle="Maximum Validation Branches"
- 		android:dialogMessage="Maximum Validation Branches"
- 		android:defaultValue="4" 
- 		android:numeric="integer"
-  		android:maxLength="1"/>
-  		
- 	<EditTextPreference
  		android:key="@string/max_leaves"
- 		android:title="Maximum Leaves"
- 		android:summary="Please enter the maximum number of leaves in a branch"
- 		android:dialogTitle="Maximum Leaves in a branch"
- 		android:dialogMessage="Maximum Leaves in a branch"
- 		android:defaultValue="10"
+ 		android:title="Maximum Blobs"
+ 		android:summary="Please enter the maximum number of blobs in a region"
+ 		android:dialogTitle="Maximum Blobs in a region"
+ 		android:dialogMessage="Maximum Blobs in a region"
+ 		android:defaultValue="6"
  		android:numeric="integer"
   		android:maxLength="3"/>
   		
+	<EditTextPreference
+ 		android:key="@string/empty_branches"
+ 		android:title="Empty Regions"
+ 		android:summary="Please enter the number of empty regions"
+ 		android:dialogTitle="Empty Regions"
+ 		android:dialogMessage="Empty Regions"
+ 		android:defaultValue="0" 
+ 		android:numeric="integer"
+  		android:maxLength="1"/>
+  	
+ 	
+ 	<EditTextPreference
+ 		android:key="@string/validation_branches"
+ 		android:title="Validation Regions"
+ 		android:summary="Please enter the number of validation regions"
+ 		android:dialogTitle="Validation Regions"
+ 		android:dialogMessage="Validation Regions"
+ 		android:defaultValue="1" 
+ 		android:numeric="integer"
+  		android:maxLength="1"/>
+  		
   	<EditTextPreference
  		android:key="@string/validation_branch_leaves"
- 		android:title="Validation Branch leaves"
- 		android:summary="Please enter the number of leaves in a validation branch"
- 		android:dialogTitle="Leaves in a validation Branch"
- 		android:dialogMessage="Leaves in a validation Branch"
- 		android:defaultValue="1"
+ 		android:title="Validation Region value"
+ 		android:summary="Please enter the number of blobs in a validation region"
+ 		android:dialogTitle="Blobs in a validation region"
+ 		android:dialogMessage="Blobs in a validation region"
+ 		android:defaultValue="2"
  		android:numeric="integer"
   		android:maxLength="1"/>
 
   	<EditTextPreference
  		android:key="@string/checksum_modulo"
- 		android:title="Validation checksum"
- 		android:summary="Please enter the modulo for the checksum"
- 		android:dialogTitle="Checksum Modulo"
- 		android:dialogMessage="Checksum Modulo"
- 		android:defaultValue="10"
+ 		android:title="Checksum value"
+ 		android:summary="Please enter the value for the checksum"
+ 		android:dialogTitle="Checksum value"
+ 		android:dialogMessage="Checksum value"
+ 		android:defaultValue="3"
  		android:numeric="integer"
   		android:maxLength="2"/>
   	

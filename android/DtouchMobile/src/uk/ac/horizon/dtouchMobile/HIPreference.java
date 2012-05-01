@@ -41,7 +41,7 @@ public class HIPreference {
 	//The total number of leaves in a marker should be divisible by the checksum modulo.
 	private static String CHECKSUM_MODULO = "checksum_modulo";
 	//Maximum number of marker occurrence.
-	private static String MARKER_OCCURRENCE = "marker_occurence"; 
+	private static String MARKER_OCCURRENCE = "marker_occurrence"; 
 	
 	protected Context mContext;
 	

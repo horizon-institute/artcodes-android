@@ -111,7 +111,6 @@ public class TWLoginActivity extends Activity {
 
         @Override
         public void onAuthFail(String error) {
-            //mText.setText("Login Failed: " + error);
         }
     }
 

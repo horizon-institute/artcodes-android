@@ -26,7 +26,6 @@ import android.util.Log;
 import android.view.SurfaceHolder;
 
 class TWMarkerSurfaceView extends TWSurfaceViewBase {
-    private static final int NO_OF_TILES = 6;
     private Mat mRgba;
     private Mat mGray;
     private ArrayList<Mat> mComponents;

@@ -169,7 +169,8 @@ public class MarkerDetector
 	
     /**
      * This function iterates through the list of markers which are identified as the valid markers. It filters 
-     * the list based on the marker occurrence value specified in the preference.
+     * the list based on the marker occurrence value specified in the preference. For example if marker occurrence preference 
+     * is 2 then it selects only those markers having 2 or more instances in the markers list. It is kind of validation check.  
      * @param markers List of markers which are identified as valid markers. 
      * @return DtouchMarker which has occurred most in the input list.
      */

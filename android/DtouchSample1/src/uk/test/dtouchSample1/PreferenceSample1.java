@@ -17,5 +17,13 @@ public class PreferenceSample1 extends HIPreference {
 	
 	public PreferenceSample1(Context context){
 		super(context);
+		this.setDefaultMinBranches(2);
+		this.setDefaultMaxBranches(5);
+		this.setDefaultEmptyBranches(1);
+		this.setDefaultValidationBranches(0);
+		this.setDefaultValidationBranchLeaves(0);
+		this.setDefaultMaxLeaves(10);
+		this.setDefaultChecksumModulo(1);
+		this.setDefaultMarkerOccurrence(1);
 	}
 }
