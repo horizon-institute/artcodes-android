@@ -252,7 +252,9 @@ class TWMarkerSurfaceView extends TWSurfaceViewBase {
     			
     			Mat tileThreshold = new Mat();
     			Mat tileMat = srcImgMat.submat(startRow, endRow, startCol, endCol);
-    			localThreshold = Imgproc.threshold(tileMat, tileThreshold, 0, 255, Imgproc.THRESH_BINARY | Imgproc.THRESH_OTSU);
+    			//localThreshold = Imgproc.threshold(tileMat, tileThreshold, 0, 255, Imgproc.THRESH_BINARY | Imgproc.THRESH_OTSU);
+    			//RNM: Adaptive threshold rules!
+    			localThreshold = 0x80; Imgproc.adaptiveThreshold(tileMat, tileThreshold, 255, Imgproc.ADAPTIVE_THRESH_GAUSSIAN_C, Imgproc.THRESH_BINARY, 91, 2);
     			Mat copyMat = outputImgMat.submat(startRow, endRow, startCol, endCol);
     			tileThreshold.copyTo(copyMat);
     			tileThreshold.release();
