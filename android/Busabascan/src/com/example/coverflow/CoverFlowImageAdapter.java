@@ -2,7 +2,7 @@ package com.example.coverflow;
 
 import java.util.List;
 
-import uk.ac.horizon.tableware.R;
+import uk.ac.horizon.busabascan.R;
 
 import android.content.Context;
 import android.graphics.Bitmap;

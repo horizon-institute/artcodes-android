@@ -1,4 +1,4 @@
-package uk.ac.horizon.tableware;
+package uk.ac.horizon.busabascan;
 
 import org.opencv.core.Rect;
 
@@ -7,9 +7,9 @@ import uk.ac.horizon.data.DataMarkerWebServices;
 import uk.ac.horizon.data.DataMarkerWebServices.MarkerDownloadRequestListener;
 import uk.ac.horizon.data.HIPreferenceTableware;
 import uk.ac.horizon.dtouchMobile.DtouchMarker;
-import uk.ac.horizon.tableware.R;
-import uk.ac.horizon.tableware.MarkerPopupWindow.OnMarkerPopupWindowListener;
-import uk.ac.horizon.tableware.TWMarkerSurfaceView.OnMarkerDetectedListener;
+import uk.ac.horizon.busabascan.R;
+import uk.ac.horizon.busabascan.MarkerPopupWindow.OnMarkerPopupWindowListener;
+import uk.ac.horizon.busabascan.TWMarkerSurfaceView.OnMarkerDetectedListener;
 import android.app.Activity;
 import android.content.Intent;
 import android.graphics.Point;

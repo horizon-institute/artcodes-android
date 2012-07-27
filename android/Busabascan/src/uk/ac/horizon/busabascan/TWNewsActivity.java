@@ -1,4 +1,4 @@
-package uk.ac.horizon.tableware;
+package uk.ac.horizon.busabascan;
 
 import android.app.Activity;
 import android.os.Bundle;

@@ -1,4 +1,4 @@
-package uk.ac.horizon.tableware;
+package uk.ac.horizon.busabascan;
 
 import android.content.Context;
 import android.view.Surface;

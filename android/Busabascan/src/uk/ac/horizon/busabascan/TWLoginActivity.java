@@ -1,4 +1,4 @@
-package uk.ac.horizon.tableware;
+package uk.ac.horizon.busabascan;
 
 import com.facebook.android.AsyncFacebookRunner;
 import com.facebook.android.LoginButton;
