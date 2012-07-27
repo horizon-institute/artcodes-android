@@ -1,0 +1,104 @@
+<?xml version="1.0" encoding="utf-8"?>
+<PreferenceScreen
+  xmlns:android="http://schemas.android.com/apk/res/android">
+
+  <PreferenceCategory
+  	android:title="Dtouch Markers"
+  	android:key="dtouch_markers">
+  
+  	<EditTextPreference
+  		android:key="@string/min_branches"
+  		android:title="Minimum Regions"
+  		android:summary="Please enter the minimum number of regions"
+  		android:dialogTitle="Minimum Regions"
+  		android:dialogMessage="Minimum Regions"
+  		android:numeric="integer"
+  		android:maxLength="2"
+  		android:defaultValue="4" />
+	
+  	<EditTextPreference
+ 		android:key="@string/max_branches"
+ 		android:title="Maximum Regions"
+ 		android:summary="Please enter the maximum number of regions"
+ 		android:dialogTitle="Maximum Regions"
+ 		android:dialogMessage="Maximum Regions"
+ 		android:defaultValue="4" 
+ 		android:numeric="integer"
+  		android:maxLength="2"/>
+	
+	<EditTextPreference
+ 		android:key="@string/max_leaves"
+ 		android:title="Maximum Blobs"
+ 		android:summary="Please enter the maximum number of blobs in a region"
+ 		android:dialogTitle="Maximum Blobs in a region"
+ 		android:dialogMessage="Maximum Blobs in a region"
+ 		android:defaultValue="6"
+ 		android:numeric="integer"
+  		android:maxLength="3"/>
+  		
+	<EditTextPreference
+ 		android:key="@string/empty_branches"
+ 		android:title="Empty Regions"
+ 		android:summary="Please enter the number of empty regions"
+ 		android:dialogTitle="Empty Regions"
+ 		android:dialogMessage="Empty Regions"
+ 		android:defaultValue="0" 
+ 		android:numeric="integer"
+  		android:maxLength="1"/>
+  	
+ 	
+ 	<EditTextPreference
+ 		android:key="@string/validation_branches"
+ 		android:title="Validation Regions"
+ 		android:summary="Please enter the number of validation regions"
+ 		android:dialogTitle="Validation Regions"
+ 		android:dialogMessage="Validation Regions"
+ 		android:defaultValue="1" 
+ 		android:numeric="integer"
+  		android:maxLength="1"/>
+  		
+  	<EditTextPreference
+ 		android:key="@string/validation_branch_leaves"
+ 		android:title="Validation Region value"
+ 		android:summary="Please enter the number of blobs in a validation region"
+ 		android:dialogTitle="Blobs in a validation region"
+ 		android:dialogMessage="Blobs in a validation region"
+ 		android:defaultValue="2"
+ 		android:numeric="integer"
+  		android:maxLength="1"/>
+
+  	<EditTextPreference
+ 		android:key="@string/checksum_modulo"
+ 		android:title="Checksum value"
+ 		android:summary="Please enter the value for the checksum"
+ 		android:dialogTitle="Checksum value"
+ 		android:dialogMessage="Checksum value"
+ 		android:defaultValue="3"
+ 		android:numeric="integer"
+  		android:maxLength="2"/>
+  	
+  	<EditTextPreference
+ 		android:key="@string/marker_occurrence"
+ 		android:title="Marker occurrence"
+ 		android:summary="Please enter the minimum number of marker occurrence"
+ 		android:dialogTitle="Marker occurrence"
+ 		android:dialogMessage="Marker occurrence"
+ 		android:defaultValue="2"
+ 		android:numeric="integer"
+  		android:maxLength="2"/>
+  		
+  </PreferenceCategory>
+  
+  <PreferenceCategory android:title="CameraSurface Preview"
+	android:key="camerasurface">
+	<EditTextPreference
+ 		android:key="@string/no_of_tiles"
+ 		android:title="Camera Tiles"
+ 		android:summary="Please enter the number of camera tiles"
+ 		android:dialogTitle="Camera Tiles"
+ 		android:dialogMessage="Camera Tiles"
+ 		android:defaultValue="2"
+ 		android:numeric="integer"
+  		android:maxLength="1"/>
+  </PreferenceCategory>
+</PreferenceScreen>

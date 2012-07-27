@@ -1,0 +1,31 @@
+<?xml version="1.0" encoding="utf-8"?>
+<RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
+	style="@style/ActivityView">
+	<RelativeLayout android:id="@+id/relativeLayout1" style="@style/ActivityBar">
+		<TextView style="@style/ActivityBarText" android:id="@+id/activityCaptionTextView"
+			android:text="Offer" />
+	</RelativeLayout>
+	<FrameLayout android:layout_height="wrap_content"
+		android:layout_width="wrap_content" android:id="@+id/offerImageframeLayout"
+		android:layout_below="@+id/relativeLayout1" android:layout_marginTop="40dp"
+		android:layout_alignParentLeft="true">
+		<ImageView android:src="@drawable/food_background"
+			android:layout_height="260dp" android:id="@+id/offerImageView"
+			android:layout_width="320dp" android:layout_gravity="center"></ImageView>
+	</FrameLayout>
+	<RelativeLayout android:id="@+id/offerButtonBar" style="@style/ButtonBar"
+		android:layout_alignParentBottom="true">
+		<ImageButton android:layout_width="wrap_content"
+			android:id="@+id/offerDetailImageButton" android:layout_height="wrap_content"
+			android:layout_below="@+id/offerImageframeLayout"
+			android:layout_alignParentLeft="true" android:layout_marginLeft="44dp"
+			android:background="@drawable/offerdetail_button"
+			android:layout_centerVertical="true" android:onClick="onOfferDetailBtnClick"></ImageButton>
+		<ImageButton android:layout_width="wrap_content"
+			android:id="@+id/shareImageButton" android:layout_height="wrap_content"
+			android:layout_below="@+id/offerImageframeLayout"
+			android:layout_alignParentRight="true" android:layout_marginRight="44dp"
+			android:background="@drawable/share_button" android:layout_centerVertical="true"
+			android:onClick="onShareBtnClick"></ImageButton>
+	</RelativeLayout>
+</RelativeLayout>
