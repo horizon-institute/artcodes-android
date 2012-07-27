@@ -23,6 +23,9 @@
 	<string name="menu_member_info">Member Card</string>
 	<string name="dining_history">dining_history</string>
 	<string name="settings_title">Settings</string>
+	<string name="camera_title">Scan Busaba</string>
+	<string name="busaba_button">Show me Busaba</string>
+		
 	<!-- facebook messages -->
 	<string name="facebookErrMsg">Can not download data from the Facebook.</string>
 	<string name="alert_dialog_ok">OK</string>

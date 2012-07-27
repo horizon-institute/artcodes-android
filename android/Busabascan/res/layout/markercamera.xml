@@ -1,21 +1,47 @@
 <?xml version="1.0" encoding="utf-8"?>
-<LinearLayout android:id="@+id/MarkerLayout"
-	android:layout_width="fill_parent" android:layout_height="fill_parent"
-	xmlns:android="http://schemas.android.com/apk/res/android">
-	<FrameLayout android:layout_height="wrap_content" android:layout_width="wrap_content" 
-		android:id="@+id/frameLayout">
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    android:id="@+id/MarkerLayout"
+    android:layout_width="fill_parent"
+    android:layout_height="fill_parent"
+    android:orientation="vertical" >
+
+    <TextView
+        android:id="@+id/textView1"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_margin="3dp"
+        android:background="@color/activity_bar_color"
+        android:gravity="center_horizontal"
+        android:text="@string/camera_title"
+        android:textAppearance="?android:attr/textAppearanceMedium" />
+
+	<FrameLayout
+	    android:id="@+id/frameLayout"
+	    android:layout_width="match_parent"
+	    android:layout_height="0dip"
+	    android:layout_weight="1" >
+
 	<view class="uk.ac.horizon.busabascan.TWMarkerSurfaceView" 
 		android:id="@+id/MarkerSurfaceView"
-		android:layout_width="wrap_content" 
-		android:layout_height="wrap_content"/>
-	<!-- <Button android:text="" 
-         android:id="@+id/scanMarkerBtn" 
-         android:layout_width="wrap_content" 
-         android:layout_height="wrap_content"
-         android:background="@drawable/markerdetailbtn"
-         android:onClick="onScanMarkerBtnClick"
-         android:layout_gravity="top|right"/>-->	
+		android:layout_width="match_parent" 
+		android:layout_height="match_parent"/>
+	
 	</FrameLayout>
+
+	<LinearLayout
+	    android:layout_width="match_parent"
+	    android:layout_height="wrap_content"
+	    android:background="@color/activity_bar_color" >
+
+		<Button
+		    android:id="@+id/busaba_button"
+		    android:layout_width="wrap_content"
+		    android:layout_height="wrap_content"
+		    android:layout_gravity="center_vertical"
+		    android:text="@string/busaba_button" />
+
+	</LinearLayout>
+
 </LinearLayout>
 <!-- 
 <RelativeLayout android:id="@+id/MarkerLayout" android:layout_width="fill_parent" android:layout_height="fill_parent" xmlns:android="http://schemas.android.com/apk/res/android">

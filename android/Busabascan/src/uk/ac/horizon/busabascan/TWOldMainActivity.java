@@ -19,7 +19,7 @@ import android.view.View;
 import android.view.Window;
 import android.widget.ImageButton;
 
-public class TWMainActivity extends FragmentActivity {
+public class TWOldMainActivity extends FragmentActivity {
 	private ProgressDialog mSpinner;
 	private Handler mHandler;
 	
@@ -114,7 +114,7 @@ public class TWMainActivity extends FragmentActivity {
 				Utility.userUID = jsonObject.getString("id");
 				
 			} catch (JSONException e) {
-				MessageDialog.showMessage(R.string.facebookErrMsg, TWMainActivity.this);
+				MessageDialog.showMessage(R.string.facebookErrMsg, TWOldMainActivity.this);
 			}finally{
 				hideSpinner();
 			}
@@ -149,8 +149,8 @@ public class TWMainActivity extends FragmentActivity {
 
         @Override
         public void onLogoutFinish() {
-        	SessionStore.clear(TWMainActivity.this);
-        	new TWFacebookUser().removeMember(TWMainActivity.this);
+        	SessionStore.clear(TWOldMainActivity.this);
+        	new TWFacebookUser().removeMember(TWOldMainActivity.this);
         	if (Utility.mFacebook != null)
         		Utility.mFacebook = null;
         	setupUserControls();

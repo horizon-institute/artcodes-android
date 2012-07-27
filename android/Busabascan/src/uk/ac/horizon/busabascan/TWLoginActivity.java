@@ -59,7 +59,7 @@ public class TWLoginActivity extends Activity {
 	}
 	
 	void displayMainActivity(){
-		Intent intent = new Intent(this.getApplicationContext(), TWMainActivity.class);
+		Intent intent = new Intent(this.getApplicationContext(), TWCameraActivity.class);
 		startActivity(intent);
 		this.finish();
 	}

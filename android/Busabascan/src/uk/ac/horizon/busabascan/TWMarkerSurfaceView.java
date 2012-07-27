@@ -137,7 +137,6 @@ class TWMarkerSurfaceView extends TWSurfaceViewBase {
     	Mat imgSegmentMat = cloneMarkerImageSegment(mGray);
     	//apply threshold.
     	Mat thresholdedImgMat = new Mat(imgSegmentMat.size(), imgSegmentMat.type());
-    	ArrayList<Double> localThresholds = applyThresholdOnImage(imgSegmentMat,thresholdedImgMat);
     	imgSegmentMat.release();
     	
       	copyThresholdedImageToRgbImgMat(thresholdedImgMat, mRgba);
@@ -163,30 +162,15 @@ class TWMarkerSurfaceView extends TWSurfaceViewBase {
     private Rect calculateImageSegmentArea(Mat imgMat){
         int width = imgMat.cols();
         int height = imgMat.rows();
-        double aspectRatio = (double)width /(double)height;
        
         int imgWidth = width / 2;
     	int imgHeight = height / 2;
-    	
-    	//Size of width and height varies of input image can vary. Make the image segment width and height equal in order to make
-    	//the image segment square.
-        
-    	//if width is more than the height.
-        if (aspectRatio > 1){
-        	//if total height is greater than imgWidth.
-        	if (height > imgWidth)
-        		imgHeight = imgWidth;
-        }else if (aspectRatio < 1){ //height is more than the width.
-        	//if total width is greater than the imgHeight.
-        	if (width > imgHeight)
-        		imgWidth = imgHeight;
-        }
-        
+    	        
         //find the centre position in the source image.
         int x = (width - imgWidth) / 2;
         int y = (height - imgHeight) / 2;
         
-        return new Rect(x, y, imgWidth, imgHeight);
+        return new Rect(x, y, imgWidth, imgWidth);
     }
     
     private void displayRectOnImageSegment(Mat imgMat, boolean markerFound){
@@ -194,7 +178,7 @@ class TWMarkerSurfaceView extends TWSurfaceViewBase {
     	if (markerFound)
     		color = new Scalar(0,255,0,255);
     	else
-    		color = new Scalar(255,0,0,255);
+    		color = new Scalar(255,160,36,255);
     	Rect rect = calculateImageSegmentArea(imgMat);
     	Core.rectangle(imgMat, rect.tl(), rect.br(), color, 3, Core.LINE_AA);
     }

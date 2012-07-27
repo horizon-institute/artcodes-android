@@ -30,10 +30,10 @@ public class LogoutFragment extends DialogFragment {
 			public void onClick(DialogInterface dialog, int which) {
 				switch (which){
 				case LOGOUT_ITEM:
-					((TWMainActivity)getActivity()).onSettingsLogoutItemClick(LogoutFragment.this);
+					((TWOldMainActivity)getActivity()).onSettingsLogoutItemClick(LogoutFragment.this);
 					break;
 				case CANCEL_ITEM:
-					((TWMainActivity)getActivity()).onSettingsCancelItemClick(LogoutFragment.this);
+					((TWOldMainActivity)getActivity()).onSettingsCancelItemClick(LogoutFragment.this);
 					break;
 				default:
 					break;
