@@ -21,38 +21,32 @@ public final class R {
     public static final class attr {
     }
     public static final class color {
-        /**  <color name="activity_bar_color">#ff0000ff</color>
- <color name="activity_bar_color">#F27405</color>
-         */
-        public static final int activity_bar_color=0x7f090002;
-        public static final int activity_bar_text_color=0x7f090003;
         /**   Activity view 
- <color name="activity_view_color">#ffffffff</color>
- <color name="activity_view_color">#BFAE99</color>
- <color name="activity_view_color">#EBEBEB</color>
          */
-        public static final int activity_view_color=0x7f090001;
-        /**  Button bar 
-         */
-        public static final int button_bar_color=0x7f090004;
+        public static final int activity_view_color=0x7f090000;
+        public static final int base_brown=0x7f090008;
+        public static final int base_grey=0x7f09000b;
+        public static final int base_orange=0x7f09000f;
+        public static final int base_red=0x7f09000a;
+        public static final int bright_white=0x7f09000e;
         /**  Button bar with text
          */
-        public static final int button_bar_with_text_color=0x7f090005;
-        public static final int coverFlowFramebackgroundcolor=0x7f09000a;
+        public static final int button_bar_with_text_color=0x7f090001;
+        public static final int coverFlowFramebackgroundcolor=0x7f090006;
         /**  Button bar with text
          */
-        public static final int dish_button_bar_with_text_color=0x7f090006;
-        /**  General text 
-         */
-        public static final int general_text_color=0x7f090000;
+        public static final int dish_button_bar_with_text_color=0x7f090002;
+        public static final int foreground_beige=0x7f09000d;
+        public static final int highlight_brown=0x7f090009;
+        public static final int highlight_grey=0x7f09000c;
         /**  List item style 
          */
-        public static final int list_item_background_color=0x7f09000b;
-        public static final int offerListbackgroundcolor=0x7f090009;
+        public static final int list_item_background_color=0x7f090007;
+        public static final int offerListbackgroundcolor=0x7f090005;
         /**  sub heading bar 
          */
-        public static final int subHeading_bar_color=0x7f090007;
-        public static final int subHeading_bar_text_color=0x7f090008;
+        public static final int subHeading_bar_color=0x7f090003;
+        public static final int subHeading_bar_text_color=0x7f090004;
     }
     public static final class dimen {
         public static final int coverFlowitemheight=0x7f0a0001;
@@ -118,15 +112,19 @@ public final class R {
         public static final int userblankface=0x7f020036;
     }
     public static final class id {
-        public static final int MarkerLayout=0x7f0b001b;
-        public static final int MarkerSurfaceView=0x7f0b001d;
+        public static final int Button01=0x7f0b0036;
+        public static final int Button02=0x7f0b0035;
+        public static final int FrameLayout1=0x7f0b0032;
+        public static final int LinearLayout1=0x7f0b0033;
+        public static final int MarkerLayout=0x7f0b0013;
+        public static final int MarkerSurfaceView=0x7f0b0015;
         public static final int MarkerwebView=0x7f0b0000;
         public static final int activityCaptionTextView=0x7f0b0002;
-        public static final int busaba_button=0x7f0b001e;
-        public static final int confirmationMessage=0x7f0b0023;
-        public static final int coverFlow=0x7f0b0030;
-        public static final int coverFlowbarrelativeLayout=0x7f0b002e;
-        public static final int coverFlowframeLayout=0x7f0b002f;
+        public static final int busaba_button=0x7f0b0016;
+        public static final int confirmationMessage=0x7f0b001b;
+        public static final int coverFlow=0x7f0b0028;
+        public static final int coverFlowbarrelativeLayout=0x7f0b0026;
+        public static final int coverFlowframeLayout=0x7f0b0027;
         public static final int dateDined=0x7f0b000d;
         public static final int diningHistorybarrelativeLayout=0x7f0b0005;
         public static final int dininghistoryaccessorybtn=0x7f0b0007;
@@ -134,49 +132,42 @@ public final class R {
         public static final int dishComments=0x7f0b000f;
         public static final int dishImageframeLayout=0x7f0b0003;
         public static final int dishRating=0x7f0b000e;
+        public static final int expandableListView1=0x7f0b0034;
         public static final int facebookloginBtn=0x7f0b0011;
-        public static final int favouriteDishBarWithAccessoryBtn=0x7f0b0031;
-        public static final int favouriteSelectedDishTitle=0x7f0b0032;
-        public static final int favouritedishaccessorybtn=0x7f0b0033;
-        public static final int frameLayout=0x7f0b001c;
+        public static final int favouriteDishBarWithAccessoryBtn=0x7f0b0029;
+        public static final int favouriteSelectedDishTitle=0x7f0b002a;
+        public static final int favouritedishaccessorybtn=0x7f0b002b;
+        public static final int frameLayout=0x7f0b0014;
         public static final int guestloginBtn=0x7f0b0012;
         public static final int imageView1=0x7f0b0010;
-        public static final int linearLayout1=0x7f0b0013;
-        public static final int linearLayout2=0x7f0b0015;
-        public static final int linearLayout3=0x7f0b0017;
-        public static final int linearLayout4=0x7f0b0019;
-        public static final int markerCode=0x7f0b0022;
-        public static final int markerCodeCaption=0x7f0b0021;
-        public static final int markerDesc=0x7f0b0028;
-        public static final int markerDescription=0x7f0b001f;
-        public static final int markerDescriptionCaption=0x7f0b0020;
-        public static final int markerLabel=0x7f0b0026;
-        public static final int markerpopupLayout=0x7f0b0027;
-        public static final int memberBtn=0x7f0b0016;
-        public static final int membername=0x7f0b0029;
-        public static final int memberoffersList=0x7f0b002d;
-        public static final int memberphoto=0x7f0b002a;
-        public static final int newsBtn=0x7f0b0018;
-        public static final int newsWebview=0x7f0b0034;
-        public static final int nobtn=0x7f0b0025;
-        public static final int offerButtonBar=0x7f0b0037;
-        public static final int offerDetailImageButton=0x7f0b0038;
-        public static final int offerImageView=0x7f0b0036;
-        public static final int offerImageframeLayout=0x7f0b0035;
-        public static final int offerbarrelativeLayout=0x7f0b002b;
-        public static final int offerlistTextView=0x7f0b0039;
+        public static final int markerCode=0x7f0b001a;
+        public static final int markerCodeCaption=0x7f0b0019;
+        public static final int markerDesc=0x7f0b0020;
+        public static final int markerDescription=0x7f0b0017;
+        public static final int markerDescriptionCaption=0x7f0b0018;
+        public static final int markerLabel=0x7f0b001e;
+        public static final int markerpopupLayout=0x7f0b001f;
+        public static final int membername=0x7f0b0021;
+        public static final int memberoffersList=0x7f0b0025;
+        public static final int memberphoto=0x7f0b0022;
+        public static final int newsWebview=0x7f0b002c;
+        public static final int nobtn=0x7f0b001d;
+        public static final int offerButtonBar=0x7f0b002f;
+        public static final int offerDetailImageButton=0x7f0b0030;
+        public static final int offerImageView=0x7f0b002e;
+        public static final int offerImageframeLayout=0x7f0b002d;
+        public static final int offerbarrelativeLayout=0x7f0b0023;
+        public static final int offerlistTextView=0x7f0b0031;
         public static final int recipeImageButton=0x7f0b0009;
         public static final int recipeImageView=0x7f0b0004;
         public static final int relativeLayout1=0x7f0b0001;
-        public static final int scanBtn=0x7f0b0014;
-        public static final int scanProgressBar=0x7f0b003a;
-        public static final int settingsBtn=0x7f0b001a;
+        public static final int scanProgressBar=0x7f0b0037;
         public static final int shareImageButton=0x7f0b000b;
         public static final int storyImageButton=0x7f0b000a;
         public static final int textView1=0x7f0b000c;
         public static final int textView2=0x7f0b0006;
-        public static final int textView3=0x7f0b002c;
-        public static final int yesbtn=0x7f0b0024;
+        public static final int textView3=0x7f0b0024;
+        public static final int yesbtn=0x7f0b001c;
     }
     public static final class layout {
         public static final int browsemarkeresult=0x7f030000;
@@ -193,12 +184,13 @@ public final class R {
         public static final int news=0x7f03000b;
         public static final int offer=0x7f03000c;
         public static final int offer_list_item=0x7f03000d;
-        public static final int scanprogress=0x7f03000e;
-        public static final int splashscreen=0x7f03000f;
+        public static final int outside=0x7f03000e;
+        public static final int scanprogress=0x7f03000f;
+        public static final int splashscreen=0x7f030010;
     }
     public static final class string {
-        public static final int alert_dialog_cancel=0x7f06001b;
-        public static final int alert_dialog_ok=0x7f06001a;
+        public static final int alert_dialog_cancel=0x7f060021;
+        public static final int alert_dialog_ok=0x7f060020;
         public static final int app_name=0x7f060000;
         public static final int busaba_button=0x7f060018;
         public static final int camera_title=0x7f060017;
@@ -206,41 +198,47 @@ public final class R {
         public static final int detect_marker=0x7f06000c;
         public static final int detect_marker_debug=0x7f06000d;
         public static final int dining_history=0x7f060015;
-        public static final int dish_download_error=0x7f06001e;
-        public static final int dish_image_download_error=0x7f060021;
-        public static final int dish_pic_download_error=0x7f06001f;
+        public static final int dish_download_error=0x7f060024;
+        public static final int dish_image_download_error=0x7f060027;
+        public static final int dish_pic_download_error=0x7f060025;
         public static final int empty_branches=0x7f060005;
         /**  facebook messages 
          */
-        public static final int facebookErrMsg=0x7f060019;
+        public static final int facebookErrMsg=0x7f06001f;
         public static final int marker_alert_no=0x7f060011;
         public static final int marker_alert_yes=0x7f060010;
         public static final int marker_desc_undefined=0x7f060012;
         /**  webservices data download 
          */
-        public static final int marker_download_error=0x7f06001d;
+        public static final int marker_download_error=0x7f060023;
         public static final int marker_identified_msg=0x7f06000f;
         public static final int marker_occurrence=0x7f06000a;
         public static final int max_branches=0x7f060004;
         public static final int max_leaves=0x7f060007;
-        public static final int member_data_download_error=0x7f060022;
-        public static final int member_data_retrieve_error=0x7f060023;
-        public static final int member_data_save_error=0x7f060024;
+        public static final int member_data_download_error=0x7f060028;
+        public static final int member_data_retrieve_error=0x7f060029;
+        public static final int member_data_save_error=0x7f06002a;
         public static final int member_name=0x7f060013;
-        public static final int member_pic_save_error=0x7f060025;
+        public static final int member_pic_save_error=0x7f06002b;
+        public static final int menu=0x7f06001a;
         public static final int menu_member_info=0x7f060014;
         public static final int min_branches=0x7f060003;
-        public static final int news_web_title=0x7f060027;
+        public static final int minutes=0x7f06001e;
+        public static final int news_web_title=0x7f06002d;
         public static final int no_of_tiles=0x7f06000b;
-        public static final int offer_image_download_error=0x7f060020;
-        public static final int pic_download_error=0x7f06001c;
+        public static final int no_queue=0x7f06001c;
+        public static final int offer_image_download_error=0x7f060026;
+        public static final int outside_title=0x7f060019;
+        public static final int pic_download_error=0x7f060022;
         public static final int progress_msg=0x7f060002;
+        public static final int queue_time=0x7f06001d;
         public static final int settings_title=0x7f060016;
+        public static final int specials=0x7f06001b;
         public static final int title=0x7f060001;
         public static final int validation_branch_leaves=0x7f060008;
         public static final int validation_branches=0x7f060006;
         public static final int view_preferences=0x7f06000e;
-        public static final int web_loading_title=0x7f060026;
+        public static final int web_loading_title=0x7f06002c;
     }
     public static final class style {
         public static final int ActivityBar=0x7f080004;
@@ -248,9 +246,14 @@ public final class R {
         public static final int ActivityView=0x7f080003;
         public static final int Animations=0x7f080000;
         public static final int Animations_GrowFromCentre=0x7f080001;
+        /**  Button bar 
+ <color name="button_bar_color">#4C4646</color> 
+         */
         public static final int ButtonBar=0x7f080006;
         public static final int ButtonBarWithText=0x7f080007;
         public static final int DishButtonBarWithText=0x7f080008;
+        /**  General text 
+         */
         public static final int generaltextView=0x7f080002;
         public static final int list_item=0x7f08000b;
         public static final int subHeadingBar=0x7f080009;

@@ -1,0 +1,51 @@
+<?xml version="1.0" encoding="utf-8"?>
+<FrameLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    android:id="@+id/FrameLayout1"
+    style="@style/ActivityView" >
+
+    <LinearLayout
+        android:id="@+id/LinearLayout1"
+        style="@style/ActivityBar"
+        android:layout_height="match_parent"
+        android:orientation="vertical" >
+
+        <ExpandableListView
+            android:id="@+id/expandableListView1"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_weight="1"
+            android:background="@color/base_brown" >
+
+        </ExpandableListView>
+
+        <TextView
+            android:id="@+id/textView1"
+            android:layout_width="fill_parent"
+            android:layout_height="wrap_content"
+            android:layout_weight="0"
+            android:background="@color/highlight_grey"
+            android:text="Bird Street"
+            android:textAppearance="?android:attr/textAppearanceMedium"
+            android:textColor="@color/bright_white" />
+
+        <LinearLayout
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content" >
+
+            <Button
+                android:id="@+id/Button02"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:text="@string/menu" />
+
+            <Button
+                android:id="@+id/Button01"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:text="@string/specials" />
+
+        </LinearLayout>
+
+    </LinearLayout>
+
+</FrameLayout>

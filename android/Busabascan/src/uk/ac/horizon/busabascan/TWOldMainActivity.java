@@ -45,16 +45,16 @@ public class TWOldMainActivity extends FragmentActivity {
 	
 	private void setupUserControls(){
 		if (Utility.mFacebook == null || !Utility.mFacebook.isSessionValid()){
-			ImageButton memberButton = (ImageButton) findViewById(R.id.memberBtn);
-			memberButton.setEnabled(false);
+//			ImageButton memberButton = (ImageButton) findViewById(R.id.memberBtn);
+//			memberButton.setEnabled(false);
 			
-			ImageButton settingsButton = (ImageButton) findViewById(R.id.settingsBtn);
-			settingsButton.setEnabled(false);
+//			ImageButton settingsButton = (ImageButton) findViewById(R.id.settingsBtn);
+//			settingsButton.setEnabled(false);
 		}
 	}
 
 	public void onScanBtnClick(View sender){
-		Intent intent = new Intent(this, TWCameraActivity.class);
+		Intent intent = new Intent(this, TWCameraMainActivity.class);
 		startActivity(intent);
 	}
 	

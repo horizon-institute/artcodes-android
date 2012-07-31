@@ -24,8 +24,14 @@
 	<string name="dining_history">dining_history</string>
 	<string name="settings_title">Settings</string>
 	<string name="camera_title">Scan Busaba</string>
-	<string name="busaba_button">Show me Busaba</string>
-		
+	<string name="busaba_button">Show me all Busabas</string>
+	<string name="outside_title">Restaurants</string>
+	<string name="menu">Menu</string>
+	<string name="specials">Today\'s Specials</string>
+	<string name="no_queue">No queue presently</string>		
+	<string name="queue_time">Seating time is currently\u0020</string>		
+	<string name="minutes">\u0020minutes</string>		
+			
 	<!-- facebook messages -->
 	<string name="facebookErrMsg">Can not download data from the Facebook.</string>
 	<string name="alert_dialog_ok">OK</string>
@@ -41,6 +47,6 @@
 	<string name="member_data_retrieve_error">Can not retrieve member data from phone</string>
 	<string name="member_data_save_error">Can not save member data on the phone</string>
 	<string name="member_pic_save_error">Error in saving member picture on the phone</string>
-	<string name="web_loading_title">Loading...</string>
+	<string name="web_loading_title">Loading&#8230;</string>
 	<string name="news_web_title">News</string>
 </resources>

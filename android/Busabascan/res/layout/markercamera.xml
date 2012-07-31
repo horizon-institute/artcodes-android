@@ -10,7 +10,7 @@
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
         android:layout_margin="3dp"
-        android:background="@color/activity_bar_color"
+        android:background="@color/base_orange"
         android:gravity="center_horizontal"
         android:text="@string/camera_title"
         android:textAppearance="?android:attr/textAppearanceMedium" />
@@ -31,13 +31,15 @@
 	<LinearLayout
 	    android:layout_width="match_parent"
 	    android:layout_height="wrap_content"
-	    android:background="@color/activity_bar_color" >
+	    android:background="@color/base_orange" >
 
 		<Button
 		    android:id="@+id/busaba_button"
-		    android:layout_width="wrap_content"
+		    android:layout_width="fill_parent"
 		    android:layout_height="wrap_content"
 		    android:layout_gravity="center_vertical"
+		    android:layout_marginTop="2dip"
+		    android:onClick="displayOutside"
 		    android:text="@string/busaba_button" />
 
 	</LinearLayout>

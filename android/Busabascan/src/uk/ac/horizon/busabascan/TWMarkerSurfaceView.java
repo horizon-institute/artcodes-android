@@ -67,11 +67,11 @@ class TWMarkerSurfaceView extends TWSurfaceViewBase {
     }
     
     private Bitmap processFrameForMarker(VideoCapture capture, DtouchMarker marker) {
-      	switch (TWCameraActivity.viewMode) {
-           case TWCameraActivity.VIEW_MODE_MARKER:
+      	switch (TWCameraMainActivity.viewMode) {
+           case TWCameraMainActivity.VIEW_MODE_MARKER:
 	        	processFrameForMarkers(capture, marker);
 	            break;
-           case TWCameraActivity.VIEW_MODE_MARKER_DEBUG:
+           case TWCameraMainActivity.VIEW_MODE_MARKER_DEBUG:
         	   processFrameForMarkersDebug(capture);
 	            break;
 	       default:
@@ -315,17 +315,6 @@ class TWMarkerSurfaceView extends TWSurfaceViewBase {
     	}*/
     }
 
-    private void displayThresholds(Mat ImgMat, Scalar thresholdColor, ArrayList<Double> thresholds){
-    	Point thresholdLocation = new Point(10.0,20.0);
-    	int yOffset = 30;
-    	int i = 1;
-    	for (Double threshold : thresholds){
-    		thresholdLocation.y = i * yOffset;    
-    		String thresholdString = "(" + threshold.toString() + ")";
-    		Core.putText(ImgMat, thresholdString, thresholdLocation, Core.FONT_HERSHEY_COMPLEX, 1, thresholdColor,3);
-    		i++;
-    	}
-    }
     
     private String codeArrayToString(List<Integer> codes){
     	StringBuffer code = new StringBuffer();

@@ -15,29 +15,45 @@
 				<category android:name="android.intent.category.LAUNCHER" />
 			</intent-filter>
 		</activity>
-		<activity android:name=".TWOldMainActivity" android:label="@string/app_name"
-			android:screenOrientation="portrait" android:theme="@android:style/Theme.NoTitleBar" />
-		<activity android:name=".TWMembershipActivity" android:label="@string/app_name"
-			android:screenOrientation="portrait" android:theme="@android:style/Theme.NoTitleBar" />
-		<activity android:name=".TWDishActivity" android:label="@string/app_name"
-			android:screenOrientation="portrait" android:theme="@android:style/Theme.NoTitleBar" />
-		<activity android:name=".TWOfferActivity" android:label="@string/app_name"
-			android:screenOrientation="portrait" android:theme="@android:style/Theme.NoTitleBar" />
-		<activity android:name=".TWDiningHistoryListActivity" android:label = "@string/app_name" 
+		<activity android:name=".TWMembershipActivity" 
+		    android:label="@string/app_name"
+			android:screenOrientation="portrait" 
 			android:theme="@android:style/Theme.NoTitleBar" />
-		<activity android:name=".TWNewsActivity" android:label = "@string/app_name" />			
-		<activity android:name=".TWLoginActivity" android:label="@string/app_name"
+		<activity android:name=".TWDishActivity" 
+		    android:label="@string/app_name"
+			android:screenOrientation="portrait" 
+			android:theme="@android:style/Theme.NoTitleBar" />
+		<activity android:name=".TWOfferActivity" 
+		    android:label="@string/app_name"
+			android:screenOrientation="portrait" 
+			android:theme="@android:style/Theme.NoTitleBar" />
+		<activity android:name=".TWDiningHistoryListActivity" 
+		    android:label = "@string/app_name" 
+			android:theme="@android:style/Theme.NoTitleBar" />
+		<activity android:name=".TWNewsActivity" 
+		    android:label = "@string/app_name" />			
+		<activity android:name=".TWLoginActivity" 
+		    android:label="@string/app_name"
 			android:screenOrientation="unspecified" />
-		<activity android:name=".TWCameraActivity" android:label="@string/app_name"
-			android:screenOrientation="portrait" android:configChanges="keyboardHidden|orientation">
+		<activity android:name=".TWCameraMainActivity" 
+		    android:label="@string/app_name"
+			android:screenOrientation="portrait" 
+			android:configChanges="keyboardHidden|orientation">
 		</activity>
 		<activity android:name=".TWPreferenceActivity"
 			android:configChanges="keyboardHidden|orientation"
 			android:screenOrientation="unspecified" />
 		<activity android:name=".TWBrowseMarkerActivity"
-			android:label="@string/app_name" android:screenOrientation="unspecified" />
-		<activity android:name=".TWMemberActivity" android:label="@string/menu_member_info"
-			android:screenOrientation="unspecified" />
+			android:label="@string/app_name" 
+			android:screenOrientation="portrait" />
+		<activity android:name=".TWMemberActivity" 
+		    android:label="@string/menu_member_info"
+			android:screenOrientation="portrait" />
+	    <activity
+            android:name=".TWOutsideActivity"
+            android:screenOrientation="portrait" 
+            android:label="@string/outside_title" >
+        </activity>
 	</application>
 	<uses-permission android:name="android.permission.CAMERA" />
 	<uses-permission android:name="android.permission.INTERNET" />
