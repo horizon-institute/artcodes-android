@@ -4,7 +4,7 @@
     android:layout_width="fill_parent"
     android:layout_height="fill_parent"
     android:orientation="vertical" >
-
+ 
     <TextView
         android:id="@+id/textView1"
         android:layout_width="match_parent"
@@ -15,10 +15,10 @@
         android:text="@string/camera_title"
         android:textAppearance="?android:attr/textAppearanceMedium" />
 
-	<FrameLayout
+	 <FrameLayout
 	    android:id="@+id/frameLayout"
 	    android:layout_width="match_parent"
-	    android:layout_height="0dip"
+	    android:layout_height="match_parent"
 	    android:layout_weight="1" >
 
 	<view class="uk.ac.horizon.busabascan.TWMarkerSurfaceView" 
@@ -26,8 +26,8 @@
 		android:layout_width="match_parent" 
 		android:layout_height="match_parent"/>
 	
-	</FrameLayout>
-
+    </FrameLayout>
+ 
 	<LinearLayout
 	    android:layout_width="match_parent"
 	    android:layout_height="wrap_content"
@@ -43,7 +43,7 @@
 		    android:text="@string/busaba_button" />
 
 	</LinearLayout>
-
+	
 </LinearLayout>
 <!-- 
 <RelativeLayout android:id="@+id/MarkerLayout" android:layout_width="fill_parent" android:layout_height="fill_parent" xmlns:android="http://schemas.android.com/apk/res/android">

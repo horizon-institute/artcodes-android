@@ -101,7 +101,7 @@ public class TWCameraMainActivity extends Activity implements OnMarkerDetectedLi
     public void onMarkerDetected(final DtouchMarker marker){
     	this.runOnUiThread(new Runnable(){
     		public void run(){
-    			showProgressControls();
+    			//showProgressControls();
     			getMarker(marker.getCodeKey());
     			//new DtouchMarkerWebServicesTask().execute(marker.getCodeKey());
     		}
@@ -159,7 +159,7 @@ public class TWCameraMainActivity extends Activity implements OnMarkerDetectedLi
     	mMarkerSurfaceView.setPreference(new HIPreferenceTableware(this));
     }
 
-    
+/*    
     private void showProgressControls(){
     	FrameLayout frameLayout = (FrameLayout) findViewById(R.id.frameLayout);
     	LayoutInflater inflater = getLayoutInflater();
@@ -172,9 +172,9 @@ public class TWCameraMainActivity extends Activity implements OnMarkerDetectedLi
     	frameLayout.removeView(progressBar);
     	progressBar = null;
     }
-    
+*/    
     private void markerDownloaded(DataMarker marker){
-    	hideProgressControls();
+//    	hideProgressControls();
     	if (marker != null)
     		displayMarkerPopupWindow(marker);
     	else
@@ -182,20 +182,20 @@ public class TWCameraMainActivity extends Activity implements OnMarkerDetectedLi
     }
     
     private void markerDownloadWithError(){
-    	hideProgressControls();
+ //   	hideProgressControls();
     	mMarkerSurfaceView.stopDisplayingDetectedMarker();
     	MessageDialog.showMessage(R.string.marker_download_error, this);
     	
     }
-    
+        
     private void displayMarkerPopupWindow(DataMarker marker){
-    	Rect rect = mMarkerSurfaceView.getMarkerPosition();
+  /*  	Rect rect = mMarkerSurfaceView.getMarkerPosition();
     	FrameLayout frameLayout = (FrameLayout) findViewById(R.id.frameLayout);
     	MarkerPopupWindow markerPopupWindow = new MarkerPopupWindow(frameLayout,marker);
     	markerPopupWindow.setOnMarkerPopupWindowListener(this);
     	Point location = new Point(rect.x,rect.y);
     	Point size = new Point(rect.width, rect.height);
-    	markerPopupWindow.show(location, size);
+    	markerPopupWindow.show(location, size);*/
     }
     
     

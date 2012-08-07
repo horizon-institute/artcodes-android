@@ -354,7 +354,13 @@ class TWMarkerSurfaceView extends TWSurfaceViewBase {
         		if (bmp != null && mCamera != null) {
         			Canvas canvas = mHolder.lockCanvas();
         			if (canvas != null) {
-        				canvas.drawBitmap(bmp, (canvas.getWidth() - bmp.getWidth()) / 2, (canvas.getHeight() - bmp.getHeight()) / 2, null);
+        				//RNM rotate to receive landscape camera in portrait display
+        				canvas.rotate(90);
+        				//canvas.drawBitmap(bmp, (canvas.getWidth() - bmp.getWidth()) / 2, (canvas.getHeight() - bmp.getHeight()) / 2, null);
+        				//RNM Position empirically.
+        				float left = 20;
+        				float top = -480;
+        				canvas.drawBitmap(bmp, left, top, null);
         				mHolder.unlockCanvasAndPost(canvas);
         			}
         			bmp.recycle();

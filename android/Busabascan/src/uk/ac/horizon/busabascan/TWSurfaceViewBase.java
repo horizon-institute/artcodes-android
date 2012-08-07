@@ -42,7 +42,9 @@ public abstract class TWSurfaceViewBase extends SurfaceView implements SurfaceHo
         	mIsSurfaceValid = true;
             if (mCamera != null && mCamera.isOpened()) {
                 List<Size> sizes = mCamera.getSupportedPreviewSizes();
-                Size size = getOptimalPreviewSize(sizes, width, height);
+                //Size size = getOptimalPreviewSize(sizes, width, height);
+                //RNM fixed for now because of issues with landscape/portrait
+                Size size = new Size(640,480);
                 mCamera.set(Highgui.CV_CAP_PROP_FRAME_WIDTH, size.width);
                 mCamera.set(Highgui.CV_CAP_PROP_FRAME_HEIGHT, size.height);
             }

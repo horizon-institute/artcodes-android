@@ -31,7 +31,7 @@ public class WindowRotation {
 	public static int getCameraRotation(Context context){
 		int rotation = 0;
 		int degrees = getDisplayRotation(context);
-		//as camera is always in landscape mode in this scenario so add some degrees to
+/*		//as camera is always in landscape mode in this scenario so add some degrees to
 		switch(degrees){
 			case 0: rotation = -90; break;
 			case 90: rotation = 0; break;
@@ -40,6 +40,8 @@ public class WindowRotation {
 			default: rotation = 0; break;
 		}
 		return rotation;
+*/
+		return degrees;
 	}
 	
 	public static void rotateViewGroup(Context context, ViewGroup layout){
