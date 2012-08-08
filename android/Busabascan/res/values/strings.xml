@@ -32,6 +32,10 @@
     <string name="no_queue">No queue presently</string>
     <string name="queue_time">Seating time is currently\u0020</string>
     <string name="minutes">\u0020minutes</string>
+    <string name="order_button">Order</string>
+    <string name="food_detail_button">Tell me more</string>
+    <string name="menu_title">The Menu</string>
+    
 
     <!-- facebook messages -->
     <string name="facebookErrMsg">Can not download data from the Facebook.</string>
