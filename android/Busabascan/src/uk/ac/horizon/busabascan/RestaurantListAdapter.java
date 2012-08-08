@@ -1,14 +1,13 @@
 package uk.ac.horizon.busabascan;
 
 import android.app.Activity;
-import android.app.ProgressDialog;
 import android.view.Gravity;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.AbsListView;
 import android.widget.BaseExpandableListAdapter;
+import android.widget.Button;
 import android.widget.LinearLayout;
-import android.widget.LinearLayout.LayoutParams;
 import android.widget.ProgressBar;
 import android.widget.TextView;
 
@@ -17,28 +16,31 @@ import android.widget.TextView;
 public class RestaurantListAdapter extends BaseExpandableListAdapter {
 	//The number of list children added programatically
 	private final static int QUEUE_IDX = 0;
+	private final static int SPECIALS_IDX = 3;
+
 	
 // Sample data set. children[i] contains the children (String[]) for
 // groups[i].
 private String[] locations = { "Wardour St", "Store St",
     "Bird St", "Panton St", "Old St", "Westfield Sheperd's Bush", "Bicester Village", "Floral St", "King's Road", "Westfield Stratford City" };
 private String[][] detail = { 
-		{ "20", "106Ð110 Wardour St. London W1F 0TR", "020 7255 8686" },
-		{ "15", "22 Store Street, London WC1E 7DF", "020 7299 7900" },
-		{ "0", "8Ð13 Bird Street, London W1U 1BU", "020 7518 8080" },
-		{ "0", "35 Panton Street, London SW1Y 4EA", "020 7930 0088" },
-		{ "40", "319 Old Street, London EC1V 9LE", "020 7729 0808" },
-		{ "0", "Westfield Shepherd's Bush, London W12 7GA", "020 3249 1919" },
-		{ "10", "Bicester Village, Oxfordshire OX266WD", "01869 362 700" },
-		{ "25", "44 Floral Street, London WC2E 9DA", "020 7759 0088" },
-		{ "0", "358 King's Road, London SW3 5UZ", "020 7349 5488" },
-		{ "0", "Westfield Stratford City, London E20 1GL", "020 8221 8989" } };
+		{ "20", "106Ð110 Wardour St. London W1F 0TR", "tel: 020 7255 8686","Today's Specials" },
+		{ "15", "22 Store Street, London WC1E 7DF", "tel: 020 7299 7900","Today's Specials" },
+		{ "0", "8Ð13 Bird Street, London W1U 1BU", "tel: 020 7518 8080","Today's Specials" },
+		{ "0", "35 Panton Street, London SW1Y 4EA", "tel: 020 7930 0088","Today's Specials" },
+		{ "40", "319 Old Street, London EC1V 9LE", "tel: 020 7729 0808","Today's Specials" },
+		{ "0", "Westfield Shepherd's Bush, London W12 7GA", "tel: 020 3249 1919","Today's Specials" },
+		{ "10", "Bicester Village, Oxfordshire OX266WD", "tel: 01869 362 700","Today's Specials" },
+		{ "25", "44 Floral Street, London WC2E 9DA", "tel: 020 7759 0088","Today's Specials" },
+		{ "0", "358 King's Road, London SW3 5UZ", "tel: 020 7349 5488","Today's Specials" },
+		{ "0", "Westfield Stratford City, London E20 1GL", "tel: 020 8221 8989","Today's Specials" } };
 
 private Activity activity;
 
 RestaurantListAdapter(Activity act) {
 	    activity = act;
 }
+
 
 public Object getChild(int groupPosition, int childPosition) {
 	Object ret;
@@ -93,11 +95,35 @@ public TextView getGenericView() {
     return textView;
 }
 
+public Button getButton(String text) {
+    // Layout parameters for the ExpandableListView
+    AbsListView.LayoutParams lp = new AbsListView.LayoutParams(
+        ViewGroup.LayoutParams.WRAP_CONTENT, 64);
+
+    Button button = new Button(activity);
+    button.setLayoutParams(lp);
+    // Center the text vertically
+    button.setGravity(Gravity.CENTER_VERTICAL | Gravity.LEFT);
+    // Set the text starting position
+ 
+    //button.setPadding(36, 0, 0, 0);
+    button.setText(text);
+    return button;
+
+}
+
 public View getChildView(int groupPosition, int childPosition,
     boolean isLastChild, View convertView, ViewGroup parent) {
-    TextView textView = getGenericView();
-    textView.setText(getChild(groupPosition, childPosition).toString());
-    return textView;
+	if (childPosition == SPECIALS_IDX)
+	{
+		return getButton(getChild(groupPosition, childPosition).toString());
+	}
+	else
+	{
+        TextView textView = getGenericView();
+        textView.setText(getChild(groupPosition, childPosition).toString());
+        return textView;
+	}
 }
 
 public Object getGroup(int groupPosition) {
