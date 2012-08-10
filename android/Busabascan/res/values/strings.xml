@@ -4,15 +4,7 @@
     <string name="title">Busaba Scan</string>
     <string name="app_name">Busabascan</string>
     <string name="progress_msg">Scanning. Please wait</string>
-    <string name="min_branches">Min regions</string>
-    <string name="max_branches">Max regiouns</string>
-    <string name="empty_branches">No. of empty regions</string>
-    <string name="validation_branches">No. of validation regions </string>
-    <string name="max_leaves">Max blobs</string>
-    <string name="validation_branch_leaves">Validation number</string>
-    <string name="checksum_modulo">Checksum</string>
-    <string name="marker_occurrence">Min pattern repeats</string>
-    <string name="no_of_tiles">No. of Tiles</string>
+
     <string name="detect_marker">Detect Marker</string>
     <string name="detect_marker_debug">Debug View</string>
     <string name="view_preferences">View Preferences</string>
