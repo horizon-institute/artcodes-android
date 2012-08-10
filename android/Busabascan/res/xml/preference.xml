@@ -13,8 +13,8 @@
   		android:dialogTitle="Minimum Regions"
   		android:dialogMessage="Minimum Regions"
   		android:numeric="integer"
-  		android:maxLength="2"
-  		android:defaultValue="4" />
+  		android:maxLength="3"
+  		android:defaultValue="5" />
 	
   	<EditTextPreference
  		android:key="@string/max_branches"
@@ -22,16 +22,16 @@
  		android:summary="Please enter the maximum number of regions"
  		android:dialogTitle="Maximum Regions"
  		android:dialogMessage="Maximum Regions"
- 		android:defaultValue="4" 
+ 		android:defaultValue="5" 
  		android:numeric="integer"
-  		android:maxLength="2"/>
+  		android:maxLength="3"/>
 	
 	<EditTextPreference
  		android:key="@string/max_leaves"
  		android:title="Maximum Blobs"
  		android:summary="Please enter the maximum number of blobs in a region"
- 		android:dialogTitle="Maximum Blobs in a region"
- 		android:dialogMessage="Maximum Blobs in a region"
+ 		android:dialogTitle="Maximum Blobs in a Region"
+ 		android:dialogMessage="Maximum Blobs in a Region"
  		android:defaultValue="6"
  		android:numeric="integer"
   		android:maxLength="3"/>
@@ -44,7 +44,7 @@
  		android:dialogMessage="Empty Regions"
  		android:defaultValue="0" 
  		android:numeric="integer"
-  		android:maxLength="1"/>
+  		android:maxLength="3"/>
   	
  	
  	<EditTextPreference
@@ -53,7 +53,7 @@
  		android:summary="Please enter the number of validation regions"
  		android:dialogTitle="Validation Regions"
  		android:dialogMessage="Validation Regions"
- 		android:defaultValue="1" 
+ 		android:defaultValue="2" 
  		android:numeric="integer"
   		android:maxLength="1"/>
   		
@@ -63,7 +63,7 @@
  		android:summary="Please enter the number of blobs in a validation region"
  		android:dialogTitle="Blobs in a validation region"
  		android:dialogMessage="Blobs in a validation region"
- 		android:defaultValue="2"
+ 		android:defaultValue="1"
  		android:numeric="integer"
   		android:maxLength="1"/>
 
@@ -73,7 +73,7 @@
  		android:summary="Please enter the value for the checksum"
  		android:dialogTitle="Checksum value"
  		android:dialogMessage="Checksum value"
- 		android:defaultValue="3"
+ 		android:defaultValue="6"
  		android:numeric="integer"
   		android:maxLength="2"/>
   	
@@ -83,7 +83,7 @@
  		android:summary="Please enter the minimum number of marker occurrence"
  		android:dialogTitle="Marker occurrence"
  		android:dialogMessage="Marker occurrence"
- 		android:defaultValue="2"
+ 		android:defaultValue="1"
  		android:numeric="integer"
   		android:maxLength="2"/>
   		
@@ -97,7 +97,7 @@
  		android:summary="Please enter the number of camera tiles"
  		android:dialogTitle="Camera Tiles"
  		android:dialogMessage="Camera Tiles"
- 		android:defaultValue="2"
+ 		android:defaultValue="1"
  		android:numeric="integer"
   		android:maxLength="1"/>
   </PreferenceCategory>

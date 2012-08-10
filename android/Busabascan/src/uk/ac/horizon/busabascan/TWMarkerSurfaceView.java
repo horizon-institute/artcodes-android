@@ -133,23 +133,25 @@ class TWMarkerSurfaceView extends TWSurfaceViewBase {
     	capture.retrieve(mRgba, Highgui.CV_CAP_ANDROID_COLOR_FRAME_RGBA);
         //Get gray scale image.
     	capture.retrieve(mGray, Highgui.CV_CAP_ANDROID_GREY_FRAME);
+    	
     	//Get image segment to detect marker.    	
     	Mat imgSegmentMat = cloneMarkerImageSegment(mGray);
-    	//apply threshold.
     	Mat thresholdedImgMat = new Mat(imgSegmentMat.size(), imgSegmentMat.type());
-    	imgSegmentMat.release();
-    	
+    	applyThresholdOnImage(imgSegmentMat,thresholdedImgMat);
       	copyThresholdedImageToRgbImgMat(thresholdedImgMat, mRgba);
-      	  	
+    	
     	Scalar contourColor = new Scalar(0, 0, 255);
     	Scalar codesColor = new Scalar(255,0,0,255);
+
     	displayMarkersDebug(thresholdedImgMat, contourColor, codesColor);
     	//displayThresholds(mRgba, codesColor, localThresholds);
-    	thresholdedImgMat.release();
+		displayRectOnImageSegment(mRgba,false);
+
     }
     
     private Mat cloneMarkerImageSegment(Mat imgMat){
     	Rect rect = calculateImageSegmentArea(imgMat);
+        //Mat calculatedImg = imgMat.submat(rect.x, rect.x + rect.width,rect.y,rect.y + rect.height);
         Mat calculatedImg = imgMat.submat(rect.y, rect.y + rect.height,rect.x,rect.x + rect.width);
     	return calculatedImg.clone();
     }
@@ -162,15 +164,15 @@ class TWMarkerSurfaceView extends TWSurfaceViewBase {
     private Rect calculateImageSegmentArea(Mat imgMat){
         int width = imgMat.cols();
         int height = imgMat.rows();
-       
+        
         int imgWidth = width / 2;
     	int imgHeight = height / 2;
     	        
-        //find the centre position in the source image.
-        int x = (width - imgWidth) / 2;
-        int y = (height - imgHeight) / 2;
+        //find the origin  in the source image.
+        int x = width / 4;
+        int y = height / 4;
         
-        return new Rect(x, y, imgWidth, imgWidth);
+        return new Rect(x, y, imgWidth, imgHeight);
     }
     
     private void displayRectOnImageSegment(Mat imgMat, boolean markerFound){
@@ -186,6 +188,7 @@ class TWMarkerSurfaceView extends TWSurfaceViewBase {
     private void displayMarkerImage(Mat srcImgMat, Mat destImageMat){
     	//find location of image segment to be replaced in the destination image.
     	Rect rect = calculateImageSegmentArea(destImageMat);
+    	//Mat destSubmat = destImageMat.submat(rect.x,rect.x + rect.width, rect.y, rect.y + rect.height);
     	Mat destSubmat = destImageMat.submat(rect.y,rect.y + rect.height, rect.x, rect.x + rect.width);
     	//copy image.
     	srcImgMat.copyTo(destSubmat);
@@ -197,7 +200,8 @@ class TWMarkerSurfaceView extends TWSurfaceViewBase {
     	Imgproc.cvtColor(thresholdedImgMat, smallRegionImg, Imgproc.COLOR_GRAY2BGRA, 4);
     	//find location of image segment to be replaced in the destination image.
     	Rect rect = calculateImageSegmentArea(dest);
-    	Mat destSubmat = dest.submat(rect.y,rect.y + rect.height, rect.x, rect.x + rect.width);
+    	//Mat destSubmat = dest.submat(rect.x,rect.x+rect.width,rect.y, rect.y+rect.height);
+    	Mat destSubmat = dest.submat(rect.y,rect.y+rect.height,rect.x, rect.x+rect.width);
     	//copy image.
     	smallRegionImg.copyTo(destSubmat);
     	smallRegionImg.release();
@@ -304,12 +308,15 @@ class TWMarkerSurfaceView extends TWSurfaceViewBase {
     		String code = codeArrayToString(marker.getCode());
     		Point codeLocation = new Point(imgMat.cols() / 4, imgMat.rows()/8);
     		Core.putText(mRgba, code, codeLocation, Core.FONT_HERSHEY_COMPLEX, 1, codesColor,3);
-    		Imgproc.drawContours(mRgba, mComponents, marker.getComponentIndex(), contourColor, 3, 8, mHierarchy, 0);
+ 
+    		Rect rect = calculateImageSegmentArea(mRgba);
+        	Mat destSubmat = mRgba.submat(rect.y,rect.y + rect.height, rect.x, rect.x + rect.width);
+    		Imgproc.drawContours(destSubmat, mComponents, marker.getComponentIndex(), contourColor, 3, 8, mHierarchy, 0);
     	}
     	/*
     	for (DtouchMarker marker : markers){
     		String code = codeArrayToString(marker.getCode());
-    		Point codeLocation = new Point(imgMat.cols() / 4, imgMat.rows()/8);
+    		//Point codeLocation = new Point(imgMat.cols() / 4, imgMat.rows()/8);
     		Core.putText(mRgba, code, codeLocation, Core.FONT_HERSHEY_COMPLEX, 1, codesColor,3);
     		Imgproc.drawContours(mRgba, mComponents, marker.getComponentIndex(), contourColor, 3, 8, mHierarchy, 0);
     	}*/

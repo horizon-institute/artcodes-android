@@ -8,18 +8,10 @@ import uk.ac.horizon.dtouchMobile.HIPreference;
 public class HIPreferenceTableware extends HIPreference {
 	
 	private static String NO_OF_TILES = "no_of_tiles";
-	private static final int DEFAULT_NO_OF_TILES = 2;   
+	private static final int DEFAULT_NO_OF_TILES = 1;   
 	
 	public HIPreferenceTableware(Context context){
 		super(context);
-		this.setDefaultMinBranches(4);
-		this.setDefaultMaxBranches(4);
-		this.setDefaultEmptyBranches(0);
-		this.setDefaultValidationBranches(1);
-		this.setDefaultValidationBranchLeaves(2);
-		this.setDefaultMaxLeaves(6);
-		this.setDefaultChecksumModulo(3);
-		this.setDefaultMarkerOccurrence(2);
 	}
 	
 	public int getNumberOfTiles(){
