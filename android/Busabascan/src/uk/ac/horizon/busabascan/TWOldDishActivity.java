@@ -28,7 +28,7 @@ import android.widget.ProgressBar;
 import android.widget.RelativeLayout;
 import android.widget.TextView;
 
-public class TWDishActivity extends Activity {
+public class TWOldDishActivity extends Activity {
 	private DataMarker mDataMarker;
 	ProgressDialog mSpinner;
 			
@@ -88,7 +88,7 @@ public class TWDishActivity extends Activity {
 			@Override
 			public void onMarkerImageDownloadError() {
 				hideInLineProgressControls();
-				MessageDialog.showMessage(R.string.dish_image_download_error,TWDishActivity.this);
+				MessageDialog.showMessage(R.string.dish_image_download_error,TWOldDishActivity.this);
 			}
 		});
 		showInLineProgressControls();
@@ -105,7 +105,7 @@ public class TWDishActivity extends Activity {
 			@Override
 			public void onMarkerImageDownloadError() {
 				hideInLineProgressControls();
-				MessageDialog.showMessage(R.string.dish_image_download_error,TWDishActivity.this);
+				MessageDialog.showMessage(R.string.dish_image_download_error,TWOldDishActivity.this);
 			}
 		});
 		showInLineProgressControls();
@@ -136,7 +136,7 @@ public class TWDishActivity extends Activity {
         	params.putString("picture", DataMarkerWebServicesURL.getMarkerThumbnailURL(mDataMarker.getCode()).toString());
         else
         	params.putString("picture", DataMarkerWebServicesURL.getDishThumbnailURL(mDataMarker.getTitle()).toString());
-        Utility.mFacebook.dialog(TWDishActivity.this, "feed", params, new FacebookPostDialogListener(this, new Handler()));
+        Utility.mFacebook.dialog(TWOldDishActivity.this, "feed", params, new FacebookPostDialogListener(this, new Handler()));
 	}
 	
 	public void onRecipeBtnClick(View sender){

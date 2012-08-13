@@ -163,7 +163,7 @@ public class TWCameraMainActivity extends Activity implements OnMarkerDetectedLi
     }
     
     private void displayDish(DataMarker marker){
-		Intent intent = new Intent(this, TWDishActivity.class);
+		Intent intent = new Intent(this, TWOldDishActivity.class);
 		Bundle markerBundle = DataMarker.createMarkerBundle(marker);
 		intent.putExtras(markerBundle);
 		startActivity(intent);
