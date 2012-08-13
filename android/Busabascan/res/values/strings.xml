@@ -4,7 +4,6 @@
     <string name="title">Busaba Scan</string>
     <string name="app_name">Busabascan</string>
     <string name="progress_msg">Scanning. Please wait</string>
-
     <string name="detect_marker">Detect Marker</string>
     <string name="detect_marker_debug">Debug View</string>
     <string name="view_preferences">View Preferences</string>
@@ -27,7 +26,6 @@
     <string name="order_button">Order</string>
     <string name="food_detail_button">Tell me more</string>
     <string name="menu_title">The Menu</string>
-    
 
     <!-- facebook messages -->
     <string name="facebookErrMsg">Can not download data from the Facebook.</string>
@@ -48,6 +46,6 @@
     <string name="news_web_title">News</string>
     <string name="hello_world">Hello world!</string>
     <string name="menu_settings">Settings</string>
-    <string name="title_activity_twmenu">TWMenuActivity</string>
+    <string name="title_activity_twdish">Check this out</string>
 
 </resources>

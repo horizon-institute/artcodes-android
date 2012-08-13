@@ -4,6 +4,7 @@ import android.app.Activity;
 import android.graphics.Typeface;
 import android.view.Gravity;
 import android.view.View;
+import android.view.View.OnClickListener;
 import android.view.ViewGroup;
 import android.widget.AbsListView;
 import android.widget.BaseExpandableListAdapter;
@@ -120,8 +121,11 @@ public class MenuListAdapter extends BaseExpandableListAdapter {
     	}
     	else //It's the buttons
     	{
-    		Button button1 = getButton(activity.getResources().getString(R.string.order_button));
-    		Button button2 = getButton(activity.getResources().getString(R.string.food_detail_button));
+    		//Create the buttons with text and callback
+    		Button button1 = getButton(activity.getResources().getString(R.string.order_button),null);
+    		DetailOnClick detailOnClick = new DetailOnClick(activity,
+    				getGroup(groupPosition).toString());
+    		Button button2 = getButton(activity.getResources().getString(R.string.food_detail_button),detailOnClick);
     	    LinearLayout horizontalLayout = new LinearLayout(activity); 
     	    horizontalLayout.setOrientation(LinearLayout.HORIZONTAL);     	 
     	    horizontalLayout.addView(button1);
@@ -223,7 +227,7 @@ public class MenuListAdapter extends BaseExpandableListAdapter {
     	return textView;
     }
     
-    public Button getButton(String text) {
+    public Button getButton(String text, OnClickListener callback) {
         // Layout parameters for the ExpandableListView
         AbsListView.LayoutParams lp = new AbsListView.LayoutParams(
             ViewGroup.LayoutParams.WRAP_CONTENT, 64);
@@ -236,6 +240,16 @@ public class MenuListAdapter extends BaseExpandableListAdapter {
      
         //button.setPadding(36, 0, 0, 0);
         button.setText(text);
+        
+        if (callback == null)
+        {
+        	button.setEnabled(false);
+        }
+        else
+        {
+        	button.setOnClickListener(callback);
+        }
+        
         return button;
 
     }
@@ -250,7 +264,6 @@ public class MenuListAdapter extends BaseExpandableListAdapter {
     public boolean isChildSelectable(int groupPosition, int childPosition) {
         return false;
     }
-    
     
 
 }

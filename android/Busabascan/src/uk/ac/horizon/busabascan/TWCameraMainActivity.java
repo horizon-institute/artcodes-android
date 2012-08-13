@@ -28,6 +28,7 @@ public class TWCameraMainActivity extends Activity implements OnMarkerDetectedLi
     public static final int	VIEW_MODE_MARKER  = 0;
     public static final int	VIEW_MODE_MARKER_DEBUG  = 1;
 	public final static String RESTAURANT = "uk.ac.horizon.busabascan.RESTAURANT";
+	public final static String DISH = "uk.ac.horizon.busabascan.DISH";
 
     private static final String MARKER_TYPE_FOOD = "food";
     private static final String MARKER_TYPE_OFFER = "offer";

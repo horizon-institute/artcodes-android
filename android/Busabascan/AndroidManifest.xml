@@ -82,8 +82,18 @@
         </activity>
         <activity
             android:name=".TWMenuActivity"
-            android:label="@string/title_activity_twmenu" 
+            android:label="@string/menu_title"
             android:screenOrientation="portrait" />
+        <activity
+            android:name=".TWDishActivity"
+            android:label="@string/title_activity_twdish"
+            android:screenOrientation="portrait"  >
+            <intent-filter>
+                <action android:name="android.intent.action.MAIN" />
+
+                <category android:name="android.intent.category.LAUNCHER" />
+            </intent-filter>
+        </activity>
     </application>
 
 </manifest>
