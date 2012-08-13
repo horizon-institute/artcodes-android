@@ -19,11 +19,27 @@ public class TWOutsideActivity extends FragmentActivity {
 	public void onCreate(Bundle savedInstanceState){
 		super.onCreate(savedInstanceState);
 		setContentView(R.layout.outside);
+		
+        Intent intent = getIntent();
+        String initialLocation = intent.getStringExtra(TWCameraMainActivity.RESTAURANT);
+
 		new Handler();
 		ExpandableListAdapter mAdapter;
 	    ExpandableListView epView = (ExpandableListView) findViewById(R.id.expandableListView1);
 	    mAdapter = new RestaurantListAdapter(this);
 	    epView.setAdapter(mAdapter);
+	    if (initialLocation != null)
+	    {
+	    	for (int i = 0; i < mAdapter.getGroupCount(); i++)
+	    	{
+	    		String loc = mAdapter.getGroup(i).toString();
+	    		if (initialLocation.equals(loc))
+	    		{
+	    			epView.expandGroup(i);
+	    			break;
+	    		}
+	    	}
+	    }
 	}
 	
 	/* Called when busaba menu button clicked */

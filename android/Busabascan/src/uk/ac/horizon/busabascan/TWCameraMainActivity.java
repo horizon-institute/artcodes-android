@@ -38,6 +38,9 @@ public class TWCameraMainActivity extends Activity implements OnMarkerDetectedLi
     private MenuItem	mItemDetectMarkerDebug;
     private MenuItem	mItemPreference;
     private TWMarkerSurfaceView mMarkerSurfaceView;
+    
+    //The mappings between codes and 
+    private static final DtouchMarker BIRD_ST_MARKER = new DtouchMarker("1:1:2:2:6");
         
     public static int viewMode  = VIEW_MODE_MARKER;
     
@@ -99,6 +102,18 @@ public class TWCameraMainActivity extends Activity implements OnMarkerDetectedLi
     }
     
     public void onMarkerDetected(final DtouchMarker marker){
+    	
+    	if (marker.isCodeEqual(BIRD_ST_MARKER))
+    	{
+    		//We're outside Bird Street.
+    		displayOutsideRestaurant("Bird St");
+    	}
+    	else
+    	{
+        	mMarkerSurfaceView.stopDisplayingDetectedMarker();
+    	}
+    	//RNM Don't need calls to the backend for now 
+    	/*
     	this.runOnUiThread(new Runnable(){
     		public void run(){
     			//showProgressControls();
@@ -106,6 +121,7 @@ public class TWCameraMainActivity extends Activity implements OnMarkerDetectedLi
     			//new DtouchMarkerWebServicesTask().execute(marker.getCodeKey());
     		}
     	});
+    	*/
     }
     
     void getMarker(String code){
@@ -132,10 +148,17 @@ public class TWCameraMainActivity extends Activity implements OnMarkerDetectedLi
     	}
     }
     
+    public void displayOutsideRestaurant (String location){
+    	//do something
+    	Intent intent = new Intent(this, TWOutsideActivity.class);
+    	intent.putExtra(RESTAURANT, location);
+    	startActivity(intent);
+    }
+    
+    // When button is pushed
     public void displayOutside (View view){
     	//do something
     	Intent intent = new Intent(this, TWOutsideActivity.class);
-    	intent.putExtra(RESTAURANT, "Bird Street");
     	startActivity(intent);
     }
     

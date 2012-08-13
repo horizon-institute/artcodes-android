@@ -18,7 +18,13 @@ public class DtouchMarker {
 	}
 	
 	public DtouchMarker(List<Integer> code){
+		super();
 		mCode = new ArrayList<Integer>(code);
+	}
+
+	public DtouchMarker(String code){
+		super();
+		this.setCode(code);
 	}
 	
 	public int getComponentIndex(){
