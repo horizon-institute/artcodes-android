@@ -82,8 +82,9 @@ public class MenuListAdapter extends BaseExpandableListAdapter {
         static final int NAME = 1;
         static final int BODY = 2;
         
-        static final int PRICE_CHILD = 1;
-        static final int ACTION_CHILD = 2;
+        static final int PRICE_CHILD = 1;       //The index of the price child
+        static final int ACTION_CHILD = 2;      //The index of the actions child
+        static final int DYNAMIC_CHILDREN = 1;  //How many children not in the array?
     
         private Activity activity;
 
@@ -132,7 +133,14 @@ public class MenuListAdapter extends BaseExpandableListAdapter {
 
     @Override
     public int getChildrenCount(int groupPosition) {
-    	return items[groupPosition].length;
+    	//Not the first member
+    	int count = items[groupPosition].length-1;
+    	if (count > 0)
+    	{
+    		//It's not a category
+    		count += DYNAMIC_CHILDREN;
+    	}
+    	return count;
     }
    
     @Override
