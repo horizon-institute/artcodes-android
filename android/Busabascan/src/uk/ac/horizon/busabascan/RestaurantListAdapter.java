@@ -90,6 +90,7 @@ public TextView getGenericView() {
     // Center the text vertically
     textView.setGravity(Gravity.CENTER_VERTICAL | Gravity.LEFT);
     //textView.setTextColor(Color.parseColor("darkblue"));
+	textView.setBackgroundColor(activity.getResources().getColor(R.color.base_brown));
     // Set the text starting position
     textView.setPadding(36, 0, 0, 0);
     return textView;
@@ -116,7 +117,9 @@ public View getChildView(int groupPosition, int childPosition,
     boolean isLastChild, View convertView, ViewGroup parent) {
 	if (childPosition == SPECIALS_IDX)
 	{
-		return getButton(getChild(groupPosition, childPosition).toString());
+		Button button = getButton(getChild(groupPosition, childPosition).toString());
+		button.setEnabled(false);
+		return button;
 	}
 	else
 	{

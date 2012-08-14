@@ -26,7 +26,9 @@
     <string name="order_button">Order</string>
     <string name="food_detail_button">Tell me more</string>
     <string name="menu_title">The Menu</string>
-
+    <string name="rated_by">Rated by\u0020</string>
+    <string name="diners">\u0020diners</string>
+    
     <!-- facebook messages -->
     <string name="facebookErrMsg">Can not download data from the Facebook.</string>
     <string name="alert_dialog_ok">OK</string>

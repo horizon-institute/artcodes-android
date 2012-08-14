@@ -122,10 +122,14 @@ public class MenuListAdapter extends BaseExpandableListAdapter {
     	else //It's the buttons
     	{
     		//Create the buttons with text and callback
+    		String dish_name = getGroup(groupPosition).toString();
     		Button button1 = getButton(activity.getResources().getString(R.string.order_button),null);
-    		DetailOnClick detailOnClick = new DetailOnClick(activity,
-    				getGroup(groupPosition).toString());
+    		DetailOnClick detailOnClick = new DetailOnClick(activity, dish_name);
     		Button button2 = getButton(activity.getResources().getString(R.string.food_detail_button),detailOnClick);
+    	    if (!Dish.knownDish(dish_name))
+    	    {
+    	    	button2.setEnabled(false);
+    	    }
     	    LinearLayout horizontalLayout = new LinearLayout(activity); 
     	    horizontalLayout.setOrientation(LinearLayout.HORIZONTAL);     	 
     	    horizontalLayout.addView(button1);
@@ -168,9 +172,10 @@ public class MenuListAdapter extends BaseExpandableListAdapter {
     	//Create the text view for the headings and menu items
     	String text = getGroup(groupPosition).toString();
     	String headingText = parseForHeadingText(text);
-    	View retn;
+    	TextView retn;
     	if (headingText != null)
     	{
+    		//It's a heading
     		//Not sure why the inflate approach didn't work
     		//retn = View.inflate(activity, R.id.refHeadingText, parent);
     		retn = getTextView(HEADING);
@@ -180,8 +185,12 @@ public class MenuListAdapter extends BaseExpandableListAdapter {
     	{
     		//retn = View.inflate(activity, R.id.refNameText, parent);
     		retn = getTextView(NAME);
+    		if (Dish.knownDish(text))
+    		{
+    			retn.setBackgroundColor(activity.getResources().getColor(R.color.highlight_grey));
+    		}
     	}
-    	((TextView) retn).setText(text);
+    	retn.setText(text);
         return retn;
     }
 
@@ -203,9 +212,11 @@ public class MenuListAdapter extends BaseExpandableListAdapter {
     	// Center the text vertically
     	textView.setGravity(Gravity.CENTER_VERTICAL | Gravity.LEFT);
     	int col_id;
+    	int col_backgrd = R.color.base_brown;
     	switch (style) {
     	case HEADING: 
-    		col_id = R.color.highlight_grey;
+    		col_id = R.color.foreground_beige;
+    		col_backgrd = R.color.base_grey;
     		break;
     	case NAME:
     		col_id = R.color.bright_white;
@@ -214,7 +225,7 @@ public class MenuListAdapter extends BaseExpandableListAdapter {
     		col_id = R.color.foreground_beige;
     	}
     	
-    	textView.setBackgroundColor(activity.getResources().getColor(R.color.base_brown));
+		textView.setBackgroundColor(activity.getResources().getColor(col_backgrd));
     	textView.setTextAppearance(activity, android.R.attr.textAppearanceMedium);
     	textView.setTextColor(activity.getResources().getColor(col_id));
     	textView.setTypeface(null,Typeface.BOLD);
