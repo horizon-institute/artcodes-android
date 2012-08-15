@@ -13,27 +13,28 @@ public class Dish {
 	static final int DESC_IDX = 3;
 	static final int PRICE_IDX = 4;
 	static final int REVIEW_IDX = 5;
-	static final int IMG_IDX = 6;
 
 	static final String dishData[][] = {
 		{"Char-grilled duck", "4.5", "3", 
 			"Chinese broccoli and tamarind sauce","£12.40",
-			"The combination of tamarind and rich juicy duck is spectacular.",
-			"char-grilled-duck.png"},
+			"The classic Busaba dishes are consistently interesting, and well executed at all branches: smoky duck breast with tart tamarind sauce"},
         {"Salmon and green mango salad", "4", "7", 
 			"lime leaf, peanut, chilli and nam pla dee sauce (s)","£7.90",
-			"A suprising delicious combination.",
-			"salmon_and_green_mango.png"},
+			"A suprisingly delicious combination based on a Thai classic salad."},
         {"Thai calamari","4.5", "12", "ginger and peppercorn", "£6.50",
-			"",""},
+			"I love love love the Thai Calamari I get from Busaba Eathai. They are delicious. The thai calarami are kinda cooked according to the traditional Salt & Pepper Squid but this version has got a crunchier and sweeter coating."},
         {"Chicken wings","3.5", "4", "pandan leaf", "£4.60",
-        	"",""},
+        	"OMG I didn't want to leave anything on my plate it was that nice; The chicken wings were great, unlike many other restaurants where they usually douse them in tons of sauce. "},
         {"Pandan chicken","5", "23", "garlic and coriander root wrapped in pandan leaf", "£5.50",
-        	"",""},
+        	"A traditional street food from Bangkok, pandan chicken can be eaten as a snack or part of a meal with rice as an accompaniment. Try the recipe from Busaba Eathai for Taste of London"}
 
 	};
 	static final int image_ids[] = {
-		R.drawable.char_grilled_duck
+		R.drawable.char_grilled_duck,
+		R.drawable.salmon_mango_salad,
+		R.drawable.thai_calamari,
+		R.drawable.chicken_wings,
+		R.drawable.pandanchicken
 	};
 	
 	String name;
@@ -42,13 +43,12 @@ public class Dish {
 	String description;
 	String price;
 	String review;
-	String image_name;
 	int    image_id;
 	
-	Dish(String n, float st, int nr, String desc, String img, int iid)
+	Dish(String n, float st, int nr, String desc, String rev, int iid)
 	{
-		name=n; stars=st; num_raters=nr; description=desc; image_name=img; 
-		image_id = iid;
+		name=n; stars=st; num_raters=nr; description=desc; 
+		review = rev; image_id = iid;
 	}
 	
 	static Dish dishFactory(String dish)
@@ -62,7 +62,7 @@ public class Dish {
 				d = new Dish(dish, 
 						 Float.parseFloat(dishData[i][STAR_IDX]),
 						 Integer.parseInt(dishData[i][RATERS_IDX]),
-						 dishData[i][DESC_IDX],  dishData[i][IMG_IDX],
+						 dishData[i][DESC_IDX], dishData[i][REVIEW_IDX],
 						 image_ids[i]);
 				break;
 			}
@@ -86,7 +86,7 @@ public class Dish {
 	{
 		return stars;
 	}
-	public int getRaters()
+	public Integer getRaters()
 	{
 	   return num_raters;
 	}
@@ -100,11 +100,7 @@ public class Dish {
 	}
 	public String getReview()
 	{
-	    return price;
-	}
-	public String getImageName()
-	{
-	    return image_name;
+	    return review;
 	}
 	public int getImageId()
 	{

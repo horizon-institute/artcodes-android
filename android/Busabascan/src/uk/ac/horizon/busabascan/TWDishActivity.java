@@ -6,6 +6,7 @@ import android.content.Intent;
 import android.graphics.drawable.Drawable;
 import android.view.Menu;
 import android.widget.ImageView;
+import android.widget.RatingBar;
 import android.widget.TextView;
 
 public class TWDishActivity extends Activity {
@@ -26,6 +27,15 @@ public class TWDishActivity extends Activity {
         ImageView image = (ImageView) findViewById(R.id.imageView1);
         int img_id = dish.getImageId();
         image.setImageDrawable(this.getResources().getDrawable(img_id));
+        RatingBar rating = (RatingBar) findViewById(R.id.ratingBar1);
+        rating.setRating(dish.getStars());
+        TextView raters = (TextView) findViewById(R.id.textViewCount);
+        raters.setText(dish.getRaters().toString());
+        TextView desc = (TextView) findViewById(R.id.dishdetail);
+        desc.setText(dish.getDescription());
+        TextView review = (TextView) findViewById(R.id.dishreview);
+        review.setText(dish.getReview());
+        
     }
 
     @Override
