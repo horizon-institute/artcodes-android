@@ -17,6 +17,7 @@
     <string name="settings_title">Settings</string>
     <string name="camera_title">Scan Busaba</string>
     <string name="busaba_button">Show me all Busabas</string>
+    <string name="me_button">About Me</string>
     <string name="outside_title">Restaurants</string>
     <string name="menu">The Busaba Menu</string>
     <string name="specials">Today\'s Specials</string>
@@ -28,6 +29,8 @@
     <string name="menu_title">The Menu</string>
     <string name="rated_by">Rated by\u0020</string>
     <string name="diners">\u0020diners</string>
+    <string name="woo">Wooo</string>
+    <string name="comunique_success">Thank you. Your order has been received.</string>
     
     <!-- facebook messages -->
     <string name="facebookErrMsg">Can not download data from the Facebook.</string>
@@ -35,7 +38,7 @@
     <string name="alert_dialog_cancel">Cancel</string>
     <string name="pic_download_error">Error in downloading member picture from the facebook.</string>
     <!-- webservices data download -->
-    <string name="marker_download_error">Error in downloading marker data.</string>
+    <string name="marker_download_error">I am sorry we cannot connect to the server at the moment.</string>
     <string name="dish_download_error">Error in downloading dish data.</string>
     <string name="dish_pic_download_error">Error in downloading dish picture</string>
     <string name="offer_image_download_error">Error in downloading offer image.</string>

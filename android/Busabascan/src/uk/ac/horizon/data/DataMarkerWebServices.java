@@ -13,6 +13,8 @@ import org.json.JSONArray;
 import org.json.JSONException;
 import org.json.JSONObject;
 
+import com.facebook.android.Utility;
+
 import android.os.AsyncTask;
 
 public class DataMarkerWebServices{
@@ -217,6 +219,30 @@ public class DataMarkerWebServices{
 		}
 	}
 	
+	private class DtouchMarkerComuniqueTask extends AsyncTask<URL, Void, String>{
+		@Override
+		protected String doInBackground(URL... params) {
+			URL url = params[0];
+			String ret = null;
+			if (url != null){
+				try {
+					ret = Utility.getResponse(url.toString());
+				} catch (IOException e) {
+					ret = null;
+				}
+			}
+			return ret;
+		}
+		
+		protected void onPostExecute(String txt){
+			if (txt != null)
+				mListener.onMarkerDownloaded(null);
+			else
+				mListener.onMarkerDownloadError();
+		}
+	}
+
+	
 	/**
 	 * Call back Request Listener interface. 
 	 * @author pszsa1
@@ -226,6 +252,12 @@ public class DataMarkerWebServices{
 		public void onMarkerDownloaded(DataMarker marker);
 		public void onMarkerDownloadError();
 		
-	}	
+	}
+
+	public void executeComuniqueRequest(String message, String userId){
+		URL[] params = new URL[1];
+		params[0] = DataMarkerWebServicesURL.getComuniqueURL(message, userId);
+		new DtouchMarkerComuniqueTask().execute(params);
+	}
 }
 

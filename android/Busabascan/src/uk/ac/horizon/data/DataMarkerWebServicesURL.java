@@ -132,10 +132,20 @@ public class DataMarkerWebServicesURL {
 		return url;
 	}
 	
+	public static URL getComuniqueURL(String message, String userId) {
+		URL url = null;
+		try{
+			url = new URL(BASE_URL + "/comunique/" + encodeString(message) + "/person/" + userId);
+		}catch(MalformedURLException e){
+			
+		}
+		return url;
+	}
+
+
 	private static String encodeString(String stringToEncode){
 		return stringToEncode.replaceAll(" ", "%20");
 	}
-
 
 	
 }

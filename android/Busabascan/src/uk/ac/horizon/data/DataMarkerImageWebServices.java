@@ -26,7 +26,7 @@ public class DataMarkerImageWebServices{
 		params[0] = DataMarkerWebServicesURL.getDishImageURL(title);
 		new DtouchMarkerDownloadImageTask().execute(params);
 	}
-		
+			
 	private class DtouchMarkerDownloadImageTask extends AsyncTask<URL, Void, Bitmap>{
 		@Override
 		protected Bitmap doInBackground(URL... params) {

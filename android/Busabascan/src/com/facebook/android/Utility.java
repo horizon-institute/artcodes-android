@@ -157,4 +157,28 @@ public class Utility extends Application {
         cursor.moveToFirst();
         return cursor.getInt(0);
     }
+
+    public static String getResponse(String url) throws IOException {
+        String resp = null;
+        try {
+            URL aURL = new URL(url);
+            URLConnection conn = aURL.openConnection();
+            conn.connect();
+            int len = conn.getContentLength();
+            //We may have no idea what it is but if it's the right length it will do.
+            if (len == 30) resp = "good";
+            //String resp = (String)conn.getContent();
+            //InputStream is = conn.getInputStream();
+            //BufferedInputStream bis = new BufferedInputStream(is);
+            //FlushedInputStream fin = new FlushedInputStream(is);
+            //fin.close();
+            //bis.close();
+            //is.close();
+         } finally {
+            if (httpclient != null) {
+                httpclient.close();
+            }
+        }
+        return resp;
+    }
 }

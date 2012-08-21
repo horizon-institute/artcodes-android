@@ -35,9 +35,12 @@ import android.net.Uri;
 import android.os.AsyncTask;
 import android.os.Bundle;
 import android.os.Handler;
+import android.support.v4.app.FragmentActivity;
+import android.support.v4.app.FragmentManager;
 import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
+import android.view.ViewGroup;
 import android.view.Window;
 import android.widget.AdapterView;
 import android.widget.AdapterView.OnItemSelectedListener;
@@ -50,7 +53,7 @@ import android.widget.ProgressBar;
 import android.widget.RelativeLayout;
 import android.widget.TextView;
 
-public class TWMembershipActivity extends Activity{
+public class TWMembershipActivity extends FragmentActivity{
 	private Handler mHandler;
 	private TextView mMemberName;
 	private ImageView mMemberPhoto;
@@ -76,6 +79,11 @@ public class TWMembershipActivity extends Activity{
 		mMember = new TWFacebookUser();
 		displayFacebookUserData();
 	}
+	
+	public void onLogoutClick(View sender){
+		displayLogoutFragment();
+	}
+
 	
 	private void displayFacebookUserData(){
 		if (Utility.mFacebook.isSessionValid()){
@@ -365,6 +373,13 @@ public class TWMembershipActivity extends Activity{
     	mMemberPhoto.setImageBitmap(null);
     	mMemberPhoto.setImageBitmap(mMember.getPicture());
     }
+    
+    private void displayLogoutFragment(){
+    	final LogoutFragment frag = new LogoutFragment();
+        FragmentManager fragMan = getSupportFragmentManager();
+    	frag.show(fragMan, "LOGOUT_FRAGMENT");
+    }
+	
     
     /*
      * Start a AsyncTask to fetch the request

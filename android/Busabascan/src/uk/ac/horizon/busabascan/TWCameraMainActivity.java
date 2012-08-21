@@ -42,6 +42,8 @@ public class TWCameraMainActivity extends Activity implements OnMarkerDetectedLi
     
     //The mappings between codes and 
     private static final DtouchMarker BIRD_ST_MARKER = new DtouchMarker("1:1:2:2:6");
+    private static final DtouchMarker PANDAN_CHICK_MARKER = new DtouchMarker("1:1:1:3:6");
+    private static final DtouchMarker CHAR_DUCK_MARKER = new DtouchMarker("1:1:3:3:4");
         
     public static int viewMode  = VIEW_MODE_MARKER;
     
@@ -89,6 +91,11 @@ public class TWCameraMainActivity extends Activity implements OnMarkerDetectedLi
         return true;
     }
     
+	public void onMemberBtnClick(View sender){
+		Intent intent = new Intent(this, TWMembershipActivity.class);
+		startActivity(intent);
+	}
+    
     private void displayPreferences(){
     	Intent intent = new Intent(this, TWPreferenceActivity.class);
 		startActivity(intent);
@@ -108,6 +115,16 @@ public class TWCameraMainActivity extends Activity implements OnMarkerDetectedLi
     	{
     		//We're outside Bird Street.
     		displayOutsideRestaurant("Bird St");
+    	}
+    	else if (marker.isCodeEqual(PANDAN_CHICK_MARKER))
+    	{
+    		//We're looking at Pandan Chicken.
+    		displayDish("Pandan chicken");
+    	}
+    	else if (marker.isCodeEqual(CHAR_DUCK_MARKER))
+    	{
+    		//We're looking at Char Grilled Duck.
+    		displayDish("Char-grilled duck");
     	}
     	else
     	{
@@ -143,14 +160,13 @@ public class TWCameraMainActivity extends Activity implements OnMarkerDetectedLi
     
     public void displayMarkerDetail(DataMarker marker){
     	if (marker.getType().compareToIgnoreCase(MARKER_TYPE_FOOD) == 0){
-    		displayDish(marker);
+    		//displayDish(marker);
     	}else if (marker.getType().compareToIgnoreCase(MARKER_TYPE_OFFER) == 0){
     		displayOffer(marker);
     	}
     }
     
     public void displayOutsideRestaurant (String location){
-    	//do something
     	Intent intent = new Intent(this, TWOutsideActivity.class);
     	intent.putExtra(RESTAURANT, location);
     	startActivity(intent);
@@ -158,15 +174,13 @@ public class TWCameraMainActivity extends Activity implements OnMarkerDetectedLi
     
     // When button is pushed
     public void displayOutside (View view){
-    	//do something
     	Intent intent = new Intent(this, TWOutsideActivity.class);
     	startActivity(intent);
     }
     
-    private void displayDish(DataMarker marker){
-		Intent intent = new Intent(this, TWOldDishActivity.class);
-		Bundle markerBundle = DataMarker.createMarkerBundle(marker);
-		intent.putExtras(markerBundle);
+    private void displayDish(String dish){
+		Intent intent = new Intent(this, TWDishActivity.class);
+		intent.putExtra(DISH, dish);
 		startActivity(intent);
 	}
     

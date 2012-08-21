@@ -35,12 +35,23 @@
 
 		<Button
 		    android:id="@+id/busaba_button"
-		    android:layout_width="fill_parent"
+		    android:layout_width="0dip"
 		    android:layout_height="wrap_content"
 		    android:layout_gravity="center_vertical"
 		    android:layout_marginTop="2dip"
+		    android:layout_weight="1"
 		    android:onClick="displayOutside"
 		    android:text="@string/busaba_button" />
+
+		<Button
+		    android:id="@+id/me_button"
+		    android:layout_width="wrap_content"
+		    android:layout_height="wrap_content"
+		    android:layout_gravity="center_vertical"
+		    android:layout_marginTop="2dip"
+		    android:onClick="onMemberBtnClick"
+		    android:text="@string/me_button" />
+				
 
 	</LinearLayout>
 	
