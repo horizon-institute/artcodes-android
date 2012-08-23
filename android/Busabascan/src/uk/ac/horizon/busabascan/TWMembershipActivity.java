@@ -375,7 +375,7 @@ public class TWMembershipActivity extends FragmentActivity{
     }
     
     private void displayLogoutFragment(){
-    	final LogoutFragment frag = new LogoutFragment();
+    	final LogoutFragment frag = new LogoutFragment(this);
         FragmentManager fragMan = getSupportFragmentManager();
     	frag.show(fragMan, "LOGOUT_FRAGMENT");
     }

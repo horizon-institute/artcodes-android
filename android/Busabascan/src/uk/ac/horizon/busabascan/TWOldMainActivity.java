@@ -68,7 +68,7 @@ public class TWOldMainActivity extends FragmentActivity {
 	}
 	
     private void displayLogoutFragment(){
-    	final LogoutFragment frag = new LogoutFragment();
+    	final LogoutFragment frag = new LogoutFragment(this);
     	frag.show(this.getSupportFragmentManager(), "LOGOUT_FRAGMENT");
     }
 	
