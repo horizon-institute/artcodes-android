@@ -1,5 +1,7 @@
 package uk.ac.horizon.busabascan;
 
+import java.io.FileNotFoundException;
+
 import com.facebook.android.AsyncFacebookRunner;
 import com.facebook.android.LoginButton;
 import com.facebook.android.R;
@@ -24,13 +26,17 @@ public class TWLoginActivity extends Activity {
 	@Override
 	public void onCreate(Bundle savedInstanceState){
 		super.onCreate(savedInstanceState);
-		setContentView(R.layout.login);
+		setContentView(R.layout.mainfblogin);
 		initFacebook();
 		initFacebookLoginButton();
-		/*
+
         if (Utility.mFacebook.isSessionValid()) {
-            requestUserData();
-        }*/
+        	//Restore the facebook data so that we can use name etc. in orders.
+        	TWFacebookUser member = new TWFacebookUser();
+        	try {
+				member.restoreMember(this);
+			} catch (FileNotFoundException e) {	}
+        }
 
 	}
 	
@@ -130,5 +136,9 @@ public class TWLoginActivity extends Activity {
             //mUserPic.setImageBitmap(null);
         }
     }
+
+	public void loginComplete() {
+		displayMainActivity();		
+	}
     
 }

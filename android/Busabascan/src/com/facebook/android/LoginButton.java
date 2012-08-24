@@ -16,6 +16,7 @@
 
 package com.facebook.android;
 
+import uk.ac.horizon.busabascan.TWLoginActivity;
 import android.app.Activity;
 import android.content.Context;
 import android.graphics.Color;
@@ -41,6 +42,7 @@ public class LoginButton extends ImageButton {
     private String[] mPermissions;
     private Activity mActivity;
     private int mActivityCode;
+    private TWLoginActivity mParent;
 
     public LoginButton(Context context) {
         super(context);
@@ -54,13 +56,14 @@ public class LoginButton extends ImageButton {
         super(context, attrs, defStyle);
     }
 
-    public void init(final Activity activity, final int activityCode, final Facebook fb) {
-        init(activity, activityCode, fb, new String[] {});
+    public void init(final TWLoginActivity parent, final int activityCode, final Facebook fb) {
+        init(parent, activityCode, fb, new String[] {});
     }
 
-    public void init(final Activity activity, final int activityCode, final Facebook fb,
+    public void init(final TWLoginActivity parent, final int activityCode, final Facebook fb,
             final String[] permissions) {
-        mActivity = activity;
+    	mParent = parent;
+        mActivity = parent;
         mActivityCode = activityCode;
         mFb = fb;
         mPermissions = permissions;
@@ -135,6 +138,9 @@ public class LoginButton extends ImageButton {
         public void onAuthSucceed() {
             setImageResource(R.drawable.facebook_logout_button);
             SessionStore.save(mFb, getContext());
+            //RNM Here we want to close the TWLoginActivity but it's a bit hairy
+            //because we're a button
+              mParent.loginComplete();
         }
 
         @Override

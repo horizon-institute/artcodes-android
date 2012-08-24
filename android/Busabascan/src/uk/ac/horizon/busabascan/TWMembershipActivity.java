@@ -146,7 +146,8 @@ public class TWMembershipActivity extends FragmentActivity{
 
 			@Override
 			public void onUserDataDownloadError() {
-				MessageDialog.showMessage(R.string.member_data_download_error, TWMembershipActivity.this);
+				//RNM stop bothering users
+				//MessageDialog.showMessage(R.string.member_data_download_error, TWMembershipActivity.this);
 			}
     	});
     	userDataWebService.executeUserDataRequest(Utility.userUID);

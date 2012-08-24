@@ -1,6 +1,9 @@
 <?xml version="1.0" encoding="utf-8"?>
 <RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
-	android:orientation="vertical" style="@style/ActivityView">
+    style="@style/ActivityView"
+    android:background="@color/base_brown"
+    android:orientation="vertical" >
+
 	<ImageView android:layout_height="wrap_content" android:id="@+id/imageView1"
 		android:layout_width="wrap_content" android:src="@drawable/login_logo"
 		android:layout_alignParentTop="true" android:layout_centerHorizontal="true"
