@@ -1,5 +1,7 @@
 package uk.ac.horizon.busabascan;
 
+import java.util.List;
+
 import org.opencv.core.Rect;
 
 import uk.ac.horizon.busabascan.MarkerPopupWindow.OnMarkerPopupWindowListener;
@@ -109,22 +111,30 @@ public class TWCameraMainActivity extends Activity implements OnMarkerDetectedLi
     	mMarkerSurfaceView.startProcessing();
     }
     
-    public void onMarkerDetected(final DtouchMarker marker){
+    public void onMarkerDetected(final List<DtouchMarker> markers){
+    	
+    	DtouchMarker marker = markers.get(0);
+    	DtouchMarker marker2 = null;
+    	if (markers.size() > 1) {marker2 = markers.get(1);}
     	
     	if (marker.isCodeEqual(BIRD_ST_MARKER))
     	{
     		//We're outside Bird Street.
     		displayOutsideRestaurant("Bird St");
     	}
-    	else if (marker.isCodeEqual(PANDAN_CHICK_MARKER))
+    	else if (marker.isCodeEqual(PANDAN_CHICK_MARKER) && marker2 == null)
     	{
     		//We're looking at Pandan Chicken.
     		displayDish("Pandan chicken");
     	}
-    	else if (marker.isCodeEqual(CHAR_DUCK_MARKER))
+    	else if (marker.isCodeEqual(CHAR_DUCK_MARKER) && marker2 == null)
     	{
     		//We're looking at Char Grilled Duck.
     		displayDish("Char-grilled duck");
+    	}
+    	else if (markers.contains(PANDAN_CHICK_MARKER) && markers.contains(CHAR_DUCK_MARKER))
+    	{
+    		displayMenu();
     	}
     	else
     	{
@@ -142,7 +152,14 @@ public class TWCameraMainActivity extends Activity implements OnMarkerDetectedLi
     	*/
     }
     
-    void getMarker(String code){
+    //Start the menu activity
+    private void displayMenu() {
+		// Start the new activity
+		Intent intent = new Intent(this, TWMenuActivity.class);
+		startActivity(intent);
+	}
+
+	void getMarker(String code){
     	DataMarkerWebServices dtouchMarkerWebServices = new DataMarkerWebServices(new MarkerDownloadRequestListener(){
     		@Override
 			public void onMarkerDownloadError() {
