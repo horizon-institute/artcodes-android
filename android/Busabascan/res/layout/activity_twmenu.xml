@@ -1,0 +1,55 @@
+<RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent" >
+
+    <ExpandableListView
+        android:id="@+id/expandableListView2"
+        android:layout_width="match_parent"
+        android:layout_height="match_parent"
+        android:layout_alignParentLeft="true"
+        android:layout_alignParentTop="true"
+        android:background="@color/base_brown" >
+
+    </ExpandableListView>
+
+    <TextView
+        android:id="@+id/refHeadingText"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_alignParentLeft="true"
+        android:layout_alignParentTop="true"
+        android:background="@color/base_brown"
+        android:text="Reference Text"
+        android:textAppearance="?android:attr/textAppearanceMedium"
+        android:textColor="@color/highlight_grey"
+        android:textStyle="bold"
+        android:visibility="gone" />
+
+    <TextView
+        android:id="@+id/refNameText"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_alignParentLeft="true"
+        android:layout_alignParentTop="true"
+        android:background="@color/base_brown"
+        android:text="Reference Text"
+        android:textAppearance="?android:attr/textAppearanceMedium"
+        android:textColor="@color/bright_white"
+        android:textStyle="bold" 
+        android:visibility="gone"/>
+
+    <TextView
+        android:id="@+id/refBodyText"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_alignParentLeft="true"
+        android:layout_alignParentTop="true"
+        android:background="@color/base_brown"
+        android:text="Reference Text"
+        android:textAppearance="?android:attr/textAppearanceMedium"
+        android:textColor="@color/foreground_beige"
+        android:textStyle="bold"
+        android:visibility="gone" />
+
+</RelativeLayout>

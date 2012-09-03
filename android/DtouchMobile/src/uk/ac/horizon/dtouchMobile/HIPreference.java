@@ -16,14 +16,14 @@ import android.preference.PreferenceManager;
 public class HIPreference {
 	
 	//branches default values
-	protected int DEFAULT_MIN_BRANCHES = 2;
+	protected int DEFAULT_MIN_BRANCHES = 5;
 	protected int DEFAULT_MAX_BRANCHES = 5;
 	protected int DEFAULT_MAX_EMPTY_BRANCHES = 0;
-	protected int DEFAULT_VALIDATION_BRANCHES = 0;
+	protected int DEFAULT_VALIDATION_BRANCHES = 2;
 	//leaves default values
-	protected int DEFAULT_MAX_LEAVES = 10;
-	protected int DEFAULT_VALIDATION_BRANCH_LEAVES = 0;
-	protected int DEFAULT_CHECKSUM_MODULO = 1;
+	protected int DEFAULT_MAX_LEAVES = 6;
+	protected int DEFAULT_VALIDATION_BRANCH_LEAVES = 1;
+	protected int DEFAULT_CHECKSUM_MODULO = 6;
 	//marker occurrence value
 	protected int DEFAULT_MARKER_OCCURRENCE = 1;
 	

@@ -1,0 +1,111 @@
+<?xml version="1.0" encoding="utf-8"?>
+<RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    style="@style/ActivityView"
+    android:background="@color/base_brown" >
+
+	<RelativeLayout android:id="@+id/relativeLayout1" style="@style/ActivityBar">
+	<TextView style="@style/ActivityBarText" android:id="@+id/textView2"
+	android:text="Membership Card"/>
+	</RelativeLayout>
+
+	<TextView
+	    android:id="@+id/membername"
+	    android:layout_width="wrap_content"
+	    android:layout_height="wrap_content"
+	    android:layout_alignParentLeft="true"
+	    android:layout_below="@+id/relativeLayout1"
+	    android:layout_marginLeft="15dp"
+	    android:layout_marginTop="10dp"
+	    android:text="Welcome!"
+	    android:textAppearance="?android:attr/textAppearanceMedium"
+	    android:textColor="@color/bright_white"
+	    android:textStyle="bold" >
+
+</TextView>
+	<ImageView android:layout_height="wrap_content" android:id="@+id/memberphoto"
+	android:layout_width="wrap_content" android:src="@drawable/userblankface"
+	android:layout_below="@+id/relativeLayout1" android:layout_alignParentRight="true"
+	android:layout_marginRight="10dp"
+	android:layout_marginTop="10dp"></ImageView>
+	<RelativeLayout android:id="@+id/offerbarrelativeLayout" style="@style/subHeadingBar"
+	android:layout_below="@+id/membername" android:layout_marginTop="90dp">
+	<TextView style="@style/subHeadingBarText" android:id="@+id/textView3"
+	android:text="Exclusive Offers"/>
+	</RelativeLayout>
+
+	<ListView
+	    android:id="@+id/memberoffersList"
+	    android:layout_width="fill_parent"
+	    android:layout_height="110dp"
+	    android:layout_below="@+id/offerbarrelativeLayout"
+	    android:background="@color/base_grey" >
+</ListView>
+	<RelativeLayout android:id="@+id/coverFlowbarrelativeLayout" style="@style/subHeadingBar"
+	android:layout_below="@+id/membername" android:layout_marginTop="240dp">
+
+	<TextView
+	    android:id="@+id/textView2"
+	    style="@style/subHeadingBarText"
+	    android:text="My Favourite Dishes"
+	    android:textColor="@color/foreground_beige" />
+
+	</RelativeLayout>
+	<FrameLayout android:layout_height="wrap_content"
+	android:layout_width="fill_parent" android:id="@+id/coverFlowframeLayout"
+	android:layout_below="@+id/coverFlowbarrelativeLayout"
+	android:background="@color/coverFlowFramebackgroundcolor">
+	<view class="com.example.coverflow.CoverFlow"
+		android:layout_height="wrap_content" android:layout_width="fill_parent"
+		android:layout_below="@+id/coverFlowframeLayout"
+		android:id="@+id/coverFlow"
+		android:layout_alignParentLeft="true" />
+	</FrameLayout>
+
+	<RelativeLayout
+	    android:id="@+id/favouriteDishBarWithAccessoryBtn"
+	    style="@style/DishButtonBarWithText"
+	    android:layout_below="@+id/coverFlowframeLayout"
+	    android:layout_marginTop="1dp"
+	    android:background="@color/base_brown"
+	    android:visibility="invisible" >
+
+	<TextView style="@style/generaltextView" android:id="@+id/favouriteSelectedDishTitle" 
+	android:layout_centerVertical="true" android:layout_alignParentLeft="true"
+	android:layout_marginLeft="0dp"></TextView>
+	<ImageButton android:id="@+id/favouritedishaccessorybtn"
+	android:layout_width="wrap_content" android:layout_height="wrap_content"
+	android:background="@drawable/accessory_button"
+	android:layout_alignParentRight="true"
+	android:layout_marginRight="5dp"
+	android:onClick="onDishDetailBtnClick"
+	android:enabled="false"
+	android:layout_centerVertical="true"></ImageButton>
+	</RelativeLayout>
+
+	<LinearLayout
+	    android:layout_width="wrap_content"
+	    android:layout_height="wrap_content"
+	    android:layout_alignParentBottom="true"
+	    android:layout_alignParentLeft="true"
+	    android:layout_alignParentRight="true"
+	    android:background="@color/base_orange"
+	    android:orientation="horizontal" >
+
+		<Button
+		    android:id="@+id/fbloginbutton"
+		    android:layout_width="wrap_content"
+		    android:layout_height="wrap_content"
+		    android:enabled = "false"
+		    android:text="Facebook Login" />
+		
+		<Button
+		    android:id="@+id/fblogoutbutton"
+		    android:layout_width="wrap_content"
+		    android:layout_height="wrap_content"
+		    android:enabled="true"
+		    android:onClick="onLogoutClick"
+		    android:text="Log out" />
+		
+	</LinearLayout>
+
+</RelativeLayout>
