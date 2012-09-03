@@ -1,0 +1,34 @@
+<?xml version="1.0" encoding="utf-8"?>
+<RelativeLayout android:id="@+id/relativeLayout1"
+	android:layout_width="fill_parent" android:layout_height="fill_parent"
+	xmlns:android="http://schemas.android.com/apk/res/android"
+	style="@style/list_item">
+	<TextView android:text="Dined on:" android:layout_width="wrap_content"
+		android:id="@+id/textView2" android:layout_height="wrap_content"
+		android:textAppearance="?android:attr/textAppearanceMedium"
+		android:layout_alignParentTop="true" android:layout_alignLeft="@+id/textView1"
+		android:paddingLeft="5dp"></TextView>
+	<TextView android:text="10/12/2012" android:layout_width="wrap_content"
+		android:id="@+id/dateDined" android:layout_height="wrap_content"
+		android:textAppearance="?android:attr/textAppearanceMedium"
+		android:layout_alignParentTop="true" android:layout_toRightOf="@+id/textView2"
+		android:paddingLeft="5dp"></TextView>
+	<RatingBar android:id="@+id/dishRating" android:layout_width="wrap_content"
+		android:layout_height="wrap_content" android:layout_below="@+id/textView2"
+		android:layout_centerHorizontal="true"
+		android:isIndicator="true"></RatingBar>
+	<!-- <TextView android:text="My Comments" android:layout_width="wrap_content"
+		android:id="@+id/textView3" android:layout_height="wrap_content"
+		android:textAppearance="?android:attr/textAppearanceMedium"
+		android:layout_below="@+id/dishRating" android:layout_alignParentLeft="true"></TextView>-->
+	<!-- <TextView android:text="My Rating" android:layout_width="wrap_content"
+		android:id="@+id/textView1" android:layout_height="wrap_content"
+		android:textAppearance="?android:attr/textAppearanceMedium"
+		android:layout_below="@+id/textView2" android:layout_alignParentLeft="true"></TextView>-->
+	<TextView android:text="I liked it." android:layout_width="wrap_content"
+		android:id="@+id/dishComments" android:layout_height="wrap_content"
+		android:textAppearance="?android:attr/textAppearanceMedium"
+		android:layout_below="@+id/dishRating" android:layout_alignParentLeft="true"
+		android:paddingLeft="5dp"></TextView>
+
+</RelativeLayout>

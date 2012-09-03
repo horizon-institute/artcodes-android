@@ -18,7 +18,13 @@ public class DtouchMarker {
 	}
 	
 	public DtouchMarker(List<Integer> code){
+		super();
 		mCode = new ArrayList<Integer>(code);
+	}
+
+	public DtouchMarker(String code){
+		super();
+		this.setCode(code);
 	}
 	
 	public int getComponentIndex(){
@@ -78,6 +84,23 @@ public class DtouchMarker {
     		return true;
     	else
     		return false;
+    }
+    
+    // Object methods for use in Map, HashMap etc.
+    public int hashCode()
+    {
+    	int hash = 0;
+    	for (int i : mCode) {hash += i;}
+    	return hash;
+    }
+    
+    public boolean equals(Object m)
+    {
+    	if (m.getClass() != this.getClass())
+    	{
+    		return false;
+    	}
+    	return isCodeEqual((DtouchMarker) m);
     }
     
 }

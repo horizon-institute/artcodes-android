@@ -1,0 +1,105 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+	<style name="Animations" />
+	<style name="Animations.GrowFromCentre">
+		<item name="@android:windowEnterAnimation">@anim/grow_from_centre</item>
+		<item name="@android:windowExitAnimation">@anim/shrink_to_centre</item>
+	</style>
+	
+	<!-- General text -->
+	<style name="generaltextView" parent="@android:style/TextAppearance.Medium">
+		<item name="android:layout_height">wrap_content</item>
+		<item name="android:layout_width">wrap_content</item>
+		<item name="android:textColor">@color/foreground_beige</item>		
+	</style>
+	
+	<!--  Activity view -->
+	<color name="activity_view_color">#F5F5F5</color>
+	<style name="ActivityView">
+		<item name="android:layout_width">fill_parent</item>
+		<item name="android:layout_height">fill_parent</item>
+		<item name="android:background">@color/activity_view_color</item>
+	</style>
+	<style name="ActivityBar">
+		<item name="android:layout_width">fill_parent</item>
+		<item name="android:layout_height">44dp</item>
+		<item name="android:layout_alignParentTop">true</item>
+		<item name="android:background">@color/base_orange</item>
+	</style>
+	<style name="ActivityBarText" parent="@android:style/TextAppearance.Large">
+		<item name="android:layout_height">wrap_content</item>
+		<item name="android:layout_width">wrap_content</item>
+		<item name="android:layout_centerVertical">true</item>
+		<item name="android:layout_centerHorizontal">true</item>
+		<item name="android:textColor">@color/bright_white</item>
+		<item name="android:textStyle">bold</item>
+	</style>
+	
+	<!-- Button bar -->
+	<!-- <color name="button_bar_color">#4C4646</color> -->
+	<style name="ButtonBar">
+		<item name="android:layout_width">fill_parent</item>
+		<item name="android:layout_height">60dp</item>
+		<item name="android:background">@color/highlight_grey</item>
+	</style>
+	
+	<!-- Button bar with text-->
+	<color name="button_bar_with_text_color">#BFAE99</color>
+	<style name="ButtonBarWithText">
+		<item name="android:layout_width">fill_parent</item>
+		<item name="android:layout_height">60dp</item>
+		<item name="android:background">@color/highlight_grey</item>
+	</style>
+	
+	<!-- Button bar with text-->
+	<color name="dish_button_bar_with_text_color">#BFAE99</color>
+	<style name="DishButtonBarWithText">
+		<item name="android:layout_width">fill_parent</item>
+		<item name="android:layout_height">55dp</item>
+		<item name="android:background">@color/highlight_grey</item>
+	</style>
+	
+	<!-- sub heading bar -->
+	<color name="subHeading_bar_color">#ff6600</color>
+	<style name="subHeadingBar">
+		<item name="android:layout_width">fill_parent</item>
+		<item name="android:layout_height">24dp</item>
+		<item name="android:background">@color/highlight_grey</item>
+	</style>
+	<color name="subHeading_bar_text_color">#ffffff</color>
+	<style name="subHeadingBarText" parent="@android:style/TextAppearance.Medium">
+		<item name="android:layout_height">wrap_content</item>
+		<item name="android:layout_width">wrap_content</item>
+		<item name="android:layout_centerVertical">true</item>
+		<item name="android:layout_alignParentLeft">true</item>
+		<item name="android:layout_marginLeft">10dp</item>
+		<item name="android:textColor">@color/foreground_beige</item>
+		<item name="android:textStyle">bold</item>
+	</style>
+	
+	<!-- CoverFlow style -->
+	<dimen name="coverFlowitemwidth">100dp</dimen>
+    <dimen name="coverFlowitemheight">100dp</dimen>
+  	
+  	<color name="offerListbackgroundcolor">#ffffff</color>
+	<color name="coverFlowFramebackgroundcolor">#BFAE99</color>
+	<!-- <color name="coverFlowbackgroundcolor">#F2A663</color>-->
+	<declare-styleable name="FavouriteThumbnailGallery">
+    	<attr name="android:galleryItemBackground" />
+    </declare-styleable>
+     
+    <!-- List item style -->
+    <color name ="list_item_background_color">#BFAE99</color>
+    <style name="list_item">
+    	<item name="android:background">@color/highlight_brown</item>
+    </style>
+    <color name="base_brown">#251228</color>
+    <color name="highlight_brown">#3d342e</color>
+    <color name="base_red">#462305</color>
+    <color name="base_grey">#4b4b4b</color>
+    <color name="highlight_grey">#808285</color>
+    <color name="foreground_beige">#c1a577</color>
+    <color name="bright_white">#f0f0f0</color>
+    <color name="base_orange">#ff7e14</color>
+    
+</resources>
