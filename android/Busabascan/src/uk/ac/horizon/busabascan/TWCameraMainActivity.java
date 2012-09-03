@@ -14,6 +14,7 @@ import uk.ac.horizon.dtouchMobile.DtouchMarker;
 import android.app.Activity;
 import android.content.Intent;
 import android.graphics.Point;
+import android.net.Uri;
 import android.os.Bundle;
 import android.util.Log;
 import android.view.LayoutInflater;
@@ -43,9 +44,14 @@ public class TWCameraMainActivity extends Activity implements OnMarkerDetectedLi
     private TWMarkerSurfaceView mMarkerSurfaceView;
     
     //The mappings between codes and 
-    private static final DtouchMarker BIRD_ST_MARKER = new DtouchMarker("1:1:2:2:6");
-    private static final DtouchMarker PANDAN_CHICK_MARKER = new DtouchMarker("1:1:1:3:6");
-    private static final DtouchMarker CHAR_DUCK_MARKER = new DtouchMarker("1:1:3:3:4");
+    //private static final DtouchMarker BIRD_ST_MARKER = new DtouchMarker("1:1:2:2:6");
+    //private static final DtouchMarker PANDAN_CHICK_MARKER = new DtouchMarker("1:1:1:3:6");
+    //private static final DtouchMarker CHAR_DUCK_MARKER = new DtouchMarker("1:1:3:3:4");
+    private static final DtouchMarker BIRD_ST_MARKER = new DtouchMarker("1:1:2:3:5");
+    private static final DtouchMarker PANDAN_CHICK_MARKER = new DtouchMarker("1:1:1:1:2");
+    private static final DtouchMarker CHAR_DUCK_MARKER = new DtouchMarker("1:1:2:4:4");
+    private static final DtouchMarker PLACEMAT1_MARKER = new DtouchMarker("1:1:1:4:5");
+    private static final DtouchMarker PLACEMAT2_MARKER = new DtouchMarker("1:1:3:3:4");
         
     public static int viewMode  = VIEW_MODE_MARKER;
     
@@ -136,6 +142,16 @@ public class TWCameraMainActivity extends Activity implements OnMarkerDetectedLi
     	{
     		displayMenu();
     	}
+    	else if (marker.isCodeEqual(PLACEMAT1_MARKER))
+    	{
+    		//We're looking at Char Grilled Duck.
+    		displayPlacemat(1);
+    	}
+    	else if (marker.isCodeEqual(PLACEMAT2_MARKER))
+    	{
+    		//We're looking at Char Grilled Duck.
+    		displayPlacemat(2);
+    	}
     	else
     	{
         	mMarkerSurfaceView.stopDisplayingDetectedMarker();
@@ -152,7 +168,19 @@ public class TWCameraMainActivity extends Activity implements OnMarkerDetectedLi
     	*/
     }
     
-    //Start the menu activity
+    private void displayPlacemat(int placemat) {
+		// Start the new activity
+		Intent intent = new Intent(this, TWSeatedActivity.class);
+		//HIPreferenceTableware preference = new HIPreferenceTableware(this);
+		//String host = preference.getKitchenIP();
+		//String url = "rtsp://"+ host + "/kitchen";
+    	////String url = "rtsp://192.168.0.8/kitchen";
+		//Intent intent = new Intent(Intent.ACTION_VIEW);
+    	//intent.setData(Uri.parse(url));
+    	startActivity(intent);		
+	}
+
+	//Start the menu activity
     private void displayMenu() {
 		// Start the new activity
 		Intent intent = new Intent(this, TWMenuActivity.class);

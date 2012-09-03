@@ -101,4 +101,15 @@
  		android:numeric="integer"
   		android:maxLength="1"/>
   </PreferenceCategory>
+  <PreferenceCategory android:title="Setup"
+	android:key="setup">
+	<EditTextPreference
+ 		android:key="kitchen_ip"
+ 		android:title="Kitchen IP"
+ 		android:summary="Please enter the IP Address of the Kitchen Webcam"
+ 		android:dialogTitle="Kitchen IP"
+ 		android:dialogMessage="Kitchen IP"
+ 		android:defaultValue="192.168.0.8"
+  		android:maxLength="15"/>
+  </PreferenceCategory>
 </PreferenceScreen>

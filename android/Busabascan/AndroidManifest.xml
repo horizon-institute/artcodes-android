@@ -87,7 +87,17 @@
         <activity
             android:name=".TWDishActivity"
             android:label="@string/title_activity_twdish"
-            android:screenOrientation="portrait"  >
+            android:screenOrientation="portrait" >
+            <intent-filter>
+                <action android:name="android.intent.action.MAIN" />
+
+                <category android:name="android.intent.category.LAUNCHER" />
+            </intent-filter>
+        </activity>
+        <activity
+            android:name=".TWSeatedActivity"
+            android:label="@string/title_activity_twseated" 
+            android:screenOrientation="portrait" >
             <intent-filter>
                 <action android:name="android.intent.action.MAIN" />
 

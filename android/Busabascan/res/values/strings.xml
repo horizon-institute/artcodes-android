@@ -31,7 +31,7 @@
     <string name="diners">\u0020diners</string>
     <string name="woo">Wooo</string>
     <string name="comunique_success">Thank you. Your order has been received.</string>
-    
+
     <!-- facebook messages -->
     <string name="facebookErrMsg">Can not download data from the Facebook.</string>
     <string name="alert_dialog_ok">OK</string>
@@ -52,5 +52,6 @@
     <string name="hello_world">Hello world!</string>
     <string name="menu_settings">Settings</string>
     <string name="title_activity_twdish">Check this out</string>
+    <string name="title_activity_twseated">TWSeatedActivity</string>
 
 </resources>

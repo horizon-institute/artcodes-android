@@ -198,27 +198,29 @@ public final class R {
     public static final class layout {
         public static final int activity_twdish=0x7f030000;
         public static final int activity_twmenu=0x7f030001;
-        public static final int browsemarkeresult=0x7f030002;
-        public static final int dining_history_list=0x7f030003;
-        public static final int dish=0x7f030004;
-        public static final int dish_history_list_item=0x7f030005;
-        public static final int main=0x7f030006;
-        public static final int mainfblogin=0x7f030007;
-        public static final int markercamera=0x7f030008;
-        public static final int markeridentificationresult=0x7f030009;
-        public static final int markerlabel=0x7f03000a;
-        public static final int markerpopup=0x7f03000b;
-        public static final int membership=0x7f03000c;
-        public static final int news=0x7f03000d;
-        public static final int offer=0x7f03000e;
-        public static final int offer_list_item=0x7f03000f;
-        public static final int outside=0x7f030010;
-        public static final int scanprogress=0x7f030011;
-        public static final int splashscreen=0x7f030012;
+        public static final int activity_twseated=0x7f030002;
+        public static final int browsemarkeresult=0x7f030003;
+        public static final int dining_history_list=0x7f030004;
+        public static final int dish=0x7f030005;
+        public static final int dish_history_list_item=0x7f030006;
+        public static final int main=0x7f030007;
+        public static final int mainfblogin=0x7f030008;
+        public static final int markercamera=0x7f030009;
+        public static final int markeridentificationresult=0x7f03000a;
+        public static final int markerlabel=0x7f03000b;
+        public static final int markerpopup=0x7f03000c;
+        public static final int membership=0x7f03000d;
+        public static final int news=0x7f03000e;
+        public static final int offer=0x7f03000f;
+        public static final int offer_list_item=0x7f030010;
+        public static final int outside=0x7f030011;
+        public static final int scanprogress=0x7f030012;
+        public static final int splashscreen=0x7f030013;
     }
     public static final class menu {
         public static final int activity_twdish=0x7f0b0000;
         public static final int activity_twmenu=0x7f0b0001;
+        public static final int activity_twseated=0x7f0b0002;
     }
     public static final class string {
         public static final int alert_dialog_cancel=0x7f060020;
@@ -270,6 +272,7 @@ public final class R {
         public static final int specials=0x7f060013;
         public static final int title=0x7f060001;
         public static final int title_activity_twdish=0x7f06002f;
+        public static final int title_activity_twseated=0x7f060030;
         public static final int view_preferences=0x7f060005;
         public static final int web_loading_title=0x7f06002b;
         public static final int woo=0x7f06001c;
