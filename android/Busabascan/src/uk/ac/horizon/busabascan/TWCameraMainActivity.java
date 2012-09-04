@@ -2,8 +2,6 @@ package uk.ac.horizon.busabascan;
 
 import java.util.List;
 
-import org.opencv.core.Rect;
-
 import uk.ac.horizon.busabascan.MarkerPopupWindow.OnMarkerPopupWindowListener;
 import uk.ac.horizon.busabascan.TWMarkerSurfaceView.OnMarkerDetectedListener;
 import uk.ac.horizon.data.DataMarker;
@@ -13,18 +11,13 @@ import uk.ac.horizon.data.HIPreferenceTableware;
 import uk.ac.horizon.dtouchMobile.DtouchMarker;
 import android.app.Activity;
 import android.content.Intent;
-import android.graphics.Point;
-import android.net.Uri;
 import android.os.Bundle;
 import android.util.Log;
-import android.view.LayoutInflater;
 import android.view.Menu;
 import android.view.MenuItem;
 import android.view.View;
 import android.view.Window;
 import android.view.WindowManager;
-import android.widget.FrameLayout;
-import android.widget.ProgressBar;
 
 public class TWCameraMainActivity extends Activity implements OnMarkerDetectedListener, OnMarkerPopupWindowListener{
     
@@ -118,39 +111,35 @@ public class TWCameraMainActivity extends Activity implements OnMarkerDetectedLi
     }
     
     public void onMarkerDetected(final List<DtouchMarker> markers){
-    	
-    	DtouchMarker marker = markers.get(0);
-    	DtouchMarker marker2 = null;
-    	if (markers.size() > 1) {marker2 = markers.get(1);}
-    	
-    	if (marker.isCodeEqual(OLD_ST_MARKER))
+    	    	
+    	if (markers.contains(OLD_ST_MARKER))
     	{
-    		//We're outside Bird Street.
-    		displayOutsideRestaurant("Bird St");
+    		//We're outside Old Street.
+    		displayOutsideRestaurant("Old St");
     	}
-    	else if (marker.isCodeEqual(PANDAN_CHICK_MARKER) && marker2 == null)
-    	{
-    		//We're looking at Pandan Chicken.
-    		displayDish("Pandan chicken");
-    	}
-    	else if (marker.isCodeEqual(CHAR_DUCK_MARKER) && marker2 == null)
+    	else if (markers.contains(PLACEMAT1_MARKER))
     	{
     		//We're looking at Char Grilled Duck.
-    		displayDish("Char-grilled duck");
+    		displayPlacemat(1);
+    	}
+    	else if (markers.contains(PLACEMAT2_MARKER))
+    	{
+    		//We're looking at Char Grilled Duck.
+    		displayPlacemat(2);
     	}
     	else if (markers.contains(PANDAN_CHICK_MARKER) && markers.contains(CHAR_DUCK_MARKER))
     	{
     		displayMenu();
     	}
-    	else if (marker.isCodeEqual(PLACEMAT1_MARKER))
+    	else if (markers.contains(PANDAN_CHICK_MARKER))
     	{
-    		//We're looking at Char Grilled Duck.
-    		displayPlacemat(1);
+    		//We're looking at Pandan Chicken.
+    		displayDish("Pandan chicken");
     	}
-    	else if (marker.isCodeEqual(PLACEMAT2_MARKER))
+    	else if (markers.contains(CHAR_DUCK_MARKER))
     	{
     		//We're looking at Char Grilled Duck.
-    		displayPlacemat(2);
+    		displayDish("Char-grilled duck");
     	}
     	else
     	{

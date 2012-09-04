@@ -1,7 +1,6 @@
 package uk.ac.horizon.busabascan;
 
 import java.util.ArrayList;
-import java.util.Collections;
 import java.util.List;
 
 import org.opencv.android.Utils;
@@ -34,9 +33,9 @@ class TWMarkerSurfaceView extends TWSurfaceViewBase {
     private MarkerDetector markerDetector;
     private Mat mMarkerImage;
     private OnMarkerDetectedListener markerListener;
-    private boolean mMarkerDetected;
     private Rect markerPosition;
     private HIPreferenceTableware mPreference;
+	IntegratedMarkers integratedMarkers = new IntegratedMarkers();
     
     
     /*Define interface to call back when marker is detected:
@@ -342,7 +341,6 @@ class TWMarkerSurfaceView extends TWSurfaceViewBase {
     }
     
     public void run() {
-		IntegratedMarkers integratedMarkers = new IntegratedMarkers();
         try
         {
         	initData();
@@ -361,7 +359,6 @@ class TWMarkerSurfaceView extends TWSurfaceViewBase {
         				throw new InterruptedException("Thread interrupted.");
         			}
         			
-        			//if(!mMarkerDetected){
             		if(!integratedMarkers.any()){
 						bmp = processFrameForMarkers(mCamera, dtouchMarkers);
         			}else{
@@ -412,7 +409,6 @@ class TWMarkerSurfaceView extends TWSurfaceViewBase {
             mHierarchy = new Mat();
         }
     	markerDetector = new MarkerDetector(this.getContext(), new HIPreferenceTableware(this.getContext()));
-    	mMarkerDetected = false;
     }
     
     @Override
@@ -438,7 +434,6 @@ class TWMarkerSurfaceView extends TWSurfaceViewBase {
     }
     
     private void setMarkerDetected(boolean detected){
-    	mMarkerDetected = detected;
     }
     
     public Rect getMarkerPosition(){

@@ -29,10 +29,10 @@ public class IntegratedMarkers {
 	//integrate is called every frame with the list of this frames detected markers.
 	//this function debounces this list using the following rules
 	//a marker that is detected is definitely there.
-	//a marker that is definitely there is there for 4 seconds of non-detection
+	//a marker that is definitely there is there for 2 seconds of non-detection
 	//each marker code has an on threshold of 0 seconds
-	//each marker code has an off threshold of 4 seconds
-	//the initial marker when going from zero to one has a pending threshold of 4 seconds.
+	//each marker code has an off threshold of 2 seconds
+	//the initial marker when going from zero to one has a pending threshold of 2 seconds.
 	public void integrate(List<DtouchMarker> dtouchMarkers) {
 		boolean unpend = false;
 		Time now = new Time();
@@ -40,6 +40,7 @@ public class IntegratedMarkers {
 		
 		integratedMarkers.clear();
 		
+		//Pass 1 set expiry for markers in this frame
 		for(DtouchMarker marker : dtouchMarkers)
 		{
 			Time expire = new Time(now);
@@ -53,35 +54,37 @@ public class IntegratedMarkers {
 			{
 				IntegrationData data = new IntegrationData();
 				data.validUntil = expire;
-				if (pool.size() == 0)
-				{
-				    data.pendingUntil = expire;	
-				}
-				else
-				{
-				    unpend = true;	
-				}
-				pool.put(marker, data);
+				data.pendingUntil = expire;
+				DtouchMarker m = new DtouchMarker(marker.getCode());
+				pool.put(m, data);
 			}
 		}
+		//Pass 2 - Gather markers
 		Iterator<Entry<DtouchMarker, IntegrationData>> it = pool.entrySet().iterator();
 		while (it.hasNext())
 		{
 			Entry<DtouchMarker, IntegrationData> pair = it.next();
-			DtouchMarker key = pair.getKey();
 			IntegrationData data = pair.getValue();
-			if (unpend)
-			{
-				//Nothing is pending once it has company
-				data.pendingUntil = past;
-			}
 			//Remove expired
 			if (now.after(data.validUntil))
 			{
-				pool.remove(key);
+				//Can't do pool.remove because java is lame 
+				//exception if map is modified during iteration! 
+				it.remove();
 			}
-			else if (data.pendingUntil.before(now))
+			else if (data.pendingUntil != null && data.pendingUntil.before(now))
 			{
+				unpend = true;
+			}
+		}
+		//Pass 3 - move everything to integrated list.
+		if (unpend)
+		{
+			it = pool.entrySet().iterator();
+			while (it.hasNext())
+			{
+				Entry<DtouchMarker, IntegrationData> pair = it.next();
+				DtouchMarker key = pair.getKey();
 				integratedMarkers.add(key);
 			}
 		}
