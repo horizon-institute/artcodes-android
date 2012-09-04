@@ -47,7 +47,7 @@ public class TWCameraMainActivity extends Activity implements OnMarkerDetectedLi
     //private static final DtouchMarker BIRD_ST_MARKER = new DtouchMarker("1:1:2:2:6");
     //private static final DtouchMarker PANDAN_CHICK_MARKER = new DtouchMarker("1:1:1:3:6");
     //private static final DtouchMarker CHAR_DUCK_MARKER = new DtouchMarker("1:1:3:3:4");
-    private static final DtouchMarker BIRD_ST_MARKER = new DtouchMarker("1:1:2:3:5");
+    private static final DtouchMarker OLD_ST_MARKER = new DtouchMarker("1:1:2:3:5");
     private static final DtouchMarker PANDAN_CHICK_MARKER = new DtouchMarker("1:1:1:1:2");
     private static final DtouchMarker CHAR_DUCK_MARKER = new DtouchMarker("1:1:2:4:4");
     private static final DtouchMarker PLACEMAT1_MARKER = new DtouchMarker("1:1:1:4:5");
@@ -123,7 +123,7 @@ public class TWCameraMainActivity extends Activity implements OnMarkerDetectedLi
     	DtouchMarker marker2 = null;
     	if (markers.size() > 1) {marker2 = markers.get(1);}
     	
-    	if (marker.isCodeEqual(BIRD_ST_MARKER))
+    	if (marker.isCodeEqual(OLD_ST_MARKER))
     	{
     		//We're outside Bird Street.
     		displayOutsideRestaurant("Bird St");
@@ -171,12 +171,6 @@ public class TWCameraMainActivity extends Activity implements OnMarkerDetectedLi
     private void displayPlacemat(int placemat) {
 		// Start the new activity
 		Intent intent = new Intent(this, TWSeatedActivity.class);
-		//HIPreferenceTableware preference = new HIPreferenceTableware(this);
-		//String host = preference.getKitchenIP();
-		//String url = "rtsp://"+ host + "/kitchen";
-    	////String url = "rtsp://192.168.0.8/kitchen";
-		//Intent intent = new Intent(Intent.ACTION_VIEW);
-    	//intent.setData(Uri.parse(url));
     	startActivity(intent);		
 	}
 

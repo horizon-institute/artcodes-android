@@ -15,7 +15,7 @@ import uk.ac.horizon.dtouchMobile.DtouchMarker;
 //multiple markers detected at once etc.
 public class IntegratedMarkers {
 	
-	final int PEND_SECONDS = 4;
+	final int PEND_SECONDS = 2;
 	
 	class IntegrationData {
 		Time pendingUntil;
