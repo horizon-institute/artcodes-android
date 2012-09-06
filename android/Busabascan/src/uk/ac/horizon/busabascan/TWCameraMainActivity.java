@@ -37,9 +37,6 @@ public class TWCameraMainActivity extends Activity implements OnMarkerDetectedLi
     private TWMarkerSurfaceView mMarkerSurfaceView;
     
     //The mappings between codes and 
-    //private static final DtouchMarker BIRD_ST_MARKER = new DtouchMarker("1:1:2:2:6");
-    //private static final DtouchMarker PANDAN_CHICK_MARKER = new DtouchMarker("1:1:1:3:6");
-    //private static final DtouchMarker CHAR_DUCK_MARKER = new DtouchMarker("1:1:3:3:4");
     private static final DtouchMarker OLD_ST_MARKER = new DtouchMarker("1:1:2:3:5");
     private static final DtouchMarker PANDAN_CHICK_MARKER = new DtouchMarker("1:1:1:1:2");
     private static final DtouchMarker CHAR_DUCK_MARKER = new DtouchMarker("1:1:2:4:4");

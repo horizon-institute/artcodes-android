@@ -1,5 +1,6 @@
 package uk.ac.horizon.busabascan;
 
+import java.io.IOException;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -88,7 +89,7 @@ class TWMarkerSurfaceView extends TWSurfaceViewBase {
     private Bitmap displayDetectedMarker(VideoCapture capture, Mat markerImage){
     	//Get original image.
     	capture.retrieve(mRgba, Highgui.CV_CAP_ANDROID_COLOR_FRAME_RGBA);
-    	displayRectOnImageSegment(mRgba,true);
+    	displayMaskOnImageSegment(mRgba,true);
     	displayMarkerImage(mMarkerImage, mRgba);
     	
     	 Bitmap bmp = Bitmap.createBitmap(mRgba.cols(), mRgba.rows(), Bitmap.Config.ARGB_8888);
@@ -121,11 +122,11 @@ class TWMarkerSurfaceView extends TWSurfaceViewBase {
     		//display codes on the original image.
     		//displayMarkerCodes(mRgba, markers);
     		//display rect with indication that a marker is identified.
-    		displayRectOnImageSegment(mRgba,true);
+    		displayMaskOnImageSegment(mRgba,true);
     		//display marker image
     		displayMarkerImage(mMarkerImage, mRgba);
     	}else
-    		displayRectOnImageSegment(mRgba,false);
+    		displayMaskOnImageSegment(mRgba,false);
     }
     
     private void processFrameForMarkersDebug(VideoCapture capture){
@@ -145,7 +146,7 @@ class TWMarkerSurfaceView extends TWSurfaceViewBase {
 
     	displayMarkersDebug(thresholdedImgMat, contourColor, codesColor);
     	//displayThresholds(mRgba, codesColor, localThresholds);
-		displayRectOnImageSegment(mRgba,false);
+		displayMaskOnImageSegment(mRgba,false);
 
     }
     
@@ -174,6 +175,16 @@ class TWMarkerSurfaceView extends TWSurfaceViewBase {
         
         return new Rect(x, y, imgWidth, imgHeight);
     }
+    
+    private void displayMaskOnImageSegment(Mat imgMat, boolean markerFound){
+    	displayRectOnImageSegment(imgMat, markerFound);
+    	//Mat peng = imgMat.clone();
+    	//try {
+		//	peng = Utils.loadResource(getContext(), R.drawable.penguin_mask_orange, -1);
+		//} catch (IOException e) {}
+    	//Core.add(peng, imgMat,imgMat);
+    }
+    
     
     private void displayRectOnImageSegment(Mat imgMat, boolean markerFound){
     	Scalar color = null;
