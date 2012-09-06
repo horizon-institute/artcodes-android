@@ -24,7 +24,7 @@ public class TWOutsideActivity extends FragmentActivity {
         String initialLocation = intent.getStringExtra(TWCameraMainActivity.RESTAURANT);
 
 		new Handler();
-		ExpandableListAdapter mAdapter;
+		RestaurantListAdapter mAdapter;
 	    ExpandableListView epView = (ExpandableListView) findViewById(R.id.expandableListView1);
 	    mAdapter = new RestaurantListAdapter(this);
 	    epView.setAdapter(mAdapter);
@@ -36,6 +36,7 @@ public class TWOutsideActivity extends FragmentActivity {
 	    		if (initialLocation.equals(loc))
 	    		{
 	    			epView.expandGroup(i);
+	    			mAdapter.highlightGroup(i);
 	    			break;
 	    		}
 	    	}

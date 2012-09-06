@@ -36,6 +36,7 @@ private String[][] detail = {
 		{ "0", "Westfield Stratford City, London E20 1GL", "tel: 020 8221 8989","Today's Specials" } };
 
 private Activity activity;
+private int highlight = -1;
 
 RestaurantListAdapter(Activity act) {
 	    activity = act;
@@ -153,7 +154,6 @@ public View getGroupView(int groupPosition, boolean isExpanded,
     textView.setLayoutParams(lp);
     // Center the text vertically
     textView.setGravity(Gravity.CENTER_VERTICAL | Gravity.LEFT);
-    //textView.setTextColor(Color.parseColor("darkblue"));
     // Set the text starting position
     textView.setPadding(60, 0, 0, 0);
     textView.setText(getGroup(groupPosition).toString());
@@ -177,6 +177,11 @@ public View getGroupView(int groupPosition, boolean isExpanded,
  
     horizontalLayout.addView(textView);
     horizontalLayout.addView(queueLengthIndicator);
+    if (groupPosition == highlight)
+    {
+    	horizontalLayout.setBackgroundColor(activity.getResources().getColor(R.color.base_grey));
+        textView.setTextColor(activity.getResources().getColor(R.color.bright_white));
+    }
     
     return horizontalLayout;
 }
@@ -197,6 +202,12 @@ private int getNormalisedQueueTime(int position)
 	if (qt > 60) {qt = 60;}
 	qt = (qt*100)/60;
 	return qt;
+}
+
+
+public void highlightGroup(int i) {
+	// Set the group background colour
+	highlight = i;	
 }	
 
 }
