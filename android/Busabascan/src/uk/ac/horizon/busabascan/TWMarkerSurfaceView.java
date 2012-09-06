@@ -177,14 +177,20 @@ class TWMarkerSurfaceView extends TWSurfaceViewBase {
     }
     
     private void displayMaskOnImageSegment(Mat imgMat, boolean markerFound){
-    	displayRectOnImageSegment(imgMat, markerFound);
-    	//Mat peng = imgMat.clone();
-    	//try {
-		//	peng = Utils.loadResource(getContext(), R.drawable.penguin_mask_orange, -1);
-		//} catch (IOException e) {}
-    	//Core.add(peng, imgMat,imgMat);
+    	HIPreferenceTableware prefs = new HIPreferenceTableware(this.getContext());
+    	if (prefs.getPenguins())
+    	{
+    	  Mat peng = imgMat.clone();
+    	  try {
+		  	peng = Utils.loadResource(getContext(), R.drawable.penguin_mask_orange, -1);
+		  } catch (IOException e) {}
+    	  Core.add(peng, imgMat,imgMat); 		
+    	} 
+    	else
+    	{
+    	  displayRectOnImageSegment(imgMat, markerFound);
+    	}
     }
-    
     
     private void displayRectOnImageSegment(Mat imgMat, boolean markerFound){
     	Scalar color = null;

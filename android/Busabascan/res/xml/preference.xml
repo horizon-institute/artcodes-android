@@ -111,5 +111,12 @@
  		android:dialogMessage="Kitchen IP"
  		android:defaultValue="192.168.0.8"
   		android:maxLength="15"/>
+	<CheckBoxPreference
+ 		android:key="penguins"
+ 		android:title="Penguins?"
+ 		android:summary="Change the camera mask"
+ 		android:dialogTitle="Penguins"
+ 		android:dialogMessage="Yes or No"
+ 		android:defaultValue="false" />
   </PreferenceCategory>
 </PreferenceScreen>

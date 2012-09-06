@@ -10,7 +10,9 @@ public class HIPreferenceTableware extends HIPreference {
 	private static String NO_OF_TILES = "no_of_tiles";
 	private static final int DEFAULT_NO_OF_TILES = 1;   
 	private static String KITCHEN_IP = "kitchen_ip";
-	private static final String DEFAULT_KITCHEN_IP = "192.168.0.8";   
+	private static final String DEFAULT_KITCHEN_IP = "192.168.0.8";  
+	private static final String PENGUINS = "penguins";
+	private static final boolean DEFAULT_PENGUINS = false;
 	
 	public HIPreferenceTableware(Context context){
 		super(context);
@@ -34,5 +36,15 @@ public class HIPreferenceTableware extends HIPreference {
 		else
 			value = DEFAULT_KITCHEN_IP;
 		return value;
+	}
+	
+	public boolean getPenguins(){
+		boolean resp = false;
+		SharedPreferences sharedPrefs  = PreferenceManager.getDefaultSharedPreferences(mContext);
+		if (sharedPrefs.contains(PENGUINS))
+			resp = sharedPrefs.getBoolean(PENGUINS, DEFAULT_PENGUINS);
+		else
+			resp = DEFAULT_PENGUINS;
+		return resp;
 	}
 }
