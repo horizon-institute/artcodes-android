@@ -14,6 +14,8 @@ import org.opencv.highgui.Highgui;
 import org.opencv.highgui.VideoCapture;
 import org.opencv.imgproc.Imgproc;
 
+import com.facebook.android.R;
+
 import uk.ac.horizon.data.HIPreferenceTableware;
 import uk.ac.horizon.dtouchMobile.DtouchMarker;
 import uk.ac.horizon.dtouchMobile.MarkerDetector;
@@ -25,6 +27,7 @@ import android.graphics.Canvas;
 import android.util.AttributeSet;
 import android.util.Log;
 import android.view.SurfaceHolder;
+import android.widget.ProgressBar;
 
 class TWMarkerSurfaceView extends TWSurfaceViewBase {
     private Mat mRgba;
@@ -114,6 +117,7 @@ class TWMarkerSurfaceView extends TWSurfaceViewBase {
     	//find markers.
     	boolean markerFound = findMarkers(thresholdedImgMat, markers);
     	thresholdedImgMat.release();
+
     	//Marker detected.
     	if (markerFound){
     		setMarkerDetected(true);
@@ -128,6 +132,11 @@ class TWMarkerSurfaceView extends TWSurfaceViewBase {
     	}else
     		displayMaskOnImageSegment(mRgba,false);
     }
+
+	public Integer getPendingPercent() {
+		Integer pendpercent = integratedMarkers.getIntegrationPercent();
+		return pendpercent;
+	}
     
     private void processFrameForMarkersDebug(VideoCapture capture){
     	//Get original image.
@@ -460,5 +469,9 @@ class TWMarkerSurfaceView extends TWSurfaceViewBase {
     public void stopDisplayingDetectedMarker(){
     	setMarkerDetected(false);
     }
+
+	public List<DtouchMarker> guessAtMarkers() {
+		return this.integratedMarkers.getPendingMarkers();
+	}
  
 }

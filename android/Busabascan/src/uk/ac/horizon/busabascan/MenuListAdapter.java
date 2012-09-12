@@ -123,7 +123,7 @@ public class MenuListAdapter extends BaseExpandableListAdapter {
     	{
     		//Create the buttons with text and callback
     		String dish_name = getGroup(groupPosition).toString();
-    		Button button1 = getButton(activity.getResources().getString(R.string.order_button),null);
+    		//Button button1 = getButton(activity.getResources().getString(R.string.order_button),null);
     		DetailOnClick detailOnClick = new DetailOnClick(activity, dish_name);
     		Button button2 = getButton(activity.getResources().getString(R.string.food_detail_button),detailOnClick);
     	    if (!Dish.knownDish(dish_name))
@@ -132,7 +132,7 @@ public class MenuListAdapter extends BaseExpandableListAdapter {
     	    }
     	    LinearLayout horizontalLayout = new LinearLayout(activity); 
     	    horizontalLayout.setOrientation(LinearLayout.HORIZONTAL);     	 
-    	    horizontalLayout.addView(button1);
+    	    //horizontalLayout.addView(button1);
     	    horizontalLayout.addView(button2);
     	    retn = horizontalLayout;
     	}

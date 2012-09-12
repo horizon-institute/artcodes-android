@@ -2,6 +2,8 @@ package uk.ac.horizon.busabascan;
 
 import java.util.List;
 
+import com.facebook.android.R;
+
 import uk.ac.horizon.busabascan.MarkerPopupWindow.OnMarkerPopupWindowListener;
 import uk.ac.horizon.busabascan.TWMarkerSurfaceView.OnMarkerDetectedListener;
 import uk.ac.horizon.data.DataMarker;
@@ -12,12 +14,15 @@ import uk.ac.horizon.dtouchMobile.DtouchMarker;
 import android.app.Activity;
 import android.content.Intent;
 import android.os.Bundle;
+import android.os.Handler;
 import android.util.Log;
 import android.view.Menu;
 import android.view.MenuItem;
 import android.view.View;
 import android.view.Window;
 import android.view.WindowManager;
+import android.widget.ProgressBar;
+import android.widget.TextView;
 
 public class TWCameraMainActivity extends Activity implements OnMarkerDetectedListener, OnMarkerPopupWindowListener{
     
@@ -35,6 +40,7 @@ public class TWCameraMainActivity extends Activity implements OnMarkerDetectedLi
     private MenuItem	mItemDetectMarkerDebug;
     private MenuItem	mItemPreference;
     private TWMarkerSurfaceView mMarkerSurfaceView;
+    private Handler progressBarHandler = new Handler();
     
     //The mappings between codes and 
     private static final DtouchMarker OLD_ST_MARKER = new DtouchMarker("1:1:2:3:5");
@@ -42,6 +48,8 @@ public class TWCameraMainActivity extends Activity implements OnMarkerDetectedLi
     private static final DtouchMarker CHAR_DUCK_MARKER = new DtouchMarker("1:1:2:4:4");
     private static final DtouchMarker PLACEMAT1_MARKER = new DtouchMarker("1:1:1:4:5");
     private static final DtouchMarker PLACEMAT2_MARKER = new DtouchMarker("1:1:3:3:4");
+    
+    enum CodeType {NONE, RESTAURANT, DISH1, DISH2, PLACEMAT1, PLACEMAT2, MENU, UNKNOWN};
         
     public static int viewMode  = VIEW_MODE_MARKER;
     
@@ -54,6 +62,7 @@ public class TWCameraMainActivity extends Activity implements OnMarkerDetectedLi
         //displaySplashScreen();
         setContentView(R.layout.markercamera);
         initTWSurfaceView();
+        
     }
     
     @Override
@@ -107,51 +116,109 @@ public class TWCameraMainActivity extends Activity implements OnMarkerDetectedLi
     	mMarkerSurfaceView.startProcessing();
     }
     
-    public void onMarkerDetected(final List<DtouchMarker> markers){
-    	    	
-    	if (markers.contains(OLD_ST_MARKER))
+    private CodeType interpretMarkers(final List<DtouchMarker> markers){
+    	
+    	CodeType ret;
+    	if (markers == null || markers.size() == 0)
     	{
-    		//We're outside Old Street.
-    		displayOutsideRestaurant("Old St");
+    		ret = CodeType.NONE;    		
+    	}
+    	else if (markers.contains(OLD_ST_MARKER))
+    	{
+    		ret = CodeType.RESTAURANT;
     	}
     	else if (markers.contains(PLACEMAT1_MARKER))
     	{
-    		//We're looking at Char Grilled Duck.
-    		displayPlacemat(1);
+    		ret = CodeType.PLACEMAT1;
     	}
     	else if (markers.contains(PLACEMAT2_MARKER))
     	{
-    		//We're looking at Char Grilled Duck.
-    		displayPlacemat(2);
+    		ret = CodeType.PLACEMAT2;
     	}
     	else if (markers.contains(PANDAN_CHICK_MARKER) && markers.contains(CHAR_DUCK_MARKER))
     	{
-    		displayMenu();
+    		ret = CodeType.MENU;
     	}
     	else if (markers.contains(PANDAN_CHICK_MARKER))
     	{
-    		//We're looking at Pandan Chicken.
-    		displayDish("Pandan chicken");
+    		ret = CodeType.DISH1;
     	}
     	else if (markers.contains(CHAR_DUCK_MARKER))
     	{
-    		//We're looking at Char Grilled Duck.
-    		displayDish("Char-grilled duck");
-    	}
+    		ret = CodeType.DISH2;
+      	}
     	else
     	{
+    		ret = CodeType.UNKNOWN;
+     	}
+		return ret;
+    }
+
+    
+    public void onMarkerDetected(final List<DtouchMarker> markers){
+    	
+    	CodeType code = interpretMarkers(markers);
+    	
+    	switch (code){
+    	case RESTAURANT:
+    		//We're outside Old Street.
+    		displayOutsideRestaurant("Old St");
+    		break;
+    	case PLACEMAT1:
+    		displayPlacemat(1);
+    		break;
+    	case PLACEMAT2:
+    		displayPlacemat(2);
+    		break;
+    	case MENU:
+    		displayMenu();
+    		break;
+    	case DISH1:
+    		//We're looking at Pandan Chicken.
+    		displayDish("Pandan chicken");
+    		break;
+    	case DISH2:
+    		//We're looking at Char Grilled Duck.
+    		displayDish("Char-grilled duck");
+    		break;
+    	default:
         	mMarkerSurfaceView.stopDisplayingDetectedMarker();
     	}
-    	//RNM Don't need calls to the backend for now 
-    	/*
-    	this.runOnUiThread(new Runnable(){
-    		public void run(){
-    			//showProgressControls();
-    			getMarker(marker.getCodeKey());
-    			//new DtouchMarkerWebServicesTask().execute(marker.getCodeKey());
-    		}
-    	});
-    	*/
+     }
+    
+    private String getDetectionGuess()
+    {
+    	String ret;
+    	
+   	    List<DtouchMarker> markers = mMarkerSurfaceView.guessAtMarkers();
+		CodeType code = interpretMarkers(markers);
+    	
+    	switch (code){
+    	case RESTAURANT:
+    		ret = "Old Street";
+    		break;
+    	case PLACEMAT1:
+    		ret = "At the table";
+    		break;
+    	case PLACEMAT2:
+    		ret = "At the table";
+    		break;
+    	case MENU:
+    		ret = "Menu";
+    		break;
+    	case DISH1:
+    		ret = "Pandan chicken";
+    		break;
+    	case DISH2:
+    		ret = "Char-grilled duck";
+    		break;
+    	case UNKNOWN:
+    		ret = "Beats me!";
+    		break;
+    	default:
+        	ret = "";
+    	}
+    	return ret;
     }
     
     private void displayPlacemat(int placemat) {
@@ -220,6 +287,44 @@ public class TWCameraMainActivity extends Activity implements OnMarkerDetectedLi
     	mMarkerSurfaceView = (TWMarkerSurfaceView) findViewById(R.id.MarkerSurfaceView);
     	mMarkerSurfaceView.setOnMarkerDetectedListener(this);
     	mMarkerSurfaceView.setPreference(new HIPreferenceTableware(this));
+    	
+    	
+    	final ProgressBar pb = (ProgressBar) this.findViewById(R.id.integrationBar);
+    	final TextView guess = (TextView) this.findViewById(R.id.textViewGuess);
+    	
+    	new Thread(new Runnable() {
+			public void run() {
+				while(true){
+					try {
+						Thread.sleep(10);
+					} catch (InterruptedException e) {}
+									    
+				   	progressBarHandler.post(new Runnable() {
+
+						public void run() {    	
+							Integer pendpercent = mMarkerSurfaceView.getPendingPercent();
+
+						    if (pendpercent > 0)
+					    	{
+						       if (pb.getVisibility() != View.VISIBLE)
+						       {
+						            pb.setVisibility(View.VISIBLE);
+						       }
+					    	   pb.setProgress(pendpercent);
+					    	}
+					    	else
+					    	{
+					    		pb.setVisibility(View.GONE);
+					    	}
+						    
+						    guess.setText(getDetectionGuess());
+						}
+			    	});				
+				}				
+			} 
+    	}).start();
+    	
+ 
     }
 
 /*    

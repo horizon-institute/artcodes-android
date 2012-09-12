@@ -18,13 +18,17 @@ public class IntegratedMarkers {
 	final int PEND_SECONDS = 2;
 	
 	class IntegrationData {
-		Time pendingUntil;
-		Time validUntil;
+		long pendingUntil;
+		long validUntil;
 	};
 
 	private List<DtouchMarker> integratedMarkers = new ArrayList<DtouchMarker>();
+	private List<DtouchMarker> pendingMarkers = new ArrayList<DtouchMarker>();
 	Map<DtouchMarker, IntegrationData> pool = new HashMap<DtouchMarker, IntegrationData>();
-	final Time past = new Time();  //1970
+	final long past = 0;  //1970
+	//Pending from the first detection until the time runs out.
+	long pendingUntil = 0;
+	
 	
 	//integrate is called every frame with the list of this frames detected markers.
 	//this function debounces this list using the following rules
@@ -34,18 +38,15 @@ public class IntegratedMarkers {
 	//each marker code has an off threshold of 2 seconds
 	//the initial marker when going from zero to one has a pending threshold of 2 seconds.
 	public void integrate(List<DtouchMarker> dtouchMarkers) {
-		boolean unpend = false;
-		Time now = new Time();
-		now.setToNow();
+		//boolean unpend = false;
+		long now = System.currentTimeMillis();
 		
 		integratedMarkers.clear();
 		
 		//Pass 1 set expiry for markers in this frame
 		for(DtouchMarker marker : dtouchMarkers)
 		{
-			Time expire = new Time(now);
-			expire.second += PEND_SECONDS;
-			expire.normalize(true);
+			long expire = System.currentTimeMillis() + PEND_SECONDS*1000;
 			if (pool.containsKey(marker))
 			{
 				pool.get(marker).validUntil = expire;
@@ -57,6 +58,10 @@ public class IntegratedMarkers {
 				data.pendingUntil = expire;
 				DtouchMarker m = new DtouchMarker(marker.getCode());
 				pool.put(m, data);
+				if (pendingUntil <= now)
+				{
+					pendingUntil = expire;
+				}
 			}
 		}
 		//Pass 2 - Gather markers
@@ -66,19 +71,16 @@ public class IntegratedMarkers {
 			Entry<DtouchMarker, IntegrationData> pair = it.next();
 			IntegrationData data = pair.getValue();
 			//Remove expired
-			if (now.after(data.validUntil))
+			if (now > data.validUntil)
 			{
 				//Can't do pool.remove because java is lame 
 				//exception if map is modified during iteration! 
 				it.remove();
 			}
-			else if (data.pendingUntil != null && data.pendingUntil.before(now))
-			{
-				unpend = true;
-			}
+//			else if (data.pendingUntil != null && data.pendingUntil.before(now))
 		}
 		//Pass 3 - move everything to integrated list.
-		if (unpend)
+		if (pendingUntil <= now)
 		{
 			it = pool.entrySet().iterator();
 			while (it.hasNext())
@@ -87,6 +89,7 @@ public class IntegratedMarkers {
 				DtouchMarker key = pair.getKey();
 				integratedMarkers.add(key);
 			}
+			pool.clear();
 		}
 	}
 
@@ -97,4 +100,32 @@ public class IntegratedMarkers {
 	public List<DtouchMarker> get() {
 		return integratedMarkers;
 	}
+	
+	public Integer getIntegrationPercent() {
+		long now = System.currentTimeMillis();
+		if (pendingUntil < now)
+		{
+		    return 0;
+		}
+		else
+		{
+			long millis = pendingUntil - now;
+			return 100 - (int)(millis/(PEND_SECONDS*10));
+		}
+	}
+
+	//return markers from the pool before they are integrated
+	public List<DtouchMarker> getPendingMarkers() {
+		pendingMarkers.clear();
+		Iterator<Entry<DtouchMarker, IntegrationData>> it = pool.entrySet().iterator();
+		it = pool.entrySet().iterator();
+		while (it.hasNext())
+		{
+			Entry<DtouchMarker, IntegrationData> pair = it.next();
+			DtouchMarker key = pair.getKey();
+			pendingMarkers.add(key);
+		}
+		return pendingMarkers;
+	}
+	
 }
