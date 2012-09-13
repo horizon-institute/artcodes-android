@@ -4,9 +4,20 @@
     android:layout_height="match_parent"
     android:background="@color/base_brown" >
 
+    <ImageView
+        android:id="@+id/imageView1"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_centerHorizontal="true"
+        android:layout_marginTop="16dip"
+        android:src="@drawable/busaba_eathai_bird_street" />
+
     <TableLayout
         android:layout_width="wrap_content"
-        android:layout_height="wrap_content" >
+        android:layout_height="wrap_content"
+        android:layout_below="@id/imageView1"
+        android:layout_centerHorizontal="true"
+        android:layout_marginTop="32dip" >
 
         <TableRow
             android:id="@+id/tableRow1"
