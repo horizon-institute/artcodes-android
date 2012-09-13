@@ -57,7 +57,7 @@
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
                 android:onClick="musicOnClick"    
-                android:enabled='false'            
+                android:enabled='true'            
                 android:text="Music for Busaba" />
 
         </TableRow>

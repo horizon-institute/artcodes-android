@@ -103,6 +103,7 @@ class TWMarkerSurfaceView extends TWSurfaceViewBase {
     }
     
     private void processFrameForMarkersFull(VideoCapture capture, List<DtouchMarker> markers){
+    	if (capture == null) return;
     	//Get original image.
     	capture.retrieve(mRgba, Highgui.CV_CAP_ANDROID_COLOR_FRAME_RGBA);
         //Get gray scale image.

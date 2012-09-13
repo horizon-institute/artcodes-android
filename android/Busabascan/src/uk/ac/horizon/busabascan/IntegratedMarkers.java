@@ -49,7 +49,7 @@ public class IntegratedMarkers {
 			long expire = System.currentTimeMillis() + PEND_SECONDS*1000;
 			if (pool.containsKey(marker))
 			{
-				pool.get(marker).validUntil = expire;
+				pool.get(marker).validUntil = expire + 100;
 			}
 			else
 			{

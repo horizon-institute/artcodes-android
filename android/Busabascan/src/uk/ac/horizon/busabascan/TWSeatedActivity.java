@@ -1,6 +1,7 @@
 package uk.ac.horizon.busabascan;
 
 import uk.ac.horizon.data.HIPreferenceTableware;
+import android.media.MediaPlayer;
 import android.net.Uri;
 import android.os.Bundle;
 import android.app.Activity;
@@ -45,7 +46,13 @@ public class TWSeatedActivity extends Activity {
 	}
 	public void musicOnClick(View view) {
 		// Start the new activity
-		Intent intent = new Intent(this, TWMenuActivity.class);
+		//MediaPlayer mp = MediaPlayer.create(this, R.raw.song);
+		//mp.start();
+		Intent intent = new Intent(android.content.Intent.ACTION_VIEW);
+		//getResources().getResourceName(R.raw.song)
+		//Uri data = Uri.parse("android.resource://uk.ac.horizon.busabascan/raw/song.mp3");
+		Uri data = Uri.parse("file:///sdcard/Music/song.mp3");
+    	intent.setDataAndType(data,"audio/mp3");
 		startActivity(intent);
 	}
 	public void payOnClick(View view) {
