@@ -198,10 +198,10 @@ public class TWCameraMainActivity extends Activity implements OnMarkerDetectedLi
     		ret = "Old Street";
     		break;
     	case PLACEMAT1:
-    		ret = "At the table";
+    		ret = "Placemat";
     		break;
     	case PLACEMAT2:
-    		ret = "At the table";
+    		ret = "Placemat";
     		break;
     	case MENU:
     		ret = "Menu";

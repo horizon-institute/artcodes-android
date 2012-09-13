@@ -54,7 +54,6 @@
         android:shadowDx="1"
         android:shadowDy="1"
         android:shadowRadius="3"
-        android:text="Char Grilled Duck"
         android:textAppearance="?android:attr/textAppearanceMedium"
         android:textColor="@color/foreground_beige" />
 
