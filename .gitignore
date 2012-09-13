@@ -4,4 +4,6 @@ Thumbs.db
 gen/
 *.swp
 *.swo
+.DS_Store
+.settings
 
