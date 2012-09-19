@@ -75,8 +75,7 @@ public class MenuListAdapter extends BaseExpandableListAdapter {
             {"Coconut rice (v)", "", "£3.10"},
             {"Jasmine rice (v)", "", "£2.20"},
             {"Brown rice (v)", "", "£2.20"},
-            {"Sticky rice (v)", "", "£3.10"},
-            {"h1. Drinks"}
+            {"Sticky rice (v)", "", "£3.10"}
             };
         
         static final int HEADING = 0;
