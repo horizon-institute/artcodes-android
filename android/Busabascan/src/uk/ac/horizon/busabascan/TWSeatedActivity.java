@@ -50,8 +50,8 @@ public class TWSeatedActivity extends Activity {
 		//mp.start();
 		Intent intent = new Intent(android.content.Intent.ACTION_VIEW);
 		//getResources().getResourceName(R.raw.song)
-		//Uri data = Uri.parse("android.resource://uk.ac.horizon.busabascan/raw/song.mp3");
-		Uri data = Uri.parse("file:///sdcard/Music/song.mp3");
+		//Uri data = Uri.parse("android.resource://uk.ac.horizon.busabascan/res/raw/song.mp3");
+		Uri data = Uri.parse("file:///sdcard/Music/Kreuzung.mp3");
     	intent.setDataAndType(data,"audio/mp3");
 		startActivity(intent);
 	}

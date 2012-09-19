@@ -103,7 +103,7 @@ class TWMarkerSurfaceView extends TWSurfaceViewBase {
     }
     
     private void processFrameForMarkersFull(VideoCapture capture, List<DtouchMarker> markers){
-    	if (capture == null) return;
+    	if (capture == null || mRgba == null) return;
     	//Get original image.
     	capture.retrieve(mRgba, Highgui.CV_CAP_ANDROID_COLOR_FRAME_RGBA);
         //Get gray scale image.
@@ -176,12 +176,12 @@ class TWMarkerSurfaceView extends TWSurfaceViewBase {
         int width = imgMat.cols();
         int height = imgMat.rows();
         
-        int imgWidth = width / 2;
-    	int imgHeight = height / 2;
+        int imgWidth = width * 2 / 3;
+    	int imgHeight = height * 2 / 3;
     	        
         //find the origin  in the source image.
-        int x = width / 4;
-        int y = height / 4;
+        int x = width / 6;
+        int y = height / 6;
         
         return new Rect(x, y, imgWidth, imgHeight);
     }
