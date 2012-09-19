@@ -42,7 +42,7 @@
         android:layout_centerHorizontal="true"
         android:layout_centerVertical="false"
         android:paddingTop="342dip"
-        android:visibility="visible" />
+        android:visibility="invisible" />
 
     <TextView
         android:id="@+id/textViewGuess"

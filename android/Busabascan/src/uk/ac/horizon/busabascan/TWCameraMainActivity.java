@@ -13,6 +13,8 @@ import uk.ac.horizon.data.HIPreferenceTableware;
 import uk.ac.horizon.dtouchMobile.DtouchMarker;
 import android.app.Activity;
 import android.content.Intent;
+import android.content.pm.PackageInfo;
+import android.content.pm.PackageManager.NameNotFoundException;
 import android.os.Bundle;
 import android.os.Handler;
 import android.util.Log;
@@ -61,6 +63,15 @@ public class TWCameraMainActivity extends Activity implements OnMarkerDetectedLi
         getWindow().setFlags(WindowManager.LayoutParams.FLAG_FULLSCREEN, WindowManager.LayoutParams.FLAG_FULLSCREEN);
         //displaySplashScreen();
         setContentView(R.layout.markercamera);
+        String versionName = "";
+        try {
+            final PackageInfo packageInfo = getPackageManager().getPackageInfo(getPackageName(), 0);
+            versionName = packageInfo.versionName;
+        } catch (NameNotFoundException e) {
+            e.printStackTrace();
+        }
+        TextView tv = (TextView) findViewById(R.id.textView1);
+        tv.setText("Scan Busaba - (" + versionName + ")");
         initTWSurfaceView();
         
     }
