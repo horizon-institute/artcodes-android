@@ -188,7 +188,7 @@ public class MenuListAdapter extends BaseExpandableListAdapter {
     		retn = getTextView(NAME);
     		if (Dish.knownDish(text))
     		{
-    			retn.setBackgroundColor(activity.getResources().getColor(R.color.highlight_grey));
+    			retn.setBackgroundColor(activity.getResources().getColor(R.color.base_red));
     		}
     	}
     	retn.setText(text);

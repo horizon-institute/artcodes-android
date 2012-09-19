@@ -15,6 +15,9 @@ public class Dish {
 	static final int REVIEW_IDX = 5;
 
 	static final String dishData[][] = {
+		{"Som tam", "3.5", "6", 
+			"A light spicy papaya salad.","£6.90",
+			"Sweet, sour and spicy with lime juice, nuts and shrimp.  Recommended to accompany Pandan Chicken or Thai calamari."},		
 		{"Char-grilled duck", "4.5", "3", 
 			"Chinese broccoli and tamarind sauce","£12.40",
 			"The classic Busaba dishes are consistently interesting, and well executed at all branches: smoky duck breast with tart tamarind sauce"},
@@ -30,6 +33,7 @@ public class Dish {
 
 	};
 	static final int image_ids[] = {
+		R.drawable.som_tam,
 		R.drawable.char_grilled_duck,
 		R.drawable.salmon_mango_salad,
 		R.drawable.thai_calamari,
