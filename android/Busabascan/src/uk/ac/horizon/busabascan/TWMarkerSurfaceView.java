@@ -177,11 +177,12 @@ class TWMarkerSurfaceView extends TWSurfaceViewBase {
         int height = imgMat.rows();
         
         int imgWidth = width * 2 / 3;
-    	int imgHeight = height * 2 / 3;
+    	//int imgHeight = height * 2 / 3;
+    	int imgHeight = imgWidth;  //Emily wants a square
     	        
         //find the origin  in the source image.
-        int x = width / 6;
-        int y = height / 6;
+        int x = (width - imgWidth) / 2;
+        int y = (height - imgHeight) / 2;
         
         return new Rect(x, y, imgWidth, imgHeight);
     }
