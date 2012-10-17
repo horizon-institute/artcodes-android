@@ -1,0 +1,62 @@
+<?xml version="1.0" encoding="utf-8"?>
+<RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
+	style="@style/ActivityView">
+	<RelativeLayout android:id="@+id/relativeLayout1" style="@style/ActivityBar">
+	<TextView style="@style/ActivityBarText" android:id="@+id/textView2"
+	android:text="@string/app_title"/>
+	</RelativeLayout>
+	<LinearLayout android:layout_width="120dp"
+		android:id="@+id/linearLayout1" android:layout_height="wrap_content"
+		android:orientation="vertical" android:layout_below="@+id/relativeLayout1"
+		android:layout_alignParentLeft="true" android:layout_marginLeft="20dp"
+		android:layout_marginTop="58dp" android:gravity="center">
+		<ImageButton android:layout_width="wrap_content"
+		    android:contentDescription="@string/scan_menu"
+			android:layout_height="wrap_content" android:id="@+id/scanBtn"
+			android:background="@drawable/scan_button"
+			android:onClick="onScanBtnClick"></ImageButton>
+		<TextView android:text="@string/scan_menu" android:textColor="#000000"
+			android:id="@+id/textView3" android:textAppearance="?android:attr/textAppearanceMedium"
+			android:layout_width="120dp" android:layout_height="wrap_content" android:gravity="center"></TextView>
+	</LinearLayout>
+	<LinearLayout android:layout_width="120dp"
+		android:id="@+id/linearLayout2" android:layout_height="wrap_content"
+		android:orientation="vertical" android:layout_alignParentRight="true"
+		android:layout_marginRight="20dp" android:layout_below="@+id/relativeLayout1"
+		android:layout_marginTop="58dp" android:gravity="center">
+		<ImageButton android:layout_width="wrap_content"
+			android:layout_height="wrap_content" android:id="@+id/memberBtn"
+			android:background="@drawable/samples_button" android:gravity="center"
+			android:onClick="onSamplesBtnClick"  android:contentDescription="@string/samples_menu"></ImageButton>
+		<TextView android:text="@string/samples_menu" android:id="@+id/textView4"
+			android:textAppearance="?android:attr/textAppearanceMedium"
+			android:layout_width="wrap_content" android:layout_height="wrap_content"
+			android:textColor="#000000" android:gravity="center"></TextView>
+	</LinearLayout>
+	<!-- 
+	<LinearLayout android:layout_width="120dp"
+		android:id="@+id/linearLayout3" android:layout_height="wrap_content"
+		android:orientation="vertical" android:layout_below="@+id/linearLayout1"
+		android:layout_alignParentLeft="true" android:layout_marginLeft="20dp"
+		android:layout_marginTop="50dp" android:gravity="center">
+		<ImageButton android:layout_width="wrap_content"
+		    android:contentDescription="@string/about_menu"
+			android:layout_height="wrap_content" android:id="@+id/newsBtn"
+			android:background="@drawable/about_button" android:gravity="center"
+			android:onClick="onAboutBtnClick"></ImageButton>
+	</LinearLayout>
+	<LinearLayout android:layout_width="120dp"
+		android:id="@+id/linearLayout4" android:layout_height="wrap_content"
+		android:orientation="vertical" android:layout_alignParentRight="true"
+		android:layout_marginRight="20dp" android:layout_below="@+id/linearLayout2"
+		android:layout_marginTop="50dp" android:gravity="center">
+		<ImageButton android:layout_width="wrap_content"
+			android:layout_height="wrap_content" android:id="@+id/settingsBtn"
+			android:background="@drawable/about_button" android:gravity="center"
+			android:onClick="onSettingsBtnClick"></ImageButton>
+		<TextView android:text="About us" android:id="@+id/textView2"
+			android:textAppearance="?android:attr/textAppearanceMedium"
+			android:layout_width="100dp" android:layout_height="wrap_content"
+			android:textColor="#000000" android:gravity="center"></TextView>
+	</LinearLayout>-->
+</RelativeLayout>
