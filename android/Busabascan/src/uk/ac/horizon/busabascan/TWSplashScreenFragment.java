@@ -15,6 +15,7 @@ public class TWSplashScreenFragment extends DialogFragment {
 	
 	@Override
 	public void onCreate(Bundle savedInstanceState){
+		super.setStyle(STYLE_NO_TITLE, getTheme());
 		super.onCreate(savedInstanceState);
 	}
 	

@@ -75,8 +75,7 @@ public class MenuListAdapter extends BaseExpandableListAdapter {
             {"Coconut rice (v)", "", "£3.10"},
             {"Jasmine rice (v)", "", "£2.20"},
             {"Brown rice (v)", "", "£2.20"},
-            {"Sticky rice (v)", "", "£3.10"},
-            {"h1. Drinks"}
+            {"Sticky rice (v)", "", "£3.10"}
             };
         
         static final int HEADING = 0;
@@ -123,7 +122,8 @@ public class MenuListAdapter extends BaseExpandableListAdapter {
     	{
     		//Create the buttons with text and callback
     		String dish_name = getGroup(groupPosition).toString();
-    		Button button1 = getButton(activity.getResources().getString(R.string.order_button),null);
+    		OrderOnClick orderOnClick = new OrderOnClick(activity, dish_name);
+    		Button button1 = getButton(activity.getResources().getString(R.string.order_button),orderOnClick);
     		DetailOnClick detailOnClick = new DetailOnClick(activity, dish_name);
     		Button button2 = getButton(activity.getResources().getString(R.string.food_detail_button),detailOnClick);
     	    if (!Dish.knownDish(dish_name))
@@ -187,7 +187,7 @@ public class MenuListAdapter extends BaseExpandableListAdapter {
     		retn = getTextView(NAME);
     		if (Dish.knownDish(text))
     		{
-    			retn.setBackgroundColor(activity.getResources().getColor(R.color.highlight_grey));
+    			retn.setBackgroundColor(activity.getResources().getColor(R.color.base_red));
     		}
     	}
     	retn.setText(text);

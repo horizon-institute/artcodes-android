@@ -1,6 +1,8 @@
 package uk.ac.horizon.busabascan;
 
 import java.io.FileNotFoundException;
+import java.net.InetAddress;
+import java.util.List;
 
 import uk.ac.horizon.data.DataMarker;
 import uk.ac.horizon.data.DataMarkerWebServices;
@@ -9,6 +11,10 @@ import android.app.Activity;
 import android.app.AlertDialog;
 import android.content.Context;
 import android.content.DialogInterface;
+import android.net.wifi.WifiConfiguration;
+import android.net.wifi.WifiManager;
+import android.provider.Settings.Secure;
+import android.text.format.Formatter;
 import android.view.View;
 
 // This class handles both the user interface aspects of sending a communique to
@@ -69,6 +75,11 @@ public class Comunique {
     	try {
 			fbUser.restoreMember(context);
 			originator = fbUser.name;
+			if (originator == null || originator.contentEquals(""))
+			{
+				originator = Secure.getString(context.getContentResolver(),
+                        Secure.ANDROID_ID);
+			}
 		} catch (FileNotFoundException e){};
     	dtouchMarkerWebServices.executeComuniqueRequest(message, originator);
  	}

@@ -24,18 +24,19 @@ public class RestaurantListAdapter extends BaseExpandableListAdapter {
 private String[] locations = { "Wardour St", "Store St",
     "Bird St", "Panton St", "Old St", "Westfield Sheperd's Bush", "Bicester Village", "Floral St", "King's Road", "Westfield Stratford City" };
 private String[][] detail = { 
-		{ "20", "106Ð110 Wardour St. London W1F 0TR", "tel: 020 7255 8686","Today's Specials" },
+		{ "11", "106Ð110 Wardour St. London W1F 0TR", "tel: 020 7255 8686","Today's Specials" },
 		{ "15", "22 Store Street, London WC1E 7DF", "tel: 020 7299 7900","Today's Specials" },
-		{ "0", "8Ð13 Bird Street, London W1U 1BU", "tel: 020 7518 8080","Today's Specials" },
-		{ "0", "35 Panton Street, London SW1Y 4EA", "tel: 020 7930 0088","Today's Specials" },
-		{ "40", "319 Old Street, London EC1V 9LE", "tel: 020 7729 0808","Today's Specials" },
-		{ "0", "Westfield Shepherd's Bush, London W12 7GA", "tel: 020 3249 1919","Today's Specials" },
-		{ "10", "Bicester Village, Oxfordshire OX266WD", "tel: 01869 362 700","Today's Specials" },
-		{ "25", "44 Floral Street, London WC2E 9DA", "tel: 020 7759 0088","Today's Specials" },
+		{ "7", "8Ð13 Bird Street, London W1U 1BU", "tel: 020 7518 8080","Today's Specials" },
+		{ "8", "35 Panton Street, London SW1Y 4EA", "tel: 020 7930 0088","Today's Specials" },
+		{ "2", "319 Old Street, London EC1V 9LE", "tel: 020 7729 0808","Today's Specials" },
+		{ "4", "Westfield Shepherd's Bush, London W12 7GA", "tel: 020 3249 1919","Today's Specials" },
+		{ "0", "Bicester Village, Oxfordshire OX266WD", "tel: 01869 362 700","Today's Specials" },
+		{ "0", "44 Floral Street, London WC2E 9DA", "tel: 020 7759 0088","Today's Specials" },
 		{ "0", "358 King's Road, London SW3 5UZ", "tel: 020 7349 5488","Today's Specials" },
 		{ "0", "Westfield Stratford City, London E20 1GL", "tel: 020 8221 8989","Today's Specials" } };
 
 private Activity activity;
+private int highlight = -1;
 
 RestaurantListAdapter(Activity act) {
 	    activity = act;
@@ -153,7 +154,6 @@ public View getGroupView(int groupPosition, boolean isExpanded,
     textView.setLayoutParams(lp);
     // Center the text vertically
     textView.setGravity(Gravity.CENTER_VERTICAL | Gravity.LEFT);
-    //textView.setTextColor(Color.parseColor("darkblue"));
     // Set the text starting position
     textView.setPadding(60, 0, 0, 0);
     textView.setText(getGroup(groupPosition).toString());
@@ -177,6 +177,11 @@ public View getGroupView(int groupPosition, boolean isExpanded,
  
     horizontalLayout.addView(textView);
     horizontalLayout.addView(queueLengthIndicator);
+    if (groupPosition == highlight)
+    {
+    	horizontalLayout.setBackgroundColor(activity.getResources().getColor(R.color.base_grey));
+        textView.setTextColor(activity.getResources().getColor(R.color.bright_white));
+    }
     
     return horizontalLayout;
 }
@@ -193,10 +198,16 @@ private int getNormalisedQueueTime(int position)
 {
 	//Get the wait in minutes
 	int qt = Integer.parseInt(detail[position][QUEUE_IDX]);
-	//Maximum normalised queue time is one hour
-	if (qt > 60) {qt = 60;}
-	qt = (qt*100)/60;
+	//Maximum normalised queue time is 40 minutes
+	if (qt > 40) {qt = 40;}
+	qt = (qt*100)/40;
 	return qt;
+}
+
+
+public void highlightGroup(int i) {
+	// Set the group background colour
+	highlight = i;	
 }	
 
 }

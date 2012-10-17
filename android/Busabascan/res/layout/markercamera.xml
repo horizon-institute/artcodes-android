@@ -1,62 +1,91 @@
 <?xml version="1.0" encoding="utf-8"?>
-<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+<RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
     android:id="@+id/MarkerLayout"
     android:layout_width="fill_parent"
     android:layout_height="fill_parent"
     android:orientation="vertical" >
- 
+
     <TextView
         android:id="@+id/textView1"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
+        android:layout_alignParentLeft="true"
+        android:layout_alignParentTop="true"
         android:layout_margin="3dp"
         android:background="@color/base_orange"
         android:gravity="center_horizontal"
         android:text="@string/camera_title"
-        android:textAppearance="?android:attr/textAppearanceMedium" />
+        android:textAppearance="?android:attr/textAppearanceLarge" />
 
-	 <FrameLayout
-	    android:id="@+id/frameLayout"
-	    android:layout_width="match_parent"
-	    android:layout_height="match_parent"
-	    android:layout_weight="1" >
+    <FrameLayout
+        android:id="@+id/frameLayout"
+        android:layout_width="match_parent"
+        android:layout_height="match_parent"
+        android:layout_above="@+id/LinearLayout1"
+        android:layout_alignParentLeft="true"
+        android:layout_below="@+id/textView1">
 
-	<view class="uk.ac.horizon.busabascan.TWMarkerSurfaceView" 
-		android:id="@+id/MarkerSurfaceView"
-		android:layout_width="match_parent" 
-		android:layout_height="match_parent"/>
-	
+        <view
+            android:id="@+id/MarkerSurfaceView"
+            android:layout_width="match_parent"
+            android:layout_height="match_parent"
+            class="uk.ac.horizon.busabascan.TWMarkerSurfaceView" />
+
     </FrameLayout>
- 
-	<LinearLayout
-	    android:layout_width="match_parent"
-	    android:layout_height="wrap_content"
-	    android:background="@color/base_orange" >
 
-		<Button
-		    android:id="@+id/busaba_button"
-		    android:layout_width="0dip"
-		    android:layout_height="wrap_content"
-		    android:layout_gravity="center_vertical"
-		    android:layout_marginTop="2dip"
-		    android:layout_weight="1"
-		    android:onClick="displayOutside"
-		    android:text="@string/busaba_button" />
+    <ProgressBar
+        android:id="@+id/integrationBar"
+        style="?android:attr/progressBarStyleHorizontal"
+        android:layout_width="158dip"
+        android:layout_height="wrap_content"
+        android:layout_alignWithParentIfMissing="true"
+        android:layout_centerHorizontal="true"
+        android:layout_centerVertical="false"
+        android:paddingTop="342dip"
+        android:visibility="invisible" />
 
-		<Button
-		    android:id="@+id/me_button"
-		    android:layout_width="wrap_content"
-		    android:layout_height="wrap_content"
-		    android:layout_gravity="center_vertical"
-		    android:layout_marginTop="2dip"
-		    android:onClick="onMemberBtnClick"
-		    android:text="@string/me_button" />
-				
+    <TextView
+        android:id="@+id/textViewGuess"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_centerHorizontal="true"
+        android:layout_marginTop="128dip"
+        android:shadowColor="@color/base_grey"
+        android:shadowDx="1"
+        android:shadowDy="1"
+        android:shadowRadius="3"
+        android:textAppearance="?android:attr/textAppearanceMedium"
+        android:textColor="@color/foreground_beige" />
 
-	</LinearLayout>
-	
-</LinearLayout>
-<!-- 
+    <LinearLayout
+        android:id="@+id/LinearLayout1"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_alignParentBottom="true"
+        android:layout_alignParentLeft="true"
+        android:background="@color/base_orange" >
+
+        <Button
+            android:id="@+id/busaba_button"
+            android:layout_width="0dip"
+            android:layout_height="wrap_content"
+            android:layout_gravity="center_vertical"
+            android:layout_marginTop="2dip"
+            android:layout_weight="1"
+            android:onClick="displayOutside"
+            android:text="@string/busaba_button" />
+
+        <Button
+            android:id="@+id/me_button"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_gravity="center_vertical"
+            android:layout_marginTop="2dip"
+            android:onClick="onMemberBtnClick"
+            android:text="@string/me_button" />
+    </LinearLayout>
+
+</RelativeLayout><!--
 <RelativeLayout android:id="@+id/MarkerLayout" android:layout_width="fill_parent" android:layout_height="fill_parent" xmlns:android="http://schemas.android.com/apk/res/android">
      <FrameLayout android:layout_height="wrap_content" android:layout_width="wrap_content" android:id="@+id/frameLayout1" android:layout_alignParentTop="true" android:layout_alignParentLeft="true" android:layout_toLeftOf="@+id/RelativeLayout2" android:layout_alignParentBottom="true">
      	<view class = "uk.ac.horizon.busabascan.TWMarkerSurfaceView" 

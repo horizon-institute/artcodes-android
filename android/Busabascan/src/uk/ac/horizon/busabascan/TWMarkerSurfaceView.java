@@ -1,7 +1,7 @@
 package uk.ac.horizon.busabascan;
 
+import java.io.IOException;
 import java.util.ArrayList;
-import java.util.Collections;
 import java.util.List;
 
 import org.opencv.android.Utils;
@@ -14,6 +14,8 @@ import org.opencv.highgui.Highgui;
 import org.opencv.highgui.VideoCapture;
 import org.opencv.imgproc.Imgproc;
 
+import com.facebook.android.R;
+
 import uk.ac.horizon.data.HIPreferenceTableware;
 import uk.ac.horizon.dtouchMobile.DtouchMarker;
 import uk.ac.horizon.dtouchMobile.MarkerDetector;
@@ -25,6 +27,7 @@ import android.graphics.Canvas;
 import android.util.AttributeSet;
 import android.util.Log;
 import android.view.SurfaceHolder;
+import android.widget.ProgressBar;
 
 class TWMarkerSurfaceView extends TWSurfaceViewBase {
     private Mat mRgba;
@@ -34,9 +37,9 @@ class TWMarkerSurfaceView extends TWSurfaceViewBase {
     private MarkerDetector markerDetector;
     private Mat mMarkerImage;
     private OnMarkerDetectedListener markerListener;
-    private boolean mMarkerDetected;
     private Rect markerPosition;
     private HIPreferenceTableware mPreference;
+	IntegratedMarkers integratedMarkers = new IntegratedMarkers();
     
     
     /*Define interface to call back when marker is detected:
@@ -89,7 +92,7 @@ class TWMarkerSurfaceView extends TWSurfaceViewBase {
     private Bitmap displayDetectedMarker(VideoCapture capture, Mat markerImage){
     	//Get original image.
     	capture.retrieve(mRgba, Highgui.CV_CAP_ANDROID_COLOR_FRAME_RGBA);
-    	displayRectOnImageSegment(mRgba,true);
+    	displayMaskOnImageSegment(mRgba,true);
     	displayMarkerImage(mMarkerImage, mRgba);
     	
     	 Bitmap bmp = Bitmap.createBitmap(mRgba.cols(), mRgba.rows(), Bitmap.Config.ARGB_8888);
@@ -100,6 +103,7 @@ class TWMarkerSurfaceView extends TWSurfaceViewBase {
     }
     
     private void processFrameForMarkersFull(VideoCapture capture, List<DtouchMarker> markers){
+    	if (capture == null || mRgba == null) return;
     	//Get original image.
     	capture.retrieve(mRgba, Highgui.CV_CAP_ANDROID_COLOR_FRAME_RGBA);
         //Get gray scale image.
@@ -114,6 +118,7 @@ class TWMarkerSurfaceView extends TWSurfaceViewBase {
     	//find markers.
     	boolean markerFound = findMarkers(thresholdedImgMat, markers);
     	thresholdedImgMat.release();
+
     	//Marker detected.
     	if (markerFound){
     		setMarkerDetected(true);
@@ -122,12 +127,17 @@ class TWMarkerSurfaceView extends TWSurfaceViewBase {
     		//display codes on the original image.
     		//displayMarkerCodes(mRgba, markers);
     		//display rect with indication that a marker is identified.
-    		displayRectOnImageSegment(mRgba,true);
+    		displayMaskOnImageSegment(mRgba,true);
     		//display marker image
     		displayMarkerImage(mMarkerImage, mRgba);
     	}else
-    		displayRectOnImageSegment(mRgba,false);
+    		displayMaskOnImageSegment(mRgba,false);
     }
+
+	public Integer getPendingPercent() {
+		Integer pendpercent = integratedMarkers.getIntegrationPercent();
+		return pendpercent;
+	}
     
     private void processFrameForMarkersDebug(VideoCapture capture){
     	//Get original image.
@@ -146,7 +156,7 @@ class TWMarkerSurfaceView extends TWSurfaceViewBase {
 
     	displayMarkersDebug(thresholdedImgMat, contourColor, codesColor);
     	//displayThresholds(mRgba, codesColor, localThresholds);
-		displayRectOnImageSegment(mRgba,false);
+		displayMaskOnImageSegment(mRgba,false);
 
     }
     
@@ -166,14 +176,31 @@ class TWMarkerSurfaceView extends TWSurfaceViewBase {
         int width = imgMat.cols();
         int height = imgMat.rows();
         
-        int imgWidth = width / 2;
-    	int imgHeight = height / 2;
+        int imgWidth = width * 1 / 2;
+    	//int imgHeight = height * 2 / 3;
+    	int imgHeight = imgWidth;  //Emily wants a square (but it was too big)
     	        
         //find the origin  in the source image.
-        int x = width / 4;
-        int y = height / 4;
+        int x = (width - imgWidth) / 2;
+        int y = (height - imgHeight) / 2;
         
         return new Rect(x, y, imgWidth, imgHeight);
+    }
+    
+    private void displayMaskOnImageSegment(Mat imgMat, boolean markerFound){
+    	HIPreferenceTableware prefs = new HIPreferenceTableware(this.getContext());
+    	if (prefs.getPenguins())
+    	{
+    	  Mat peng = imgMat.clone();
+    	  try {
+		  	peng = Utils.loadResource(getContext(), R.drawable.penguin_mask_orange, -1);
+		  } catch (IOException e) {}
+    	  Core.add(peng, imgMat,imgMat); 		
+    	} 
+    	else
+    	{
+    	  displayRectOnImageSegment(imgMat, markerFound);
+    	}
     }
     
     private void displayRectOnImageSegment(Mat imgMat, boolean markerFound){
@@ -342,7 +369,6 @@ class TWMarkerSurfaceView extends TWSurfaceViewBase {
     }
     
     public void run() {
-		IntegratedMarkers integratedMarkers = new IntegratedMarkers();
         try
         {
         	initData();
@@ -361,7 +387,6 @@ class TWMarkerSurfaceView extends TWSurfaceViewBase {
         				throw new InterruptedException("Thread interrupted.");
         			}
         			
-        			//if(!mMarkerDetected){
             		if(!integratedMarkers.any()){
 						bmp = processFrameForMarkers(mCamera, dtouchMarkers);
         			}else{
@@ -412,7 +437,6 @@ class TWMarkerSurfaceView extends TWSurfaceViewBase {
             mHierarchy = new Mat();
         }
     	markerDetector = new MarkerDetector(this.getContext(), new HIPreferenceTableware(this.getContext()));
-    	mMarkerDetected = false;
     }
     
     @Override
@@ -438,7 +462,6 @@ class TWMarkerSurfaceView extends TWSurfaceViewBase {
     }
     
     private void setMarkerDetected(boolean detected){
-    	mMarkerDetected = detected;
     }
     
     public Rect getMarkerPosition(){
@@ -448,5 +471,9 @@ class TWMarkerSurfaceView extends TWSurfaceViewBase {
     public void stopDisplayingDetectedMarker(){
     	setMarkerDetected(false);
     }
+
+	public List<DtouchMarker> guessAtMarkers() {
+		return this.integratedMarkers.getPendingMarkers();
+	}
  
 }

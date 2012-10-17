@@ -1,0 +1,87 @@
+<RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    android:background="@color/base_brown" >
+
+    <ImageView
+        android:id="@+id/imageView1"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_centerHorizontal="true"
+        android:layout_marginTop="16dip"
+        android:src="@drawable/busaba_eathai_bird_street" />
+
+    <TableLayout
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_below="@id/imageView1"
+        android:layout_centerHorizontal="true"
+        android:layout_marginTop="32dip" >
+
+        <TableRow
+            android:id="@+id/tableRow1"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content" >
+
+            <Button
+                android:id="@+id/kitchen_button"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:onClick="kitchenOnClick"
+                android:text="Look in the Kitchen" />
+
+            <Button
+                android:id="@+id/call_button"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:onClick="callOnClick"
+                android:text="Call a Waiter" />
+        </TableRow>
+
+        <TableRow
+            android:id="@+id/tableRow2"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content" >
+
+            <Button
+                android:id="@+id/culture_button"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:onClick="aboutOnClick"
+                android:enabled='false'             
+                android:text="About Busaba" />
+
+            <Button
+                android:id="@+id/music_button"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:onClick="musicOnClick"    
+                android:enabled='true'            
+                android:text="Music for Busaba" />
+
+        </TableRow>
+
+        <TableRow
+            android:id="@+id/tableRow3"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content" >
+
+            <Button
+                android:id="@+id/games_button"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:enabled = 'false'
+                android:text="Thai Games" />
+
+            <Button
+                android:id="@+id/pay_button"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:onClick="payOnClick"                
+                android:text="Request the Bill" />
+        </TableRow>
+
+    </TableLayout>
+
+</RelativeLayout>
