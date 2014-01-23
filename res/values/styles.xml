@@ -1,0 +1,45 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources xmlns:android="http://schemas.android.com/apk/res/android">
+
+    <style name="Animations" />
+
+    <style name="Animations.GrowFromCentre">
+        <item name="@android:windowEnterAnimation">@anim/grow_from_centre</item>
+        <item name="@android:windowExitAnimation">@anim/shrink_to_centre</item>
+    </style>
+
+    <color name="bright_white">#f0f0f0</color>
+    <color name="base_orange">#ff7e14</color>
+    <!-- Activity view -->
+    <color name="activity_view_color">#F5F5F5</color>
+
+    <style name="ActivityView">
+        <item name="android:layout_width">fill_parent</item>
+        <item name="android:layout_height">fill_parent</item>
+        <item name="android:background">@color/activity_view_color</item>
+    </style>
+
+    <style name="ActivityBar">
+        <item name="android:layout_width">fill_parent</item>
+        <item name="android:layout_height">44dp</item>
+        <item name="android:layout_alignParentTop">true</item>
+        <item name="android:background">@color/base_orange</item>
+    </style>
+
+    <style name="ActivityBarText" parent="@android:style/TextAppearance.Large">
+        <item name="android:layout_height">wrap_content</item>
+        <item name="android:layout_width">wrap_content</item>
+        <item name="android:layout_centerVertical">true</item>
+        <item name="android:layout_centerHorizontal">true</item>
+        <item name="android:textColor">@color/bright_white</item>
+        <item name="android:textStyle">bold</item>
+    </style>
+
+    <style name="PreferenceScreen" parent="android:Theme.Light">
+        <item name="android:textColor">@color/Blue</item>
+        <item name="android:textColorSecondary">@color/DarkBlue</item>
+        <item name="android:background">#E0D4B7</item>
+        <item name="android:textColorTertiary">@color/DarkBlue</item>
+    </style>
+
+</resources>
