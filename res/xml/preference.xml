@@ -1,0 +1,161 @@
+<?xml version="1.0" encoding="utf-8"?>
+<PreferenceScreen xmlns:android="http://schemas.android.com/apk/res/android" >
+
+    <PreferenceCategory
+        android:key="WebURLs"
+        android:title="Website URLs for Codes" >
+        <EditTextPreference
+            android:defaultValue="http://aestheticodes.com/"
+            android:dialogMessage="URL for Code: 1:1:1:1:1"
+            android:dialogTitle="Code: 1:1:1:1:1"
+            android:key="code_1_1_1_1_1"
+            android:summary="Please enter the website for the code 1:1:1:1:1"
+            android:title="URL for code: 1:1:1:1:1" >
+        </EditTextPreference>
+        <EditTextPreference
+            android:defaultValue="http://aestheticodes.com/"
+            android:dialogMessage="URL for Code: 1:1:1:1:2"
+            android:dialogTitle="Code: 1:1:1:1:2"
+            android:key="code_1_1_1_1_2"
+            android:summary="Please enter the website for the code 1:1:1:1:2"
+            android:title="URL for code: 1:1:1:1:2" >
+        </EditTextPreference>
+        <EditTextPreference
+            android:defaultValue="http://aestheticodes.com/"
+            android:dialogMessage="URL for Code: 1:1:1:4:5"
+            android:dialogTitle="Code: 1:1:1:4:5"
+            android:key="code_1_1_1_4_5"
+            android:summary="Please enter the website for the code 1:1:1:4:5"
+            android:title="URL for code: 1:1:1:4:5" >
+        </EditTextPreference>
+        <EditTextPreference
+            android:defaultValue="http://aestheticodes.com/"
+            android:dialogMessage="URL for Code: 1:1:2:3:5"
+            android:dialogTitle="Code: 1:1:2:3:5"
+            android:key="code_1_1_2_3_5"
+            android:summary="Please enter the website for the code 1:1:2:3:5"
+            android:title="URL for code: 1:1:2:3:5" >
+        </EditTextPreference>
+        <EditTextPreference
+            android:defaultValue="http://aestheticodes.com/"
+            android:dialogMessage="URL for Code: 1:1:2:4:4"
+            android:dialogTitle="Code: 1:1:2:4:4"
+            android:key="code_1_1_2_4_4"
+            android:summary="Please enter the website for the code 1:1:2:4:4"
+            android:title="URL for code: 1:1:2:4:4" >
+        </EditTextPreference>
+        <EditTextPreference
+            android:defaultValue="http://vimeo.com/61249310"
+            android:dialogMessage="URL for Code: 1:1:3:3:4"
+            android:dialogTitle="Code: 1:1:3:3:4"
+            android:key="code_1_1_3_3_4"
+            android:summary="Please enter the website for the code 1:1:3:3:4"
+            android:title="URL for code: 1:1:3:3:4" >
+        </EditTextPreference>
+    </PreferenceCategory>
+
+    <PreferenceScreen
+        android:key="advanced_prefs"
+        android:title="Advanced Settings" >
+        <PreferenceCategory
+            android:key="dtouch_markers"
+            android:title="Dtouch Markers" >
+            <EditTextPreference
+                android:defaultValue="4"
+                android:dialogMessage="Minimum Regions"
+                android:dialogTitle="Minimum Regions"
+                android:key="@string/min_branches"
+                android:maxLength="2"
+                android:numeric="integer"
+                android:summary="Please enter the minimum number of regions"
+                android:title="Minimum Regions" />
+            <EditTextPreference
+                android:defaultValue="6"
+                android:dialogMessage="Maximum Regions"
+                android:dialogTitle="Maximum Regions"
+                android:key="@string/max_branches"
+                android:maxLength="2"
+                android:numeric="integer"
+                android:summary="Please enter the maximum number of regions"
+                android:title="Maximum Regions" />
+            <EditTextPreference
+                android:defaultValue="6"
+                android:dialogMessage="Maximum Blobs in a region"
+                android:dialogTitle="Maximum Blobs in a region"
+                android:key="@string/max_leaves"
+                android:maxLength="3"
+                android:numeric="integer"
+                android:summary="Please enter the maximum number of blobs in a region"
+                android:title="Maximum Blobs" />
+            <EditTextPreference
+                android:defaultValue="0"
+                android:dialogMessage="Empty Regions"
+                android:dialogTitle="Empty Regions"
+                android:key="@string/empty_branches"
+                android:maxLength="1"
+                android:numeric="integer"
+                android:summary="Please enter the number of empty regions"
+                android:title="Empty Regions" />
+            <EditTextPreference
+                android:defaultValue="2"
+                android:dialogMessage="Validation Regions"
+                android:dialogTitle="Validation Regions"
+                android:key="@string/validation_branches"
+                android:maxLength="1"
+                android:numeric="integer"
+                android:summary="Please enter the number of validation regions"
+                android:title="Validation Regions" />
+            <EditTextPreference
+                android:defaultValue="1"
+                android:dialogMessage="Blobs in a validation region"
+                android:dialogTitle="Blobs in a validation region"
+                android:key="@string/validation_branch_leaves"
+                android:maxLength="1"
+                android:numeric="integer"
+                android:summary="Please enter the number of blobs in a validation region"
+                android:title="Validation Region value" />
+            <EditTextPreference
+                android:defaultValue="3"
+                android:dialogMessage="Checksum value"
+                android:dialogTitle="Checksum value"
+                android:key="@string/checksum_modulo"
+                android:maxLength="2"
+                android:numeric="integer"
+                android:summary="Please enter the value for the checksum"
+                android:title="Checksum value" />
+            <EditTextPreference
+                android:defaultValue="1"
+                android:dialogMessage="Marker occurrence"
+                android:dialogTitle="Marker occurrence"
+                android:key="@string/marker_occurrence"
+                android:maxLength="2"
+                android:numeric="integer"
+                android:summary="Please enter the minimum number of marker occurrence"
+                android:title="Marker occurrence" />
+        </PreferenceCategory>
+        <PreferenceCategory
+            android:key="camerasurface"
+            android:title="CameraSurface Preview" >
+            <EditTextPreference
+                android:defaultValue="2"
+                android:dialogMessage="Camera Tiles"
+                android:dialogTitle="Camera Tiles"
+                android:key="@string/no_of_tiles"
+                android:maxLength="1"
+                android:numeric="integer"
+                android:summary="Please enter the number of camera tiles"
+                android:title="Camera Tiles" />
+        </PreferenceCategory>
+    </PreferenceScreen>
+    <PreferenceScreen
+        android:key="about_aestheticodes"
+        android:title="About Aestheticodes" >
+        <intent android:action="uk.ac.horizon.aestheticodes.AboutActivity" />
+    </PreferenceScreen>
+    <PreferenceScreen
+        android:key="about_aestheticodes"
+        android:title="Learn to Draw" >
+        <intent android:action="uk.ac.horizon.aestheticodes.TeachMeActivity" />
+    </PreferenceScreen>
+
+</PreferenceScreen>

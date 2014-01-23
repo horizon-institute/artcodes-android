@@ -1,0 +1,35 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+
+    <string name="app_name">Aestheticodes</string>
+    <string name="app_title">Aestheticodes</string>
+    <string name="launch_image_desc">Dtouch scanner launch image</string>
+    <string name="camera_title">Scan Marker</string>
+    <string name="detect_marker">Detect Marker</string>
+    <string name="detect_marker_debug">Detect Marker Debug</string>
+    <string name="view_preferences">View Preferences</string>
+    <!-- dialog -->
+    <string name="downloadErrorMsg">There is an error in downloading the data.</string>
+    <string name="alert_dialog_ok">OK</string>
+    <!-- menu -->
+    <string name="scan_menu">Scan Marker</string>
+    <string name="about_menu">About us</string>
+    <string name="samples_menu">Samples</string>
+    <!-- about -->
+    <string name="web_loading_title">Loading&#8230;</string>
+    <string name="about_web_title">Browse Website</string>
+    <!-- Preferences -->
+    <string name="min_branches">min_branches</string>
+    <string name="max_branches">max_branches</string>
+    <string name="empty_branches">empty_branches</string>
+    <string name="validation_branches">validation_branches</string>
+    <string name="max_leaves">max_leaves</string>
+    <string name="validation_branch_leaves">validation_branch_leaves</string>
+    <string name="checksum_modulo">checksum_modulo</string>
+    <string name="marker_occurrence">marker_occurrence</string>
+    <string name="no_of_tiles">no_of_tiles</string>
+    <!-- Deafult WebSites -->
+    <string name="about_aestheticodes">http://aestheticodes.com/info/</string>
+    <string name="teachme_aestheticodes">http://aestheticodes.com/teach-me/</string>
+
+</resources>
