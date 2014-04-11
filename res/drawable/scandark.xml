@@ -1,6 +1,0 @@
-<selector xmlns:android="http://schemas.android.com/apk/res/android">
-
-    <item android:drawable="@drawable/scanner_button" android:state_pressed="false" android:state_selected="true"/>
-    <item android:drawable="@drawable/scanlight"/>
-
-</selector>

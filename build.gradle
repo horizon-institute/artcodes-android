@@ -1,0 +1,76 @@
+/*
+ * Aestheticodes recognises a different marker scheme that allows the
+ * creation of aesthetically pleasing, even beautiful, codes.
+ * Copyright (C) 2014  Aestheticodes
+ *
+ *     This program is free software: you can redistribute it and/or modify
+ *     it under the terms of the GNU Affero General Public License as published
+ *     by the Free Software Foundation, either version 3 of the License, or
+ *     (at your option) any later version.
+ *
+ *     This program is distributed in the hope that it will be useful,
+ *     but WITHOUT ANY WARRANTY; without even the implied warranty of
+ *     MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+ *     GNU Affero General Public License for more details.
+ *
+ *     You should have received a copy of the GNU Affero General Public License
+ *     along with this program.  If not, see <http://www.gnu.org/licenses/>.
+ */
+
+buildscript {
+	repositories {
+		mavenCentral()
+	}
+	dependencies {
+		classpath 'com.android.tools.build:gradle:0.+'
+	}
+}
+
+apply plugin: 'android'
+apply plugin: 'idea'
+
+idea {
+	module{
+		downloadJavadoc = true
+		downloadSources = true
+	}
+}
+
+repositories {
+	mavenCentral()
+	maven {
+		url 'http://maven2.javacv.googlecode.com/git/'
+	}
+}
+
+evaluationDependsOn(':dTouchMobile')
+evaluationDependsOn(':opencv')
+
+dependencies {
+	compile project(':dTouchMobile')
+	compile project(':opencv')
+	compile 'com.android.support:support-v4:+'
+}
+
+android {
+	compileSdkVersion 19
+	buildToolsVersion "19.0.3"
+	sourceSets {
+		main {
+			manifest.srcFile 'AndroidManifest.xml'
+			java.srcDirs = ['src']
+			aidl.srcDirs = ['src']
+			renderscript.srcDirs = ['src']
+			res.srcDirs = ['res']
+			assets.srcDirs = ['assets']
+			jniLibs.srcDirs = ['libs']
+		}
+
+		instrumentTest.setRoot('tests')
+	}
+
+	defaultConfig {
+		minSdkVersion 11
+		targetSdkVersion 19
+	}
+}
