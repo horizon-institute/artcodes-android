@@ -1,3 +1,22 @@
+/*
+ * Aestheticodes recognises a different marker scheme that allows the
+ * creation of aesthetically pleasing, even beautiful, codes.
+ * Copyright (C) 2014  Aestheticodes
+ *
+ *     This program is free software: you can redistribute it and/or modify
+ *     it under the terms of the GNU Affero General Public License as published
+ *     by the Free Software Foundation, either version 3 of the License, or
+ *     (at your option) any later version.
+ *
+ *     This program is distributed in the hope that it will be useful,
+ *     but WITHOUT ANY WARRANTY; without even the implied warranty of
+ *     MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+ *     GNU Affero General Public License for more details.
+ *
+ *     You should have received a copy of the GNU Affero General Public License
+ *     along with this program.  If not, see <http://www.gnu.org/licenses/>.
+ */
+
 package uk.ac.horizon.data;
 
 import java.util.Hashtable;
@@ -16,14 +35,6 @@ public class DtouchMarkersDataSource
 	{
 		dataMarkers = new Hashtable<String, DataMarker>();
 
-		// add services data.
-		// String VIEDO_ID = "cKd8NXWwvKI";
-		// addMarker("1:1:2:2:3", "You Tube", "vnd:youTube" + VIEDO_ID,
-		// DataMarker.YOU_TUBE);
-		// addMarker("1:1:1:3:3", "email", null, DataMarker.MAIL);
-
-		//
-
 		SharedPreferences prefs = PreferenceManager.getDefaultSharedPreferences(mContext);
 		String code1 = prefs.getString("code_1_1_1_1_2", "http://www.aestheticodes.com");
 		String code2 = prefs.getString("code_1_1_1_4_5", "http://www.aestheticodes.com");
@@ -40,7 +51,7 @@ public class DtouchMarkersDataSource
 		addMarker("1:1:2:3:5", "Browse website", code3, DataMarker.WEBSITE);
 		addMarker("1:1:2:4:4", "Browse website", code4, DataMarker.WEBSITE);
 		// post card
-		addMarker("1:1:3:3:4", "Browse website", code5, DataMarker.WEBSITE);// "http://aestheticodes.blogs.wp.horizon.ac.uk/",DataMarker.WEBSITE);
+		addMarker("1:1:3:3:4", "Browse website", code5, DataMarker.WEBSITE);
 		addMarker("1:1:1:1:1", "Browse website", code6, DataMarker.WEBSITE);
 
 	}
