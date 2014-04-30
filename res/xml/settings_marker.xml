@@ -1,0 +1,120 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!--
+  ~ Aestheticodes recognises a different marker scheme that allows the
+  ~ creation of aesthetically pleasing, even beautiful, codes.
+  ~ Copyright (C) 2014  Aestheticodes
+  ~
+  ~     This program is free software: you can redistribute it and/or modify
+  ~     it under the terms of the GNU Affero General Public License as published
+  ~     by the Free Software Foundation, either version 3 of the License, or
+  ~     (at your option) any later version.
+  ~
+  ~     This program is distributed in the hope that it will be useful,
+  ~     but WITHOUT ANY WARRANTY; without even the implied warranty of
+  ~     MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+  ~     GNU Affero General Public License for more details.
+  ~
+  ~     You should have received a copy of the GNU Affero General Public License
+  ~     along with this program.  If not, see <http://www.gnu.org/licenses/>.
+  -->
+
+<PreferenceScreen xmlns:android="http://schemas.android.com/apk/res/android">
+
+	<PreferenceCategory
+			android:key="markerURLs"
+			android:orderingFromXml="false"
+			android:title="Marker URLs">
+		<Preference
+				android:key="add_marker"
+				android:order="200"
+				android:icon="@drawable/ic_action_new"
+				android:title="Add Marker">
+		</Preference>
+	</PreferenceCategory>
+
+	<PreferenceCategory
+			android:title="Advanced Settings">
+		<PreferenceScreen
+				android:key="advanced_prefs"
+				android:title="Detection Settings">
+			<PreferenceCategory
+					android:key="dtouch_markers"
+					android:title="Detection Settings">
+				<EditTextPreference
+						android:defaultValue="4"
+						android:dialogTitle="@string/min_regions"
+						android:key="min_branches"
+						android:maxLength="2"
+						android:numeric="integer"
+						android:title="@string/min_regions" />
+				<EditTextPreference
+						android:defaultValue="6"
+						android:key="max_branches"
+						android:dialogTitle="@string/max_regions"
+						android:maxLength="2"
+						android:numeric="integer"
+						android:title="@string/max_regions" />
+				<EditTextPreference
+						android:defaultValue="6"
+						android:key="max_leaves"
+						android:maxLength="3"
+						android:numeric="integer"
+						android:dialogTitle="@string/max_leaves"
+						android:title="@string/max_leaves" />
+				<EditTextPreference
+						android:defaultValue="0"
+						android:dialogTitle="Empty Regions"
+						android:key="empty_branches"
+						android:maxLength="1"
+						android:numeric="integer"
+						android:dialogMessage="The maximum number of empty regions"
+						android:title="Empty Regions" />
+				<EditTextPreference
+						android:defaultValue="2"
+						android:dialogMessage="Validation Regions"
+						android:dialogTitle="Validation Regions"
+						android:key="validation_branches"
+						android:maxLength="1"
+						android:numeric="integer"
+						android:summary="Please enter the number of validation regions"
+						android:title="Validation Regions" />
+				<EditTextPreference
+						android:defaultValue="1"
+						android:dialogMessage="Blobs in a validation region"
+						android:dialogTitle="Blobs in a validation region"
+						android:key="validation_branch_leaves"
+						android:maxLength="1"
+						android:numeric="integer"
+						android:summary="Please enter the number of blobs in a validation region"
+						android:title="Validation Region value" />
+				<EditTextPreference
+						android:defaultValue="3"
+						android:dialogMessage="Checksum value"
+						android:dialogTitle="Checksum value"
+						android:key="checksum_modulo"
+						android:maxLength="2"
+						android:numeric="integer"
+						android:summary="Please enter the value for the checksum"
+						android:title="Checksum value" />
+				<EditTextPreference
+						android:defaultValue="1"
+						android:dialogMessage="Marker occurrence"
+						android:dialogTitle="Marker occurrence"
+						android:key="marker_occurrence"
+						android:maxLength="2"
+						android:numeric="integer"
+						android:summary="Please enter the minimum number of marker occurrence"
+						android:title="Marker occurrence" />
+				<EditTextPreference
+						android:defaultValue="2"
+						android:dialogMessage="Camera Tiles"
+						android:dialogTitle="Camera Tiles"
+						android:key="no_of_tiles"
+						android:maxLength="1"
+						android:numeric="integer"
+						android:summary="Please enter the number of camera tiles"
+						android:title="Camera Tiles" />
+			</PreferenceCategory>
+		</PreferenceScreen>
+	</PreferenceCategory>
+</PreferenceScreen>

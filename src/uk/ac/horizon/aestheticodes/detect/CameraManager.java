@@ -24,8 +24,9 @@ import android.graphics.Bitmap;
 import android.graphics.Point;
 import android.graphics.Rect;
 import android.hardware.Camera;
+import android.os.Build;
+import android.util.DisplayMetrics;
 import android.util.Log;
-import android.view.Display;
 import android.view.Surface;
 import android.view.SurfaceHolder;
 import android.view.WindowManager;
@@ -36,13 +37,10 @@ import java.util.List;
 public class CameraManager implements Camera.PreviewCallback
 {
 	private static final String TAG = CameraManager.class.getName();
-
+	private final Context context;
 	private Camera camera;
 	private int cameraId;
-
 	private Rect framingRect;
-
-	private Context context;
 	private Bitmap result;
 
 	private byte[] data = null;
@@ -65,7 +63,7 @@ public class CameraManager implements Camera.PreviewCallback
 
 	public void release()
 	{
-		if(camera != null)
+		if (camera != null)
 		{
 			camera.stopPreview();
 			camera.setPreviewCallback(null);
@@ -89,10 +87,10 @@ public class CameraManager implements Camera.PreviewCallback
 			result = null;
 			Camera.CameraInfo info = new Camera.CameraInfo();
 
-			for(int index = 0; index < Camera.getNumberOfCameras(); index++)
+			for (int index = 0; index < Camera.getNumberOfCameras(); index++)
 			{
 				Camera.getCameraInfo(index, info);
-				if(info.facing == Camera.CameraInfo.CAMERA_FACING_BACK)
+				if (info.facing == Camera.CameraInfo.CAMERA_FACING_BACK)
 				{
 					cameraId = index;
 					camera = Camera.open(index);
@@ -121,7 +119,7 @@ public class CameraManager implements Camera.PreviewCallback
 
 	public void startPreview(SurfaceHolder holder) throws IOException
 	{
-		if(camera == null)
+		if (camera == null)
 		{
 			createCamera();
 		}
@@ -139,44 +137,59 @@ public class CameraManager implements Camera.PreviewCallback
 			{
 				return null;
 			}
-			Point screenResolution = getScreenResolution();
-			if (screenResolution == null)
+
+			Point screen = getScreenResolution();
+			if (screen == null)
 			{
 				// Called early, before init even finished
 				return null;
 			}
 
-			final int size = Math.min(screenResolution.x, screenResolution.y);
-			final int leftOffset = (screenResolution.x - size) / 2;
-			final int topOffset = (screenResolution.y - size) / 2;
-			framingRect = new Rect(leftOffset, topOffset, leftOffset + size, topOffset + size);
+			Camera.Size camera = getSize();
+			int degrees = getRotation();
+			if (degrees == 0 || degrees == 180)
+			{
+				int swap = camera.height;
+				camera.height = camera.width;
+				camera.width = swap;
+			}
+
+			final int size = Math.min(camera.width, camera.height);
+			final int width = (size * screen.x / camera.width);
+			final int height = (size * screen.y / camera.height);
+			final int leftOffset = (screen.x - width) / 2;
+			final int topOffset = (screen.y - height) / 2;
+			framingRect = new Rect(leftOffset, topOffset, leftOffset + width, topOffset + height);
 			Log.d(TAG, "Calculated framing rect: " + framingRect);
 		}
 		return framingRect;
 	}
 
-	public void setCameraDisplayOrientation()
+	public int getRotation()
 	{
-		Camera.CameraInfo info = new Camera.CameraInfo();
-		Camera.getCameraInfo(cameraId, info);
 		WindowManager manager = (WindowManager) context.getSystemService(Context.WINDOW_SERVICE);
 		int rotation = manager.getDefaultDisplay().getRotation();
-		int degrees = 0;
 		switch (rotation)
 		{
 			case Surface.ROTATION_0:
-				degrees = 0;
-				break;
+				return 0;
 			case Surface.ROTATION_90:
-				degrees = 90;
-				break;
+				return 90;
 			case Surface.ROTATION_180:
-				degrees = 180;
-				break;
+				return 180;
 			case Surface.ROTATION_270:
-				degrees = 270;
-				break;
+				return 270;
 		}
+		return 0;
+	}
+
+	private void setCameraDisplayOrientation()
+	{
+		Camera.CameraInfo info = new Camera.CameraInfo();
+		Camera.getCameraInfo(cameraId, info);
+
+		int degrees = getRotation();
+		Log.i(TAG, "Orientation = " + degrees + "°");
 
 		int result;
 		if (info.facing == Camera.CameraInfo.CAMERA_FACING_FRONT)
@@ -189,18 +202,34 @@ public class CameraManager implements Camera.PreviewCallback
 			result = (info.orientation - degrees + 360) % 360;
 		}
 		camera.setDisplayOrientation(result);
+
+		framingRect = null;
 	}
 
 	private Point getScreenResolution()
 	{
-		WindowManager manager = (WindowManager) context.getSystemService(Context.WINDOW_SERVICE);
-		Display display = manager.getDefaultDisplay();
-		Point theScreenResolution = new Point();
-		display.getSize(theScreenResolution);
-		return theScreenResolution;
+		DisplayMetrics display = context.getResources().getDisplayMetrics();
+
+		int width = display.widthPixels;
+		int height = display.heightPixels;
+		return new Point(width, height);
 	}
 
-	public Camera.Size getPreviewSize()
+	public void setOrientation()
+	{
+		if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.ICE_CREAM_SANDWICH)
+		{
+			setCameraDisplayOrientation();
+		}
+		else
+		{
+			camera.stopPreview();
+			setCameraDisplayOrientation();
+			camera.startPreview();
+		}
+	}
+
+	public Camera.Size getSize()
 	{
 		Camera.Parameters afterParameters = camera.getParameters();
 		return afterParameters.getPreviewSize();
@@ -209,7 +238,7 @@ public class CameraManager implements Camera.PreviewCallback
 	@Override
 	public synchronized void onPreviewFrame(byte[] bytes, Camera camera)
 	{
-		if(data == null)
+		if (data == null)
 		{
 			data = new byte[bytes.length];
 			camera.setPreviewCallbackWithBuffer(this);

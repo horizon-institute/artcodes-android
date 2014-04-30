@@ -30,7 +30,7 @@ apply plugin: 'android'
 apply plugin: 'idea'
 
 idea {
-	module{
+	module {
 		downloadJavadoc = true
 		downloadSources = true
 	}
@@ -72,5 +72,19 @@ android {
 	defaultConfig {
 		minSdkVersion 11
 		targetSdkVersion 19
+	}
+
+	signingConfigs {
+		release {
+			storeFile file(project.property('keystore'))
+			storePassword project.property('keystore.password')
+			keyAlias project.property('key.alias')
+			keyPassword project.property('key.password')
+		}
+	}
+	buildTypes {
+		release {
+			signingConfig signingConfigs.release
+		}
 	}
 }

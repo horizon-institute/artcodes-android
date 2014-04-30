@@ -19,58 +19,53 @@
 
 package uk.ac.horizon.data;
 
-import java.util.Hashtable;
-
 import android.content.Context;
 import android.content.SharedPreferences;
 import android.preference.PreferenceManager;
 
+import java.util.HashMap;
+import java.util.Map;
+
 public class DtouchMarkersDataSource
 {
-	private static Hashtable<String, DataMarker> dataMarkers;
-	private static Context mContext;
+	private static final Map<String, DataMarker> dataMarkers = new HashMap<String, DataMarker>();
 	public static boolean prefsChanged = false;
+	private static Context mContext;
 
 	private static void initMarkers()
 	{
-		dataMarkers = new Hashtable<String, DataMarker>();
-
-		SharedPreferences prefs = PreferenceManager.getDefaultSharedPreferences(mContext);
-		String code1 = prefs.getString("code_1_1_1_1_2", "http://www.aestheticodes.com");
-		String code2 = prefs.getString("code_1_1_1_4_5", "http://www.aestheticodes.com");
-		String code3 = prefs.getString("code_1_1_2_3_5", "http://www.aestheticodes.com");
-		String code4 = prefs.getString("code_1_1_2_4_4", "http://www.aestheticodes.com");
-		String code5 = prefs.getString("code_1_1_3_3_4", "http://www.aestheticodes.com");
-		String code6 = prefs.getString("code_1_1_1_1_1", "http://www.aestheticodes.com");
-
-		// Food
-		addMarker("1:1:1:1:2", "Browse website", code1, DataMarker.WEBSITE);
-		// Placemat
-		addMarker("1:1:1:4:5", "Browse website", code2, DataMarker.WEBSITE);
-		// restaurant
-		addMarker("1:1:2:3:5", "Browse website", code3, DataMarker.WEBSITE);
-		addMarker("1:1:2:4:4", "Browse website", code4, DataMarker.WEBSITE);
-		// post card
-		addMarker("1:1:3:3:4", "Browse website", code5, DataMarker.WEBSITE);
-		addMarker("1:1:1:1:1", "Browse website", code6, DataMarker.WEBSITE);
-
+		dataMarkers.clear();
+		SharedPreferences sharedPreferences = PreferenceManager.getDefaultSharedPreferences(mContext);
+		for (String key : sharedPreferences.getAll().keySet())
+		{
+			if (key.startsWith("code_"))
+			{
+				final String code = key.substring("code_".length()).replaceAll("_", ":");
+				final String url = sharedPreferences.getString(key, null);
+				if (url != null)
+				{
+					addMarker(code, url);
+				}
+			}
+		}
 	}
 
-	public static void addMarker(String code, String title, String uri, int serviceId)
+	public static void addMarker(String code, String uri)
 	{
-		DataMarker marker = new DataMarker(code, title, uri, serviceId);
-		dataMarkers.put(code, marker);
+		dataMarkers.put(code, new DataMarker(code, "Browse website", uri, DataMarker.WEBSITE));
 	}
 
 	public static DataMarker getDtouchMarkerUsingKey(String codeKey, Context context)
 	{
 		mContext = context;
 		DataMarker marker = null;
-		if (dataMarkers == null || dataMarkers.isEmpty() || prefsChanged)
+		if (dataMarkers.isEmpty() || prefsChanged)
 		{
 			initMarkers();
 			if (prefsChanged)
+			{
 				prefsChanged = false;
+			}
 		}
 		if (dataMarkers.containsKey(codeKey))
 		{

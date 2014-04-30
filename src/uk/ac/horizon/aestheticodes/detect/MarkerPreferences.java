@@ -20,8 +20,6 @@
 package uk.ac.horizon.aestheticodes.detect;
 
 import android.content.Context;
-import android.content.SharedPreferences;
-import android.preference.PreferenceManager;
 import uk.ac.horizon.dtouchMobile.HIPreference;
 
 public class MarkerPreferences extends HIPreference
@@ -44,16 +42,6 @@ public class MarkerPreferences extends HIPreference
 
 	public int getNumberOfTiles()
 	{
-		int value = -1;
-		SharedPreferences sharedPrefs = PreferenceManager.getDefaultSharedPreferences(mContext);
-		if (sharedPrefs.contains(NO_OF_TILES))
-		{
-			value = Integer.parseInt(sharedPrefs.getString(NO_OF_TILES, Integer.toString(DEFAULT_NO_OF_TILES)));
-		}
-		else
-		{
-			value = DEFAULT_NO_OF_TILES;
-		}
-		return value;
+		return getIntValue(NO_OF_TILES, DEFAULT_NO_OF_TILES);
 	}
 }
