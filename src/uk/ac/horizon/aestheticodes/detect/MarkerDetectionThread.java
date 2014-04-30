@@ -23,7 +23,12 @@ import android.graphics.Bitmap;
 import android.hardware.Camera;
 import android.util.Log;
 import org.opencv.android.Utils;
-import org.opencv.core.*;
+import org.opencv.core.Core;
+import org.opencv.core.CvType;
+import org.opencv.core.Mat;
+import org.opencv.core.MatOfPoint;
+import org.opencv.core.Rect;
+import org.opencv.core.Scalar;
 import org.opencv.imgproc.Imgproc;
 import uk.ac.horizon.dtouchMobile.DtouchMarker;
 import uk.ac.horizon.dtouchMobile.MarkerDetector;
@@ -34,14 +39,13 @@ import java.util.List;
 public class MarkerDetectionThread extends Thread
 {
 	private static final String TAG = MarkerDetectionThread.class.getName();
-	private static final Scalar fontColor = new Scalar(0, 0, 0, 255);
 	private static final Scalar detectedColour = new Scalar(255, 255, 0, 255);
 	private final MarkerDetector markerDetector;
 	private final CameraManager cameraManager;
 	private final MarkerPreferences markerPreferences;
 	MarkerDetectionListener listener;
 	private boolean running = true;
-	private boolean detecting = true;
+	private DrawMode drawMode = DrawMode.none;
 
 	public MarkerDetectionThread(CameraManager cameraManager, MarkerDetectionListener listener)
 	{
@@ -93,6 +97,7 @@ public class MarkerDetectionThread extends Thread
 				endRow = (int) image.size().height;
 			}
 
+			Mat tileThreshold = new Mat();
 			for (int tileColCount = 0; tileColCount < numberOfTiles; tileColCount++)
 			{
 				startCol = tileColCount * tileHeight;
@@ -105,7 +110,6 @@ public class MarkerDetectionThread extends Thread
 					endCol = (int) image.size().width;
 				}
 
-				Mat tileThreshold = new Mat();
 				Mat tileMat = image.submat(startRow, endRow, startCol, endCol);
 				// localThreshold = Imgproc.threshold(tileMat, tileThreshold, 0,
 				// 255, Imgproc.THRESH_BINARY | Imgproc.THRESH_OTSU);
@@ -118,8 +122,8 @@ public class MarkerDetectionThread extends Thread
 				Imgproc.threshold(tileMat, tileThreshold, 127, 255, Imgproc.THRESH_OTSU);
 				tileThreshold.copyTo(tileMat);
 				tileMat.release();
-				tileThreshold.release();
 			}
+			tileThreshold.release();
 		}
 	}
 
@@ -131,12 +135,9 @@ public class MarkerDetectionThread extends Thread
 		{
 			// holds all the markers identified in the camera.
 			List<DtouchMarker> markersDetected = new ArrayList<DtouchMarker>();
-			Mat contourImg = inputImage.clone();
 			// Find blobs using connect component.
-			Imgproc.findContours(contourImg, contours, hierarchy, Imgproc.RETR_TREE, Imgproc.CHAIN_APPROX_NONE);
+			Imgproc.findContours(inputImage, contours, hierarchy, Imgproc.RETR_TREE, Imgproc.CHAIN_APPROX_NONE);
 
-			// No need to use contourImg so release it.
-			contourImg.release();
 
 			List<Integer> code = new ArrayList<Integer>();
 
@@ -152,7 +153,7 @@ public class MarkerDetectionThread extends Thread
 					marker.setComponentIndex(i);
 					markersDetected.add(marker);
 
-					if (!detecting && drawImage != null)
+					if (drawMode == DrawMode.outline && drawImage != null)
 					{
 						Imgproc.drawContours(drawImage, contours, i, detectedColour, 5);
 						Rect bounds = Imgproc.boundingRect(contours.get(i));
@@ -178,13 +179,32 @@ public class MarkerDetectionThread extends Thread
 		}
 	}
 
+	void rotate(Mat src, Mat dst, int angle)
+	{
+		if (src != dst)
+		{
+			src.copyTo(dst);
+		}
+
+		angle = ((angle / 90) % 4) * 90;
+
+		//0 : flip vertical; 1 flip horizontal
+		int flip_horizontal_or_vertical = angle > 0 ? 1 : 0;
+		int number = Math.abs(angle / 90);
+
+		for (int i = 0; i != number; ++i)
+		{
+			Core.transpose(dst, dst);
+			Core.flip(dst, dst, flip_horizontal_or_vertical);
+		}
+	}
 
 	@Override
 	public void run()
 	{
 		try
 		{
-			Camera.Size size = cameraManager.getPreviewSize();
+			Camera.Size size = cameraManager.getSize();
 			Mat image = new Mat(size.height, size.width, CvType.CV_8UC1);
 			Bitmap bmp = null;
 			while (running)
@@ -204,8 +224,9 @@ public class MarkerDetectionThread extends Thread
 
 						Mat drawImage = null;
 
-						if (!detecting)
+						if (drawMode != DrawMode.none)
 						{
+							rotate(detectionImage, detectionImage, 360 + 90 - cameraManager.getRotation());
 							drawImage = new Mat(detectionImage.rows(), detectionImage.cols(), CvType.CV_8UC4);
 						}
 
@@ -213,13 +234,13 @@ public class MarkerDetectionThread extends Thread
 						List<DtouchMarker> markers = findMarkers(detectionImage, drawImage);
 
 						// if markers are found then decide which marker code occurred most.
-						if (detecting)
+						if (!markers.isEmpty() && listener != null)
 						{
-							if (!markers.isEmpty() && listener != null)
-							{
-								listener.markerDetected(markerDetector.compareDetectedMarkers(markers));
-								running = false;
-							}
+							listener.markerDetected(markerDetector.compareDetectedMarkers(markers));
+						}
+
+						if (drawMode == DrawMode.none)
+						{
 							cameraManager.setResult(null);
 						}
 						else if (drawImage != null)
@@ -234,6 +255,11 @@ public class MarkerDetectionThread extends Thread
 
 							listener.tracking(markers);
 
+							drawImage.release();
+						}
+
+						if (drawImage != null)
+						{
 							drawImage.release();
 						}
 					}
@@ -260,13 +286,19 @@ public class MarkerDetectionThread extends Thread
 		Log.i(TAG, "Finishing processing thread");
 	}
 
-	public boolean isDetecting()
+	public DrawMode getDrawMode()
 	{
-		return detecting;
+		return drawMode;
 	}
 
-	public void setDetecting(boolean detecting)
+	public void setDrawMode(DrawMode drawMode)
 	{
-		this.detecting = detecting;
+		Log.i(TAG, "Set draw mode " + drawMode);
+		this.drawMode = drawMode;
+	}
+
+	public enum DrawMode
+	{
+		none, outline
 	}
 }

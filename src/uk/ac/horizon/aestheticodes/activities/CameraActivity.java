@@ -22,13 +22,23 @@ import android.app.Activity;
 import android.content.Intent;
 import android.net.Uri;
 import android.os.Bundle;
+import android.preference.PreferenceManager;
 import android.util.Log;
-import android.view.*;
+import android.view.Menu;
+import android.view.MenuInflater;
+import android.view.MenuItem;
+import android.view.SurfaceHolder;
+import android.view.SurfaceView;
+import android.view.View;
+import android.view.WindowManager;
+import android.widget.AdapterView;
+import android.widget.ArrayAdapter;
+import android.widget.Spinner;
 import org.opencv.android.OpenCVLoader;
 import uk.ac.horizon.aestheticodes.R;
+import uk.ac.horizon.aestheticodes.detect.CameraManager;
 import uk.ac.horizon.aestheticodes.detect.MarkerDetectionListener;
 import uk.ac.horizon.aestheticodes.detect.MarkerDetectionThread;
-import uk.ac.horizon.aestheticodes.detect.CameraManager;
 import uk.ac.horizon.aestheticodes.detect.ViewfinderView;
 import uk.ac.horizon.data.DataMarker;
 import uk.ac.horizon.data.DataMarkerWebServices;
@@ -77,26 +87,7 @@ public class CameraActivity extends Activity implements SurfaceHolder.Callback, 
 		{
 			return;
 		}
-
-		try
-		{
-			cameraManager.stopPreview();
-		}
-		catch (Exception e)
-		{
-			// Tried to stop non-existent preview
-		}
-
-		cameraManager.setCameraDisplayOrientation();
-
-		try
-		{
-			cameraManager.startPreview(this.holder);
-		}
-		catch (Exception e)
-		{
-			Log.d(TAG, "Error starting camera preview: " + e.getMessage());
-		}
+		cameraManager.setOrientation();
 	}
 
 	@Override
@@ -104,6 +95,8 @@ public class CameraActivity extends Activity implements SurfaceHolder.Callback, 
 	{
 		super.onCreate(savedInstanceState);
 		getWindow().addFlags(WindowManager.LayoutParams.FLAG_KEEP_SCREEN_ON);
+
+		PreferenceManager.setDefaultValues(this, R.xml.settings_defaults, false);
 
 		setContentView(R.layout.capture);
 
@@ -125,6 +118,26 @@ public class CameraActivity extends Activity implements SurfaceHolder.Callback, 
 	{
 		MenuInflater inflater = getMenuInflater();
 		inflater.inflate(R.menu.capture_actions, menu);
+
+		MenuItem spinnerItem = menu.findItem(R.id.action_mode);
+		Spinner spinner = (Spinner) spinnerItem.getActionView();
+		ArrayAdapter<CharSequence> listAdapter = ArrayAdapter.createFromResource(this, R.array.action_modes,
+				android.R.layout.simple_spinner_dropdown_item);
+		spinner.setAdapter(listAdapter);
+		spinner.setOnItemSelectedListener(new AdapterView.OnItemSelectedListener()
+		{
+			@Override
+			public void onItemSelected(AdapterView<?> parent, View view, int position, long id)
+			{
+				thread.setDrawMode(MarkerDetectionThread.DrawMode.values()[position]);
+			}
+
+			@Override
+			public void onNothingSelected(AdapterView<?> parent)
+			{
+			}
+		});
+
 		return super.onCreateOptionsMenu(menu);
 	}
 
@@ -166,28 +179,28 @@ public class CameraActivity extends Activity implements SurfaceHolder.Callback, 
 		switch (item.getItemId())
 		{
 			case R.id.action_settings:
-				startActivity(new Intent(this, PreferencesActivity.class));
+				startActivity(new Intent(this, SettingsActivity.class));
 				return true;
 			case R.id.action_about:
 				startActivity(new Intent(this, AboutActivity.class));
 				return true;
-			case R.id.action_Help:
+			case R.id.action_help:
 				startActivity(new Intent(this, GuideActivity.class));
 				return true;
-			case R.id.action_track:
-				if (thread != null)
-				{
-					thread.setDetecting(!thread.isDetecting());
-					if (thread.isDetecting())
-					{
-						item.setTitle(getString(R.string.action_track));
-					}
-					else
-					{
-						item.setTitle(getString(R.string.action_detect));
-					}
-				}
-				return true;
+//			case R.id.action_track:
+//				if (thread != null)
+//				{
+//					thread.setDetecting(!thread.isDetecting());
+//					if (thread.isDetecting())
+//					{
+//						item.setTitle(getString(R.string.action_track));
+//					}
+//					else
+//					{
+//						item.setTitle(getString(R.string.action_detect));
+//					}
+//				}
+//				return true;
 			default:
 				return super.onOptionsItemSelected(item);
 		}
@@ -197,14 +210,18 @@ public class CameraActivity extends Activity implements SurfaceHolder.Callback, 
 	@Override
 	public void markerDetected(final DtouchMarker marker)
 	{
-		this.runOnUiThread(new Runnable()
+		if (thread.getDrawMode() == MarkerDetectionThread.DrawMode.none)
 		{
-			public void run()
+			thread.setRunning(false);
+			this.runOnUiThread(new Runnable()
 			{
-				// showProgressControls();
-				getMarker(marker.getCodeKey());
-			}
-		});
+				public void run()
+				{
+					// showProgressControls();
+					getMarker(marker.getCodeKey());
+				}
+			});
+		}
 	}
 
 	private void getMarker(String code)
@@ -213,7 +230,7 @@ public class CameraActivity extends Activity implements SurfaceHolder.Callback, 
 		{
 			public void onMarkerDownloaded(DataMarker marker)
 			{
-				if(marker != null)
+				if (marker != null)
 				{
 					startActivity(new Intent(Intent.ACTION_VIEW, Uri.parse(marker.getUri())));
 				}

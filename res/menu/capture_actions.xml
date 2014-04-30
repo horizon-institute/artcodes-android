@@ -19,18 +19,20 @@
 
 <menu xmlns:tools="http://schemas.android.com/tools" xmlns:android="http://schemas.android.com/apk/res/android"
       tools:context=".activities.CameraActivity">
-    <item android:id="@+id/action_track"
-          android:title="@string/action_track"
-          android:showAsAction="ifRoom" />
-    <item android:id="@+id/action_settings"
+	<item android:id="@+id/action_mode"
+	      android:showAsAction="ifRoom"
+	      android:title="@string/detect"
+	      android:orderInCategory="1"
+	      android:actionViewClass="android.widget.Spinner" />
+	<item android:id="@+id/action_settings"
           android:title="@string/action_settings"
           android:icon="@drawable/ic_action_settings"
           android:showAsAction="never" />
-    <item android:id="@+id/action_about"
+	<item android:id="@+id/action_about"
           android:icon="@drawable/ic_action_about"
           android:title="@string/action_about"
           android:showAsAction="never" />
-    <item android:id="@+id/action_Help"
+	<item android:id="@+id/action_help"
           android:icon="@drawable/ic_action_help"
           android:title="@string/action_help"
           android:showAsAction="never" />
