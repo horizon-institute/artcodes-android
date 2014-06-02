@@ -27,11 +27,10 @@
 	<string name="dialog_action_cancel">Cancel</string>
 	<string name="min_regions">Minimum Regions</string>
 	<string name="detect">Detect</string>
+	<string name="drawmode_none">Detect</string>
+	<string name="drawmode_outline">Outline</string>
+	<string name="drawmode_threshold">Threshold</string>
 	<string name="markerCode">Marker Code</string>
-	<string-array name="action_modes">
-		<item>Detect</item>
-		<item>Outline</item>
-	</string-array>
 	<string name="max_regions">Maximum Regions</string>
 	<string name="max_leaves">Maximum Blobs in a Region</string>
 	<!-- Default WebSites -->

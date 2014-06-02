@@ -49,7 +49,7 @@ public class DataMarkerWebServices
 	{
 		protected DataMarker doInBackground(String... data)
 		{
-			return DtouchMarkersDataSource.getDtouchMarkerUsingKey(data[0], mContext);
+			return DtouchMarkersDataSource.getMarker(data[0], mContext);
 		}
 
 		protected void onPostExecute(DataMarker marker)

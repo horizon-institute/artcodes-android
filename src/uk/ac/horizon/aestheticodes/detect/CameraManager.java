@@ -58,7 +58,6 @@ public class CameraManager implements Camera.PreviewCallback
 	public synchronized void setResult(Bitmap result)
 	{
 		this.result = result;
-
 	}
 
 	public void release()
@@ -80,35 +79,64 @@ public class CameraManager implements Camera.PreviewCallback
 
 	private void createCamera()
 	{
-		try
-		{
-			data = null;
-			framingRect = null;
-			result = null;
-			Camera.CameraInfo info = new Camera.CameraInfo();
+		data = null;
+		framingRect = null;
+		result = null;
 
-			for (int index = 0; index < Camera.getNumberOfCameras(); index++)
+		for (int cameraId = 0; cameraId < Camera.getNumberOfCameras(); cameraId++)
+		{
+			try
 			{
-				Camera.getCameraInfo(index, info);
-				if (info.facing == Camera.CameraInfo.CAMERA_FACING_BACK)
+				Camera.CameraInfo info = new Camera.CameraInfo();
+				Camera.getCameraInfo(cameraId, info);
+
+				if(info.facing == Camera.CameraInfo.CAMERA_FACING_BACK)
 				{
-					cameraId = index;
-					camera = Camera.open(index);
+					camera = Camera.open(cameraId);
+					this.cameraId = cameraId;
+
 					Camera.Parameters parameters = camera.getParameters();
 					List<String> focusModes = parameters.getSupportedFocusModes();
-					if (focusModes.contains(Camera.Parameters.FOCUS_MODE_CONTINUOUS_VIDEO))
+					if (focusModes != null && focusModes.contains(Camera.Parameters.FOCUS_MODE_CONTINUOUS_VIDEO))
 					{
 						parameters.setFocusMode(Camera.Parameters.FOCUS_MODE_CONTINUOUS_VIDEO);
 					}
 					camera.setParameters(parameters);
 
 					setCameraDisplayOrientation();
+
+					return;
 				}
 			}
+			catch (RuntimeException e)
+			{
+				Log.e(TAG, "Failed to open camera " + cameraId + ": " + e.getLocalizedMessage(), e);
+			}
 		}
-		catch (Exception e)
+
+		for (int cameraId = 0; cameraId < Camera.getNumberOfCameras(); cameraId++)
 		{
-			Log.e(TAG, e.getMessage(), e);
+			try
+			{
+				camera = Camera.open(cameraId);
+				this.cameraId = cameraId;
+
+				Camera.Parameters parameters = camera.getParameters();
+				List<String> focusModes = parameters.getSupportedFocusModes();
+				if (focusModes != null && focusModes.contains(Camera.Parameters.FOCUS_MODE_CONTINUOUS_VIDEO))
+				{
+					parameters.setFocusMode(Camera.Parameters.FOCUS_MODE_CONTINUOUS_VIDEO);
+				}
+				camera.setParameters(parameters);
+
+				setCameraDisplayOrientation();
+
+				return;
+			}
+			catch (RuntimeException e)
+			{
+				Log.e(TAG, "Failed to open camera " + cameraId + ": " + e.getLocalizedMessage(), e);
+			}
 		}
 	}
 
@@ -183,6 +211,13 @@ public class CameraManager implements Camera.PreviewCallback
 		return 0;
 	}
 
+	public boolean isFront()
+	{
+		Camera.CameraInfo info = new Camera.CameraInfo();
+		Camera.getCameraInfo(cameraId, info);
+		return info.facing == Camera.CameraInfo.CAMERA_FACING_FRONT;
+	}
+
 	private void setCameraDisplayOrientation()
 	{
 		Camera.CameraInfo info = new Camera.CameraInfo();
@@ -192,12 +227,12 @@ public class CameraManager implements Camera.PreviewCallback
 		Log.i(TAG, "Orientation = " + degrees + "°");
 
 		int result;
-		if (info.facing == Camera.CameraInfo.CAMERA_FACING_FRONT)
-		{
-			result = (info.orientation + degrees) % 360;
-			result = (360 - result) % 360;  // compensate the mirror
-		}
-		else
+		//if (info.facing == Camera.CameraInfo.CAMERA_FACING_FRONT)
+		//{
+		//	result = (info.orientation + degrees) % 360;
+		//	result = (360 - result) % 360;  // compensate the mirror
+		//}
+		//else
 		{  // back-facing
 			result = (info.orientation - degrees + 360) % 360;
 		}

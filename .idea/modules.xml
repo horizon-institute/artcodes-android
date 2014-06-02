@@ -3,7 +3,7 @@
   <component name="ProjectModuleManager">
     <modules>
       <module fileurl="file://$PROJECT_DIR$/aestheticodes.iml" filepath="$PROJECT_DIR$/aestheticodes.iml" />
-      <module fileurl="file://$PROJECT_DIR$/../dTouchMobile/dTouchMobile.iml" filepath="$PROJECT_DIR$/../dTouchMobile/dTouchMobile.iml" />
+      <module fileurl="file://$PROJECT_DIR$/../aestheticodes-core/aestheticodes-core.iml" filepath="$PROJECT_DIR$/../aestheticodes-core/aestheticodes-core.iml" />
       <module fileurl="file://$PROJECT_DIR$/../opencv/opencv.iml" filepath="$PROJECT_DIR$/../opencv/opencv.iml" />
     </modules>
   </component>

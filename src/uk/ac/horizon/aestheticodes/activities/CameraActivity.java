@@ -42,7 +42,7 @@ import uk.ac.horizon.aestheticodes.detect.MarkerDetectionThread;
 import uk.ac.horizon.aestheticodes.detect.ViewfinderView;
 import uk.ac.horizon.data.DataMarker;
 import uk.ac.horizon.data.DataMarkerWebServices;
-import uk.ac.horizon.dtouchMobile.DtouchMarker;
+import uk.ac.horizon.aestheticodes.Marker;
 
 import java.io.IOException;
 import java.util.List;
@@ -63,6 +63,7 @@ public class CameraActivity extends Activity implements SurfaceHolder.Callback, 
 	private CameraManager cameraManager;
 	private MarkerDetectionThread thread;
 	private ViewfinderView viewfinder;
+	private Spinner spinner;
 
 	public void surfaceCreated(SurfaceHolder holder)
 	{
@@ -120,9 +121,21 @@ public class CameraActivity extends Activity implements SurfaceHolder.Callback, 
 		inflater.inflate(R.menu.capture_actions, menu);
 
 		MenuItem spinnerItem = menu.findItem(R.id.action_mode);
-		Spinner spinner = (Spinner) spinnerItem.getActionView();
-		ArrayAdapter<CharSequence> listAdapter = ArrayAdapter.createFromResource(this, R.array.action_modes,
-				android.R.layout.simple_spinner_dropdown_item);
+		spinner = (Spinner) spinnerItem.getActionView();
+		ArrayAdapter<CharSequence> listAdapter = new ArrayAdapter<CharSequence>(this, android.R.layout.simple_spinner_item);
+		listAdapter.setDropDownViewResource(android.R.layout.simple_spinner_dropdown_item);
+		for(MarkerDetectionThread.DrawMode mode: MarkerDetectionThread.DrawMode.values())
+		{
+			int id = getResources().getIdentifier("drawmode_" + mode.name(), "string", getPackageName());
+			if(id != 0)
+			{
+				listAdapter.add(getString(id));
+			}
+			else
+			{
+				listAdapter.add(mode.name());
+			}
+		}
 		spinner.setAdapter(listAdapter);
 		spinner.setOnItemSelectedListener(new AdapterView.OnItemSelectedListener()
 		{
@@ -135,6 +148,7 @@ public class CameraActivity extends Activity implements SurfaceHolder.Callback, 
 			@Override
 			public void onNothingSelected(AdapterView<?> parent)
 			{
+				thread.setDrawMode(MarkerDetectionThread.DrawMode.none);
 			}
 		});
 
@@ -153,6 +167,10 @@ public class CameraActivity extends Activity implements SurfaceHolder.Callback, 
 				cameraManager.startPreview(holder);
 				thread = new MarkerDetectionThread(cameraManager, this);
 				thread.start();
+				if(spinner != null)
+				{
+					thread.setDrawMode(MarkerDetectionThread.DrawMode.values()[spinner.getSelectedItemPosition()]);
+				}
 			}
 			catch (Exception e)
 			{
@@ -208,8 +226,12 @@ public class CameraActivity extends Activity implements SurfaceHolder.Callback, 
 
 
 	@Override
-	public void markerDetected(final DtouchMarker marker)
+	public void markerDetected(final Marker marker)
 	{
+		if(thread == null)
+		{
+			return;
+		}
 		if (thread.getDrawMode() == MarkerDetectionThread.DrawMode.none)
 		{
 			thread.setRunning(false);
@@ -252,7 +274,7 @@ public class CameraActivity extends Activity implements SurfaceHolder.Callback, 
 	}
 
 	@Override
-	public void tracking(List<DtouchMarker> markers)
+	public void tracking(List<Marker> markers)
 	{
 		runOnUiThread(new Runnable()
 		{

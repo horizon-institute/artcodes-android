@@ -19,7 +19,7 @@
 
 package uk.ac.horizon.aestheticodes.detect;
 
-import uk.ac.horizon.dtouchMobile.DtouchMarker;
+import uk.ac.horizon.aestheticodes.Marker;
 
 import java.util.List;
 
@@ -28,6 +28,6 @@ import java.util.List;
  */
 public interface MarkerDetectionListener
 {
-	void markerDetected(DtouchMarker marker);
-	void tracking(List<DtouchMarker> markers);
+	void markerDetected(Marker marker);
+	void tracking(List<Marker> markers);
 }

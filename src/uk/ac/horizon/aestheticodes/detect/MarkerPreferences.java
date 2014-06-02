@@ -20,9 +20,9 @@
 package uk.ac.horizon.aestheticodes.detect;
 
 import android.content.Context;
-import uk.ac.horizon.dtouchMobile.HIPreference;
+import uk.ac.horizon.aestheticodes.MarkerSettings;
 
-public class MarkerPreferences extends HIPreference
+public class MarkerPreferences extends MarkerSettings
 {
 	private static final String NO_OF_TILES = "no_of_tiles";
 	private static final int DEFAULT_NO_OF_TILES = 1;

@@ -30,8 +30,8 @@ import org.opencv.core.MatOfPoint;
 import org.opencv.core.Rect;
 import org.opencv.core.Scalar;
 import org.opencv.imgproc.Imgproc;
-import uk.ac.horizon.dtouchMobile.DtouchMarker;
-import uk.ac.horizon.dtouchMobile.MarkerDetector;
+import uk.ac.horizon.aestheticodes.Marker;
+import uk.ac.horizon.aestheticodes.MarkerDetector;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -40,6 +40,7 @@ public class MarkerDetectionThread extends Thread
 {
 	private static final String TAG = MarkerDetectionThread.class.getName();
 	private static final Scalar detectedColour = new Scalar(255, 255, 0, 255);
+	private static final Scalar outlineColour = new Scalar(0, 0, 0, 255);
 	private final MarkerDetector markerDetector;
 	private final CameraManager cameraManager;
 	private final MarkerPreferences markerPreferences;
@@ -127,47 +128,46 @@ public class MarkerDetectionThread extends Thread
 		}
 	}
 
-	private List<DtouchMarker> findMarkers(Mat inputImage, Mat drawImage)
+	private List<Marker> findMarkers(Mat inputImage, Mat drawImage)
 	{
 		final ArrayList<MatOfPoint> contours = new ArrayList<MatOfPoint>();
 		final Mat hierarchy = new Mat();
 		try
 		{
 			// holds all the markers identified in the camera.
-			List<DtouchMarker> markersDetected = new ArrayList<DtouchMarker>();
+			List<Marker> markersDetected = new ArrayList<Marker>();
 			// Find blobs using connect component.
 			Imgproc.findContours(inputImage, contours, hierarchy, Imgproc.RETR_TREE, Imgproc.CHAIN_APPROX_NONE);
 
-
-			List<Integer> code = new ArrayList<Integer>();
-
 			for (int i = 0; i < contours.size(); i++)
 			{
-				// clean this list.
-				code.clear();
+				List<Integer> code = new ArrayList<Integer>();
 				if (markerDetector.verifyRoot(i, hierarchy, code))
 				{
 					// if marker found then add in the list.
-					DtouchMarker marker = new DtouchMarker();
+					Marker marker = new Marker();
 					marker.setCode(code);
 					marker.setComponentIndex(i);
 					markersDetected.add(marker);
 
 					if (drawMode == DrawMode.outline && drawImage != null)
 					{
+						Imgproc.drawContours(drawImage, contours, i, outlineColour, 7);
 						Imgproc.drawContours(drawImage, contours, i, detectedColour, 5);
-						Rect bounds = Imgproc.boundingRect(contours.get(i));
-
-						Core.putText(drawImage, marker.getCodeKey(), bounds.tl(), Core.FONT_HERSHEY_SIMPLEX, 1, detectedColour, 3);
 					}
 				}
-				//else
-				//{
-				//if (!detecting && drawImage != null)
-				//{
-				//Imgproc.drawContours(drawImage, contours, i, new Scalar(0, 0, 255), 3);
-				//}
-				//}
+			}
+
+			if(drawMode != DrawMode.none && drawImage != null)
+			{
+				for (Marker marker : markersDetected)
+				{
+					Rect bounds = Imgproc.boundingRect(contours.get(marker.getComponentIndex()));
+					String markerCode = marker.getCodeKey();
+
+					Core.putText(drawImage, markerCode, bounds.tl(), Core.FONT_HERSHEY_SIMPLEX, 1, outlineColour, 5);
+					Core.putText(drawImage, markerCode, bounds.tl(), Core.FONT_HERSHEY_SIMPLEX, 1, detectedColour, 3);
+				}
 			}
 
 			return markersDetected;
@@ -179,7 +179,7 @@ public class MarkerDetectionThread extends Thread
 		}
 	}
 
-	void rotate(Mat src, Mat dst, int angle)
+	void rotate(Mat src, Mat dst, int angle, boolean flip)
 	{
 		if (src != dst)
 		{
@@ -195,7 +195,10 @@ public class MarkerDetectionThread extends Thread
 		for (int i = 0; i != number; ++i)
 		{
 			Core.transpose(dst, dst);
-			Core.flip(dst, dst, flip_horizontal_or_vertical);
+			if(!flip)
+			{
+				Core.flip(dst, dst, flip_horizontal_or_vertical);
+			}
 		}
 	}
 
@@ -223,15 +226,22 @@ public class MarkerDetectionThread extends Thread
 						thresholdImage(detectionImage);
 
 						Mat drawImage = null;
-
 						if (drawMode != DrawMode.none)
 						{
-							rotate(detectionImage, detectionImage, 360 + 90 - cameraManager.getRotation());
-							drawImage = new Mat(detectionImage.rows(), detectionImage.cols(), CvType.CV_8UC4);
+							rotate(detectionImage, detectionImage, 360 + 90 - cameraManager.getRotation(), cameraManager.isFront());
+
+							if(drawMode == DrawMode.threshold)
+							{
+								drawImage = detectionImage.clone();
+							}
+							else
+							{
+								drawImage = new Mat(detectionImage.rows(), detectionImage.cols(), CvType.CV_8UC4);
+							}
 						}
 
 						// find markers.
-						List<DtouchMarker> markers = findMarkers(detectionImage, drawImage);
+						List<Marker> markers = findMarkers(detectionImage, drawImage);
 
 						// if markers are found then decide which marker code occurred most.
 						if (!markers.isEmpty() && listener != null)
@@ -239,11 +249,20 @@ public class MarkerDetectionThread extends Thread
 							listener.markerDetected(markerDetector.compareDetectedMarkers(markers));
 						}
 
-						if (drawMode == DrawMode.none)
+						if (drawMode == DrawMode.none || drawImage == null)
 						{
-							cameraManager.setResult(null);
+							if(cameraManager.getResult() != null)
+							{
+								cameraManager.setResult(null);
+								listener.tracking(markers);
+							}
+							else
+							{
+								cameraManager.setResult(null);
+							}
+
 						}
-						else if (drawImage != null)
+						else
 						{
 							if (bmp == null)
 							{
@@ -299,6 +318,6 @@ public class MarkerDetectionThread extends Thread
 
 	public enum DrawMode
 	{
-		none, outline
+		none, outline, threshold
 	}
 }

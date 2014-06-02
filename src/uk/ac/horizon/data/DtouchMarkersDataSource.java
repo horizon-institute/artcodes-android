@@ -30,12 +30,11 @@ public class DtouchMarkersDataSource
 {
 	private static final Map<String, DataMarker> dataMarkers = new HashMap<String, DataMarker>();
 	public static boolean prefsChanged = false;
-	private static Context mContext;
 
-	private static void initMarkers()
+	private static void initMarkers(Context context)
 	{
 		dataMarkers.clear();
-		SharedPreferences sharedPreferences = PreferenceManager.getDefaultSharedPreferences(mContext);
+		SharedPreferences sharedPreferences = PreferenceManager.getDefaultSharedPreferences(context);
 		for (String key : sharedPreferences.getAll().keySet())
 		{
 			if (key.startsWith("code_"))
@@ -52,16 +51,15 @@ public class DtouchMarkersDataSource
 
 	public static void addMarker(String code, String uri)
 	{
-		dataMarkers.put(code, new DataMarker(code, "Browse website", uri, DataMarker.WEBSITE));
+		dataMarkers.put(code, new DataMarker(code, uri));
 	}
 
-	public static DataMarker getDtouchMarkerUsingKey(String codeKey, Context context)
+	public static DataMarker getMarker(String codeKey, Context context)
 	{
-		mContext = context;
 		DataMarker marker = null;
 		if (dataMarkers.isEmpty() || prefsChanged)
 		{
-			initMarkers();
+			initMarkers(context);
 			if (prefsChanged)
 			{
 				prefsChanged = false;

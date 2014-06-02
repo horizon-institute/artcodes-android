@@ -38,18 +38,16 @@ idea {
 
 repositories {
 	mavenCentral()
-	maven {
-		url 'http://maven2.javacv.googlecode.com/git/'
-	}
 }
 
-evaluationDependsOn(':dTouchMobile')
+evaluationDependsOn(':aestheticodes-core')
 evaluationDependsOn(':opencv')
 
 dependencies {
-	compile project(':dTouchMobile')
+	compile project(':aestheticodes-core')
 	compile project(':opencv')
 	compile 'com.android.support:support-v4:+'
+	compile 'com.google.code.gson:gson:+'
 }
 
 android {
@@ -70,7 +68,7 @@ android {
 	}
 
 	defaultConfig {
-		minSdkVersion 9
+		minSdkVersion 11
 		targetSdkVersion 19
 	}
 
@@ -87,4 +85,12 @@ android {
 			signingConfig signingConfigs.release
 		}
 	}
+
+	lintOptions {
+		abortOnError false
+	}
+}
+
+task wrapper(type: Wrapper) {
+    gradleVersion = '1.11'
 }

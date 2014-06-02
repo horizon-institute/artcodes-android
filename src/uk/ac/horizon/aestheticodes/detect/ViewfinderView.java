@@ -20,23 +20,22 @@
 package uk.ac.horizon.aestheticodes.detect;
 
 import android.content.Context;
-import android.content.res.Resources;
 import android.graphics.Bitmap;
 import android.graphics.Canvas;
+import android.graphics.Color;
 import android.graphics.Paint;
+import android.graphics.PorterDuff;
+import android.graphics.PorterDuffXfermode;
 import android.graphics.Rect;
 import android.util.AttributeSet;
+import android.util.Log;
 import android.view.View;
 import uk.ac.horizon.aestheticodes.R;
 
 public final class ViewfinderView extends View
 {
-	private static final String TAG = ViewfinderView.class.getName();
-
 	private final Paint paint;
-	private Bitmap resultBitmap;
 	private final int maskColor;
-	private final int resultColor;
 
 	private CameraManager cameraManager;
 
@@ -46,9 +45,7 @@ public final class ViewfinderView extends View
 
 		// Initialize these once for performance rather than calling them every time in onDraw().
 		paint = new Paint(Paint.ANTI_ALIAS_FLAG);
-		Resources resources = getResources();
-		maskColor = resources.getColor(R.color.viewfinder_mask);
-		resultColor = resources.getColor(R.color.result_view);
+		maskColor = getResources().getColor(R.color.viewfinder_mask);
 	}
 
 	public void setCameraManager(CameraManager cameraManager)
@@ -64,42 +61,25 @@ public final class ViewfinderView extends View
 			return; // not ready yet, early draw before done configuring
 		}
 
-		Rect frame = cameraManager.getFramingRect();
+		final Rect frame = cameraManager.getFramingRect();
 		if (frame == null)
 		{
 			return;
 		}
-		int width = canvas.getWidth();
-		int height = canvas.getHeight();
+		final int width = canvas.getWidth();
+		final int height = canvas.getHeight();
 
 		Bitmap result = cameraManager.getResult();
-		if(result != null)
+		if (result != null)
 		{
 			canvas.drawBitmap(result, null, frame, null);
 		}
 
 		// Draw the exterior (i.e. outside the framing rect) darkened
-		paint.setColor(resultBitmap != null ? resultColor : maskColor);
+		paint.setColor(maskColor);
 		canvas.drawRect(0, 0, width, frame.top, paint);
 		canvas.drawRect(0, frame.top, frame.left, frame.bottom + 1, paint);
 		canvas.drawRect(frame.right + 1, frame.top, width, frame.bottom + 1, paint);
 		canvas.drawRect(0, frame.bottom + 1, width, height, paint);
-	}
-
-	public void drawViewfinder()
-	{
-		Bitmap resultBitmap = this.resultBitmap;
-		this.resultBitmap = null;
-		if (resultBitmap != null)
-		{
-			resultBitmap.recycle();
-		}
-		invalidate();
-	}
-
-	public void drawResultBitmap(Bitmap barcode)
-	{
-		resultBitmap = barcode;
-		invalidate();
 	}
 }

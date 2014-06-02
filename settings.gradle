@@ -16,8 +16,6 @@
  *     You should have received a copy of the GNU Affero General Public License
  *     along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
-
-include ':dTouchMobile'
-project(':dTouchMobile').projectDir = new File(settingsDir, '../dTouchMobile')
-include ':opencv'
+include ':opencv', ':aestheticodes-core'
+project(':aestheticodes-core').projectDir = new File(settingsDir, '../aestheticodes-core')
 project(':opencv').projectDir = new File(settingsDir, '../opencv')

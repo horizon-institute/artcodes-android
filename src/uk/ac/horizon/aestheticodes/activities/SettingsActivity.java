@@ -48,7 +48,7 @@ import android.widget.LinearLayout;
 import uk.ac.horizon.aestheticodes.R;
 import uk.ac.horizon.aestheticodes.detect.MarkerPreferences;
 import uk.ac.horizon.data.DtouchMarkersDataSource;
-import uk.ac.horizon.dtouchMobile.MarkerConstraint;
+import uk.ac.horizon.aestheticodes.MarkerConstraint;
 
 public class SettingsActivity extends PreferenceActivity implements SharedPreferences.OnSharedPreferenceChangeListener
 {
@@ -334,13 +334,13 @@ public class SettingsActivity extends PreferenceActivity implements SharedPrefer
 					sourceValue = ":";
 				}
 
-				boolean result = constraints.validateMarker(destination.subSequence(0, destinationStart).toString() + sourceValue +
+				boolean result = constraints.isValidMarker(destination.subSequence(0, destinationStart).toString() + sourceValue +
 						destination.subSequence(destinationEnd, destination.length()).toString(), true);
 
 				if (!result && !sourceValue.startsWith(":"))
 				{
 					sourceValue = ":" + sourceValue;
-					result = constraints.validateMarker(destination.subSequence(0, destinationStart).toString() + sourceValue +
+					result = constraints.isValidMarker(destination.subSequence(0, destinationStart).toString() + sourceValue +
 							destination.subSequence(destinationEnd, destination.length()).toString(), true);
 				}
 
