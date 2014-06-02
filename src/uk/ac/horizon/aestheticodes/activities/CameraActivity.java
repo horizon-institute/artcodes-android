@@ -124,9 +124,10 @@ public class CameraActivity extends Activity implements SurfaceHolder.Callback, 
 		spinner = (Spinner) spinnerItem.getActionView();
 		ArrayAdapter<CharSequence> listAdapter = new ArrayAdapter<CharSequence>(this, android.R.layout.simple_spinner_item);
 		listAdapter.setDropDownViewResource(android.R.layout.simple_spinner_dropdown_item);
+		final String drawPrefix = getString(R.string.draw_prefix);
 		for(MarkerDetectionThread.DrawMode mode: MarkerDetectionThread.DrawMode.values())
 		{
-			int id = getResources().getIdentifier("drawmode_" + mode.name(), "string", getPackageName());
+			int id = getResources().getIdentifier(drawPrefix + mode.name(), "string", getPackageName());
 			if(id != 0)
 			{
 				listAdapter.add(getString(id));

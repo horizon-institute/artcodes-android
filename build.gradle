@@ -52,7 +52,7 @@ dependencies {
 
 android {
 	compileSdkVersion 19
-	buildToolsVersion "19.0.3"
+	buildToolsVersion "19.1.0"
 	sourceSets {
 		main {
 			manifest.srcFile 'AndroidManifest.xml'
@@ -92,5 +92,5 @@ android {
 }
 
 task wrapper(type: Wrapper) {
-    gradleVersion = '1.11'
+    gradleVersion = '1.12'
 }
