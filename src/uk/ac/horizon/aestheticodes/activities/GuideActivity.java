@@ -23,40 +23,23 @@ import android.app.Activity;
 import android.os.Bundle;
 import android.webkit.WebView;
 import android.webkit.WebViewClient;
-import android.widget.TextView;
 import android.widget.Toast;
 import uk.ac.horizon.aestheticodes.R;
 
 public class GuideActivity extends Activity
 {
-	TextView aboutTextView;
-	WebView mWebview;
+	WebView webView;
 
 	@Override
 	public void onCreate(Bundle savedInstanceState)
 	{
-		// super.onCreate(savedInstanceState);
-		// setContentView(R.layout.aboutview);
-		//
-		// aboutTextView = (TextView) findViewById(R.id.aboutTextView);
-		// aboutTextView.setText("About Aestheticodes");
-		//
-		// aboutWebView = (WebView) findViewById(R.id.aboutWebView);
-		//
-		// // Load the URL from the strings resource: easier to change in one
-		// place
-		// // at later stage
-		// aboutWebView.loadUrl(getResources().getString(R.string.about_aestheticodes));
 		super.onCreate(savedInstanceState);
 
-		mWebview = new WebView(this);
-
-		// mWebview.getSettings().setJavaScriptEnabled(true); // enable
-		// javascript
+		webView = new WebView(this);
 
 		final Activity activity = this;
 
-		mWebview.setWebViewClient(new WebViewClient()
+		webView.setWebViewClient(new WebViewClient()
 		{
 			public void onReceivedError(WebView view, int errorCode, String description, String failingUrl)
 			{
@@ -65,8 +48,7 @@ public class GuideActivity extends Activity
 		});
 
 		activity.setTitle("Teach Me");
-		mWebview.loadUrl(getResources().getString(R.string.teachme_aestheticodes));
-		setContentView(mWebview);
-
+		webView.loadUrl(getResources().getString(R.string.teachme_aestheticodes));
+		setContentView(webView);
 	}
 }
