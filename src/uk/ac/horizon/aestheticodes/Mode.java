@@ -17,31 +17,12 @@
  *     along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-package uk.ac.horizon.aestheticodes.detect;
+package uk.ac.horizon.aestheticodes;
 
-import android.content.Context;
-import uk.ac.horizon.aestheticodes.MarkerSettings;
-
-public class MarkerPreferences extends MarkerSettings
+/**
+ * Created by kevin on 02/07/2014.
+ */
+public enum Mode
 {
-	private static final String NO_OF_TILES = "no_of_tiles";
-	private static final int DEFAULT_NO_OF_TILES = 1;
-
-	public MarkerPreferences(Context context)
-	{
-		super(context);
-		this.setDefaultMinBranches(5);
-		this.setDefaultMaxBranches(6);
-		this.setDefaultEmptyBranches(0);
-		this.setDefaultValidationBranches(2);
-		this.setDefaultValidationBranchLeaves(1);
-		this.setDefaultMaxLeaves(5);
-		this.setDefaultChecksumModulo(3);
-		this.setDefaultMarkerOccurrence(1);
-	}
-
-	public int getNumberOfTiles()
-	{
-		return getIntValue(NO_OF_TILES, DEFAULT_NO_OF_TILES);
-	}
+	detect, outline, threshold
 }

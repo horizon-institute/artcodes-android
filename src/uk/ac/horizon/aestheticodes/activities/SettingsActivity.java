@@ -45,15 +45,13 @@ import android.widget.Button;
 import android.widget.EditText;
 import android.widget.FrameLayout;
 import android.widget.LinearLayout;
+import uk.ac.horizon.aestheticodes.MarkerSettings;
 import uk.ac.horizon.aestheticodes.R;
-import uk.ac.horizon.aestheticodes.detect.MarkerPreferences;
-import uk.ac.horizon.data.DtouchMarkersDataSource;
-import uk.ac.horizon.aestheticodes.MarkerConstraint;
 
 public class SettingsActivity extends PreferenceActivity implements SharedPreferences.OnSharedPreferenceChangeListener
 {
 	private static final String TAG = SettingsActivity.class.getName();
-	private MarkerPreferences markerPreferences;
+	private MarkerSettings settings = MarkerSettings.getSettings();
 
 	/**
 	 * Sets up the action bar for an {@link PreferenceScreen}
@@ -115,8 +113,6 @@ public class SettingsActivity extends PreferenceActivity implements SharedPrefer
 	public void onCreate(Bundle savedInstanceState)
 	{
 		super.onCreate(savedInstanceState);
-
-		markerPreferences = new MarkerPreferences(this);
 
 		addPreferencesFromResource(R.xml.settings_marker);
 
@@ -197,7 +193,6 @@ public class SettingsActivity extends PreferenceActivity implements SharedPrefer
 
 	public void onSharedPreferenceChanged(SharedPreferences sharedPreferences, String key)
 	{
-		DtouchMarkersDataSource.prefsChanged = true;
 		Log.i(TAG, key + " changed");
 		final Preference preference = findPreference(key);
 		if (preference != null)
@@ -252,7 +247,7 @@ public class SettingsActivity extends PreferenceActivity implements SharedPrefer
 		PreferenceManager.setDefaultValues(getApplicationContext(), R.xml.settings_marker, true);
 	}
 
-	private class MarkerDialogFragment extends DialogFragment
+	public class MarkerDialogFragment extends DialogFragment
 	{
 		private EditText markerCode;
 		private EditText markerURL;
@@ -318,13 +313,6 @@ public class SettingsActivity extends PreferenceActivity implements SharedPrefer
 
 		private class MarkerCodeInputFilter implements InputFilter
 		{
-			private final MarkerConstraint constraints;
-
-			public MarkerCodeInputFilter()
-			{
-				constraints = new MarkerConstraint(markerPreferences);
-			}
-
 			@Override
 			public CharSequence filter(CharSequence source, int sourceStart, int sourceEnd, Spanned destination, int destinationStart, int destinationEnd)
 			{
@@ -334,13 +322,13 @@ public class SettingsActivity extends PreferenceActivity implements SharedPrefer
 					sourceValue = ":";
 				}
 
-				boolean result = constraints.isValidMarker(destination.subSequence(0, destinationStart).toString() + sourceValue +
+				boolean result = settings.isValidMarker(destination.subSequence(0, destinationStart).toString() + sourceValue +
 						destination.subSequence(destinationEnd, destination.length()).toString(), true);
 
 				if (!result && !sourceValue.startsWith(":"))
 				{
 					sourceValue = ":" + sourceValue;
-					result = constraints.isValidMarker(destination.subSequence(0, destinationStart).toString() + sourceValue +
+					result = settings.isValidMarker(destination.subSequence(0, destinationStart).toString() + sourceValue +
 							destination.subSequence(destinationEnd, destination.length()).toString(), true);
 				}
 

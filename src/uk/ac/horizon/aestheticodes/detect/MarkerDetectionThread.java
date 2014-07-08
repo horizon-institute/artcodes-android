@@ -32,6 +32,8 @@ import org.opencv.core.Scalar;
 import org.opencv.imgproc.Imgproc;
 import uk.ac.horizon.aestheticodes.Marker;
 import uk.ac.horizon.aestheticodes.MarkerDetector;
+import uk.ac.horizon.aestheticodes.MarkerSettings;
+import uk.ac.horizon.aestheticodes.Mode;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -43,17 +45,15 @@ public class MarkerDetectionThread extends Thread
 	private static final Scalar outlineColour = new Scalar(0, 0, 0, 255);
 	private final MarkerDetector markerDetector;
 	private final CameraManager cameraManager;
-	private final MarkerPreferences markerPreferences;
 	MarkerDetectionListener listener;
 	private boolean running = true;
-	private DrawMode drawMode = DrawMode.none;
+	private Mode mode = Mode.detect;
 
-	public MarkerDetectionThread(CameraManager cameraManager, MarkerDetectionListener listener)
+	public MarkerDetectionThread(CameraManager cameraManager, MarkerDetectionListener listener, MarkerSettings settings)
 	{
 		this.cameraManager = cameraManager;
 		this.listener = listener;
-		this.markerPreferences = new MarkerPreferences(cameraManager.getContext());
-		markerDetector = new MarkerDetector(cameraManager.getContext(), markerPreferences);
+		markerDetector = new MarkerDetector(settings);
 	}
 
 	public void setRunning(boolean running)
@@ -78,7 +78,7 @@ public class MarkerDetectionThread extends Thread
 		int startCol;
 		int endCol;
 
-		int numberOfTiles = markerPreferences.getNumberOfTiles();
+		int numberOfTiles = 2; // TODO ? settings.getNumberOfTiles();
 		int tileWidth = (int) image.size().height / numberOfTiles;
 		int tileHeight = (int) image.size().width / numberOfTiles;
 
@@ -150,7 +150,7 @@ public class MarkerDetectionThread extends Thread
 					marker.setComponentIndex(i);
 					markersDetected.add(marker);
 
-					if (drawMode == DrawMode.outline && drawImage != null)
+					if (mode == Mode.outline && drawImage != null)
 					{
 						Imgproc.drawContours(drawImage, contours, i, outlineColour, 7);
 						Imgproc.drawContours(drawImage, contours, i, detectedColour, 5);
@@ -158,7 +158,7 @@ public class MarkerDetectionThread extends Thread
 				}
 			}
 
-			if(drawMode != DrawMode.none && drawImage != null)
+			if(mode != Mode.detect && drawImage != null)
 			{
 				for (Marker marker : markersDetected)
 				{
@@ -226,11 +226,11 @@ public class MarkerDetectionThread extends Thread
 						thresholdImage(detectionImage);
 
 						Mat drawImage = null;
-						if (drawMode != DrawMode.none)
+						if (mode != Mode.detect)
 						{
 							rotate(detectionImage, detectionImage, 360 + 90 - cameraManager.getRotation(), cameraManager.isFront());
 
-							if(drawMode == DrawMode.threshold)
+							if(mode == Mode.threshold)
 							{
 								drawImage = detectionImage.clone();
 							}
@@ -243,24 +243,9 @@ public class MarkerDetectionThread extends Thread
 						// find markers.
 						List<Marker> markers = findMarkers(detectionImage, drawImage);
 
-						// if markers are found then decide which marker code occurred most.
-						if (!markers.isEmpty() && listener != null)
+						if (mode == Mode.detect || drawImage == null)
 						{
-							listener.markerDetected(markerDetector.compareDetectedMarkers(markers));
-						}
-
-						if (drawMode == DrawMode.none || drawImage == null)
-						{
-							if(cameraManager.getResult() != null)
-							{
-								cameraManager.setResult(null);
-								listener.tracking(markers);
-							}
-							else
-							{
-								cameraManager.setResult(null);
-							}
-
+							cameraManager.setResult(null);
 						}
 						else
 						{
@@ -272,9 +257,12 @@ public class MarkerDetectionThread extends Thread
 
 							cameraManager.setResult(bmp);
 
-							listener.tracking(markers);
-
 							drawImage.release();
+						}
+
+						if(listener != null)
+						{
+							listener.markersDetected(markers);
 						}
 
 						if (drawImage != null)
@@ -305,19 +293,14 @@ public class MarkerDetectionThread extends Thread
 		Log.i(TAG, "Finishing processing thread");
 	}
 
-	public DrawMode getDrawMode()
+	public Mode getMode()
 	{
-		return drawMode;
+		return mode;
 	}
 
-	public void setDrawMode(DrawMode drawMode)
+	public void setMode(Mode mode)
 	{
-		Log.i(TAG, "Set draw mode " + drawMode);
-		this.drawMode = drawMode;
-	}
-
-	public enum DrawMode
-	{
-		none, outline, threshold
+		Log.i(TAG, "Set mode " + mode);
+		this.mode = mode;
 	}
 }

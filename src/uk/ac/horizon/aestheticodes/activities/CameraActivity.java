@@ -18,38 +18,38 @@
  */
 package uk.ac.horizon.aestheticodes.activities;
 
-import android.app.Activity;
+import android.content.Context;
 import android.content.Intent;
 import android.net.Uri;
 import android.os.Bundle;
-import android.preference.PreferenceManager;
+import android.support.v4.app.Fragment;
+import android.support.v4.app.FragmentActivity;
+import android.support.v4.app.FragmentPagerAdapter;
+import android.support.v4.view.ViewPager;
 import android.util.Log;
-import android.view.Menu;
-import android.view.MenuInflater;
-import android.view.MenuItem;
-import android.view.SurfaceHolder;
-import android.view.SurfaceView;
-import android.view.View;
-import android.view.WindowManager;
-import android.widget.AdapterView;
-import android.widget.ArrayAdapter;
-import android.widget.Spinner;
+import android.view.*;
+import android.widget.ProgressBar;
+import android.widget.TextView;
 import org.opencv.android.OpenCVLoader;
+import uk.ac.horizon.aestheticodes.Marker;
+import uk.ac.horizon.aestheticodes.MarkerAction;
+import uk.ac.horizon.aestheticodes.MarkerSelection;
+import uk.ac.horizon.aestheticodes.MarkerSettings;
+import uk.ac.horizon.aestheticodes.Mode;
 import uk.ac.horizon.aestheticodes.R;
 import uk.ac.horizon.aestheticodes.detect.CameraManager;
 import uk.ac.horizon.aestheticodes.detect.MarkerDetectionListener;
 import uk.ac.horizon.aestheticodes.detect.MarkerDetectionThread;
 import uk.ac.horizon.aestheticodes.detect.ViewfinderView;
-import uk.ac.horizon.data.DataMarker;
-import uk.ac.horizon.data.DataMarkerWebServices;
-import uk.ac.horizon.aestheticodes.Marker;
 
 import java.io.IOException;
 import java.util.List;
 
-public class CameraActivity extends Activity implements SurfaceHolder.Callback, MarkerDetectionListener
+public class CameraActivity extends FragmentActivity implements SurfaceHolder.Callback, MarkerDetectionListener
 {
 	private static final String TAG = CameraActivity.class.getName();
+	private static final String MODE_PREFIX = "mode_";
+	private static final int MAX_PROGRESS = 1000;
 
 	static
 	{
@@ -59,11 +59,47 @@ public class CameraActivity extends Activity implements SurfaceHolder.Callback, 
 		}
 	}
 
+	public static final class ModeFragment extends Fragment
+	{
+		private Context context;
+		private Mode mode;
+
+		public ModeFragment(Context context, Mode mode)
+		{
+			this.context = context;
+			this.mode = mode;
+		}
+
+		@Override
+		public View onCreateView(LayoutInflater inflater, ViewGroup container,
+		                         Bundle savedInstanceState)
+		{
+			// Inflate the layout for this fragment
+			TextView view = new TextView(context);
+			view.setGravity(Gravity.CENTER_HORIZONTAL);
+			//view.setRotation(90);
+			int id = context.getResources().getIdentifier(MODE_PREFIX + mode.name(), "string", context.getPackageName());
+			if (id != 0)
+			{
+				view.setText(getString(id));
+			}
+			else
+			{
+				view.setText(mode.name());
+			}
+
+			return view;
+		}
+	}
+
+	private final MarkerSettings settings = MarkerSettings.getSettings();
+	private final MarkerSelection detectingMarkers = new MarkerSelection();
 	private SurfaceHolder holder;
 	private CameraManager cameraManager;
 	private MarkerDetectionThread thread;
 	private ViewfinderView viewfinder;
-	private Spinner spinner;
+	private ViewPager pager;
+	private ProgressBar progress;
 
 	public void surfaceCreated(SurfaceHolder holder)
 	{
@@ -97,14 +133,62 @@ public class CameraActivity extends Activity implements SurfaceHolder.Callback, 
 		super.onCreate(savedInstanceState);
 		getWindow().addFlags(WindowManager.LayoutParams.FLAG_KEEP_SCREEN_ON);
 
-		PreferenceManager.setDefaultValues(this, R.xml.settings_defaults, false);
-
 		setContentView(R.layout.capture);
 
 		cameraManager = new CameraManager(this);
 
 		viewfinder = (ViewfinderView) findViewById(R.id.viewfinder);
 		viewfinder.setCameraManager(cameraManager);
+
+		progress = (ProgressBar) findViewById(R.id.progress);
+		progress.setMax(MAX_PROGRESS);
+
+		pager = (ViewPager) findViewById(R.id.pager);
+		pager.setAdapter(new FragmentPagerAdapter(getSupportFragmentManager())
+		{
+			@Override
+			public int getCount()
+			{
+				return settings.getModes().size();
+			}
+
+			@Override
+			public Fragment getItem(int position)
+			{
+				return new ModeFragment(CameraActivity.this, settings.getModes().get(position));
+			}
+		});
+		pager.setOnPageChangeListener(new ViewPager.OnPageChangeListener()
+		{
+			@Override
+			public void onPageScrolled(int position, float positionOffset, int positionOffsetPixels)
+			{
+
+			}
+
+			@Override
+			public void onPageSelected(int position)
+			{
+				thread.setMode(settings.getModes().get(position));
+				viewfinder.invalidate();
+				if (progress != null)
+				{
+					detectingMarkers.reset();
+					progress.setVisibility(View.INVISIBLE);
+				}
+			}
+
+			@Override
+			public void onPageScrollStateChanged(int state)
+			{
+
+			}
+		});
+
+		pager.setCurrentItem(0);
+		pager.setOffscreenPageLimit(3);
+		pager.setPageTransformer(true, new ZoomOutPageTransformer());
+		pager.setPageMargin((int) (getResources().getDisplayMetrics().widthPixels / -1.5));
 
 		final SurfaceView surfaceView = (SurfaceView) findViewById(R.id.preview);
 		holder = surfaceView.getHolder();
@@ -114,44 +198,23 @@ public class CameraActivity extends Activity implements SurfaceHolder.Callback, 
 
 	}
 
+	private void update()
+	{
+		if (settings.getModes().size() <= 1)
+		{
+			pager.setVisibility(View.INVISIBLE);
+		}
+		else
+		{
+			pager.setVisibility(View.VISIBLE);
+		}
+	}
+
 	@Override
 	public boolean onCreateOptionsMenu(Menu menu)
 	{
 		MenuInflater inflater = getMenuInflater();
 		inflater.inflate(R.menu.capture_actions, menu);
-
-		MenuItem spinnerItem = menu.findItem(R.id.action_mode);
-		spinner = (Spinner) spinnerItem.getActionView();
-		ArrayAdapter<CharSequence> listAdapter = new ArrayAdapter<CharSequence>(this, android.R.layout.simple_spinner_item);
-		listAdapter.setDropDownViewResource(android.R.layout.simple_spinner_dropdown_item);
-		final String drawPrefix = getString(R.string.draw_prefix);
-		for(MarkerDetectionThread.DrawMode mode: MarkerDetectionThread.DrawMode.values())
-		{
-			int id = getResources().getIdentifier(drawPrefix + mode.name(), "string", getPackageName());
-			if(id != 0)
-			{
-				listAdapter.add(getString(id));
-			}
-			else
-			{
-				listAdapter.add(mode.name());
-			}
-		}
-		spinner.setAdapter(listAdapter);
-		spinner.setOnItemSelectedListener(new AdapterView.OnItemSelectedListener()
-		{
-			@Override
-			public void onItemSelected(AdapterView<?> parent, View view, int position, long id)
-			{
-				thread.setDrawMode(MarkerDetectionThread.DrawMode.values()[position]);
-			}
-
-			@Override
-			public void onNothingSelected(AdapterView<?> parent)
-			{
-				thread.setDrawMode(MarkerDetectionThread.DrawMode.none);
-			}
-		});
 
 		return super.onCreateOptionsMenu(menu);
 	}
@@ -166,11 +229,17 @@ public class CameraActivity extends Activity implements SurfaceHolder.Callback, 
 			try
 			{
 				cameraManager.startPreview(holder);
-				thread = new MarkerDetectionThread(cameraManager, this);
+				thread = new MarkerDetectionThread(cameraManager, this, settings);
 				thread.start();
-				if(spinner != null)
+				if (pager != null)
 				{
-					thread.setDrawMode(MarkerDetectionThread.DrawMode.values()[spinner.getSelectedItemPosition()]);
+					thread.setMode(Mode.values()[pager.getCurrentItem()]);
+				}
+
+				if (progress != null)
+				{
+					detectingMarkers.reset();
+					progress.setVisibility(View.INVISIBLE);
 				}
 			}
 			catch (Exception e)
@@ -206,84 +275,80 @@ public class CameraActivity extends Activity implements SurfaceHolder.Callback, 
 			case R.id.action_help:
 				startActivity(new Intent(this, GuideActivity.class));
 				return true;
-//			case R.id.action_track:
-//				if (thread != null)
-//				{
-//					thread.setDetecting(!thread.isDetecting());
-//					if (thread.isDetecting())
-//					{
-//						item.setTitle(getString(R.string.action_track));
-//					}
-//					else
-//					{
-//						item.setTitle(getString(R.string.action_detect));
-//					}
-//				}
-//				return true;
+			case R.id.action_switch_camera:
+				return true;
 			default:
 				return super.onOptionsItemSelected(item);
 		}
 	}
 
-
 	@Override
-	public void markerDetected(final Marker marker)
+	public void markersDetected(final List<Marker> markers)
 	{
 		if(thread == null)
 		{
 			return;
 		}
-		if (thread.getDrawMode() == MarkerDetectionThread.DrawMode.none)
+		if (thread.getMode() == Mode.detect)
 		{
-			thread.setRunning(false);
-			this.runOnUiThread(new Runnable()
+			detectingMarkers.addMarkers(markers);
+
+			runOnUiThread(new Runnable()
 			{
+				@Override
 				public void run()
 				{
-					// showProgressControls();
-					getMarker(marker.getCodeKey());
+					if (detectingMarkers.hasStarted())
+					{
+						progress.setVisibility(View.VISIBLE);
+						progress.setProgress((int) (MAX_PROGRESS * detectingMarkers.getProgress()));
+						progress.setAlpha(1 - detectingMarkers.expiration());
+					}
+					else if(detectingMarkers.isTimeUp())
+					{
+						progress.setVisibility(View.INVISIBLE);
+					}
 				}
 			});
-		}
-	}
 
-	private void getMarker(String code)
-	{
-		DataMarkerWebServices dtouchMarkerWebServices = new DataMarkerWebServices(new DataMarkerWebServices.MarkerDownloadRequestListener()
-		{
-			public void onMarkerDownloaded(DataMarker marker)
+			if(detectingMarkers.isTimeUp())
 			{
-				if (marker != null)
+				detectingMarkers.reset();
+			}
+			else if (detectingMarkers.isFinished())
+			{
+				Marker marker = detectingMarkers.getLikelyMarker();
+				detectingMarkers.reset();
+
+				MarkerAction markerDetail = settings.getMarkers().get(marker.getCodeKey());
+				if (markerDetail != null)
 				{
-					startActivity(new Intent(Intent.ACTION_VIEW, Uri.parse(marker.getUri())));
+					cameraManager.stopPreview();
+					if (markerDetail.getShowDetail())
+					{
+						startActivity(new Intent(this, SettingsActivity.class));
+					}
+					else
+					{
+						startActivity(new Intent(Intent.ACTION_VIEW, Uri.parse(markerDetail.getAction())));
+					}
 				}
 				else
 				{
-					Log.e(TAG, "No data found for marker");
-					thread = new MarkerDetectionThread(cameraManager, CameraActivity.this);
-					thread.start();
+					Log.w(TAG, "No details for marker " + marker.getCodeKey());
 				}
 			}
-
-			@Override
-			public void onMarkerDownloadError()
-			{
-				Log.e(TAG, "Marker download error. WTF?");
-			}
-		});
-		dtouchMarkerWebServices.executeMarkerRequestUsingCode(code, null, this);
-	}
-
-	@Override
-	public void tracking(List<Marker> markers)
-	{
-		runOnUiThread(new Runnable()
+		}
+		else
 		{
-			@Override
-			public void run()
+			runOnUiThread(new Runnable()
 			{
-				viewfinder.invalidate();
-			}
-		});
+				@Override
+				public void run()
+				{
+					viewfinder.invalidate();
+				}
+			});
+		}
 	}
 }

@@ -17,17 +17,20 @@
  *     along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-package uk.ac.horizon.data;
+package uk.ac.horizon.aestheticodes;
 
-public class DataMarker
+public class MarkerAction
 {
 	private String code;
-	private String uri;
+	private String action;
+	private boolean visible = true;
+	private boolean editable = true;
+	private String image;
+	private boolean showDetail = true;
 
-	public DataMarker(String code, String uri)
+	public String getCode()
 	{
-		setCode(code);
-		setUri(uri);
+		return code;
 	}
 
 	public void setCode(String code)
@@ -35,18 +38,53 @@ public class DataMarker
 		this.code = code;
 	}
 
-	public String getCode()
+	public String getAction()
 	{
-		return code;
+		return action;
 	}
 
-	public String getUri()
+	public void setAction(String action)
 	{
-		return uri;
+		this.action = action;
 	}
 
-	public void setUri(String uri)
+	public boolean isVisible()
 	{
-		this.uri = uri;
+		return visible;
+	}
+
+	public void setVisible(boolean visible)
+	{
+		this.visible = visible;
+	}
+
+	public boolean isEditable()
+	{
+		return editable;
+	}
+
+	public void setEditable(boolean editable)
+	{
+		this.editable = editable;
+	}
+
+	public String getImage()
+	{
+		return image;
+	}
+
+	public void setImage(String image)
+	{
+		this.image = image;
+	}
+
+	public boolean getShowDetail()
+	{
+		return showDetail;
+	}
+
+	public void setShowDetail(boolean showDetail)
+	{
+		this.showDetail = showDetail;
 	}
 }

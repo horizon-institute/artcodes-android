@@ -30,11 +30,37 @@
             android:layout_width="fill_parent"
             android:layout_height="fill_parent"/>
 
+	<TextView android:layout_width="wrap_content"
+	          android:layout_height="wrap_content"
+	          android:layout_gravity="bottom|center_horizontal"
+	          android:background="@color/transparent"
+	          android:text="@string/pager_mark"
+	          android:textColor="@android:color/white" android:paddingBottom="100dp" android:id="@+id/pager_mark" />
+
+	<ProgressBar
+			android:layout_width="fill_parent"
+			android:layout_height="wrap_content"
+			style="@android:style/Widget.Holo.ProgressBar.Horizontal"
+			android:layout_gravity="bottom|center_horizontal"
+			android:layout_marginRight="30dp"
+			android:layout_marginLeft="30dp"
+			android:layout_marginBottom="30dp" android:id="@+id/progress" />
+
     <TextView android:id="@+id/status_view"
-              android:layout_width="wrap_content"
-              android:layout_height="wrap_content"
-              android:layout_gravity="bottom|center_horizontal"
+              android:layout_width="fill_parent"
+              android:layout_height="fill_parent"
               android:background="@color/transparent"
               android:text="@string/default_status"
-              android:textColor="@android:color/white"/>
+              android:textColor="@android:color/white"
+              android:gravity="center_horizontal|bottom"
+		    />
+
+	<android.support.v4.view.ViewPager
+			android:id="@+id/pager"
+			android:layout_width="match_parent"
+			android:layout_height="80dp"
+			android:layout_gravity="bottom|center_horizontal"
+			android:layout_marginBottom="20dp"
+			android:overScrollMode="never"
+			/>
 </merge>

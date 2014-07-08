@@ -94,7 +94,7 @@
 						android:key="checksum_modulo"
 						android:maxLength="2"
 						android:numeric="integer"
-						android:summary="Please enter the value for the checksum"
+						android:summary="Please enter the value for the checksumModulo"
 						android:title="Checksum value" />
 				<EditTextPreference
 						android:defaultValue="1"

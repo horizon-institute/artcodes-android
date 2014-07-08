@@ -28,6 +28,5 @@ import java.util.List;
  */
 public interface MarkerDetectionListener
 {
-	void markerDetected(Marker marker);
-	void tracking(List<Marker> markers);
+	void markersDetected(List<Marker> markers);
 }

@@ -16,7 +16,6 @@
  *     You should have received a copy of the GNU Affero General Public License
  *     along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
-
 buildscript {
 	repositories {
 		mavenCentral()
@@ -26,27 +25,20 @@ buildscript {
 	}
 }
 
-apply plugin: 'android'
 apply plugin: 'idea'
-
-idea {
-	module {
-		downloadJavadoc = true
-		downloadSources = true
-	}
-}
+apply plugin: 'eclipse'
+apply plugin: 'com.android.application'
 
 repositories {
 	mavenCentral()
+	maven {
+		url 'https://raw.github.com/vRallev/mvn-repo/master/'
+	}
 }
 
-evaluationDependsOn(':aestheticodes-core')
-evaluationDependsOn(':opencv')
-
 dependencies {
-	compile project(':aestheticodes-core')
-	compile project(':opencv')
-	compile 'com.android.support:support-v4:+'
+	compile 'org.opencv:opencv-android:+'
+	compile 'com.android.support:support-v4:19.+'
 	compile 'com.google.code.gson:gson:+'
 }
 
@@ -70,6 +62,8 @@ android {
 	defaultConfig {
 		minSdkVersion 11
 		targetSdkVersion 19
+		versionCode 17
+		versionName '2.1.0'
 	}
 
 	signingConfigs {
@@ -92,5 +86,5 @@ android {
 }
 
 task wrapper(type: Wrapper) {
-    gradleVersion = '1.12'
+	gradleVersion = '1.12'
 }
