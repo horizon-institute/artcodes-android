@@ -17,10 +17,11 @@
  *     along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-package uk.ac.horizon.aestheticodes;
+package uk.ac.horizon.aestheticodes.model;
 
 import java.util.ArrayList;
 import java.util.Arrays;
+import java.util.Date;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
@@ -32,8 +33,6 @@ import java.util.Map;
  * max leaves in a branch. The second set of parameters are used to define to
  * validate a marker. It defines the number of validation branches, leaves in a
  * validation branch and the checksumModulo modulo.
- *
- * @author pszsa1
  */
 public class MarkerSettings
 {
@@ -44,21 +43,40 @@ public class MarkerSettings
 		return settings;
 	}
 
+	public void setSettings(MarkerSettings settings)
+	{
+		minRegions = settings.minRegions;
+		maxRegions = settings.maxRegions;
+		maxEmptyRegions = settings.maxEmptyRegions;
+		maxRegionValue = settings.maxRegionValue;
+		validationRegions = settings.validationRegions;
+		validationRegionValue = settings.validationRegionValue;
+		checksumModulo = settings.checksumModulo;
+		markers.clear();
+		markers.putAll(settings.markers);
+		modes.clear();
+		modes.addAll(settings.modes);
+
+		updateURL = settings.updateURL;
+		lastUpdate = settings.lastUpdate;
+
+		editable = settings.editable;
+	}
+
+	private final List<Mode> modes = new ArrayList<Mode>();
+	private final Map<String, MarkerAction> markers = new HashMap<String, MarkerAction>();
 	private int minRegions = 5;
 	private int maxRegions = 5;
 	private int maxEmptyRegions = 0;
 	private int maxRegionValue = 6;
 	private int validationRegions = 2;
 	private int validationRegionValue = 1;
-	private int checksumModulo = 6;
-
-	private String updateURL;
-
-	// marker occurrence value
-	private int defaultMarkerOccurrence = 1;
-
-	private List<Mode> modes = new ArrayList<Mode>();
-	private Map<String, MarkerAction> markers = new HashMap<String, MarkerAction>();
+	private int checksumModulo = 3;
+	private boolean editable = true;
+	private boolean addMarker = true;
+	private Date lastUpdate;
+	private transient boolean changed = false;
+	private String updateURL = "http://www.wornchaos.org/settings.json";
 
 	public MarkerSettings()
 	{
@@ -78,6 +96,7 @@ public class MarkerSettings
 	public void setMinRegions(int minRegions)
 	{
 		this.minRegions = minRegions;
+		changed = true;
 	}
 
 	public int getMaxRegions()
@@ -88,6 +107,7 @@ public class MarkerSettings
 	public void setMaxRegions(int maxRegions)
 	{
 		this.maxRegions = maxRegions;
+		changed = true;
 	}
 
 	public int getMaxEmptyRegions()
@@ -98,6 +118,7 @@ public class MarkerSettings
 	public void setMaxEmptyRegions(int maxEmptyRegions)
 	{
 		this.maxEmptyRegions = maxEmptyRegions;
+		changed = true;
 	}
 
 	public int getMaxRegionValue()
@@ -108,6 +129,7 @@ public class MarkerSettings
 	public void setMaxRegionValue(int maxRegionValue)
 	{
 		this.maxRegionValue = maxRegionValue;
+		changed = true;
 	}
 
 	public int getValidationRegions()
@@ -118,6 +140,7 @@ public class MarkerSettings
 	public void setValidationRegions(int validationRegions)
 	{
 		this.validationRegions = validationRegions;
+		changed = true;
 	}
 
 	public int getValidationRegionValue()
@@ -128,6 +151,7 @@ public class MarkerSettings
 	public void setValidationRegionValue(int validationRegionValue)
 	{
 		this.validationRegionValue = validationRegionValue;
+		changed = true;
 	}
 
 	public int getChecksumModulo()
@@ -138,6 +162,7 @@ public class MarkerSettings
 	public void setChecksumModulo(int checksumModulo)
 	{
 		this.checksumModulo = checksumModulo;
+		changed = true;
 	}
 
 	public boolean isValidMarker(List<Integer> markerCodes)
@@ -150,10 +175,15 @@ public class MarkerSettings
 		return markers;
 	}
 
-	public boolean isValidMarker(List<Integer> markerCodes, boolean partial)
-
+	public void setChanged(boolean changed)
 	{
-		return hasValidNumberofRegions(markerCodes)
+		this.changed = changed;
+	}
+
+	public boolean isValidMarker(List<Integer> markerCodes, boolean partial)
+	{
+		return markerCodes != null
+				&& hasValidNumberofRegions(markerCodes)
 				&& hasValidNumberofEmptyRegions(markerCodes)
 				&& hasValidNumberOfLeaves(markerCodes)
 				&& hasValidationRegions(markerCodes)
@@ -162,39 +192,33 @@ public class MarkerSettings
 
 	public boolean isValidMarker(String marker, boolean partial)
 	{
-		int count = marker.length() - marker.replace(".", "").length();
-		int maxCodeLength = maxRegions;
-		if (count >= maxCodeLength)
-		{
-			return false;
-		}
-
+		String[] values = marker.split(":");
 		if (!partial)
 		{
-			int minCodeLength = minRegions;
-			if (count < minCodeLength)
+			if (values.length < minRegions)
 			{
 				return false;
 			}
 		}
 
-		String[] values = marker.split(":");
-		if (values.length > maxCodeLength)
+		if (values.length > maxRegions)
 		{
 			return false;
 		}
 
 		int prevValue = 0;
-		int maxCodeValue = maxRegionValue;
+		List<Integer> codes = new ArrayList<Integer>();
 		for (String value : values)
 		{
 			try
 			{
 				int codeValue = Integer.parseInt(value);
-				if (codeValue < 1 || codeValue > maxCodeValue || codeValue < prevValue)
+				if (codeValue > maxRegionValue || codeValue < prevValue)
 				{
 					return false;
 				}
+
+				codes.add(codeValue);
 
 				prevValue = codeValue;
 			}
@@ -202,6 +226,11 @@ public class MarkerSettings
 			{
 				return false;
 			}
+		}
+
+		if (!partial)
+		{
+			return isValidMarker(codes);
 		}
 
 		return true;
@@ -288,5 +317,31 @@ public class MarkerSettings
 			}
 		}
 		return true;
+	}
+
+	public String getUpdateURL()
+	{
+		return updateURL;
+	}
+
+	public boolean canAddMarker()
+	{
+		return addMarker;
+	}
+
+	public Date getLastUpdate()
+	{
+		return lastUpdate;
+	}
+
+	public void setLastUpdate(Date lastUpdate)
+	{
+		this.lastUpdate = lastUpdate;
+		changed = true;
+	}
+
+	public boolean hasChanged()
+	{
+		return changed;
 	}
 }

@@ -50,17 +50,14 @@
 				<EditTextPreference
 						android:defaultValue="6"
 						android:key="max_branches"
-						android:dialogTitle="@string/max_regions"
 						android:maxLength="2"
 						android:numeric="integer"
-						android:title="@string/max_regions" />
+						 />
 				<EditTextPreference
 						android:defaultValue="6"
 						android:key="max_leaves"
 						android:maxLength="3"
-						android:numeric="integer"
-						android:dialogTitle="@string/max_leaves"
-						android:title="@string/max_leaves" />
+						android:numeric="integer"/>
 				<EditTextPreference
 						android:defaultValue="0"
 						android:dialogTitle="Empty Regions"

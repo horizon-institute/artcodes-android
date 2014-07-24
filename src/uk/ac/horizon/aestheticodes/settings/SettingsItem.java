@@ -17,74 +17,53 @@
  *     along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-package uk.ac.horizon.aestheticodes;
+package uk.ac.horizon.aestheticodes.settings;
 
-public class MarkerAction
+import android.content.Context;
+
+public class SettingsItem
 {
-	private String code;
-	private String action;
-	private boolean visible = true;
-	private boolean editable = true;
-	private String image;
-	private boolean showDetail = true;
-
-	public String getCode()
+	public enum Type
 	{
-		return code;
+		header, single_line, two_line, two_line_disabled
 	}
 
-	public void setCode(String code)
+	private String title;
+	protected final SettingsActivity activity;
+
+	protected SettingsItem(SettingsActivity activity)
 	{
-		this.code = code;
+		this.activity = activity;
 	}
 
-	public String getAction()
+	public SettingsItem(SettingsActivity activity, String title)
 	{
-		return action;
+		this.activity = activity;
+		this.title = title;
 	}
 
-	public void setAction(String action)
+	public String getTitle()
 	{
-		this.action = action;
+		return title;
 	}
 
-	public boolean isVisible()
+	public Type getType()
 	{
-		return visible;
+		return Type.header;
 	}
 
-	public void setVisible(boolean visible)
+	public void selected()
 	{
-		this.visible = visible;
+
 	}
 
-	public boolean isEditable()
+	public int getIcon()
 	{
-		return editable;
+		return 0;
 	}
 
-	public void setEditable(boolean editable)
+	public String getDetail()
 	{
-		this.editable = editable;
-	}
-
-	public String getImage()
-	{
-		return image;
-	}
-
-	public void setImage(String image)
-	{
-		this.image = image;
-	}
-
-	public boolean getShowDetail()
-	{
-		return showDetail;
-	}
-
-	public void setShowDetail(boolean showDetail)
-	{
-		this.showDetail = showDetail;
+		return null;
 	}
 }

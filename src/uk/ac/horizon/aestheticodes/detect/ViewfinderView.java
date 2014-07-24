@@ -61,13 +61,13 @@ public final class ViewfinderView extends View
 			return; // not ready yet, early draw before done configuring
 		}
 
-		final Rect frame = cameraManager.getFramingRect();
+		final int width = canvas.getWidth();
+		final int height = canvas.getHeight();
+		final Rect frame = cameraManager.getFrame(width, height);
 		if (frame == null)
 		{
 			return;
 		}
-		final int width = canvas.getWidth();
-		final int height = canvas.getHeight();
 
 		Bitmap result = cameraManager.getResult();
 		if (result != null)

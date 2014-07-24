@@ -32,7 +32,7 @@ apply plugin: 'com.android.application'
 repositories {
 	mavenCentral()
 	maven {
-		url 'https://raw.github.com/vRallev/mvn-repo/master/'
+		url 'https://raw.githubusercontent.com/vRallev/mvn-repo/master/'
 	}
 }
 
@@ -40,11 +40,12 @@ dependencies {
 	compile 'org.opencv:opencv-android:+'
 	compile 'com.android.support:support-v4:19.+'
 	compile 'com.google.code.gson:gson:+'
+	compile 'com.squareup.picasso:picasso:+'
 }
 
 android {
-	compileSdkVersion 19
-	buildToolsVersion "19.1.0"
+	compileSdkVersion 20
+	buildToolsVersion "20.0.0"
 	sourceSets {
 		main {
 			manifest.srcFile 'AndroidManifest.xml'
@@ -61,7 +62,7 @@ android {
 
 	defaultConfig {
 		minSdkVersion 11
-		targetSdkVersion 19
+		targetSdkVersion 20
 		versionCode 17
 		versionName '2.1.0'
 	}

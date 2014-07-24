@@ -17,9 +17,7 @@
  *     along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-package uk.ac.horizon.aestheticodes;
-
-import android.util.Log;
+package uk.ac.horizon.aestheticodes.model;
 
 import java.util.HashMap;
 import java.util.List;
@@ -28,7 +26,7 @@ import java.util.Map;
 public class MarkerSelection
 {
 	private static final float duration = 1000;
-	private final Map<String, Marker> occurences = new HashMap<String, Marker>();
+	private final Map<String, Marker> occurrences = new HashMap<String, Marker>();
 	private long last = 0;
 	private long lastUpdate = 0;
 	private long total = 0;
@@ -39,7 +37,7 @@ public class MarkerSelection
 		final long now = System.currentTimeMillis();
 		if(markers.size() > 0)
 		{
-			if (occurences.size() == 0)
+			if (occurrences.size() == 0)
 			{
 				total = 0;
 			}
@@ -60,15 +58,15 @@ public class MarkerSelection
 		{
 			for (Marker marker : markers)
 			{
-				//increase occurence if this marker is already in the list.
-				Marker existing = occurences.get(marker.getCodeKey());
+				//increase occurrence if this marker is already in the list.
+				Marker existing = occurrences.get(marker.getCodeKey());
 				if (existing != null)
 				{
-					existing.setOccurences(marker.getOccurences() + existing.getOccurences());
+					existing.setOccurrences(marker.getOccurrences() + existing.getOccurrences());
 				}
 				else
 				{
-					occurences.put(marker.getCodeKey(), marker);
+					occurrences.put(marker.getCodeKey(), marker);
 				}
 			}
 		}
@@ -103,9 +101,9 @@ public class MarkerSelection
 	public Marker getLikelyMarker()
 	{
 		Marker likely = null;
-		for (Marker marker : occurences.values())
+		for (Marker marker : occurrences.values())
 		{
-			if (likely == null || marker.getOccurences() > likely.getOccurences())
+			if (likely == null || marker.getOccurrences() > likely.getOccurrences())
 			{
 				likely = marker;
 			}
@@ -115,13 +113,13 @@ public class MarkerSelection
 
 	public void reset()
 	{
-		occurences.clear();
+		occurrences.clear();
 	}
 
 	public float getProgress()
 	{
 		final long now = System.currentTimeMillis();
-		if (occurences.size() == 0)
+		if (occurrences.size() == 0)
 		{
 			return 0;
 		}
@@ -135,6 +133,6 @@ public class MarkerSelection
 
 	public boolean hasStarted()
 	{
-		return occurences.size() != 0;
+		return occurrences.size() != 0;
 	}
 }

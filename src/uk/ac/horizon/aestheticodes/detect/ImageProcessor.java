@@ -19,11 +19,10 @@
 
 package uk.ac.horizon.aestheticodes.detect;
 
-import uk.ac.horizon.aestheticodes.model.Marker;
+import android.hardware.Camera;
 
-import java.util.List;
-
-public interface MarkerDetectionListener
+public interface ImageProcessor
 {
-	void markersDetected(List<Marker> markers);
+	public void processImage(byte[] data);
+	public void initCamera(Camera.Size size);
 }

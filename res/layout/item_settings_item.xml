@@ -18,10 +18,22 @@
   ~     along with this program.  If not, see <http://www.gnu.org/licenses/>.
   -->
 
-<resources xmlns:android="http://schemas.android.com/apk/res/android">
-    <color name="transparent">#00000000</color>
-    <color name="viewfinder_mask">#60000000</color>
-    <color name="result_view">#b0000000</color>
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+                android:layout_width="fill_parent"
+                android:layout_height="72dp"
+                android:padding="16dp"
+                android:orientation="horizontal">
+	<ImageView android:id="@+id/settings_item_icon"
+	           android:layout_width="40dp"
+	           android:layout_height="40dp"
+	           android:layout_marginRight="16dp"
+	           android:scaleType="fitCenter" />
 
-	<color name="list_background">#fafafa</color>
-</resources>
+	<TextView android:id="@+id/settings_item_title"
+	          android:layout_width="wrap_content"
+	          android:layout_height="fill_parent"
+	          android:textSize="16sp"
+	          android:textColor="#FF4D4D4D"
+	          android:gravity="center_vertical" />
+</LinearLayout>
+

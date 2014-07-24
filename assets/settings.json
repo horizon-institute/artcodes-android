@@ -28,7 +28,7 @@
 	"maxRegionValue": 6,
 	"validationRegions": 2,
 	"validationRegionValue": 1,
-	"checksumModulo": 6,
+	"checksumModulo": 3,
 	"modes": ["detect", "outline", "threshold"],
 	"editable": true,
 	"addMarkers": true

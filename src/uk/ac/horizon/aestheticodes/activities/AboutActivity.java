@@ -50,5 +50,7 @@ public class AboutActivity extends Activity
 		activity.setTitle("About Aestheticodes");
 		webView.loadUrl(getResources().getString(R.string.about_aestheticodes));
 		setContentView(webView);
+
+		getActionBar().setDisplayHomeAsUpEnabled(true);
 	}
 }

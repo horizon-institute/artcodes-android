@@ -17,13 +17,31 @@
  *     along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-package uk.ac.horizon.aestheticodes.detect;
+package uk.ac.horizon.aestheticodes.settings;
 
-import uk.ac.horizon.aestheticodes.model.Marker;
+import android.content.Context;
+import android.content.Intent;
 
-import java.util.List;
-
-public interface MarkerDetectionListener
+public class ActivitySettingsItem extends SettingsItem
 {
-	void markersDetected(List<Marker> markers);
+	private Class<?> activityClass;
+
+	public ActivitySettingsItem(SettingsActivity activity, String title, Class<?> activityClass)
+	{
+		super(activity, title);
+		this.activityClass = activityClass;
+	}
+
+	@Override
+	public void selected()
+	{
+		activity.startActivity(new Intent(activity, activityClass));
+	}
+
+	@Override
+	public Type getType()
+	{
+		return Type.single_line;
+	}
+
 }

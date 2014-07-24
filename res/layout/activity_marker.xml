@@ -19,9 +19,47 @@
   ~     along with this program.  If not, see <http://www.gnu.org/licenses/>.
   -->
 
-<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
-              android:orientation="vertical"
-              android:layout_width="match_parent"
-              android:layout_height="match_parent">
+<ScrollView xmlns:android="http://schemas.android.com/apk/res/android"
+            xmlns:tools="http://schemas.android.com/tools" android:orientation="vertical"
+            android:layout_width="match_parent"
+            android:layout_height="match_parent" tools:context=".activities.MarkerActivity">
 
-</LinearLayout>
+	<LinearLayout android:layout_width="fill_parent" android:layout_height="wrap_content"
+	              android:orientation="vertical">
+		<ImageView
+				android:layout_width="fill_parent"
+				android:layout_height="wrap_content"
+				android:id="@+id/imageView" android:src="@drawable/placeholder" android:adjustViewBounds="true" />
+
+		<RelativeLayout
+				android:layout_width="fill_parent"
+				android:layout_height="wrap_content">
+			<TextView
+					android:layout_width="wrap_content"
+					android:layout_height="wrap_content"
+					android:textSize="20sp"
+					android:textColor="#FF222222"
+					android:id="@+id/titleView"
+					android:textStyle="bold" android:layout_gravity="top"
+					android:padding="16dp" />
+			<Button
+					android:layout_width="100dp"
+					android:layout_height="wrap_content"
+					android:text="Open"
+					android:id="@+id/button"
+					android:layout_gravity="center_vertical|right"
+					android:layout_alignParentEnd="true"
+					android:layout_marginLeft="16dp"
+					android:layout_marginTop="16dp"
+					android:layout_marginRight="16dp" />
+		</RelativeLayout>
+		<TextView
+				android:layout_width="wrap_content"
+				android:layout_height="wrap_content"
+				android:textColor="#FF222222"
+				android:id="@+id/descriptionView"
+				android:layout_gravity="center_horizontal"
+				android:textSize="14sp"
+				android:padding="16dp" />
+	</LinearLayout>
+</ScrollView>

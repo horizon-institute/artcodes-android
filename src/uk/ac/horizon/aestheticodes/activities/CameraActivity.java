@@ -18,34 +18,51 @@
  */
 package uk.ac.horizon.aestheticodes.activities;
 
-import android.content.Context;
 import android.content.Intent;
+import android.content.res.Resources;
+import android.graphics.Bitmap;
+import android.graphics.Rect;
+import android.hardware.Camera;
 import android.net.Uri;
+import android.os.Build;
 import android.os.Bundle;
 import android.support.v4.app.Fragment;
 import android.support.v4.app.FragmentActivity;
 import android.support.v4.app.FragmentPagerAdapter;
 import android.support.v4.view.ViewPager;
 import android.util.Log;
-import android.view.*;
+import android.view.LayoutInflater;
+import android.view.Menu;
+import android.view.MenuInflater;
+import android.view.MenuItem;
+import android.view.SurfaceHolder;
+import android.view.SurfaceView;
+import android.view.View;
+import android.view.ViewGroup;
+import android.view.WindowManager;
 import android.widget.ProgressBar;
+import android.widget.RelativeLayout;
 import android.widget.TextView;
 import org.opencv.android.OpenCVLoader;
-import uk.ac.horizon.aestheticodes.Marker;
-import uk.ac.horizon.aestheticodes.MarkerAction;
-import uk.ac.horizon.aestheticodes.MarkerSelection;
-import uk.ac.horizon.aestheticodes.MarkerSettings;
-import uk.ac.horizon.aestheticodes.Mode;
+import org.opencv.android.Utils;
+import org.opencv.core.CvType;
+import org.opencv.core.Mat;
+import org.opencv.core.Size;
+import org.opencv.imgproc.Imgproc;
 import uk.ac.horizon.aestheticodes.R;
 import uk.ac.horizon.aestheticodes.detect.CameraManager;
 import uk.ac.horizon.aestheticodes.detect.MarkerDetectionListener;
 import uk.ac.horizon.aestheticodes.detect.MarkerDetectionThread;
 import uk.ac.horizon.aestheticodes.detect.ViewfinderView;
+import uk.ac.horizon.aestheticodes.model.Marker;
+import uk.ac.horizon.aestheticodes.model.MarkerAction;
+import uk.ac.horizon.aestheticodes.model.MarkerSelection;
+import uk.ac.horizon.aestheticodes.model.MarkerSettings;
+import uk.ac.horizon.aestheticodes.model.Mode;
 
-import java.io.IOException;
 import java.util.List;
 
-public class CameraActivity extends FragmentActivity implements SurfaceHolder.Callback, MarkerDetectionListener
+public class CameraActivity extends FragmentActivity implements MarkerDetectionListener
 {
 	private static final String TAG = CameraActivity.class.getName();
 	private static final String MODE_PREFIX = "mode_";
@@ -61,31 +78,23 @@ public class CameraActivity extends FragmentActivity implements SurfaceHolder.Ca
 
 	public static final class ModeFragment extends Fragment
 	{
-		private Context context;
-		private Mode mode;
-
-		public ModeFragment(Context context, Mode mode)
+		public ModeFragment()
 		{
-			this.context = context;
-			this.mode = mode;
 		}
 
 		@Override
-		public View onCreateView(LayoutInflater inflater, ViewGroup container,
-		                         Bundle savedInstanceState)
+		public View onCreateView(LayoutInflater inflater, ViewGroup container, Bundle savedInstanceState)
 		{
-			// Inflate the layout for this fragment
-			TextView view = new TextView(context);
-			view.setGravity(Gravity.CENTER_HORIZONTAL);
-			//view.setRotation(90);
-			int id = context.getResources().getIdentifier(MODE_PREFIX + mode.name(), "string", context.getPackageName());
+			final TextView view = (TextView)inflater.inflate(R.layout.item_mode, container, false);
+			final String mode = getArguments().getString("mode");
+			int id = getActivity().getResources().getIdentifier(MODE_PREFIX + mode, "string", getActivity().getPackageName());
 			if (id != 0)
 			{
 				view.setText(getString(id));
 			}
 			else
 			{
-				view.setText(mode.name());
+				view.setText(mode);
 			}
 
 			return view;
@@ -93,39 +102,15 @@ public class CameraActivity extends FragmentActivity implements SurfaceHolder.Ca
 	}
 
 	private final MarkerSettings settings = MarkerSettings.getSettings();
-	private final MarkerSelection detectingMarkers = new MarkerSelection();
+	private final MarkerSelection markerSelection = new MarkerSelection();
 	private SurfaceHolder holder;
 	private CameraManager cameraManager;
 	private MarkerDetectionThread thread;
 	private ViewfinderView viewfinder;
 	private ViewPager pager;
 	private ProgressBar progress;
+	private RelativeLayout bottomView;
 
-	public void surfaceCreated(SurfaceHolder holder)
-	{
-		try
-		{
-			cameraManager.startPreview(holder);
-		}
-		catch (IOException e)
-		{
-			Log.d(TAG, "Error setting camera preview: " + e.getMessage());
-		}
-	}
-
-	public void surfaceDestroyed(SurfaceHolder holder)
-	{
-		// empty. Take care of releasing the Camera preview in your activity.
-	}
-
-	public void surfaceChanged(SurfaceHolder holder, int format, int w, int h)
-	{
-		if (this.holder.getSurface() == null)
-		{
-			return;
-		}
-		cameraManager.setOrientation();
-	}
 
 	@Override
 	public void onCreate(Bundle savedInstanceState)
@@ -133,12 +118,20 @@ public class CameraActivity extends FragmentActivity implements SurfaceHolder.Ca
 		super.onCreate(savedInstanceState);
 		getWindow().addFlags(WindowManager.LayoutParams.FLAG_KEEP_SCREEN_ON);
 
-		setContentView(R.layout.capture);
+		setContentView(R.layout.activity_camera);
 
 		cameraManager = new CameraManager(this);
 
 		viewfinder = (ViewfinderView) findViewById(R.id.viewfinder);
 		viewfinder.setCameraManager(cameraManager);
+		viewfinder.addOnLayoutChangeListener(new View.OnLayoutChangeListener() {
+			@Override
+			public void onLayoutChange(View view, int i, int i2, int i3, int i4, int i5, int i6, int i7, int i8)
+			{
+				Log.i(TAG, "Layout!");
+				layout();
+			}
+		});
 
 		progress = (ProgressBar) findViewById(R.id.progress);
 		progress.setMax(MAX_PROGRESS);
@@ -155,7 +148,12 @@ public class CameraActivity extends FragmentActivity implements SurfaceHolder.Ca
 			@Override
 			public Fragment getItem(int position)
 			{
-				return new ModeFragment(CameraActivity.this, settings.getModes().get(position));
+				Bundle bundle = new Bundle();
+				bundle.putString("mode", settings.getModes().get(position).name());
+
+				ModeFragment fragment = new ModeFragment();
+				fragment.setArguments(bundle);
+				return fragment;
 			}
 		});
 		pager.setOnPageChangeListener(new ViewPager.OnPageChangeListener()
@@ -170,10 +168,11 @@ public class CameraActivity extends FragmentActivity implements SurfaceHolder.Ca
 			public void onPageSelected(int position)
 			{
 				thread.setMode(settings.getModes().get(position));
+				cameraManager.setResult(null);
 				viewfinder.invalidate();
 				if (progress != null)
 				{
-					detectingMarkers.reset();
+					markerSelection.reset();
 					progress.setVisibility(View.INVISIBLE);
 				}
 			}
@@ -187,19 +186,24 @@ public class CameraActivity extends FragmentActivity implements SurfaceHolder.Ca
 
 		pager.setCurrentItem(0);
 		pager.setOffscreenPageLimit(3);
-		pager.setPageTransformer(true, new ZoomOutPageTransformer());
-		pager.setPageMargin((int) (getResources().getDisplayMetrics().widthPixels / -1.5));
+		pager.setPageTransformer(true, new ModeSelectTransformer());
+		pager.setPageMargin((int) (getResources().getDisplayMetrics().widthPixels / -1.3));
 
 		final SurfaceView surfaceView = (SurfaceView) findViewById(R.id.preview);
 		holder = surfaceView.getHolder();
-		holder.addCallback(this);
+		holder.addCallback(cameraManager);
 		// deprecated setting, but required on Android versions prior to 3.0
 		holder.setType(SurfaceHolder.SURFACE_TYPE_PUSH_BUFFERS);
 
+		bottomView = (RelativeLayout) findViewById(R.id.bottomView);
+
+		MarkerSettingsHelper.loadSettings(this);
+		settingsUpdated();
 	}
 
-	private void update()
+	private void settingsUpdated()
 	{
+		Log.i(TAG, "Settings updated");
 		if (settings.getModes().size() <= 1)
 		{
 			pager.setVisibility(View.INVISIBLE);
@@ -216,6 +220,9 @@ public class CameraActivity extends FragmentActivity implements SurfaceHolder.Ca
 		MenuInflater inflater = getMenuInflater();
 		inflater.inflate(R.menu.capture_actions, menu);
 
+		MenuItem item = menu.findItem(R.id.action_switch_camera);
+		item.setVisible(cameraManager.getCameraCount() > 1);
+
 		return super.onCreateOptionsMenu(menu);
 	}
 
@@ -223,12 +230,16 @@ public class CameraActivity extends FragmentActivity implements SurfaceHolder.Ca
 	public void onResume()
 	{
 		super.onResume();
-		Log.d(TAG, "On Resume");
+		startCamera();
+	}
+
+	private void startCamera()
+	{
 		if (cameraManager != null)
 		{
 			try
 			{
-				cameraManager.startPreview(holder);
+				cameraManager.start(holder);
 				thread = new MarkerDetectionThread(cameraManager, this, settings);
 				thread.start();
 				if (pager != null)
@@ -238,9 +249,11 @@ public class CameraActivity extends FragmentActivity implements SurfaceHolder.Ca
 
 				if (progress != null)
 				{
-					detectingMarkers.reset();
+					markerSelection.reset();
 					progress.setVisibility(View.INVISIBLE);
 				}
+
+				layout();
 			}
 			catch (Exception e)
 			{
@@ -249,10 +262,50 @@ public class CameraActivity extends FragmentActivity implements SurfaceHolder.Ca
 		}
 	}
 
+	private void layout()
+	{
+		Rect frame = cameraManager.getFrame(viewfinder.getWidth(), viewfinder.getHeight());
+		if(frame == null)
+		{
+			return;
+		}
+		Log.i(TAG,"Frame = " + frame + ", " + viewfinder.getWidth());
+		ViewGroup.LayoutParams p = bottomView.getLayoutParams();
+		p.height = frame.top;
+		p.width = frame.width();
+		bottomView.setLayoutParams(p);
+
+		if (android.os.Build.VERSION.SDK_INT >= Build.VERSION_CODES.KITKAT)
+		{
+			// Don't draw over nav bar
+			bottomView.setPadding(0,0,0,getNavBarHeight());
+		}
+
+		bottomView.requestLayout();
+		pager.invalidate();
+		viewfinder.invalidate();
+	}
+
+	private int getNavBarHeight()
+	{
+		Resources resources = getResources();
+		int resourceId = resources.getIdentifier("navigation_bar_height", "dimen", "android");
+		if (resourceId > 0) {
+			return resources.getDimensionPixelSize(resourceId);
+		}
+		return 0;
+	}
+
 	@Override
 	protected void onPause()
 	{
 		super.onPause();
+		stopCamera();
+
+	}
+
+	private void stopCamera()
+	{
 		if (cameraManager != null)
 		{
 			cameraManager.release();
@@ -267,75 +320,87 @@ public class CameraActivity extends FragmentActivity implements SurfaceHolder.Ca
 		switch (item.getItemId())
 		{
 			case R.id.action_settings:
-				startActivity(new Intent(this, SettingsActivity.class));
-				return true;
-			case R.id.action_about:
-				startActivity(new Intent(this, AboutActivity.class));
-				return true;
-			case R.id.action_help:
-				startActivity(new Intent(this, GuideActivity.class));
+				startActivity(new Intent(this, MarkerListActivity.class));
 				return true;
 			case R.id.action_switch_camera:
+				try
+				{
+					stopCamera();
+					cameraManager.flip();
+					viewfinder.invalidate();
+					startCamera();
+				}
+				catch (Exception e)
+				{
+					Log.e(TAG, e.getMessage(), e);
+				}
 				return true;
 			default:
 				return super.onOptionsItemSelected(item);
 		}
 	}
 
+
+
 	@Override
 	public void markersDetected(final List<Marker> markers)
 	{
-		if(thread == null)
+		if (thread == null)
 		{
 			return;
 		}
 		if (thread.getMode() == Mode.detect)
 		{
-			detectingMarkers.addMarkers(markers);
+			markerSelection.addMarkers(markers);
 
 			runOnUiThread(new Runnable()
 			{
 				@Override
 				public void run()
 				{
-					if (detectingMarkers.hasStarted())
+					if (markerSelection.hasStarted())
 					{
 						progress.setVisibility(View.VISIBLE);
-						progress.setProgress((int) (MAX_PROGRESS * detectingMarkers.getProgress()));
-						progress.setAlpha(1 - detectingMarkers.expiration());
+						progress.setProgress((int) (MAX_PROGRESS * markerSelection.getProgress()));
+						progress.setAlpha(1 - markerSelection.expiration());
 					}
-					else if(detectingMarkers.isTimeUp())
+					else if (markerSelection.isTimeUp())
 					{
 						progress.setVisibility(View.INVISIBLE);
 					}
 				}
 			});
 
-			if(detectingMarkers.isTimeUp())
+			if (markerSelection.isTimeUp())
 			{
-				detectingMarkers.reset();
+				markerSelection.reset();
 			}
-			else if (detectingMarkers.isFinished())
+			else if (markerSelection.isFinished())
 			{
-				Marker marker = detectingMarkers.getLikelyMarker();
-				detectingMarkers.reset();
+				Marker marker = markerSelection.getLikelyMarker();
+				markerSelection.reset();
 
-				MarkerAction markerDetail = settings.getMarkers().get(marker.getCodeKey());
-				if (markerDetail != null)
+				if(marker != null)
 				{
-					cameraManager.stopPreview();
-					if (markerDetail.getShowDetail())
+					MarkerAction markerDetail = settings.getMarkers().get(marker.getCodeKey());
+					if (markerDetail != null)
 					{
-						startActivity(new Intent(this, SettingsActivity.class));
+						cameraManager.stop();
+						if (markerDetail.getShowDetail())
+						{
+							Intent intent = new Intent(this, MarkerActivity.class);
+							intent.putExtra("marker", marker.getCodeKey());
+							startActivity(intent);
+						}
+						else
+						{
+							startActivity(new Intent(Intent.ACTION_VIEW, Uri.parse(markerDetail.getAction())));
+						}
 					}
 					else
 					{
-						startActivity(new Intent(Intent.ACTION_VIEW, Uri.parse(markerDetail.getAction())));
+						Log.w(TAG, "No details for marker " + marker.getCodeKey());
 					}
-				}
-				else
-				{
-					Log.w(TAG, "No details for marker " + marker.getCodeKey());
 				}
 			}
 		}

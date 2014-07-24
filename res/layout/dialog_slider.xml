@@ -1,3 +1,5 @@
+<?xml version="1.0" encoding="utf-8"?>
+
 <!--
   ~ Aestheticodes recognises a different marker scheme that allows the
   ~ creation of aesthetically pleasing, even beautiful, codes.
@@ -17,14 +19,19 @@
   ~     along with this program.  If not, see <http://www.gnu.org/licenses/>.
   -->
 
-<menu xmlns:tools="http://schemas.android.com/tools" xmlns:android="http://schemas.android.com/apk/res/android"
-      tools:context=".activities.CameraActivity">
-	<item android:id="@+id/action_switch_camera"
-	      android:title="@string/action_switch_camera"
-	      android:icon="@drawable/ic_action_switch_camera"
-	      android:showAsAction="ifRoom" />
-	<item android:id="@+id/action_settings"
-          android:title="@string/action_settings"
-          android:icon="@drawable/ic_action_settings"
-          android:showAsAction="ifRoom" />
-</menu>
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+              android:orientation="vertical"
+              android:layout_width="fill_parent"
+              android:layout_height="wrap_content" android:padding="16dp">
+
+	<TextView
+			android:layout_width="fill_parent"
+			android:layout_height="wrap_content"
+			android:text="Off"
+			android:id="@+id/sliderValue" android:layout_weight="1" android:gravity="center"
+			android:singleLine="true" android:textSize="16sp" android:layout_marginBottom="8dp" />
+	<SeekBar android:layout_width="fill_parent"
+	         android:layout_height="wrap_content"
+	         android:id="@+id/slider" android:layout_weight="1" android:progress="5" android:max="10"
+	         android:layout_gravity="center_vertical" />
+</LinearLayout>

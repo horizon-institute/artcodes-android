@@ -29,7 +29,6 @@ import org.opencv.core.Mat;
 import org.opencv.core.MatOfPoint;
 import org.opencv.core.Rect;
 import org.opencv.core.Scalar;
-import org.opencv.core.Size;
 import org.opencv.imgproc.Imgproc;
 import uk.ac.horizon.aestheticodes.model.Marker;
 import uk.ac.horizon.aestheticodes.model.MarkerDetector;
@@ -39,30 +38,24 @@ import uk.ac.horizon.aestheticodes.model.Mode;
 import java.util.ArrayList;
 import java.util.List;
 
-public class MarkerDetectionThread extends Thread
+public class MarkerImageProcessor implements ImageProcessor
 {
-	private static final String TAG = MarkerDetectionThread.class.getName();
+	private static final String TAG = MarkerImageProcessor.class.getName();
 	private static final Scalar detectedColour = new Scalar(255, 255, 0, 255);
 	private static final Scalar outlineColour = new Scalar(0, 0, 0, 255);
 	private final MarkerDetector markerDetector;
 	private final CameraManager cameraManager;
 	private final MarkerDetectionListener listener;
-	private boolean running = true;
 	private Mode mode = Mode.detect;
 
-	public MarkerDetectionThread(CameraManager cameraManager, MarkerDetectionListener listener, MarkerSettings settings)
+	public MarkerImageProcessor(CameraManager cameraManager, MarkerDetectionListener listener, MarkerSettings settings)
 	{
 		this.cameraManager = cameraManager;
 		this.listener = listener;
 		markerDetector = new MarkerDetector(settings);
 	}
 
-	public void setRunning(boolean running)
-	{
-		this.running = running;
-	}
-
-	public static Mat cropImage(Mat imgMat)
+	private Mat cropImage(Mat imgMat)
 	{
 		final int size = Math.min(imgMat.rows(), imgMat.cols());
 
@@ -72,25 +65,44 @@ public class MarkerDetectionThread extends Thread
 		return imgMat.submat(rowStart, rowStart + size, colStart, colStart + size);
 	}
 
-	private static void thresholdImage(Mat image)
+	private void thresholdImage(Mat image)
 	{
-		//Imgproc.GaussianBlur(image, image, new Size(5, 5), 0);
-		if (false)
+		final int numberOfTiles = 3;
+		final int tileHeight = (int) image.size().height / numberOfTiles;
+		final int tileWidth = (int) image.size().width / numberOfTiles;
+
+		// Split image into tiles and apply threshold on each image tile separately.
+		for (int tileRowCount = 0; tileRowCount < numberOfTiles; tileRowCount++)
 		{
-			Imgproc.threshold(image, image, 127, 255, Imgproc.THRESH_OTSU);
+			final int startRow = tileRowCount * tileHeight;
+			int endRow;
+			if (tileRowCount < numberOfTiles - 1)
+			{
+				endRow = (tileRowCount + 1) * tileHeight;
+			}
+			else
+			{
+				endRow = (int) image.size().height;
+			}
+
+			for (int tileColCount = 0; tileColCount < numberOfTiles; tileColCount++)
+			{
+				final int startCol = tileColCount * tileWidth;
+				int endCol;
+				if (tileColCount < numberOfTiles - 1)
+				{
+					endCol = (tileColCount + 1) * tileWidth;
+				}
+				else
+				{
+					endCol = (int) image.size().width;
+				}
+
+				final Mat tileMat = image.submat(startRow, endRow, startCol, endCol);
+				Imgproc.threshold(tileMat, tileMat, 127, 255, Imgproc.THRESH_OTSU);
+				tileMat.release();
+			}
 		}
-		else
-		{
-			Mat resizeimage = new Mat();
-
-			Imgproc.resize(image, resizeimage, new Size(640, 640));
-			//Imgproc.GaussianBlur(resizeimage, resizeimage, new Size(5, 5), 0);
-
-			Imgproc.adaptiveThreshold(resizeimage, resizeimage, 255, Imgproc.ADAPTIVE_THRESH_MEAN_C, Imgproc.THRESH_BINARY, 181, 2);
-
-			Imgproc.resize(resizeimage, image, new Size(image.width(), image.height()));
-		}
-
 	}
 
 	private List<Marker> findMarkers(Mat inputImage, Mat drawImage)
@@ -115,7 +127,7 @@ public class MarkerDetectionThread extends Thread
 					marker.setComponentIndex(i);
 					markersDetected.add(marker);
 
-					if ((mode == Mode.outline || mode == Mode.threshold) && drawImage != null)
+					if ((mode == Mode.outline) && drawImage != null)
 					{
 						Imgproc.drawContours(drawImage, contours, i, outlineColour, 7);
 						Imgproc.drawContours(drawImage, contours, i, detectedColour, 5);
@@ -123,7 +135,7 @@ public class MarkerDetectionThread extends Thread
 				}
 			}
 
-			if ((mode != Mode.detect || mode == Mode.threshold) && drawImage != null)
+			if (mode != Mode.detect && drawImage != null)
 			{
 				for (Marker marker : markersDetected)
 				{
@@ -144,7 +156,7 @@ public class MarkerDetectionThread extends Thread
 		}
 	}
 
-	private static void rotate(Mat src, Mat dst, int angle, boolean flip)
+	void rotate(Mat src, Mat dst, int angle, boolean flip)
 	{
 		if (src != dst)
 		{
@@ -154,111 +166,87 @@ public class MarkerDetectionThread extends Thread
 		angle = ((angle / 90) % 4) * 90;
 
 		//0 : flip vertical; 1 flip horizontal
-
 		int flip_horizontal_or_vertical = angle > 0 ? 1 : 0;
-		if (flip)
-		{
-			flip_horizontal_or_vertical = -1;
-		}
 		int number = Math.abs(angle / 90);
 
 		for (int i = 0; i != number; ++i)
 		{
 			Core.transpose(dst, dst);
-			Core.flip(dst, dst, flip_horizontal_or_vertical);
+			if (!flip)
+			{
+				Core.flip(dst, dst, flip_horizontal_or_vertical);
+			}
+		}
+	}
+
+	private Mat image;
+	private Bitmap bmp = null;
+
+	@Override
+	public void processImage(byte[] data)
+	{
+		image.put(0, 0, data);
+
+		// Cut down region for detection
+		Mat croppedImage = cropImage(image);
+
+		// apply threshold.
+		thresholdImage(croppedImage);
+
+		Mat drawImage = null;
+		if (mode != Mode.detect)
+		{
+			rotate(croppedImage, croppedImage, 360 + 90 - cameraManager.getRotation(), cameraManager.isFront());
+
+			if (mode == Mode.threshold)
+			{
+				drawImage = croppedImage.clone();
+			}
+			else
+			{
+				drawImage = new Mat(croppedImage.rows(), croppedImage.cols(), CvType.CV_8UC4);
+			}
+		}
+
+		// find markers.
+		List<Marker> markers = findMarkers(croppedImage, drawImage);
+
+		if (mode == Mode.detect || drawImage == null)
+		{
+			cameraManager.setResult(null);
+		}
+		else
+		{
+			if (bmp == null)
+			{
+				bmp = Bitmap.createBitmap(drawImage.cols(), drawImage.rows(), Bitmap.Config.ARGB_8888);
+			}
+			Utils.matToBitmap(drawImage, bmp);
+
+			cameraManager.setResult(bmp);
+
+			drawImage.release();
+		}
+
+		if (listener != null)
+		{
+			listener.markersDetected(markers);
+		}
+
+		if (drawImage != null)
+		{
+			drawImage.release();
 		}
 	}
 
 	@Override
-	public void run()
+	public void initCamera(Camera.Size size)
 	{
-		try
+		if(image != null)
 		{
-			Camera.Size size = cameraManager.getSize();
-			Mat image = new Mat(size.height, size.width, CvType.CV_8UC1);
-			Bitmap bmp = null;
-			while (running)
-			{
-				try
-				{
-					byte[] data = cameraManager.getData();
-					if (data != null)
-					{
-						image.put(0, 0, data);
-
-						// Cut down region for detection
-						Mat croppedImage = cropImage(image);
-
-						// apply threshold.
-						thresholdImage(croppedImage);
-
-						Mat drawImage = null;
-						if (mode != Mode.detect)
-						{
-							rotate(croppedImage, croppedImage, 360 + 90 - cameraManager.getRotation(), cameraManager.isFront());
-
-							if (mode == Mode.threshold)
-							{
-								drawImage = new Mat(croppedImage.rows(), croppedImage.cols(), CvType.CV_8UC3);
-								Imgproc.cvtColor(croppedImage, drawImage, Imgproc.COLOR_GRAY2BGR);
-							}
-							else
-							{
-								drawImage = new Mat(croppedImage.rows(), croppedImage.cols(), CvType.CV_8UC4);
-							}
-						}
-
-						// find markers.
-						List<Marker> markers = findMarkers(croppedImage, drawImage);
-
-						if (mode == Mode.detect || drawImage == null)
-						{
-							cameraManager.setResult(null);
-						}
-						else
-						{
-							if (bmp == null)
-							{
-								bmp = Bitmap.createBitmap(drawImage.cols(), drawImage.rows(), Bitmap.Config.ARGB_8888);
-							}
-							Utils.matToBitmap(drawImage, bmp);
-
-							cameraManager.setResult(bmp);
-
-							drawImage.release();
-						}
-
-						if (listener != null)
-						{
-							listener.markersDetected(markers);
-						}
-
-						if (drawImage != null)
-						{
-							drawImage.release();
-						}
-					}
-					else
-					{
-						Log.i(TAG, "No data");
-						synchronized (this)
-						{
-							wait(200);
-						}
-					}
-				}
-				catch (Exception e)
-				{
-					Log.e(TAG, e.getMessage(), e);
-				}
-			}
+			image.release();
 		}
-		catch (Exception e)
-		{
-			Log.e(TAG, e.getMessage(), e);
-		}
-
-		Log.i(TAG, "Finishing processing thread");
+		image = new Mat(size.height, size.width, CvType.CV_8UC1);
 	}
 
 	public Mode getMode()

@@ -24,6 +24,7 @@
 	<string name="action_switch_camera">Switch Camera</string>
     <string name="action_help">Help</string>
     <string name="action_about">About</string>
+	<string name="dialog_action_set">Set</string>
 	<string name="dialog_action_create">Create</string>
 	<string name="dialog_action_cancel">Cancel</string>
 	<string name="min_regions">Minimum Regions</string>
@@ -32,12 +33,45 @@
 	<string name="mode_threshold">Threshold</string>
 	<string name="pager_mark">■</string>
 	<string name="markerCode">Marker Code</string>
-	<string name="max_regions">Maximum Regions</string>
-	<string name="max_leaves">Maximum Blobs in a Region</string>
+	<string name="settings_markers">Markers</string>
+	<string name="settings">Settings</string>
 	<!-- Default WebSites -->
 	<string name="about_aestheticodes">http://aestheticodes.com/info/</string>
     <string name="teachme_aestheticodes">http://aestheticodes.com/teach-me/</string>
-    <string name="default_status">Place an Aestheticode inside the viewfinder to scan it.</string>
+    <string name="default_status">Place an Aestheticode inside the viewfinder to scan it</string>
 	<string name="URL">URL</string>
 	<string name="aestheticodes_url">http://www.aestheticodes.com</string>
+	<string name="minRegions">Min Regions</string>
+	<string name="minRegions_desc">The minimum number of regions in a valid Aestheticode.</string>
+	<plurals name="minRegions_value">
+		<item quantity="one">1 Region</item>
+		<item quantity="other">%d Regions</item>
+	</plurals>
+	<string name="maxRegions">Max Regions</string>
+	<string name="maxRegions_desc">The maximum number of regions in a valid Aestheticode.</string>
+	<plurals name="maxRegions_value">
+		<item quantity="one">1 Region</item>
+		<item quantity="other">%d Regions</item>
+	</plurals>
+	<string name="maxRegionValue">Max Region Value</string>
+	<string name="maxRegionValue_desc">The maximum value a region can have in a valid Aestheticode.</string>
+	<string name="maxEmptyRegions">Empty Regions</string>
+	<string name="maxEmptyRegions_desc">The maximum number of empty regions in a valid Aestheticode.</string>
+	<string name="maxEmptyRegions_off">None</string>
+	<plurals name="maxEmptyRegions_value">
+		<item quantity="one">Maximum 1 Empty Region</item>
+		<item quantity="other">Maximum %d Empty Regions</item>
+	</plurals>
+	<string name="validationRegions">Validation</string>
+	<string name="validationRegions_desc">The number of regions that must have a specified value in a valid Aestheticode.</string>
+	<string name="validationRegions_off">Off</string>
+	<plurals name="validationRegions_value">
+		<item quantity="one">1 Validation Region</item>
+		<item quantity="other">%d Validation Regions</item>
+	</plurals>
+	<string name="validationRegionValue">Validation Region Value</string>
+	<string name="validationRegionValue_desc">The value that validation regions must have in a valid Aestheticode.</string>
+	<string name="checksumModulo">Checksum Value</string>
+	<string name="checksumModulo_off">Disabled</string>
+	<string name="checksumModulo_desc">The Aestheticode checksum: the sum of all regions must be divisible by this value to be valid.</string>
 </resources>

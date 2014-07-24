@@ -17,7 +17,7 @@
  *     along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-package uk.ac.horizon.aestheticodes;
+package uk.ac.horizon.aestheticodes.model;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -31,7 +31,7 @@ public class Marker
 {
 	private int index;
 	private List<Integer> code;
-	private int occurences = 1;
+	private int occurrences = 1;
 
 	//constructors
 	public Marker()
@@ -51,14 +51,14 @@ public class Marker
 		setCode(code);
 	}
 
-	public int getOccurences()
+	public int getOccurrences()
 	{
-		return 1;
+		return occurrences;
 	}
 
-	public void setOccurences(int value)
+	public void setOccurrences(int value)
 	{
-		this.occurences = value;
+		this.occurrences = value;
 	}
 
 	private static List<Integer> getCodeArrayFromString(String code)
