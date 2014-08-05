@@ -28,6 +28,7 @@ import android.util.Log;
 import android.view.Surface;
 import android.view.SurfaceHolder;
 import android.view.WindowManager;
+import android.widget.Toast;
 
 import java.io.IOException;
 import java.util.List;
@@ -127,6 +128,62 @@ public class CameraManager implements Camera.PreviewCallback, SurfaceHolder.Call
 					{
 						parameters.setFocusMode(Camera.Parameters.FOCUS_MODE_CONTINUOUS_VIDEO);
 					}
+                    else if (focusModes != null && focusModes.contains(Camera.Parameters.FOCUS_MODE_AUTO))
+                    {
+                        // if FOCUS_MODE_CONTINUOUS_VIDEO is not supported auto-focus the camera every few seconds
+                        parameters.setFocusMode(Camera.Parameters.FOCUS_MODE_AUTO);
+                        Runnable r = new Runnable() {
+                            @Override
+                            public void run() {
+                                Camera.AutoFocusCallback autoFocusCallback = new Camera.AutoFocusCallback()
+                                {
+                                    @Override
+                                    public void onAutoFocus(boolean b, Camera camera)
+                                    {
+                                        //Log.i("AutoFocus", "AutoFocus - b: " + b);
+                                    }
+                                };
+                                while (camera!=null)
+                                {
+                                    try
+                                    {
+                                        camera.autoFocus(autoFocusCallback);
+                                        Thread.currentThread().sleep(5000);
+                                    }
+                                    catch (InterruptedException e)
+                                    {}
+                                    catch (NullPointerException e)
+                                    {
+                                        // Catch NullPointerException because camera is set to null
+                                        // on another thread and we need an exception handler for
+                                        // InterruptedException anyway.
+                                        break;
+                                    }
+                                }
+                            }
+                        };
+                        Thread t = new Thread(r);
+                        t.start();
+                    }
+
+                    /////
+                    Camera.Size s = parameters.getPreviewSize();
+                    Log.i(this.getClass().getName(), "Camera preview resolution: "+s.width+"x"+s.height+" Ratio: "+((float)s.width/(float)s.height));
+                    List<Camera.Size> supportedPreviewSizes = parameters.getSupportedPreviewSizes();
+                    Log.i(this.getClass().getName(), "Supported camera preview sizes:");
+                    for (Camera.Size supportedSize : supportedPreviewSizes) {
+                        Log.i(this.getClass().getName(), " - "+supportedSize.width+"x"+supportedSize.height+" ("+((float)supportedSize.width/(float)supportedSize.height)+")");
+                    }
+                    Log.i(this.getClass().getName(), "(end of supported camera sizes)");
+
+                    Log.i(this.getClass().getName(), "Camera focus mode: " + parameters.getFocusMode());
+                    Log.i(this.getClass().getName(), "Supported camera focus modes:");
+                    for (String supportedFocusMode : parameters.getSupportedFocusModes()) {
+                        Log.i(this.getClass().getName(), " - "+supportedFocusMode);
+                    }
+                    Log.i(this.getClass().getName(), "(end of supported camera focus modes)");
+                    /////
+
 					camera.setParameters(parameters);
 
 					setCameraDisplayOrientation();
