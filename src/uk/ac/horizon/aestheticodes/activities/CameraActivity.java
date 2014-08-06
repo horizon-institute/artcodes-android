@@ -76,16 +76,27 @@ public class CameraActivity extends FragmentActivity implements MarkerDetectionL
 		}
 	}
 
+
 	public static final class ModeFragment extends Fragment
 	{
-		public ModeFragment()
+        private View.OnClickListener onClickListener;
+
+
+        public ModeFragment()
 		{
 		}
 
-		@Override
+        public void setOnClickListener(View.OnClickListener onClickListener)
+        {
+            this.onClickListener = onClickListener;
+        }
+
+
+        @Override
 		public View onCreateView(LayoutInflater inflater, ViewGroup container, Bundle savedInstanceState)
 		{
-			final TextView view = (TextView)inflater.inflate(R.layout.item_mode, container, false);
+			final View layoutView = inflater.inflate(R.layout.item_mode, container, false);
+            final TextView view = (TextView)layoutView.findViewById(R.id.modeText);
 			final String mode = getArguments().getString("mode");
 			int id = getActivity().getResources().getIdentifier(MODE_PREFIX + mode, "string", getActivity().getPackageName());
 			if (id != 0)
@@ -97,7 +108,9 @@ public class CameraActivity extends FragmentActivity implements MarkerDetectionL
 				view.setText(mode);
 			}
 
-			return view;
+            view.setOnClickListener(onClickListener);
+
+			return layoutView;
 		}
 	}
 
@@ -111,6 +124,18 @@ public class CameraActivity extends FragmentActivity implements MarkerDetectionL
 	private ProgressBar progress;
 	private RelativeLayout bottomView;
 
+
+    /**
+     * Get an OnClickListener that will change a ViewPager to the given position.
+     */
+    private View.OnClickListener getOnClickListenerForMode(final ViewPager pager, final int position) {
+        return new View.OnClickListener() {
+            @Override
+            public void onClick(View view) {
+                pager.setCurrentItem(position);
+            }
+        };
+    }
 
 	@Override
 	public void onCreate(Bundle savedInstanceState)
@@ -136,6 +161,8 @@ public class CameraActivity extends FragmentActivity implements MarkerDetectionL
 		progress = (ProgressBar) findViewById(R.id.progress);
 		progress.setMax(MAX_PROGRESS);
 
+
+
 		pager = (ViewPager) findViewById(R.id.pager);
 		pager.setAdapter(new FragmentPagerAdapter(getSupportFragmentManager())
 		{
@@ -152,6 +179,7 @@ public class CameraActivity extends FragmentActivity implements MarkerDetectionL
 				bundle.putString("mode", settings.getModes().get(position).name());
 
 				ModeFragment fragment = new ModeFragment();
+                fragment.setOnClickListener(getOnClickListenerForMode(pager, position));
 				fragment.setArguments(bundle);
 				return fragment;
 			}
@@ -182,12 +210,14 @@ public class CameraActivity extends FragmentActivity implements MarkerDetectionL
 			{
 
 			}
+
 		});
 
 		pager.setCurrentItem(0);
 		pager.setOffscreenPageLimit(3);
 		pager.setPageTransformer(true, new ModeSelectTransformer());
 		pager.setPageMargin((int) (getResources().getDisplayMetrics().widthPixels / -1.3));
+        pager.setClickable(true);
 
 		final SurfaceView surfaceView = (SurfaceView) findViewById(R.id.preview);
 		holder = surfaceView.getHolder();

@@ -65,7 +65,8 @@
 				android:layout_width="fill_parent"
 				android:layout_height="fill_parent"
 				android:overScrollMode="never"
-				android:paddingTop="16dp" />
+				android:paddingTop="16dp"
+            android:clickable="true" />
 	</RelativeLayout>
 
 
