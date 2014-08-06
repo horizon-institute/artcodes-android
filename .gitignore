@@ -1,7 +1,7 @@
 .gradle
 build
 /gradle.properties
-.idea
+.idea/**
 
 picasso-2.3.3/build.gradle
 
@@ -22,5 +22,11 @@ settings.gradle
 .idea/misc.xml
 
 .idea/gradle.xml
+
+.idea/workspace.xml
+
+.idea/libraries/gson_2_2_4.xml
+
+.idea/libraries/support_v4_19_1_0.xml
 
 .idea/workspace.xml
