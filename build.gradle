@@ -37,10 +37,10 @@ repositories {
 }
 
 dependencies {
-	compile 'org.opencv:opencv-android:+'
-	compile 'com.android.support:support-v4:19.+'
-	compile 'com.google.code.gson:gson:+'
-	compile 'com.squareup.picasso:picasso:+'
+    compile 'org.opencv:opencv-android:+'
+    compile 'com.android.support:support-v4:19.+'
+    compile 'com.google.code.gson:gson:+'
+    compile project(':picasso-2.3.3')
 }
 
 android {
@@ -67,19 +67,19 @@ android {
 		versionName '2.1.0'
 	}
 
-	signingConfigs {
-		release {
-			storeFile file(project.property('keystore'))
-			storePassword project.property('keystore.password')
-			keyAlias project.property('key.alias')
-			keyPassword project.property('key.password')
-		}
-	}
-	buildTypes {
-		release {
-			signingConfig signingConfigs.release
-		}
-	}
+	//signingConfigs {
+	//	release {
+	//		storeFile file(project.property('keystore'))
+	//		storePassword project.property('keystore.password')
+	//		keyAlias project.property('key.alias')
+	//		keyPassword project.property('key.password')
+	//	}
+	//}
+	//buildTypes {
+	//	release {
+	//		signingConfig signingConfigs.release
+	//	}
+	//}
 
 	lintOptions {
 		abortOnError false

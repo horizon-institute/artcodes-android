@@ -1,6 +1,6 @@
 .gradle
 build
-/gradle.properties
+gradle.properties
 .idea/
 picasso-2.3.3/
 settings.gradle
