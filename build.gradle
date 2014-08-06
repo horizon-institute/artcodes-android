@@ -40,7 +40,7 @@ dependencies {
     compile 'org.opencv:opencv-android:+'
     compile 'com.android.support:support-v4:19.+'
     compile 'com.google.code.gson:gson:+'
-    compile project(':picasso-2.3.3')
+	compile 'com.squareup.picasso:picasso:+'
 }
 
 android {
