@@ -46,6 +46,7 @@ public class MarkerDetectionThread extends Thread
 	private static final Scalar outlineColour = new Scalar(0, 0, 0, 255);
 	private final MarkerDetector markerDetector;
 	private final CameraManager cameraManager;
+	private int unmarkedFrames = 0;
 	private final MarkerDetectionListener listener;
 	private boolean running = true;
 	private Mode mode = Mode.detect;
@@ -72,25 +73,61 @@ public class MarkerDetectionThread extends Thread
 		return imgMat.submat(rowStart, rowStart + size, colStart, colStart + size);
 	}
 
-	private static void thresholdImage(Mat image)
+	private void thresholdImage(Mat image)
 	{
-		//Imgproc.GaussianBlur(image, image, new Size(5, 5), 0);
-		if (false)
+		if (true)
 		{
+			Imgproc.GaussianBlur(image, image, new Size(5, 5), 0);
+
+			final int numberOfTiles = ((unmarkedFrames / 2) % 9) + 1;
+			final int tileHeight = (int) image.size().height / numberOfTiles;
+			final int tileWidth = (int) image.size().width / numberOfTiles;
+
+			// Split image into tiles and apply threshold on each image tile separately.
+			for (int tileRowCount = 0; tileRowCount < numberOfTiles; tileRowCount++)
+			{
+				final int startRow = tileRowCount * tileHeight;
+				int endRow;
+				if (tileRowCount < numberOfTiles - 1)
+				{
+					endRow = (tileRowCount + 1) * tileHeight;
+				}
+				else
+				{
+					endRow = (int) image.size().height;
+				}
+
+				for (int tileColCount = 0; tileColCount < numberOfTiles; tileColCount++)
+				{
+					final int startCol = tileColCount * tileWidth;
+					int endCol;
+					if (tileColCount < numberOfTiles - 1)
+					{
+						endCol = (tileColCount + 1) * tileWidth;
+					}
+					else
+					{
+						endCol = (int) image.size().width;
+					}
+
+					final Mat tileMat = image.submat(startRow, endRow, startCol, endCol);
+					Imgproc.threshold(tileMat, tileMat, 127, 255, Imgproc.THRESH_OTSU);
+					tileMat.release();
+				}
+			}
+
 			Imgproc.threshold(image, image, 127, 255, Imgproc.THRESH_OTSU);
 		}
 		else
 		{
-			Mat resizeimage = new Mat();
+			Imgproc.resize(image, image, new Size(540, 540));
 
-			Imgproc.resize(image, resizeimage, new Size(640, 640));
-			//Imgproc.GaussianBlur(resizeimage, resizeimage, new Size(5, 5), 0);
+			Imgproc.GaussianBlur(image, image, new Size(5, 5), 0);
 
-			Imgproc.adaptiveThreshold(resizeimage, resizeimage, 255, Imgproc.ADAPTIVE_THRESH_MEAN_C, Imgproc.THRESH_BINARY, 181, 2);
-
-			Imgproc.resize(resizeimage, image, new Size(image.width(), image.height()));
+			int neighbourhood = (((unmarkedFrames % 50) + 1) * 4) + 1;
+			//Log.i(TAG, "Neighbourhood = " + neighbourhood);
+			Imgproc.adaptiveThreshold(image, image, 255, Imgproc.ADAPTIVE_THRESH_MEAN_C, Imgproc.THRESH_BINARY, neighbourhood, 2);
 		}
-
 	}
 
 	private List<Marker> findMarkers(Mat inputImage, Mat drawImage)
@@ -210,6 +247,10 @@ public class MarkerDetectionThread extends Thread
 
 						// find markers.
 						List<Marker> markers = findMarkers(croppedImage, drawImage);
+						if(markers.size() == 0)
+						{
+							unmarkedFrames++;
+						}
 
 						if (mode == Mode.detect || drawImage == null)
 						{
