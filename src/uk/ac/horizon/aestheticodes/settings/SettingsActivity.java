@@ -23,6 +23,7 @@ import android.content.Context;
 import android.os.Bundle;
 import android.support.v4.app.FragmentActivity;
 import android.support.v4.app.NavUtils;
+import android.support.v7.app.ActionBarActivity;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -36,7 +37,7 @@ import uk.ac.horizon.aestheticodes.R;
 import java.util.ArrayList;
 import java.util.List;
 
-public class SettingsActivity extends FragmentActivity
+public class SettingsActivity extends ActionBarActivity
 {
 	public static class Adapter extends BaseAdapter
 	{
@@ -181,7 +182,7 @@ public class SettingsActivity extends FragmentActivity
 			}
 		});
 
-		getActionBar().setDisplayHomeAsUpEnabled(true);
+		getSupportActionBar().setDisplayHomeAsUpEnabled(true);
 
 		refresh();
 	}

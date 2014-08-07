@@ -30,6 +30,7 @@ import android.support.v4.app.Fragment;
 import android.support.v4.app.FragmentActivity;
 import android.support.v4.app.FragmentPagerAdapter;
 import android.support.v4.view.ViewPager;
+import android.support.v7.app.ActionBarActivity;
 import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.Menu;
@@ -62,7 +63,7 @@ import uk.ac.horizon.aestheticodes.model.Mode;
 
 import java.util.List;
 
-public class CameraActivity extends FragmentActivity implements MarkerDetectionListener
+public class CameraActivity extends ActionBarActivity implements MarkerDetectionListener
 {
 	private static final String TAG = CameraActivity.class.getName();
 	private static final String MODE_PREFIX = "mode_";
@@ -149,14 +150,24 @@ public class CameraActivity extends FragmentActivity implements MarkerDetectionL
 
 		viewfinder = (ViewfinderView) findViewById(R.id.viewfinder);
 		viewfinder.setCameraManager(cameraManager);
-		viewfinder.addOnLayoutChangeListener(new View.OnLayoutChangeListener() {
+
+        // earlier versions of Android do not support addOnLayoutChangeListener
+        // edited ViewfinderView class for alternative
+		/*viewfinder.addOnLayoutChangeListener(new View.OnLayoutChangeListener() {
 			@Override
 			public void onLayoutChange(View view, int i, int i2, int i3, int i4, int i5, int i6, int i7, int i8)
 			{
 				Log.i(TAG, "Layout!");
 				layout();
 			}
-		});
+		});*/
+        viewfinder.addSizeChangedListener(new ViewfinderView.SizeChangedListener() {
+            @Override
+            public void sizeHasChanged() {
+                Log.i(TAG, "Layout!");
+                layout();
+            }
+        });
 
 		progress = (ProgressBar) findViewById(R.id.progress);
 		progress.setMax(MAX_PROGRESS);
@@ -392,7 +403,12 @@ public class CameraActivity extends FragmentActivity implements MarkerDetectionL
 					{
 						progress.setVisibility(View.VISIBLE);
 						progress.setProgress((int) (MAX_PROGRESS * markerSelection.getProgress()));
-						progress.setAlpha(1 - markerSelection.expiration());
+                        if (!Build.VERSION.RELEASE.matches("^2\\.3.*$"))
+                        {
+                            // Android 2.3/API 10 does not support setAlpha
+                            // TODO: fix progress bar on 2.3
+                            progress.setAlpha(1 - markerSelection.expiration());
+                        }
 					}
 					else if (markerSelection.isTimeUp())
 					{
@@ -437,13 +453,13 @@ public class CameraActivity extends FragmentActivity implements MarkerDetectionL
 		else
 		{
 			runOnUiThread(new Runnable()
-			{
-				@Override
-				public void run()
-				{
-					viewfinder.invalidate();
-				}
-			});
+            {
+                @Override
+                public void run()
+                {
+                    viewfinder.invalidate();
+                }
+            });
 		}
 	}
 }

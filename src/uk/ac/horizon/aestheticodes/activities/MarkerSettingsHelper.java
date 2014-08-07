@@ -26,6 +26,7 @@ import android.os.AsyncTask;
 import android.util.Log;
 import com.google.gson.Gson;
 import com.google.gson.GsonBuilder;
+import com.google.gson.JsonSyntaxException;
 import com.google.gson.reflect.TypeToken;
 import uk.ac.horizon.aestheticodes.model.MarkerAction;
 import uk.ac.horizon.aestheticodes.model.MarkerSettings;
@@ -79,11 +80,16 @@ public class MarkerSettingsHelper
 				Log.i(TAG, "The response is: " + response);
 				if (response == HttpURLConnection.HTTP_OK)
 				{
-					Reader reader = new InputStreamReader(conn.getInputStream());
-					MarkerSettings newSettings = gson.fromJson(reader, MarkerSettings.class);
-					newSettings.setLastUpdate(new Date(conn.getLastModified()));
+                    try {
+                        Reader reader = new InputStreamReader(conn.getInputStream());
+                        MarkerSettings newSettings = gson.fromJson(reader, MarkerSettings.class);
+                        newSettings.setLastUpdate(new Date(conn.getLastModified()));
 
-					return newSettings;
+                        return newSettings;
+                    } catch (JsonSyntaxException e) {
+                        Log.e(TAG, "There was a syntax problem with the downloaded JSON, maybe a proxy server is forwarding us to a login page?", e);
+                        return null;
+                    }
 				}
 			}
 			catch (IOException e)

@@ -21,12 +21,13 @@ package uk.ac.horizon.aestheticodes.activities;
 
 import android.app.Activity;
 import android.os.Bundle;
+import android.support.v7.app.ActionBarActivity;
 import android.webkit.WebView;
 import android.webkit.WebViewClient;
 import android.widget.Toast;
 import uk.ac.horizon.aestheticodes.R;
 
-public class AboutActivity extends Activity
+public class AboutActivity extends ActionBarActivity
 {
 	WebView webView;
 
@@ -48,9 +49,10 @@ public class AboutActivity extends Activity
 		});
 
 		activity.setTitle("About Aestheticodes");
-		webView.loadUrl(getResources().getString(R.string.about_aestheticodes));
 		setContentView(webView);
+        webView.loadUrl(getResources().getString(R.string.about_aestheticodes));
 
-		getActionBar().setDisplayHomeAsUpEnabled(true);
+		getSupportActionBar().setDisplayHomeAsUpEnabled(true);
+
 	}
 }

@@ -22,14 +22,14 @@ package uk.ac.horizon.aestheticodes.detect;
 import android.content.Context;
 import android.graphics.Bitmap;
 import android.graphics.Canvas;
-import android.graphics.Color;
 import android.graphics.Paint;
-import android.graphics.PorterDuff;
-import android.graphics.PorterDuffXfermode;
 import android.graphics.Rect;
 import android.util.AttributeSet;
-import android.util.Log;
 import android.view.View;
+
+import java.util.HashSet;
+import java.util.Set;
+
 import uk.ac.horizon.aestheticodes.R;
 
 public final class ViewfinderView extends View
@@ -82,4 +82,25 @@ public final class ViewfinderView extends View
 		canvas.drawRect(frame.right + 1, frame.top, width, frame.bottom + 1, paint);
 		canvas.drawRect(0, frame.bottom + 1, width, height, paint);
 	}
+
+    public interface SizeChangedListener {
+        public void sizeHasChanged();
+    }
+
+    Set<SizeChangedListener> sizeChangeListeners = new HashSet<SizeChangedListener>();
+    public void addSizeChangedListener(SizeChangedListener listener) {
+        this.sizeChangeListeners.add(listener);
+    }
+    public boolean removeSizeChangedListener(SizeChangedListener listener) {
+        return this.sizeChangeListeners.remove(listener);
+    }
+
+    @Override
+    protected void onSizeChanged(int w, int h, int oldw, int oldh) {
+        super.onSizeChanged(w, h, oldw, oldh);
+        for (SizeChangedListener listener:this.sizeChangeListeners) {
+            listener.sizeHasChanged();
+        }
+    }
+
 }

@@ -18,22 +18,41 @@
   ~     along with this program.  If not, see <http://www.gnu.org/licenses/>.
   -->
 <resources>
-    <style name="CaptureTheme" parent="android:Theme.Holo">
+    <style name="CaptureTheme" parent="@style/Theme.AppCompat.Light.DarkActionBar">
         <item name="android:windowContentOverlay">@null</item>
+        <item name="android:actionBarStyle">@style/ActionBar.Transparent.Compat</item>
+
         <item name="android:windowActionBarOverlay">true</item>
         <item name="android:windowActionModeOverlay">true</item>
+        <item name="windowActionBarOverlay">true</item>
+        <!-- <item name="windowActionModeOverlay">true</item>-->
+        <item name="actionBarStyle">@style/ActionBar.Transparent.Compat</item>
 
-	    <item name="android:actionBarStyle">@style/ActionBarStyle.Transparent</item>
+
+
+        <item name="android:windowTranslucentStatus">true</item>
+        <item name="android:windowTranslucentNavigation">true</item>
     </style>
 
-	<style name="ActionBarStyle.Transparent" parent="@android:Widget.ActionBar">
+	<style name="ActionBarStyle.Transparent" parent="@style/Widget.AppCompat.ActionBar">
 		<item name="android:background">@null</item>
+        <item name="android:textAppearance">@style/TextAppearance.AppCompat.Widget.ActionBar.Title.Inverse</item>
 	</style>
 
-	<style name="MarkerTheme" parent="@android:style/Theme.Holo.Light">
+	<style name="MarkerTheme" parent="@style/Theme.AppCompat.Light">
 		<item name="android:windowContentOverlay">@null</item>
-		<item name="android:windowActionBarOverlay">true</item>
-		<item name="android:windowActionModeOverlay">true</item>
-		<item name="android:actionBarStyle">@style/ActionBarStyle.Transparent</item>
+        <item name="android:windowActionBarOverlay">true</item>
+        <item name="android:windowActionModeOverlay">true</item>
+        <item name="android:actionBarStyle">@style/ActionBarStyle.Transparent</item>
+
+        <item name="windowActionBarOverlay">true</item>
+        <!-- <item name="windowActionModeOverlay">true</item> -->
+        <item name="actionBarStyle">@style/ActionBarStyle.Transparent</item>
 	</style>
+
+    <style name="ActionBar.Transparent.Compat" parent="@style/Widget.AppCompat.ActionBar">
+        <item name="background">@null</item>
+        <item name="titleTextStyle">@style/TextAppearance.AppCompat.Widget.ActionBar.Title.Inverse</item>
+    </style>
+
 </resources>

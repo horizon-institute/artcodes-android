@@ -48,6 +48,9 @@ public class CameraManager implements Camera.PreviewCallback, SurfaceHolder.Call
 	private Bitmap result;
 	private int facing = Camera.CameraInfo.CAMERA_FACING_BACK;
 
+    private boolean autoFocusThreadAlive = false;
+    private Thread autoFocusThread;
+
 	private byte[] data = null;
 
 	public CameraManager(Context context)
@@ -94,6 +97,13 @@ public class CameraManager implements Camera.PreviewCallback, SurfaceHolder.Call
 
 	public void release()
 	{
+        if (autoFocusThread != null)
+        {
+            autoFocusThreadAlive = false;
+            autoFocusThread.interrupt();
+            autoFocusThread = null;
+        }
+
 		if (camera != null)
 		{
 			camera.stopPreview();
@@ -148,12 +158,13 @@ public class CameraManager implements Camera.PreviewCallback, SurfaceHolder.Call
                                         //Log.i("AutoFocus", "AutoFocus - b: " + b);
                                     }
                                 };
-                                while (true)
+                                autoFocusThreadAlive = true;
+                                while (autoFocusThreadAlive)
                                 {
                                     try
                                     {
                                         Thread.currentThread().sleep(5000);
-                                        if (camera!=null)
+                                        if (autoFocusThreadAlive && camera!=null)
                                             camera.autoFocus(autoFocusCallback);
                                         else
                                             break;
@@ -170,8 +181,8 @@ public class CameraManager implements Camera.PreviewCallback, SurfaceHolder.Call
                                 }
                             }
                         };
-                        Thread t = new Thread(r);
-                        t.start();
+                        autoFocusThread = new Thread(r);
+                        autoFocusThread.start();
                     }
 
                     // Select preview size:

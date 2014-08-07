@@ -19,7 +19,7 @@
   -->
 
 <resources>
-	<style name="MarkerTheme" parent="@android:style/Theme.Holo.Light.DarkActionBar">
+	<style name="MarkerTheme" parent="@style/Theme.AppCompat.Light.DarkActionBar">
 		<item name="android:windowContentOverlay">@null</item>
 		<item name="android:windowActionBarOverlay">true</item>
 		<item name="android:windowActionModeOverlay">true</item>
