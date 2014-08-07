@@ -148,12 +148,15 @@ public class CameraManager implements Camera.PreviewCallback, SurfaceHolder.Call
                                         //Log.i("AutoFocus", "AutoFocus - b: " + b);
                                     }
                                 };
-                                while (camera!=null)
+                                while (true)
                                 {
                                     try
                                     {
-                                        camera.autoFocus(autoFocusCallback);
                                         Thread.currentThread().sleep(5000);
+                                        if (camera!=null)
+                                            camera.autoFocus(autoFocusCallback);
+                                        else
+                                            break;
                                     }
                                     catch (InterruptedException e)
                                     {}
@@ -178,7 +181,6 @@ public class CameraManager implements Camera.PreviewCallback, SurfaceHolder.Call
 
                     float reportedDpHeight = displayMetrics.heightPixels / displayMetrics.density;
                     float reportedDpWidth = displayMetrics.widthPixels / displayMetrics.density;
-                    Log.i("DISPLAY SIZE", reportedDpWidth+"x"+reportedDpHeight+" (Ratio: "+(reportedDpHeight/reportedDpWidth)+", Density: "+displayMetrics.density+")");
 
                     // adjust the reported screen height (because of os bars)
                     if (Build.VERSION.RELEASE.matches("^4\\.4.*$")) {
@@ -190,6 +192,7 @@ public class CameraManager implements Camera.PreviewCallback, SurfaceHolder.Call
                     }
 
                     float ratioOfSurface = reportedDpHeight/reportedDpWidth;
+                    Log.i("EST.SURFACE SIZE", reportedDpWidth+"x"+reportedDpHeight+" (Ratio: "+ratioOfSurface+", Density: "+displayMetrics.density+")");
 
                     // Step 2: Find camera preview that is best match for estimated surface ratio
                     List<Camera.Size> supportedPreviewSizes = parameters.getSupportedPreviewSizes();

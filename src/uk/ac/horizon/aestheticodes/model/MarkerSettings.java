@@ -175,6 +175,21 @@ public class MarkerSettings
 		return markers;
 	}
 
+    /**
+     * Delete a marker from the list of markers.
+     * @param code The code of the marker to delete.
+     * @return True if a marker was deleted, false if the given code was not found.
+     */
+    public boolean deleteMarker(String code) {
+        if (this.markers.containsKey(code)) {
+            this.markers.remove(code);
+            this.setChanged(true);
+            return true;
+        } else {
+            return false;
+        }
+    }
+
 	public void setChanged(boolean changed)
 	{
 		this.changed = changed;

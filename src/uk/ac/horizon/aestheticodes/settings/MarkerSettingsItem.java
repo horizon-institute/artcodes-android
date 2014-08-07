@@ -53,7 +53,7 @@ public class MarkerSettingsItem extends SettingsItem
 
 			LayoutInflater inflater = getActivity().getLayoutInflater();
 
-			String code = getArguments().getString("code");
+			final String code = getArguments().getString("code");
 			final MarkerAction action = settings.getMarkers().get(code);
 			// Inflate and set the layout for the dialog
 			// Pass null as the parent view because its going in the dialog layout
@@ -88,6 +88,15 @@ public class MarkerSettingsItem extends SettingsItem
 					// User cancelled the dialog
 				}
 			});
+            
+            builder.setNeutralButton("Delete", new DialogInterface.OnClickListener() {
+                @Override
+                public void onClick(DialogInterface dialogInterface, int i) {
+                    settings.deleteMarker(code);
+                    ((SettingsActivity)getActivity()).refresh();
+                }
+            });
+            
 			// Create the AlertDialog object and return it
 			final AlertDialog dialog = builder.create();
             dialog.getWindow().setSoftInputMode(WindowManager.LayoutParams.SOFT_INPUT_STATE_VISIBLE);
