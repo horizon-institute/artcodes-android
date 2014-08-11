@@ -19,12 +19,16 @@
 
 package uk.ac.horizon.aestheticodes.model;
 
+import android.util.Log;
+
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Date;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+
+import uk.ac.horizon.aestheticodes.settings.ThresholdBehaviour;
 
 /**
  * This class defines the constraints for markers.It contains two sets
@@ -60,6 +64,11 @@ public class MarkerSettings
 		updateURL = settings.updateURL;
 		lastUpdate = settings.lastUpdate;
 
+        if (settings.thresholdBehaviour != null)
+        {
+            thresholdBehaviour = settings.thresholdBehaviour;
+        }
+
 		editable = settings.editable;
 	}
 
@@ -77,6 +86,8 @@ public class MarkerSettings
 	private Date lastUpdate;
 	private transient boolean changed = false;
 	private String updateURL = "http://www.wornchaos.org/settings.json";
+
+    private String thresholdBehaviour = null;
 
 	public MarkerSettings()
 	{
@@ -164,6 +175,29 @@ public class MarkerSettings
 		this.checksumModulo = checksumModulo;
 		changed = true;
 	}
+
+    public ThresholdBehaviour getThresholdBehaviour()
+    {
+        if (this.thresholdBehaviour==null || this.thresholdBehaviour.equals("temporalTile"))
+        {
+            return ThresholdBehaviour.temporalTile;
+        }
+        else if (this.thresholdBehaviour.equals("resize"))
+        {
+            return ThresholdBehaviour.resize;
+        }
+        else
+        {
+            Log.w(this.getClass().getName(), "Unsupported threshold behaviour: "+this.thresholdBehaviour);
+            return ThresholdBehaviour.temporalTile;
+        }
+    }
+
+    public void setThresholdBehaviour(String thresholdBehaviour)
+    {
+        this.thresholdBehaviour = thresholdBehaviour;
+        this.changed = true;
+    }
 
 	public boolean isValidMarker(List<Integer> markerCodes)
 	{

@@ -80,13 +80,16 @@ public class MarkerSettingsHelper
 				Log.i(TAG, "The response is: " + response);
 				if (response == HttpURLConnection.HTTP_OK)
 				{
-                    try {
+                    try
+                    {
                         Reader reader = new InputStreamReader(conn.getInputStream());
                         MarkerSettings newSettings = gson.fromJson(reader, MarkerSettings.class);
                         newSettings.setLastUpdate(new Date(conn.getLastModified()));
 
                         return newSettings;
-                    } catch (JsonSyntaxException e) {
+                    }
+                    catch (JsonSyntaxException e)
+                    {
                         Log.e(TAG, "There was a syntax problem with the downloaded JSON, maybe a proxy server is forwarding us to a login page?", e);
                         return null;
                     }

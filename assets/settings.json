@@ -31,5 +31,7 @@
 	"checksumModulo": 3,
 	"modes": ["detect", "outline", "threshold"],
 	"editable": true,
-	"addMarkers": true
+	"addMarkers": true,
+
+	"thresholdBehaviour": "temporalTile"
 }

@@ -35,6 +35,7 @@ import uk.ac.horizon.aestheticodes.model.Marker;
 import uk.ac.horizon.aestheticodes.model.MarkerDetector;
 import uk.ac.horizon.aestheticodes.model.MarkerSettings;
 import uk.ac.horizon.aestheticodes.model.Mode;
+import uk.ac.horizon.aestheticodes.settings.ThresholdBehaviour;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -75,7 +76,9 @@ public class MarkerDetectionThread extends Thread
 
 	private void thresholdImage(Mat image)
 	{
-		if (true)
+        ThresholdBehaviour thresholdBehaviour = MarkerSettings.getSettings().getThresholdBehaviour();
+
+		if (thresholdBehaviour == ThresholdBehaviour.temporalTile)
 		{
 			Imgproc.GaussianBlur(image, image, new Size(5, 5), 0);
 
@@ -118,7 +121,7 @@ public class MarkerDetectionThread extends Thread
 
 			Imgproc.threshold(image, image, 127, 255, Imgproc.THRESH_OTSU);
 		}
-		else
+		else if (thresholdBehaviour == ThresholdBehaviour.resize)
 		{
 			Imgproc.resize(image, image, new Size(540, 540));
 
