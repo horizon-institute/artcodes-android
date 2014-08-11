@@ -19,9 +19,7 @@
 
 package uk.ac.horizon.aestheticodes.detect;
 
-import android.app.Activity;
 import android.app.AlertDialog;
-import android.app.DialogFragment;
 import android.content.Context;
 import android.graphics.Bitmap;
 import android.graphics.Rect;
@@ -31,9 +29,7 @@ import android.util.DisplayMetrics;
 import android.util.Log;
 import android.view.Surface;
 import android.view.SurfaceHolder;
-import android.view.View;
 import android.view.WindowManager;
-import android.widget.Toast;
 
 import java.io.IOException;
 import java.util.List;
@@ -309,9 +305,9 @@ public class CameraManager implements Camera.PreviewCallback, SurfaceHolder.Call
         else
         {
             AlertDialog.Builder builder = new AlertDialog.Builder(context);
-            builder.setTitle("Camera unavailable.");
-            builder.setMessage("Restart device.");
-            builder.setPositiveButton("OK",null);
+            builder.setTitle(R.string.noCameraTitle);
+            builder.setMessage(R.string.noCameraMessage);
+            builder.setPositiveButton(R.string.noCameraButton,null);
             AlertDialog alertDialog = builder.create();
             alertDialog.show();
         }

@@ -52,12 +52,13 @@ public class MarkerSettingsItem extends SettingsItem
 			// TODO builder.setMessage(getDescription());
 
 			LayoutInflater inflater = getActivity().getLayoutInflater();
+            final SettingsActivity settingsActivity = (SettingsActivity) getActivity();
 
 			final String code = getArguments().getString("code");
 			final MarkerAction action = settings.getMarkers().get(code);
 			// Inflate and set the layout for the dialog
 			// Pass null as the parent view because its going in the dialog layout
-			builder.setTitle("Marker " + action.getCode());
+			builder.setTitle(getResources().getString(R.string.dialog_marker_title_prefix) + " " + action.getCode());
 
 			View view = inflater.inflate(R.layout.dialog_edit_marker, null);
 
@@ -78,7 +79,7 @@ public class MarkerSettingsItem extends SettingsItem
                         action.setAction(urlView.getText().toString());
                     }
 					settings.setChanged(true);
-					((SettingsActivity)getActivity()).refresh();
+                    settingsActivity.refresh();
 				}
 			});
 			builder.setNegativeButton(R.string.dialog_action_cancel, new DialogInterface.OnClickListener()
@@ -89,14 +90,31 @@ public class MarkerSettingsItem extends SettingsItem
 				}
 			});
             
-            builder.setNeutralButton("Delete", new DialogInterface.OnClickListener() {
+            builder.setNeutralButton(R.string.dialog_action_delete, new DialogInterface.OnClickListener() {
                 @Override
                 public void onClick(DialogInterface dialogInterface, int i) {
-                    settings.deleteMarker(code);
-                    ((SettingsActivity)getActivity()).refresh();
+                    AlertDialog.Builder confirmBuilder = new AlertDialog.Builder(getActivity());
+                    confirmBuilder.setTitle(getResources().getString(R.string.confirmDeleteDialogTitlePrefix) + " " + code + "?");
+                    confirmBuilder.setMessage(R.string.confirmDeleteDialogMessage);
+                    confirmBuilder.setPositiveButton(R.string.confirmDeleteDialogPositive, new DialogInterface.OnClickListener() {
+                        @Override
+                        public void onClick(DialogInterface dialogInterface, int i) {
+                            // delete the marker:
+                            settings.deleteMarker(code);
+                            settingsActivity.refresh();
+                        }
+                    });
+                    confirmBuilder.setNegativeButton(R.string.confirmDeleteDialogNegative, new DialogInterface.OnClickListener() {
+                        @Override
+                        public void onClick(DialogInterface dialogInterface, int i) {
+                            // nothing
+                        }
+                    });
+
+                    confirmBuilder.create().show();
                 }
             });
-            
+
 			// Create the AlertDialog object and return it
 			final AlertDialog dialog = builder.create();
             dialog.getWindow().setSoftInputMode(WindowManager.LayoutParams.SOFT_INPUT_STATE_VISIBLE);
