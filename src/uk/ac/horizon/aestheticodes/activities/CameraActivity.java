@@ -31,6 +31,7 @@ import android.support.v4.app.FragmentActivity;
 import android.support.v4.app.FragmentPagerAdapter;
 import android.support.v4.view.ViewPager;
 import android.support.v7.app.ActionBarActivity;
+import android.util.DisplayMetrics;
 import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.Menu;
@@ -310,9 +311,23 @@ public class CameraActivity extends ActionBarActivity implements MarkerDetection
 		{
 			return;
 		}
+
 		Log.i(TAG,"Frame = " + frame + ", " + viewfinder.getWidth());
 		ViewGroup.LayoutParams p = bottomView.getLayoutParams();
-		p.height = frame.top;
+        SurfaceView surfaceView = (SurfaceView) findViewById(R.id.preview);
+        if (android.os.Build.VERSION.SDK_INT > Build.VERSION_CODES.GINGERBREAD_MR1)
+        {
+            p.height = surfaceView.getHeight()-frame.bottom;
+            // should be equivalent to frame.top when the top and bottom are the same size
+        }
+        else
+        {
+            // For some reason the above (and frame.top) gives too great a value on 2.3/Nexus One
+            // ...The top and bottom dark shaded areas are not equal.
+            DisplayMetrics displayMetrics = getResources().getDisplayMetrics();
+            p.height = (int)(surfaceView.getHeight()-frame.bottom-20 * displayMetrics.density);
+        }
+
 		p.width = frame.width();
 		bottomView.setLayoutParams(p);
 
@@ -403,10 +418,9 @@ public class CameraActivity extends ActionBarActivity implements MarkerDetection
 					{
 						progress.setVisibility(View.VISIBLE);
 						progress.setProgress((int) (MAX_PROGRESS * markerSelection.getProgress()));
-                        if (!Build.VERSION.RELEASE.matches("^2\\.3.*$"))
+                        if (android.os.Build.VERSION.SDK_INT > Build.VERSION_CODES.GINGERBREAD_MR1)
                         {
                             // Android 2.3/API 10 does not support setAlpha
-                            // TODO: fix progress bar on 2.3
                             progress.setAlpha(1 - markerSelection.expiration());
                         }
 					}

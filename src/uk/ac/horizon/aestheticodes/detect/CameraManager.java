@@ -20,6 +20,8 @@
 package uk.ac.horizon.aestheticodes.detect;
 
 import android.app.Activity;
+import android.app.AlertDialog;
+import android.app.DialogFragment;
 import android.content.Context;
 import android.graphics.Bitmap;
 import android.graphics.Rect;
@@ -194,10 +196,13 @@ public class CameraManager implements Camera.PreviewCallback, SurfaceHolder.Call
                     float reportedDpWidth = displayMetrics.widthPixels / displayMetrics.density;
 
                     // adjust the reported screen height (because of os bars)
-                    if (Build.VERSION.RELEASE.matches("^4\\.4.*$")) {
+                    if (android.os.Build.VERSION.SDK_INT >= Build.VERSION_CODES.KITKAT)
+                    {
                         // on Kitkat the surface is larger than the reported screen size
                         reportedDpHeight +=48;
-                    } else { /*earlier*/
+                    }
+                    else
+                    {
                         // in earlier versions the surface is smaller than the reported screen size
                         reportedDpHeight -=25;
                     }
@@ -209,13 +214,15 @@ public class CameraManager implements Camera.PreviewCallback, SurfaceHolder.Call
                     List<Camera.Size> supportedPreviewSizes = parameters.getSupportedPreviewSizes();
                     Camera.Size bestFitSoFar = null;
                     float ratioDifferenceOfBestFitSoFar = 0;
-                    for (Camera.Size supportedSize : supportedPreviewSizes) {
+                    for (Camera.Size supportedSize : supportedPreviewSizes)
+                    {
                         float ratio = (float)supportedSize.width / (float)supportedSize.height;
                         float ratioDifference = Math.abs(ratio - ratioOfSurface);
 
                         Log.i("SUP.PREVIEW", supportedSize.width+"x"+supportedSize.height+" ("+ratio+")");
 
-                        if (bestFitSoFar==null || ratioDifference < ratioDifferenceOfBestFitSoFar) {
+                        if (bestFitSoFar==null || ratioDifference < ratioDifferenceOfBestFitSoFar)
+                        {
                             bestFitSoFar = supportedSize;
                             ratioDifferenceOfBestFitSoFar = ratioDifference;
                         }
@@ -226,7 +233,8 @@ public class CameraManager implements Camera.PreviewCallback, SurfaceHolder.Call
                     ///// Debug: Print supported focus modes
                     Log.i(this.getClass().getName(), "Camera focus mode: " + parameters.getFocusMode());
                     Log.i(this.getClass().getName(), "Supported camera focus modes:");
-                    for (String supportedFocusMode : parameters.getSupportedFocusModes()) {
+                    for (String supportedFocusMode : parameters.getSupportedFocusModes())
+                    {
                         Log.i(this.getClass().getName(), " - "+supportedFocusMode);
                     }
                     Log.i(this.getClass().getName(), "(end of supported camera focus modes)");
@@ -292,9 +300,21 @@ public class CameraManager implements Camera.PreviewCallback, SurfaceHolder.Call
 			createCamera();
 		}
 
-		camera.setPreviewDisplay(holder);
-		camera.setOneShotPreviewCallback(this);
-		camera.startPreview();
+        if (camera != null)
+        {
+            camera.setPreviewDisplay(holder);
+            camera.setOneShotPreviewCallback(this);
+            camera.startPreview();
+        }
+        else
+        {
+            AlertDialog.Builder builder = new AlertDialog.Builder(context);
+            builder.setTitle("Camera unavailable.");
+            builder.setMessage("Restart device.");
+            builder.setPositiveButton("OK",null);
+            AlertDialog alertDialog = builder.create();
+            alertDialog.show();
+        }
 	}
 
 	public int getCameraCount()
@@ -389,16 +409,19 @@ public class CameraManager implements Camera.PreviewCallback, SurfaceHolder.Call
 
 	public void updateOrientation()
 	{
-		if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.ICE_CREAM_SANDWICH)
-		{
-			setCameraDisplayOrientation();
-		}
-		else
-		{
-			camera.stopPreview();
-			setCameraDisplayOrientation();
-			camera.startPreview();
-		}
+        if (camera!=null)
+        {
+            if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.ICE_CREAM_SANDWICH)
+            {
+                setCameraDisplayOrientation();
+            }
+            else
+            {
+                    camera.stopPreview();
+                    setCameraDisplayOrientation();
+                    camera.startPreview();
+            }
+        }
 	}
 
 	public Camera.Size getSize()
