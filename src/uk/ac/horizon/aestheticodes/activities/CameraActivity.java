@@ -20,18 +20,14 @@ package uk.ac.horizon.aestheticodes.activities;
 
 import android.content.Intent;
 import android.content.res.Resources;
-import android.graphics.Bitmap;
 import android.graphics.Rect;
-import android.hardware.Camera;
 import android.net.Uri;
 import android.os.Build;
 import android.os.Bundle;
 import android.support.v4.app.Fragment;
-import android.support.v4.app.FragmentActivity;
 import android.support.v4.app.FragmentPagerAdapter;
 import android.support.v4.view.ViewPager;
 import android.support.v7.app.ActionBarActivity;
-import android.util.DisplayMetrics;
 import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.Menu;
@@ -46,11 +42,6 @@ import android.widget.ProgressBar;
 import android.widget.RelativeLayout;
 import android.widget.TextView;
 import org.opencv.android.OpenCVLoader;
-import org.opencv.android.Utils;
-import org.opencv.core.CvType;
-import org.opencv.core.Mat;
-import org.opencv.core.Size;
-import org.opencv.imgproc.Imgproc;
 import uk.ac.horizon.aestheticodes.R;
 import uk.ac.horizon.aestheticodes.detect.CameraManager;
 import uk.ac.horizon.aestheticodes.detect.MarkerDetectionListener;
@@ -315,19 +306,7 @@ public class CameraActivity extends ActionBarActivity implements MarkerDetection
 		Log.i(TAG,"Frame = " + frame + ", " + viewfinder.getWidth());
 		ViewGroup.LayoutParams p = bottomView.getLayoutParams();
         SurfaceView surfaceView = (SurfaceView) findViewById(R.id.preview);
-        if (android.os.Build.VERSION.SDK_INT > Build.VERSION_CODES.GINGERBREAD_MR1)
-        {
-            p.height = surfaceView.getHeight()-frame.bottom;
-            // should be equivalent to frame.top when the top and bottom are the same size
-        }
-        else
-        {
-            // For some reason the above (and frame.top) gives too great a value on 2.3/Nexus One
-            // ...The top and bottom dark shaded areas are not equal.
-            DisplayMetrics displayMetrics = getResources().getDisplayMetrics();
-            p.height = (int)(surfaceView.getHeight()-frame.bottom-20 * displayMetrics.density);
-        }
-
+        p.height = surfaceView.getHeight()-frame.bottom;
 		p.width = frame.width();
 		bottomView.setLayoutParams(p);
 

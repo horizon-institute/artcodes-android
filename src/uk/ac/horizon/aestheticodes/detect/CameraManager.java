@@ -226,16 +226,6 @@ public class CameraManager implements Camera.PreviewCallback, SurfaceHolder.Call
                     Log.i("SUP.PREVIEW", "Selected: " + bestFitSoFar.width+"x"+bestFitSoFar.height+" ("+((float)bestFitSoFar.width/(float)bestFitSoFar.height)+")");
                     parameters.setPreviewSize(bestFitSoFar.width,bestFitSoFar.height);
 
-                    ///// Debug: Print supported focus modes
-                    Log.i(this.getClass().getName(), "Camera focus mode: " + parameters.getFocusMode());
-                    Log.i(this.getClass().getName(), "Supported camera focus modes:");
-                    for (String supportedFocusMode : parameters.getSupportedFocusModes())
-                    {
-                        Log.i(this.getClass().getName(), " - "+supportedFocusMode);
-                    }
-                    Log.i(this.getClass().getName(), "(end of supported camera focus modes)");
-                    /////
-
 					camera.setParameters(parameters);
 
 					setCameraDisplayOrientation();
