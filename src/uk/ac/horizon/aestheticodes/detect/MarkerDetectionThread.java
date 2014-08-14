@@ -47,7 +47,7 @@ public class MarkerDetectionThread extends Thread
 	private static final Scalar outlineColour = new Scalar(0, 0, 0, 255);
 	private final MarkerDetector markerDetector;
 	private final CameraManager cameraManager;
-	private int unmarkedFrames = 0;
+	private int framesSinceLastMarker = 0, cumulativeFramesWithoutMarker=0;
 	private final MarkerDetectionListener listener;
 	private boolean running = true;
 	private Mode mode = Mode.detect;
@@ -78,11 +78,16 @@ public class MarkerDetectionThread extends Thread
 	{
         ThresholdBehaviour thresholdBehaviour = MarkerSettings.getSettings().getThresholdBehaviour();
 
+        if (framesSinceLastMarker > 2)
+        {
+            ++cumulativeFramesWithoutMarker;
+        }
+
 		if (thresholdBehaviour == ThresholdBehaviour.temporalTile)
 		{
 			Imgproc.GaussianBlur(image, image, new Size(5, 5), 0);
 
-			final int numberOfTiles = ((unmarkedFrames / 2) % 9) + 1;
+			final int numberOfTiles = (cumulativeFramesWithoutMarker%9)+1;
 			final int tileHeight = (int) image.size().height / numberOfTiles;
 			final int tileWidth = (int) image.size().width / numberOfTiles;
 
@@ -127,7 +132,7 @@ public class MarkerDetectionThread extends Thread
 
 			Imgproc.GaussianBlur(image, image, new Size(5, 5), 0);
 
-			int neighbourhood = (((unmarkedFrames % 50) + 1) * 4) + 1;
+			int neighbourhood = (((cumulativeFramesWithoutMarker % 50) + 1) * 4) + 1;
 			//Log.i(TAG, "Neighbourhood = " + neighbourhood);
 			Imgproc.adaptiveThreshold(image, image, 255, Imgproc.ADAPTIVE_THRESH_MEAN_C, Imgproc.THRESH_BINARY, neighbourhood, 2);
 		}
@@ -252,8 +257,10 @@ public class MarkerDetectionThread extends Thread
 						List<Marker> markers = findMarkers(croppedImage, drawImage);
 						if(markers.size() == 0)
 						{
-							unmarkedFrames++;
-						}
+                            ++framesSinceLastMarker;
+						} else {
+                            framesSinceLastMarker = 0;
+                        }
 
 						if (mode == Mode.detect || drawImage == null)
 						{
