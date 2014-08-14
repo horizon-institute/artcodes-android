@@ -61,6 +61,10 @@ public class MarkerSettings
 		modes.clear();
 		modes.addAll(settings.modes);
 
+        addMarkers = settings.addMarkers;
+        addMarkerByScanning = settings.addMarkerByScanning;
+        editable = settings.editable;
+
 		updateURL = settings.updateURL;
 		lastUpdate = settings.lastUpdate;
 
@@ -82,7 +86,8 @@ public class MarkerSettings
 	private int validationRegionValue = 1;
 	private int checksumModulo = 3;
 	private boolean editable = true;
-	private boolean addMarker = true;
+    private boolean addMarkers = true;
+    private boolean addMarkerByScanning = false;
 	private Date lastUpdate;
 	private transient boolean changed = false;
 	private String updateURL = "http://www.wornchaos.org/settings.json";
@@ -375,7 +380,7 @@ public class MarkerSettings
 
 	public boolean canAddMarker()
 	{
-		return addMarker;
+		return addMarkers;
 	}
 
 	public Date getLastUpdate()
@@ -393,4 +398,8 @@ public class MarkerSettings
 	{
 		return changed;
 	}
+
+    public boolean canAddMarkerByScanning() {
+        return addMarkerByScanning;
+    }
 }

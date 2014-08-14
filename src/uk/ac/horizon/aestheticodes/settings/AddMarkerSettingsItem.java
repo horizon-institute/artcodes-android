@@ -33,6 +33,7 @@ import android.util.Patterns;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.WindowManager;
+import android.widget.Button;
 import android.widget.EditText;
 import uk.ac.horizon.aestheticodes.R;
 import uk.ac.horizon.aestheticodes.model.MarkerAction;
@@ -101,7 +102,13 @@ public class AddMarkerSettingsItem extends SettingsItem
 
 			final EditText markerCode = (EditText) view.findViewById(R.id.markerCode);
 			markerCode.setFilters(new InputFilter[] { new MarkerCodeInputFilter() });
-			final EditText urlView = (EditText) view.findViewById(R.id.markerURL);
+            final EditText urlView = (EditText) view.findViewById(R.id.markerURL);
+            if (this.presetCode != null)
+            {
+                markerCode.setText(this.presetCode);
+                markerCode.setEnabled(false);
+                urlView.requestFocus();
+            }
 
 			builder.setView(view);
 			builder.setPositiveButton(R.string.dialog_action_set, new DialogInterface.OnClickListener()
@@ -201,9 +208,25 @@ public class AddMarkerSettingsItem extends SettingsItem
 
 			markerCode.addTextChangedListener(watcher);
 			urlView.addTextChangedListener(watcher);
+            // disable the positive button when shown as the URL field will be empty
+            dialog.setOnShowListener(new DialogInterface.OnShowListener() {
+                @Override
+                public void onShow(DialogInterface dialogInterface) {
+                    Button positiveButton = dialog.getButton(AlertDialog.BUTTON_POSITIVE);
+                    if (positiveButton != null)
+                    {
+                        positiveButton.setEnabled(false);
+                    }
+                }
+            });
 
 			return dialog;
 		}
+
+        private String presetCode = null;
+        public void presetCode(String code) {
+            this.presetCode = code;
+        }
 	}
 
 

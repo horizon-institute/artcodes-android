@@ -18,12 +18,16 @@
  */
 package uk.ac.horizon.aestheticodes.activities;
 
+import android.app.AlertDialog;
+import android.content.Context;
+import android.content.DialogInterface;
 import android.content.Intent;
 import android.content.res.Resources;
 import android.graphics.Rect;
 import android.net.Uri;
 import android.os.Build;
 import android.os.Bundle;
+import android.os.Handler;
 import android.support.v4.app.Fragment;
 import android.support.v4.app.FragmentPagerAdapter;
 import android.support.v4.view.ViewPager;
@@ -439,6 +443,11 @@ public class CameraActivity extends ActionBarActivity implements MarkerDetection
 					else
 					{
 						Log.w(TAG, "No details for marker " + marker.getCodeKey());
+
+                        if (MarkerSettings.getSettings().canAddMarkerByScanning())
+                        {
+                            this.addMarkerDialog(marker.getCodeKey());
+                        }
 					}
 				}
 			}
@@ -455,4 +464,43 @@ public class CameraActivity extends ActionBarActivity implements MarkerDetection
             });
 		}
 	}
+
+    private void addMarkerDialog(final String code)
+    {
+        markerSelection.pause();
+        final Context context = this;
+        new Handler(getMainLooper()).post(new Runnable() {
+            @Override
+            public void run() {
+                progress.setVisibility(View.INVISIBLE);
+                AlertDialog.Builder builder = new AlertDialog.Builder(context);
+                builder.setTitle("New marker " + code);
+                builder.setMessage("Do you want to add an action for marker " + code + "?");
+                builder.setPositiveButton("Add Action", new DialogInterface.OnClickListener() {
+                    @Override
+                    public void onClick(DialogInterface dialogInterface, int i) {
+                        markerSelection.unpause();
+                        Intent addMarkerIntent =new Intent(context, MarkerListActivity.class);
+                        addMarkerIntent.putExtra("code", code);
+                        startActivity(addMarkerIntent);
+                    }
+                });
+                builder.setNegativeButton("Cancel", new DialogInterface.OnClickListener() {
+                    @Override
+                    public void onClick(DialogInterface dialogInterface, int i) {
+                        markerSelection.unpause();
+                    }
+                });
+                builder.setOnCancelListener(new DialogInterface.OnCancelListener() {
+                    @Override
+                    public void onCancel(DialogInterface dialogInterface) {
+                        markerSelection.unpause();
+                    }
+                });
+                AlertDialog alertDialog = builder.create();
+                alertDialog.show();
+            }
+        });
+
+    }
 }

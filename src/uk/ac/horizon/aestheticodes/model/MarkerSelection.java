@@ -31,8 +31,24 @@ public class MarkerSelection
 	private long lastUpdate = 0;
 	private long total = 0;
 
+    private boolean paused = false;
+
+    public void pause()
+    {
+        this.paused = true;
+    }
+    public void unpause()
+    {
+        this.paused = false;
+    }
+
 	public void addMarkers(List<Marker> markers)
 	{
+        if (paused)
+        {
+            return;
+        }
+
 		//check if this is the first marker detected in particular duration.
 		final long now = System.currentTimeMillis();
 		if(markers.size() > 0)

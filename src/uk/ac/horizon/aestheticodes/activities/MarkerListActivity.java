@@ -19,6 +19,7 @@
 
 package uk.ac.horizon.aestheticodes.activities;
 
+import android.app.AlertDialog;
 import android.os.Bundle;
 import android.util.Log;
 import uk.ac.horizon.aestheticodes.model.MarkerAction;
@@ -40,7 +41,20 @@ public class MarkerListActivity extends SettingsActivity
 {
 	final MarkerSettings settings = MarkerSettings.getSettings();
 
-	@Override
+    @Override
+    protected void onCreate(Bundle savedInstanceState) {
+        super.onCreate(savedInstanceState);
+
+        if (this.getIntent().hasExtra("code"))
+        {
+            String code = this.getIntent().getStringExtra("code");
+            final AddMarkerSettingsItem.AddMarkerDialogFragment dialogFragment = new AddMarkerSettingsItem.AddMarkerDialogFragment();
+            dialogFragment.presetCode(code);
+            dialogFragment.show(this.getSupportFragmentManager(), "missiles");
+        }
+    }
+
+    @Override
 	public void refresh()
 	{
 		adapter.clear();

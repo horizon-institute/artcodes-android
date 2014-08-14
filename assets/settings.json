@@ -33,5 +33,6 @@
 	"editable": true,
 	"addMarkers": true,
 
+    "addMarkerByScanning": true,
 	"thresholdBehaviour": "temporalTile"
 }
