@@ -162,10 +162,18 @@ public class CameraManager implements Camera.PreviewCallback, SurfaceHolder.Call
                                     try
                                     {
                                         Thread.currentThread().sleep(5000);
+                                        MarkerDetectionThread detectionThread = MarkerDetectionThread.getMostRecentMarkerDetectionThread();
                                         if (autoFocusThreadAlive && camera!=null)
-                                            camera.autoFocus(autoFocusCallback);
+                                        {
+                                            if (detectionThread!=null && detectionThread.getFramesSinceLastMarker()>2)
+                                            {
+                                                camera.autoFocus(autoFocusCallback);
+                                            }
+                                        }
                                         else
+                                        {
                                             break;
+                                        }
                                     }
                                     catch (InterruptedException e)
                                     {}

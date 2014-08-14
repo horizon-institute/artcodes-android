@@ -52,16 +52,40 @@ public class MarkerDetectionThread extends Thread
 	private boolean running = true;
 	private Mode mode = Mode.detect;
 
+    /* Static variable because the camera focus (old devices) thread needs to know the number of frames since the last marker so it does not try to focus while reading a marker :( */
+    private static MarkerDetectionThread mostRecentMarkerDetectionThread;
+    public synchronized static MarkerDetectionThread getMostRecentMarkerDetectionThread()
+    {
+        return mostRecentMarkerDetectionThread;
+    }
+    private synchronized static void setMostRecentMarkerDetectionThread(MarkerDetectionThread detectionThread)
+    {
+        mostRecentMarkerDetectionThread = detectionThread;
+    }
+    public int getFramesSinceLastMarker() {
+        return this.framesSinceLastMarker;
+    }
+
+
 	public MarkerDetectionThread(CameraManager cameraManager, MarkerDetectionListener listener, MarkerSettings settings)
-	{
-		this.cameraManager = cameraManager;
-		this.listener = listener;
-		markerDetector = new MarkerDetector(settings);
-	}
+    {
+        this.cameraManager = cameraManager;
+        this.listener = listener;
+        markerDetector = new MarkerDetector(settings);
+        setMostRecentMarkerDetectionThread(this);
+    }
 
 	public void setRunning(boolean running)
 	{
 		this.running = running;
+        if (running)
+        {
+            setMostRecentMarkerDetectionThread(this);
+        }
+        else
+        {
+            setMostRecentMarkerDetectionThread(null);
+        }
 	}
 
 	public static Mat cropImage(Mat imgMat)
