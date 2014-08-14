@@ -38,6 +38,8 @@ import uk.ac.horizon.aestheticodes.R;
 
 public class CameraManager implements Camera.PreviewCallback, SurfaceHolder.Callback
 {
+    public static boolean deviceNeedsManualAutoFocus = false;
+
 	private static final String TAG = CameraManager.class.getName();
 	private final Context context;
 	private Camera camera;
@@ -45,9 +47,6 @@ public class CameraManager implements Camera.PreviewCallback, SurfaceHolder.Call
 	private Rect framingRect;
 	private Bitmap result;
 	private int facing = Camera.CameraInfo.CAMERA_FACING_BACK;
-
-    private boolean autoFocusThreadAlive = false;
-    private Thread autoFocusThread;
 
 	private byte[] data = null;
 
@@ -95,13 +94,6 @@ public class CameraManager implements Camera.PreviewCallback, SurfaceHolder.Call
 
 	public void release()
 	{
-        if (autoFocusThread != null)
-        {
-            autoFocusThreadAlive = false;
-            autoFocusThread.interrupt();
-            autoFocusThread = null;
-        }
-
 		if (camera != null)
 		{
 			camera.stopPreview();
@@ -143,52 +135,9 @@ public class CameraManager implements Camera.PreviewCallback, SurfaceHolder.Call
 					}
                     else if (focusModes != null && focusModes.contains(Camera.Parameters.FOCUS_MODE_AUTO))
                     {
-                        // if FOCUS_MODE_CONTINUOUS_VIDEO is not supported auto-focus the camera every few seconds
+                        // if FOCUS_MODE_CONTINUOUS_VIDEO is not supported flag that manual auto-focus is needed every few seconds
                         parameters.setFocusMode(Camera.Parameters.FOCUS_MODE_AUTO);
-                        Runnable r = new Runnable() {
-                            @Override
-                            public void run() {
-                                Camera.AutoFocusCallback autoFocusCallback = new Camera.AutoFocusCallback()
-                                {
-                                    @Override
-                                    public void onAutoFocus(boolean b, Camera camera)
-                                    {
-                                        //Log.i("AutoFocus", "AutoFocus - b: " + b);
-                                    }
-                                };
-                                autoFocusThreadAlive = true;
-                                while (autoFocusThreadAlive)
-                                {
-                                    try
-                                    {
-                                        Thread.currentThread().sleep(5000);
-                                        MarkerDetectionThread detectionThread = MarkerDetectionThread.getMostRecentMarkerDetectionThread();
-                                        if (autoFocusThreadAlive && camera!=null)
-                                        {
-                                            if (detectionThread!=null && detectionThread.getFramesSinceLastMarker()>2)
-                                            {
-                                                camera.autoFocus(autoFocusCallback);
-                                            }
-                                        }
-                                        else
-                                        {
-                                            break;
-                                        }
-                                    }
-                                    catch (InterruptedException e)
-                                    {}
-                                    catch (NullPointerException e)
-                                    {
-                                        // Catch NullPointerException because camera is set to null
-                                        // on another thread and we need an exception handler for
-                                        // InterruptedException anyway.
-                                        break;
-                                    }
-                                }
-                            }
-                        };
-                        autoFocusThread = new Thread(r);
-                        autoFocusThread.start();
+                        deviceNeedsManualAutoFocus = true;
                     }
 
                     // Select preview size:
@@ -435,4 +384,12 @@ public class CameraManager implements Camera.PreviewCallback, SurfaceHolder.Call
 		}
 		camera.addCallbackBuffer(data);
 	}
+
+    public void performManualAutoFocus(Camera.AutoFocusCallback callback)
+    {
+        if (camera!=null)
+        {
+            camera.autoFocus(callback);
+        }
+    }
 }

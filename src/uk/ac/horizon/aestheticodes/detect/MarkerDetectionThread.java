@@ -52,19 +52,7 @@ public class MarkerDetectionThread extends Thread
 	private boolean running = true;
 	private Mode mode = Mode.detect;
 
-    /* Static variable because the camera focus (old devices) thread needs to know the number of frames since the last marker so it does not try to focus while reading a marker :( */
-    private static MarkerDetectionThread mostRecentMarkerDetectionThread;
-    public synchronized static MarkerDetectionThread getMostRecentMarkerDetectionThread()
-    {
-        return mostRecentMarkerDetectionThread;
-    }
-    private synchronized static void setMostRecentMarkerDetectionThread(MarkerDetectionThread detectionThread)
-    {
-        mostRecentMarkerDetectionThread = detectionThread;
-    }
-    public int getFramesSinceLastMarker() {
-        return this.framesSinceLastMarker;
-    }
+    private long timeOfLastAutoFocus;
 
 
 	public MarkerDetectionThread(CameraManager cameraManager, MarkerDetectionListener listener, MarkerSettings settings)
@@ -72,20 +60,12 @@ public class MarkerDetectionThread extends Thread
         this.cameraManager = cameraManager;
         this.listener = listener;
         markerDetector = new MarkerDetector(settings);
-        setMostRecentMarkerDetectionThread(this);
+        timeOfLastAutoFocus = System.currentTimeMillis();
     }
 
 	public void setRunning(boolean running)
 	{
 		this.running = running;
-        if (running)
-        {
-            setMostRecentMarkerDetectionThread(this);
-        }
-        else
-        {
-            setMostRecentMarkerDetectionThread(null);
-        }
 	}
 
 	public static Mat cropImage(Mat imgMat)
@@ -326,6 +306,19 @@ public class MarkerDetectionThread extends Thread
 				{
 					Log.e(TAG, e.getMessage(), e);
 				}
+
+                // Test if camera needs to be focused
+                if (CameraManager.deviceNeedsManualAutoFocus && this.framesSinceLastMarker>2 && System.currentTimeMillis()-this.timeOfLastAutoFocus>=5000)
+                {
+                    this.timeOfLastAutoFocus = System.currentTimeMillis();
+                    this.cameraManager.performManualAutoFocus(new Camera.AutoFocusCallback()
+                    {
+                        @Override
+                        public void onAutoFocus(boolean b, Camera camera)
+                        {
+                        }
+                    });
+                }
 			}
 		}
 		catch (Exception e)
