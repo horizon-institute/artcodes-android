@@ -35,6 +35,7 @@ import java.io.IOException;
 import java.util.List;
 
 import uk.ac.horizon.aestheticodes.R;
+import uk.ac.horizon.aestheticodes.activities.CameraActivity;
 
 public class CameraManager implements Camera.PreviewCallback, SurfaceHolder.Callback
 {
@@ -151,8 +152,11 @@ public class CameraManager implements Camera.PreviewCallback, SurfaceHolder.Call
                     // adjust the reported screen height (because of os bars)
                     if (android.os.Build.VERSION.SDK_INT >= Build.VERSION_CODES.KITKAT)
                     {
-                        // on Kitkat the surface is larger than the reported screen size
-                        reportedDpHeight +=48;
+                        if (CameraActivity.hasNavBar(context))
+                        {
+                            // on Kitkat (with the NAVBAR) the surface is larger than the reported screen size
+                            reportedDpHeight += 48;
+                        }
                     }
                     else
                     {
@@ -183,7 +187,7 @@ public class CameraManager implements Camera.PreviewCallback, SurfaceHolder.Call
                     Log.i("SUP.PREVIEW", "Selected: " + bestFitSoFar.width+"x"+bestFitSoFar.height+" ("+((float)bestFitSoFar.width/(float)bestFitSoFar.height)+")");
                     parameters.setPreviewSize(bestFitSoFar.width,bestFitSoFar.height);
 
-					camera.setParameters(parameters);
+                    camera.setParameters(parameters);
 
 					setCameraDisplayOrientation();
 

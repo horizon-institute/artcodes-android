@@ -33,6 +33,8 @@ import android.support.v4.app.FragmentPagerAdapter;
 import android.support.v4.view.ViewPager;
 import android.support.v7.app.ActionBarActivity;
 import android.util.Log;
+import android.view.KeyCharacterMap;
+import android.view.KeyEvent;
 import android.view.LayoutInflater;
 import android.view.Menu;
 import android.view.MenuInflater;
@@ -40,6 +42,7 @@ import android.view.MenuItem;
 import android.view.SurfaceHolder;
 import android.view.SurfaceView;
 import android.view.View;
+import android.view.ViewConfiguration;
 import android.view.ViewGroup;
 import android.view.WindowManager;
 import android.widget.ProgressBar;
@@ -314,7 +317,7 @@ public class CameraActivity extends ActionBarActivity implements MarkerDetection
 		p.width = frame.width();
 		bottomView.setLayoutParams(p);
 
-		if (android.os.Build.VERSION.SDK_INT >= Build.VERSION_CODES.KITKAT)
+		if (android.os.Build.VERSION.SDK_INT >= Build.VERSION_CODES.KITKAT && hasNavBar(this))
 		{
 			// Don't draw over nav bar
 			bottomView.setPadding(0,0,0,getNavBarHeight());
@@ -325,6 +328,10 @@ public class CameraActivity extends ActionBarActivity implements MarkerDetection
 		viewfinder.invalidate();
 	}
 
+    /**
+     * Get the height of the software NavBar. Note: This may return a height value even if the device does not display a NavBar, see hasNavBar(Context).
+     * @return The height of the NavBar
+     */
 	private int getNavBarHeight()
 	{
 		Resources resources = getResources();
@@ -334,6 +341,22 @@ public class CameraActivity extends ActionBarActivity implements MarkerDetection
 		}
 		return 0;
 	}
+
+    /**
+     * Test if the device displays a software NavBar.
+     * @param context
+     * @return
+     */
+    public static boolean hasNavBar(Context context)
+    {
+        boolean hasMenuKey = true;
+        if (android.os.Build.VERSION.SDK_INT >= Build.VERSION_CODES.ICE_CREAM_SANDWICH)
+        {
+            hasMenuKey = ViewConfiguration.get(context).hasPermanentMenuKey();
+        }
+        boolean hasBackKey = KeyCharacterMap.deviceHasKey(KeyEvent.KEYCODE_BACK);
+        return !hasBackKey && !hasMenuKey;
+    }
 
 	@Override
 	protected void onPause()
