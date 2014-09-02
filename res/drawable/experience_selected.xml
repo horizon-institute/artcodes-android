@@ -1,3 +1,5 @@
+<?xml version="1.0" encoding="utf-8"?>
+
 <!--
   ~ Aestheticodes recognises a different marker scheme that allows the
   ~ creation of aesthetically pleasing, even beautiful, codes.
@@ -17,14 +19,11 @@
   ~     along with this program.  If not, see <http://www.gnu.org/licenses/>.
   -->
 
-<menu xmlns:tools="http://schemas.android.com/tools" xmlns:android="http://schemas.android.com/apk/res/android"
-      tools:context=".activities.CameraActivity" xmlns:app="http://schemas.android.com/apk/res-auto">
-	<item android:id="@+id/action_switch_camera"
-	      android:title="@string/action_switch_camera"
-	      android:icon="@drawable/ic_action_switch_camera"
-          app:showAsAction="ifRoom" />
-	<item android:id="@+id/action_settings"
-          android:title="@string/action_settings"
-          android:icon="@drawable/ic_action_settings"
-          app:showAsAction="ifRoom"/>
-</menu>
+<shape xmlns:android="http://schemas.android.com/apk/res/android"
+       android:shape="oval">
+
+	<solid android:color="#FF6699FF" />
+
+	<size android:width="40dp"
+	      android:height="40dp" />
+</shape>

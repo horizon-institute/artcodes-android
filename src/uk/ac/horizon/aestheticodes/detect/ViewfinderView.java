@@ -26,17 +26,21 @@ import android.graphics.Paint;
 import android.graphics.Rect;
 import android.util.AttributeSet;
 import android.view.View;
+import uk.ac.horizon.aestheticodes.R;
 
 import java.util.HashSet;
 import java.util.Set;
 
-import uk.ac.horizon.aestheticodes.R;
-
 public final class ViewfinderView extends View
 {
+	public interface SizeChangedListener
+	{
+		public void sizeHasChanged();
+	}
+
 	private final Paint paint;
 	private final int maskColor;
-
+	Set<SizeChangedListener> sizeChangeListeners = new HashSet<SizeChangedListener>();
 	private CameraManager cameraManager;
 
 	public ViewfinderView(Context context, AttributeSet attrs)
@@ -83,24 +87,24 @@ public final class ViewfinderView extends View
 		canvas.drawRect(0, frame.bottom + 1, width, height, paint);
 	}
 
-    public interface SizeChangedListener {
-        public void sizeHasChanged();
-    }
+	public void addSizeChangedListener(SizeChangedListener listener)
+	{
+		this.sizeChangeListeners.add(listener);
+	}
 
-    Set<SizeChangedListener> sizeChangeListeners = new HashSet<SizeChangedListener>();
-    public void addSizeChangedListener(SizeChangedListener listener) {
-        this.sizeChangeListeners.add(listener);
-    }
-    public boolean removeSizeChangedListener(SizeChangedListener listener) {
-        return this.sizeChangeListeners.remove(listener);
-    }
+	public boolean removeSizeChangedListener(SizeChangedListener listener)
+	{
+		return this.sizeChangeListeners.remove(listener);
+	}
 
-    @Override
-    protected void onSizeChanged(int w, int h, int oldw, int oldh) {
-        super.onSizeChanged(w, h, oldw, oldh);
-        for (SizeChangedListener listener:this.sizeChangeListeners) {
-            listener.sizeHasChanged();
-        }
-    }
+	@Override
+	protected void onSizeChanged(int w, int h, int oldw, int oldh)
+	{
+		super.onSizeChanged(w, h, oldw, oldh);
+		for (SizeChangedListener listener : this.sizeChangeListeners)
+		{
+			listener.sizeHasChanged();
+		}
+	}
 
 }

@@ -18,10 +18,23 @@
   ~     along with this program.  If not, see <http://www.gnu.org/licenses/>.
   -->
 
-<resources xmlns:android="http://schemas.android.com/apk/res/android">
-	<color name="selected_item">#660066FF</color>
-    <color name="viewfinder_mask">#60000000</color>
-    <color name="result_view">#b0000000</color>
-	<color name="drawer_background">#333333</color>
-	<color name="list_background">#fafafa</color>
-</resources>
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+                android:layout_width="fill_parent"
+                android:layout_height="72dp"
+                android:padding="8dp"
+                android:orientation="horizontal" android:background="@drawable/list_selector">
+	<ImageView android:id="@+id/experience_icon"
+	           android:layout_width="48dp"
+	           android:layout_height="48dp"
+	           android:layout_marginEnd="8dp"
+	           android:layout_marginRight="8dp"
+	           android:scaleType="fitCenter" android:background="@drawable/experience_selector" android:padding="4dp" />
+
+	<TextView android:id="@+id/experience_title"
+	          android:layout_width="wrap_content"
+	          android:layout_height="fill_parent"
+	          android:textSize="16sp"
+	          android:textColor="#FFEEEEEE"
+	          android:gravity="center_vertical" />
+</LinearLayout>
+

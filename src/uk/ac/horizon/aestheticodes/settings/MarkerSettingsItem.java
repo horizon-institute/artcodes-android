@@ -33,16 +33,15 @@ import android.view.View;
 import android.view.WindowManager;
 import android.widget.EditText;
 import uk.ac.horizon.aestheticodes.R;
+import uk.ac.horizon.aestheticodes.model.Experience;
+import uk.ac.horizon.aestheticodes.model.ExperienceManager;
 import uk.ac.horizon.aestheticodes.model.MarkerAction;
-import uk.ac.horizon.aestheticodes.model.MarkerSettings;
 
 public class MarkerSettingsItem extends SettingsItem
 {
-	private static final MarkerSettings settings = MarkerSettings.getSettings();
-
 	public static class EditMarkerDialogFragment extends DialogFragment
 	{
-		final Handler handler = new Handler();
+		private final Handler handler = new Handler();
 
 		@Override
 		public Dialog onCreateDialog(Bundle savedInstanceState)
@@ -52,10 +51,14 @@ public class MarkerSettingsItem extends SettingsItem
 			// TODO builder.setMessage(getDescription());
 
 			LayoutInflater inflater = getActivity().getLayoutInflater();
-            final SettingsActivity settingsActivity = (SettingsActivity) getActivity();
+			final SettingsActivity settingsActivity = (SettingsActivity) getActivity();
 
 			final String code = getArguments().getString("code");
-			final MarkerAction action = settings.getMarkers().get(code);
+			final String experienceID = getArguments().getString("experience");
+
+			ExperienceManager experienceManager = new ExperienceManager(getActivity());
+			final Experience experience = experienceManager.get(experienceID);
+			final MarkerAction action = experience.getMarkers().get(code);
 			// Inflate and set the layout for the dialog
 			// Pass null as the parent view because its going in the dialog layout
 			builder.setTitle(getResources().getString(R.string.dialog_marker_title_prefix) + " " + action.getCode());
@@ -70,16 +73,16 @@ public class MarkerSettingsItem extends SettingsItem
 			{
 				public void onClick(DialogInterface dialog, int id)
 				{
-                    if(Patterns.WEB_URL.matcher("http://" + urlView.getText().toString()).matches())
-                    {
-                        action.setAction("http://" + urlView.getText().toString());
-                    }
-                    else
-                    {
-                        action.setAction(urlView.getText().toString());
-                    }
-					settings.setChanged(true);
-                    settingsActivity.refresh();
+					if (Patterns.WEB_URL.matcher("http://" + urlView.getText().toString()).matches())
+					{
+						action.setAction("http://" + urlView.getText().toString());
+					}
+					else
+					{
+						action.setAction(urlView.getText().toString());
+					}
+					experience.setChanged(true);
+					settingsActivity.refresh();
 				}
 			});
 			builder.setNegativeButton(R.string.dialog_action_cancel, new DialogInterface.OnClickListener()
@@ -89,35 +92,41 @@ public class MarkerSettingsItem extends SettingsItem
 					// User cancelled the dialog
 				}
 			});
-            
-            builder.setNeutralButton(R.string.dialog_action_delete, new DialogInterface.OnClickListener() {
-                @Override
-                public void onClick(DialogInterface dialogInterface, int i) {
-                    AlertDialog.Builder confirmBuilder = new AlertDialog.Builder(getActivity());
-                    confirmBuilder.setTitle(getResources().getString(R.string.confirmDeleteDialogTitlePrefix) + " " + code + "?");
-                    confirmBuilder.setMessage(R.string.confirmDeleteDialogMessage);
-                    confirmBuilder.setPositiveButton(R.string.confirmDeleteDialogPositive, new DialogInterface.OnClickListener() {
-                        @Override
-                        public void onClick(DialogInterface dialogInterface, int i) {
-                            // delete the marker:
-                            settings.deleteMarker(code);
-                            settingsActivity.refresh();
-                        }
-                    });
-                    confirmBuilder.setNegativeButton(R.string.confirmDeleteDialogNegative, new DialogInterface.OnClickListener() {
-                        @Override
-                        public void onClick(DialogInterface dialogInterface, int i) {
-                            // nothing
-                        }
-                    });
 
-                    confirmBuilder.create().show();
-                }
-            });
+			builder.setNeutralButton(R.string.dialog_action_delete, new DialogInterface.OnClickListener()
+			{
+				@Override
+				public void onClick(DialogInterface dialogInterface, int i)
+				{
+					AlertDialog.Builder confirmBuilder = new AlertDialog.Builder(getActivity());
+					confirmBuilder.setTitle(getResources().getString(R.string.confirmDeleteDialogTitlePrefix) + " " + code + "?");
+					confirmBuilder.setMessage(R.string.confirmDeleteDialogMessage);
+					confirmBuilder.setPositiveButton(R.string.confirmDeleteDialogPositive, new DialogInterface.OnClickListener()
+					{
+						@Override
+						public void onClick(DialogInterface dialogInterface, int i)
+						{
+							// delete the marker:
+							experience.deleteMarker(code);
+							settingsActivity.refresh();
+						}
+					});
+					confirmBuilder.setNegativeButton(R.string.confirmDeleteDialogNegative, new DialogInterface.OnClickListener()
+					{
+						@Override
+						public void onClick(DialogInterface dialogInterface, int i)
+						{
+							// nothing
+						}
+					});
+
+					confirmBuilder.create().show();
+				}
+			});
 
 			// Create the AlertDialog object and return it
 			final AlertDialog dialog = builder.create();
-            dialog.getWindow().setSoftInputMode(WindowManager.LayoutParams.SOFT_INPUT_STATE_VISIBLE);
+			dialog.getWindow().setSoftInputMode(WindowManager.LayoutParams.SOFT_INPUT_STATE_VISIBLE);
 
 			urlView.addTextChangedListener(new TextWatcher()
 			{
@@ -126,7 +135,7 @@ public class MarkerSettingsItem extends SettingsItem
 					@Override
 					public void run()
 					{
-						if(Patterns.WEB_URL.matcher(urlView.getText().toString()).matches())
+						if (Patterns.WEB_URL.matcher(urlView.getText().toString()).matches())
 						{
 							dialog.getButton(AlertDialog.BUTTON_POSITIVE).setEnabled(true);
 							urlView.setError(null);
@@ -164,11 +173,22 @@ public class MarkerSettingsItem extends SettingsItem
 		}
 	}
 
-	private MarkerAction action;
+	private static String getDetail(final MarkerAction action)
+	{
+		if (action.getAction() != null && action.getAction().startsWith("http://"))
+		{
+			return action.getAction().substring("http://".length());
+		}
+		return action.getAction();
+	}
 
-	public MarkerSettingsItem(SettingsActivity activity, MarkerAction action)
+	private final Experience experience;
+	private final MarkerAction action;
+
+	public MarkerSettingsItem(SettingsActivity activity, Experience experience, MarkerAction action)
 	{
 		super(activity);
+		this.experience = experience;
 		this.action = action;
 	}
 
@@ -187,7 +207,7 @@ public class MarkerSettingsItem extends SettingsItem
 	@Override
 	public Type getType()
 	{
-		if(action.isEditable())
+		if (action.isEditable())
 		{
 			return Type.two_line;
 		}
@@ -197,23 +217,15 @@ public class MarkerSettingsItem extends SettingsItem
 	@Override
 	public void selected()
 	{
-		if(action.isEditable())
+		if (action.isEditable())
 		{
 			final EditMarkerDialogFragment dialogFragment = new EditMarkerDialogFragment();
 			final Bundle bundle = new Bundle();
+			bundle.putString("experience", experience.getId());
 			bundle.putString("code", action.getCode());
 			dialogFragment.setArguments(bundle);
 			dialogFragment.show(activity.getSupportFragmentManager(), "missiles");
 		}
-	}
-
-	private static String getDetail(final MarkerAction action)
-	{
-		if(action.getAction() != null && action.getAction().startsWith("http://"))
-		{
-			return action.getAction().substring("http://".length());
-		}
-		return action.getAction();
 	}
 
 	@Override

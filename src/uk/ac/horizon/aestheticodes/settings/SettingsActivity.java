@@ -183,8 +183,6 @@ public class SettingsActivity extends ActionBarActivity
 		});
 
 		getSupportActionBar().setDisplayHomeAsUpEnabled(true);
-
-		refresh();
 	}
 
 	@Override

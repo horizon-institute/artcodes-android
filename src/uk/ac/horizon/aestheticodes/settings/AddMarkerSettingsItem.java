@@ -36,15 +36,23 @@ import android.view.WindowManager;
 import android.widget.Button;
 import android.widget.EditText;
 import uk.ac.horizon.aestheticodes.R;
+import uk.ac.horizon.aestheticodes.model.Experience;
+import uk.ac.horizon.aestheticodes.model.ExperienceManager;
 import uk.ac.horizon.aestheticodes.model.MarkerAction;
-import uk.ac.horizon.aestheticodes.model.MarkerSettings;
 
 public class AddMarkerSettingsItem extends SettingsItem
 {
-	private static final MarkerSettings settings = MarkerSettings.getSettings();
+	private final Experience experience;
 
 	private static class MarkerCodeInputFilter implements InputFilter
 	{
+		private final Experience experience;
+
+		public MarkerCodeInputFilter(Experience experience)
+		{
+			this.experience = experience;
+		}
+
 		@Override
 		public CharSequence filter(CharSequence source, int sourceStart, int sourceEnd, Spanned destination, int destinationStart, int destinationEnd)
 		{
@@ -60,12 +68,12 @@ public class AddMarkerSettingsItem extends SettingsItem
 			{
 				return sourceValue;
 			}
-			boolean resultValid = settings.isValidMarker(result, true);
+			boolean resultValid = experience.isValidMarker(result, true);
 
 			if (!resultValid && !sourceValue.startsWith(":"))
 			{
 				sourceValue = ":" + sourceValue;
-				resultValid = settings.isValidMarker(destination.subSequence(0, destinationStart).toString() + sourceValue +
+				resultValid = experience.isValidMarker(destination.subSequence(0, destinationStart).toString() + sourceValue +
 						destination.subSequence(destinationEnd, destination.length()).toString(), true);
 			}
 
@@ -98,10 +106,15 @@ public class AddMarkerSettingsItem extends SettingsItem
 			// Pass null as the parent view because its going in the dialog layout
 			builder.setTitle("Add New Marker");
 
+			final String experienceID = getArguments().getString("experience");
+
+			ExperienceManager experienceManager = new ExperienceManager(getActivity());
+			final Experience experience = experienceManager.get(experienceID);
+
 			View view = inflater.inflate(R.layout.dialog_add_marker, null);
 
 			final EditText markerCode = (EditText) view.findViewById(R.id.markerCode);
-			markerCode.setFilters(new InputFilter[] { new MarkerCodeInputFilter() });
+			markerCode.setFilters(new InputFilter[] { new MarkerCodeInputFilter(experience) });
             final EditText urlView = (EditText) view.findViewById(R.id.markerURL);
             if (this.presetCode != null)
             {
@@ -125,8 +138,8 @@ public class AddMarkerSettingsItem extends SettingsItem
                     {
                         action.setAction(urlView.getText().toString());
                     }
-					settings.setChanged(true);
-					settings.getMarkers().put(action.getCode(), action);
+					experience.setChanged(true);
+					experience.getMarkers().put(action.getCode(), action);
 					((SettingsActivity)getActivity()).refresh();
 				}
 			});
@@ -159,7 +172,7 @@ public class AddMarkerSettingsItem extends SettingsItem
 							urlView.setError("This url is not valid");
 						}
 
-						if(settings.isValidMarker(markerCode.getText().toString(), false))
+						if(experience.isValidMarker(markerCode.getText().toString(), false))
 						{
 							markerCode.setError(null);
 						}
@@ -168,7 +181,7 @@ public class AddMarkerSettingsItem extends SettingsItem
 							markerCode.setError("This code is not valid");
 						}
 
-						if(!settings.getMarkers().containsKey(markerCode.getText().toString()))
+						if(!experience.getMarkers().containsKey(markerCode.getText().toString()))
 						{
 							markerCode.setError(null);
 						}
@@ -202,7 +215,7 @@ public class AddMarkerSettingsItem extends SettingsItem
 
 				private boolean isValid()
 				{
-					return Patterns.WEB_URL.matcher(urlView.getText().toString()).matches() && settings.isValidMarker(markerCode.getText().toString(), false) && !settings.getMarkers().containsKey(markerCode.getText().toString());
+					return Patterns.WEB_URL.matcher(urlView.getText().toString()).matches() && experience.isValidMarker(markerCode.getText().toString(), false) && !experience.getMarkers().containsKey(markerCode.getText().toString());
 				}
 			};
 
@@ -230,9 +243,10 @@ public class AddMarkerSettingsItem extends SettingsItem
 	}
 
 
-	public AddMarkerSettingsItem(SettingsActivity activity, String title)
+	public AddMarkerSettingsItem(SettingsActivity activity, Experience experience, String title)
 	{
 		super(activity, title);
+		this.experience = experience;
 	}
 
 	@Override
@@ -245,6 +259,9 @@ public class AddMarkerSettingsItem extends SettingsItem
 	public void selected()
 	{
 		final AddMarkerDialogFragment dialogFragment = new AddMarkerDialogFragment();
+		final Bundle bundle = new Bundle();
+		bundle.putString("experience", experience.getId());
+		dialogFragment.setArguments(bundle);
 		dialogFragment.show(activity.getSupportFragmentManager(), "missiles");
 	}
 

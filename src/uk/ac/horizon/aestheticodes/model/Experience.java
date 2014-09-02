@@ -20,6 +20,7 @@
 package uk.ac.horizon.aestheticodes.model;
 
 import android.util.Log;
+import uk.ac.horizon.aestheticodes.settings.ThresholdBehaviour;
 
 import java.util.ArrayList;
 import java.util.Arrays;
@@ -27,8 +28,6 @@ import java.util.Date;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
-
-import uk.ac.horizon.aestheticodes.settings.ThresholdBehaviour;
 
 /**
  * This class defines the constraints for markers.It contains two sets
@@ -38,46 +37,13 @@ import uk.ac.horizon.aestheticodes.settings.ThresholdBehaviour;
  * validate a marker. It defines the number of validation branches, leaves in a
  * validation branch and the checksumModulo modulo.
  */
-public class MarkerSettings
+public class Experience
 {
-	private static final MarkerSettings settings = new MarkerSettings();
-
-	public static MarkerSettings getSettings()
-	{
-		return settings;
-	}
-
-	public void setSettings(MarkerSettings settings)
-	{
-		minRegions = settings.minRegions;
-		maxRegions = settings.maxRegions;
-		maxEmptyRegions = settings.maxEmptyRegions;
-		maxRegionValue = settings.maxRegionValue;
-		validationRegions = settings.validationRegions;
-		validationRegionValue = settings.validationRegionValue;
-		checksumModulo = settings.checksumModulo;
-		markers.clear();
-		markers.putAll(settings.markers);
-		modes.clear();
-		modes.addAll(settings.modes);
-
-        addMarkers = settings.addMarkers;
-        addMarkerByScanning = settings.addMarkerByScanning;
-        editable = settings.editable;
-
-		updateURL = settings.updateURL;
-		lastUpdate = settings.lastUpdate;
-
-        if (settings.thresholdBehaviour != null)
-        {
-            thresholdBehaviour = settings.thresholdBehaviour;
-        }
-
-		editable = settings.editable;
-	}
-
 	private final List<Mode> modes = new ArrayList<Mode>();
 	private final Map<String, MarkerAction> markers = new HashMap<String, MarkerAction>();
+	private String id;
+	private String name;
+	private String icon;
 	private int minRegions = 5;
 	private int maxRegions = 5;
 	private int maxEmptyRegions = 0;
@@ -86,15 +52,15 @@ public class MarkerSettings
 	private int validationRegionValue = 1;
 	private int checksumModulo = 3;
 	private boolean editable = true;
-    private boolean addMarkers = true;
-    private boolean addMarkerByScanning = false;
+	private boolean addMarkers = true;
+	private boolean addMarkerByScanning = false;
 	private Date lastUpdate;
 	private transient boolean changed = false;
 	private String updateURL = "http://www.wornchaos.org/settings.json";
 
-    private String thresholdBehaviour = null;
+	private String thresholdBehaviour = null;
 
-	public MarkerSettings()
+	public Experience()
 	{
 		modes.addAll(Arrays.asList(Mode.values()));
 	}
@@ -113,6 +79,11 @@ public class MarkerSettings
 	{
 		this.minRegions = minRegions;
 		changed = true;
+	}
+
+	public boolean isEditable()
+	{
+		return editable;
 	}
 
 	public int getMaxRegions()
@@ -181,28 +152,33 @@ public class MarkerSettings
 		changed = true;
 	}
 
-    public ThresholdBehaviour getThresholdBehaviour()
-    {
-        if (this.thresholdBehaviour==null || this.thresholdBehaviour.equals("temporalTile"))
-        {
-            return ThresholdBehaviour.temporalTile;
-        }
-        else if (this.thresholdBehaviour.equals("resize"))
-        {
-            return ThresholdBehaviour.resize;
-        }
-        else
-        {
-            Log.w(this.getClass().getName(), "Unsupported threshold behaviour: "+this.thresholdBehaviour);
-            return ThresholdBehaviour.temporalTile;
-        }
-    }
+	public ThresholdBehaviour getThresholdBehaviour()
+	{
+		if (this.thresholdBehaviour == null || this.thresholdBehaviour.equals("temporalTile"))
+		{
+			return ThresholdBehaviour.temporalTile;
+		}
+		else if (this.thresholdBehaviour.equals("resize"))
+		{
+			return ThresholdBehaviour.resize;
+		}
+		else
+		{
+			Log.w(this.getClass().getName(), "Unsupported threshold behaviour: " + this.thresholdBehaviour);
+			return ThresholdBehaviour.temporalTile;
+		}
+	}
 
-    public void setThresholdBehaviour(String thresholdBehaviour)
-    {
-        this.thresholdBehaviour = thresholdBehaviour;
-        this.changed = true;
-    }
+	public String getIcon()
+	{
+		return icon;
+	}
+
+	public void setThresholdBehaviour(String thresholdBehaviour)
+	{
+		this.thresholdBehaviour = thresholdBehaviour;
+		this.changed = true;
+	}
 
 	public boolean isValidMarker(List<Integer> markerCodes)
 	{
@@ -214,20 +190,25 @@ public class MarkerSettings
 		return markers;
 	}
 
-    /**
-     * Delete a marker from the list of markers.
-     * @param code The code of the marker to delete.
-     * @return True if a marker was deleted, false if the given code was not found.
-     */
-    public boolean deleteMarker(String code) {
-        if (this.markers.containsKey(code)) {
-            this.markers.remove(code);
-            this.setChanged(true);
-            return true;
-        } else {
-            return false;
-        }
-    }
+	/**
+	 * Delete a marker from the list of markers.
+	 *
+	 * @param code The code of the marker to delete.
+	 * @return True if a marker was deleted, false if the given code was not found.
+	 */
+	public boolean deleteMarker(String code)
+	{
+		if (this.markers.containsKey(code))
+		{
+			this.markers.remove(code);
+			this.setChanged(true);
+			return true;
+		}
+		else
+		{
+			return false;
+		}
+	}
 
 	public void setChanged(boolean changed)
 	{
@@ -282,12 +263,8 @@ public class MarkerSettings
 			}
 		}
 
-		if (!partial)
-		{
-			return isValidMarker(codes);
-		}
+		return partial || isValidMarker(codes);
 
-		return true;
 	}
 
 	/**
@@ -399,7 +376,18 @@ public class MarkerSettings
 		return changed;
 	}
 
-    public boolean canAddMarkerByScanning() {
-        return addMarkerByScanning;
-    }
+	public boolean canAddMarkerByScanning()
+	{
+		return addMarkerByScanning;
+	}
+
+	public String getId()
+	{
+		return id;
+	}
+
+	public String getName()
+	{
+		return name;
+	}
 }

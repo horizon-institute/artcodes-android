@@ -21,7 +21,10 @@
 			"action": "http://www.aestheticodes.com"
 		}
 	],
-	"updateURL": "http://www.wornchaos.org/settings.json",
+	"id": "uk.ac.horizon.aestheticodes.default",
+	"name": "Aestheticodes",
+	"icon": "http://www.wornchaos.org/default_logo.png",
+	"updateURL": "http://www.wornchaos.org/uk.ac.horizon.aestheticodes.default.json",
 	"minRegions": 5,
 	"maxRegions": 5,
 	"maxEmptyRegions": 0,

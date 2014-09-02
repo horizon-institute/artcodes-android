@@ -19,44 +19,101 @@
 
 package uk.ac.horizon.aestheticodes.activities;
 
+import android.content.Intent;
+import android.graphics.Bitmap;
+import android.graphics.drawable.BitmapDrawable;
+import android.graphics.drawable.Drawable;
+import android.net.Uri;
 import android.os.Bundle;
-import uk.ac.horizon.aestheticodes.model.MarkerSettings;
+import android.support.v4.app.NavUtils;
+import android.view.MenuItem;
+import com.squareup.picasso.Picasso;
+import com.squareup.picasso.Target;
+import uk.ac.horizon.aestheticodes.R;
+import uk.ac.horizon.aestheticodes.model.Experience;
+import uk.ac.horizon.aestheticodes.model.ExperienceManager;
 import uk.ac.horizon.aestheticodes.settings.IntPropertySettingsItem;
 import uk.ac.horizon.aestheticodes.settings.Property;
 import uk.ac.horizon.aestheticodes.settings.SettingsActivity;
-import uk.ac.horizon.aestheticodes.settings.SettingsItem;
 
 public class MarkerSettingsActivity extends SettingsActivity
 {
-	private final static MarkerSettings settings = MarkerSettings.getSettings();
+	private ExperienceManager experienceManager;
+	private Experience experience;
 
 	@Override
 	public void onCreate(Bundle savedInstanceState)
 	{
 		super.onCreate(savedInstanceState);
 
-		adapter.add(new IntPropertySettingsItem(this, settings, "minRegions", 1, "maxRegions"));
-		adapter.add(new IntPropertySettingsItem(this, settings, "maxRegions", "minRegions", 12));
-		adapter.add(new IntPropertySettingsItem(this, settings, "maxRegionValue", 1, 9));
-		adapter.add(new IntPropertySettingsItem(this, settings, "maxEmptyRegions", 0, "maxRegions", 0));
-		adapter.add(new IntPropertySettingsItem(this, settings, "validationRegions", 0, "maxRegions", 0));
-		adapter.add(new IntPropertySettingsItem(this, settings, "validationRegionValue", 1, "maxRegionValue"));
-		adapter.add(new IntPropertySettingsItem(this, settings, "checksumModulo", 1, 12, 1));
+		Bundle extras = getIntent().getExtras();
+		String experienceID = extras.getString("experience");
+
+		experienceManager = new ExperienceManager(this);
+		experience = experienceManager.get(experienceID);
+
+		adapter.add(new IntPropertySettingsItem(this, experience, "minRegions", 1, "maxRegions"));
+		adapter.add(new IntPropertySettingsItem(this, experience, "maxRegions", "minRegions", 12));
+		adapter.add(new IntPropertySettingsItem(this, experience, "maxRegionValue", 1, 9));
+		adapter.add(new IntPropertySettingsItem(this, experience, "maxEmptyRegions", 0, "maxRegions", 0));
+		adapter.add(new IntPropertySettingsItem(this, experience, "validationRegions", 0, "maxRegions", 0));
+		adapter.add(new IntPropertySettingsItem(this, experience, "validationRegionValue", 1, "maxRegionValue"));
+		adapter.add(new IntPropertySettingsItem(this, experience, "checksumModulo", 1, 12, 1));
 
 		adapter.notifyDataSetChanged();
+
+		getSupportActionBar().setDisplayHomeAsUpEnabled(true);
+		getSupportActionBar().setTitle(getString(R.string.marker_settings_title, experience.getName()));
+		if (experience.getIcon() != null)
+		{
+			Picasso.with(this).load(experience.getIcon()).into(new Target()
+			{
+				@Override
+				public void onBitmapLoaded(Bitmap bitmap, Picasso.LoadedFrom from)
+				{
+					getSupportActionBar().setIcon(new BitmapDrawable(getResources(), bitmap));
+				}
+
+				@Override
+				public void onBitmapFailed(Drawable errorDrawable)
+				{
+
+				}
+
+				@Override
+				public void onPrepareLoad(Drawable placeHolderDrawable)
+				{
+
+				}
+			});
+		}
+
 	}
 
 	@Override
 	public void refresh()
 	{
-		MarkerSettingsHelper.saveSettings(this);
+		experienceManager.add(experience);
 		adapter.notifyDataSetChanged();
+	}
+
+	@Override
+	public boolean onOptionsItemSelected(MenuItem item)
+	{
+		switch (item.getItemId())
+		{
+			// Respond to the action bar's Up/Home button
+			case android.R.id.home:
+				NavUtils.navigateUpTo(this, new Intent(Intent.ACTION_EDIT, Uri.parse("aestheticodes://" + experience.getId())));
+				return true;
+		}
+		return super.onOptionsItemSelected(item);
 	}
 
 	@Override
 	public void setProperty(String propertyName, Object value)
 	{
-		Property property = new Property(settings, propertyName);
+		Property property = new Property(experience, propertyName);
 		property.set(value);
 	}
 }

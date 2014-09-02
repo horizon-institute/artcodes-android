@@ -23,7 +23,10 @@ import android.content.Context;
 import android.content.DialogInterface;
 import android.content.Intent;
 import android.content.res.Resources;
+import android.graphics.Bitmap;
 import android.graphics.Rect;
+import android.graphics.drawable.BitmapDrawable;
+import android.graphics.drawable.Drawable;
 import android.net.Uri;
 import android.os.Build;
 import android.os.Bundle;
@@ -31,38 +34,31 @@ import android.os.Handler;
 import android.support.v4.app.Fragment;
 import android.support.v4.app.FragmentPagerAdapter;
 import android.support.v4.view.ViewPager;
-import android.support.v7.app.ActionBarActivity;
 import android.util.Log;
-import android.view.KeyCharacterMap;
-import android.view.KeyEvent;
-import android.view.LayoutInflater;
-import android.view.Menu;
-import android.view.MenuInflater;
-import android.view.MenuItem;
-import android.view.SurfaceHolder;
-import android.view.SurfaceView;
-import android.view.View;
-import android.view.ViewConfiguration;
-import android.view.ViewGroup;
-import android.view.WindowManager;
+import android.view.*;
+import android.widget.BaseAdapter;
+import android.widget.ImageView;
 import android.widget.ProgressBar;
 import android.widget.RelativeLayout;
 import android.widget.TextView;
+import com.squareup.picasso.Picasso;
+import com.squareup.picasso.Target;
 import org.opencv.android.OpenCVLoader;
 import uk.ac.horizon.aestheticodes.R;
 import uk.ac.horizon.aestheticodes.detect.CameraManager;
 import uk.ac.horizon.aestheticodes.detect.MarkerDetectionListener;
 import uk.ac.horizon.aestheticodes.detect.MarkerDetectionThread;
 import uk.ac.horizon.aestheticodes.detect.ViewfinderView;
+import uk.ac.horizon.aestheticodes.model.Experience;
+import uk.ac.horizon.aestheticodes.model.ExperienceManager;
 import uk.ac.horizon.aestheticodes.model.Marker;
 import uk.ac.horizon.aestheticodes.model.MarkerAction;
 import uk.ac.horizon.aestheticodes.model.MarkerSelection;
-import uk.ac.horizon.aestheticodes.model.MarkerSettings;
 import uk.ac.horizon.aestheticodes.model.Mode;
 
 import java.util.List;
 
-public class CameraActivity extends ActionBarActivity implements MarkerDetectionListener
+public class CameraActivity extends DrawerActivity implements MarkerDetectionListener
 {
 	private static final String TAG = CameraActivity.class.getName();
 	private static final String MODE_PREFIX = "mode_";
@@ -76,27 +72,91 @@ public class CameraActivity extends ActionBarActivity implements MarkerDetection
 		}
 	}
 
+	public static class ExperienceAdapter extends BaseAdapter
+	{
+		private final Context context;
+		private final LayoutInflater inflater;
+		private final ExperienceManager experienceManager;
+		private Experience selected;
+
+		public ExperienceAdapter(final Context context, final ExperienceManager experienceManager)
+		{
+			this.context = context;
+			inflater = (LayoutInflater) context.getSystemService(LAYOUT_INFLATER_SERVICE);
+			this.experienceManager = experienceManager;
+		}
+
+		@Override
+		public int getCount()
+		{
+			return experienceManager.list().size();
+		}
+
+		@Override
+		public Object getItem(int i)
+		{
+			return experienceManager.list().get(i);
+		}
+
+		@Override
+		public long getItemId(final int position)
+		{
+			return experienceManager.list().get(position).getId().hashCode();
+		}
+
+		@Override
+		public View getView(int i, View view, ViewGroup viewGroup)
+		{
+			final Experience experience = experienceManager.list().get(i);
+			if (view == null)
+			{
+				view = inflater.inflate(R.layout.item_experience, viewGroup, false);
+			}
+
+			final ImageView iconView = (ImageView) view.findViewById(R.id.experience_icon);
+			if (experience.getIcon() == null)
+			{
+				iconView.setVisibility(View.GONE);
+			}
+			else
+			{
+				Log.i(TAG, "Loading icon " + experience.getIcon());
+				iconView.setVisibility(View.VISIBLE);
+				Picasso.with(context).setLoggingEnabled(true);
+				Picasso.with(context).cancelRequest(iconView);
+				Picasso.with(context).load(experience.getIcon()).into(iconView);
+			}
+
+			iconView.setSelected(experience.equals(selected));
+
+			final TextView eventTitle = (TextView) view.findViewById(R.id.experience_title);
+			eventTitle.setText(experience.getName());
+
+			return view;
+		}
+
+	}
 
 	public static final class ModeFragment extends Fragment
 	{
-        private View.OnClickListener onClickListener;
+		private View.OnClickListener onClickListener;
 
 
-        public ModeFragment()
+		public ModeFragment()
 		{
 		}
 
-        public void setOnClickListener(View.OnClickListener onClickListener)
-        {
-            this.onClickListener = onClickListener;
-        }
+		public void setOnClickListener(View.OnClickListener onClickListener)
+		{
+			this.onClickListener = onClickListener;
+		}
 
 
-        @Override
+		@Override
 		public View onCreateView(LayoutInflater inflater, ViewGroup container, Bundle savedInstanceState)
 		{
 			final View layoutView = inflater.inflate(R.layout.item_mode, container, false);
-            final TextView view = (TextView)layoutView.findViewById(R.id.modeText);
+			final TextView view = (TextView) layoutView.findViewById(R.id.modeText);
 			final String mode = getArguments().getString("mode");
 			int id = getActivity().getResources().getIdentifier(MODE_PREFIX + mode, "string", getActivity().getPackageName());
 			if (id != 0)
@@ -108,14 +168,30 @@ public class CameraActivity extends ActionBarActivity implements MarkerDetection
 				view.setText(mode);
 			}
 
-            view.setOnClickListener(onClickListener);
+			view.setOnClickListener(onClickListener);
 
 			return layoutView;
 		}
 	}
 
-	private final MarkerSettings settings = MarkerSettings.getSettings();
+	/**
+	 * Test if the device displays a software NavBar.
+	 */
+	public static boolean hasNavBar(Context context)
+	{
+		boolean hasMenuKey = true;
+		if (android.os.Build.VERSION.SDK_INT >= Build.VERSION_CODES.ICE_CREAM_SANDWICH)
+		{
+			hasMenuKey = ViewConfiguration.get(context).hasPermanentMenuKey();
+		}
+		boolean hasBackKey = KeyCharacterMap.deviceHasKey(KeyEvent.KEYCODE_BACK);
+		return !hasBackKey && !hasMenuKey;
+	}
+
 	private final MarkerSelection markerSelection = new MarkerSelection();
+	private ExperienceManager experienceManager;
+	private ExperienceAdapter experienceAdapter;
+	private Experience experience;
 	private SurfaceHolder holder;
 	private CameraManager cameraManager;
 	private MarkerDetectionThread thread;
@@ -124,18 +200,29 @@ public class CameraActivity extends ActionBarActivity implements MarkerDetection
 	private ProgressBar progress;
 	private RelativeLayout bottomView;
 
+	/**
+	 * Get an OnClickListener that will change a ViewPager to the given position.
+	 */
+	private View.OnClickListener getOnClickListenerForMode(final ViewPager pager, final int position)
+	{
+		return new View.OnClickListener()
+		{
+			@Override
+			public void onClick(View view)
+			{
+				pager.setCurrentItem(position);
+			}
+		};
+	}
 
-    /**
-     * Get an OnClickListener that will change a ViewPager to the given position.
-     */
-    private View.OnClickListener getOnClickListenerForMode(final ViewPager pager, final int position) {
-        return new View.OnClickListener() {
-            @Override
-            public void onClick(View view) {
-                pager.setCurrentItem(position);
-            }
-        };
-    }
+	@Override
+	protected void selectItem(final int position)
+	{
+		super.selectItem(position);
+
+		experience = experienceManager.list().get(position);
+		experienceChanged();
+	}
 
 	@Override
 	public void onCreate(Bundle savedInstanceState)
@@ -143,15 +230,15 @@ public class CameraActivity extends ActionBarActivity implements MarkerDetection
 		super.onCreate(savedInstanceState);
 		getWindow().addFlags(WindowManager.LayoutParams.FLAG_KEEP_SCREEN_ON);
 
-		setContentView(R.layout.activity_camera);
+		setContentView(R.layout.activity_main);
 
 		cameraManager = new CameraManager(this);
 
 		viewfinder = (ViewfinderView) findViewById(R.id.viewfinder);
 		viewfinder.setCameraManager(cameraManager);
 
-        // earlier versions of Android do not support addOnLayoutChangeListener
-        // edited ViewfinderView class for alternative
+		// earlier versions of Android do not support addOnLayoutChangeListener
+		// edited ViewfinderView class for alternative
 		/*viewfinder.addOnLayoutChangeListener(new View.OnLayoutChangeListener() {
 			@Override
 			public void onLayoutChange(View view, int i, int i2, int i3, int i4, int i5, int i6, int i7, int i8)
@@ -160,18 +247,18 @@ public class CameraActivity extends ActionBarActivity implements MarkerDetection
 				layout();
 			}
 		});*/
-        viewfinder.addSizeChangedListener(new ViewfinderView.SizeChangedListener() {
-            @Override
-            public void sizeHasChanged() {
-                Log.i(TAG, "Layout!");
-                layout();
-            }
-        });
+		viewfinder.addSizeChangedListener(new ViewfinderView.SizeChangedListener()
+		{
+			@Override
+			public void sizeHasChanged()
+			{
+				Log.i(TAG, "Layout!");
+				layout();
+			}
+		});
 
 		progress = (ProgressBar) findViewById(R.id.progress);
 		progress.setMax(MAX_PROGRESS);
-
-
 
 		pager = (ViewPager) findViewById(R.id.pager);
 		pager.setAdapter(new FragmentPagerAdapter(getSupportFragmentManager())
@@ -179,17 +266,21 @@ public class CameraActivity extends ActionBarActivity implements MarkerDetection
 			@Override
 			public int getCount()
 			{
-				return settings.getModes().size();
+				if (experience == null)
+				{
+					return 0;
+				}
+				return experience.getModes().size();
 			}
 
 			@Override
 			public Fragment getItem(int position)
 			{
 				Bundle bundle = new Bundle();
-				bundle.putString("mode", settings.getModes().get(position).name());
+				bundle.putString("mode", experience.getModes().get(position).name());
 
 				ModeFragment fragment = new ModeFragment();
-                fragment.setOnClickListener(getOnClickListenerForMode(pager, position));
+				fragment.setOnClickListener(getOnClickListenerForMode(pager, position));
 				fragment.setArguments(bundle);
 				return fragment;
 			}
@@ -205,7 +296,7 @@ public class CameraActivity extends ActionBarActivity implements MarkerDetection
 			@Override
 			public void onPageSelected(int position)
 			{
-				thread.setMode(settings.getModes().get(position));
+				thread.setMode(experience.getModes().get(position));
 				cameraManager.setResult(null);
 				viewfinder.invalidate();
 				if (progress != null)
@@ -227,7 +318,7 @@ public class CameraActivity extends ActionBarActivity implements MarkerDetection
 		pager.setOffscreenPageLimit(3);
 		pager.setPageTransformer(true, new ModeSelectTransformer());
 		pager.setPageMargin((int) (getResources().getDisplayMetrics().widthPixels / -1.3));
-        pager.setClickable(true);
+		pager.setClickable(true);
 
 		final SurfaceView surfaceView = (SurfaceView) findViewById(R.id.preview);
 		holder = surfaceView.getHolder();
@@ -237,14 +328,38 @@ public class CameraActivity extends ActionBarActivity implements MarkerDetection
 
 		bottomView = (RelativeLayout) findViewById(R.id.bottomView);
 
-		MarkerSettingsHelper.loadSettings(this);
-		settingsUpdated();
+		experienceManager = new ExperienceManager(this);
+		experienceManager.load();
+
+		if (savedInstanceState != null && savedInstanceState.containsKey("experience"))
+		{
+			Log.i(TAG, "Loading experience " + savedInstanceState.getString("experience"));
+			experience = experienceManager.get(savedInstanceState.getString("experience"));
+		}
+
+		if (experience == null)
+		{
+			experience = experienceManager.get("uk.ac.horizon.aestheticodes.default");
+		}
+
+		experienceAdapter = new ExperienceAdapter(this, experienceManager);
+
+		createDrawer(experienceAdapter, R.id.drawer_layout, R.id.drawer_list);
+
+		experienceChanged();
+
 	}
 
-	private void settingsUpdated()
+	private void experienceChanged()
 	{
-		Log.i(TAG, "Settings updated");
-		if (settings.getModes().size() <= 1)
+		Log.i(TAG, "experience updated");
+		pager.getAdapter().notifyDataSetChanged();
+		setTitle(experience.getName());
+		if (thread != null)
+		{
+			thread.setSettings(experience);
+		}
+		if (experience.getModes().size() <= 1)
 		{
 			pager.setVisibility(View.INVISIBLE);
 		}
@@ -252,6 +367,37 @@ public class CameraActivity extends ActionBarActivity implements MarkerDetection
 		{
 			pager.setVisibility(View.VISIBLE);
 		}
+
+		List<Experience> experiences = experienceManager.list();
+		int index = experiences.indexOf(experience);
+		setItemSelected(index);
+
+		if (experience.getIcon() != null)
+		{
+			Picasso.with(this).load(experience.getIcon()).into(new Target()
+			{
+				@Override
+				public void onBitmapLoaded(Bitmap bitmap, Picasso.LoadedFrom from)
+				{
+					getSupportActionBar().setIcon(new BitmapDrawable(getResources(), bitmap));
+				}
+
+				@Override
+				public void onBitmapFailed(Drawable errorDrawable)
+				{
+
+				}
+
+				@Override
+				public void onPrepareLoad(Drawable placeHolderDrawable)
+				{
+
+				}
+			});
+		}
+
+		experienceAdapter.selected = experience;
+		experienceAdapter.notifyDataSetChanged();
 	}
 
 	@Override
@@ -280,7 +426,7 @@ public class CameraActivity extends ActionBarActivity implements MarkerDetection
 			try
 			{
 				cameraManager.start(holder);
-				thread = new MarkerDetectionThread(cameraManager, this, settings);
+				thread = new MarkerDetectionThread(cameraManager, this, experience);
 				thread.start();
 				if (pager != null)
 				{
@@ -305,58 +451,46 @@ public class CameraActivity extends ActionBarActivity implements MarkerDetection
 	private void layout()
 	{
 		Rect frame = cameraManager.getFrame(viewfinder.getWidth(), viewfinder.getHeight());
-		if(frame == null)
+		if (frame == null)
 		{
 			return;
 		}
 
-		Log.i(TAG,"Frame = " + frame + ", " + viewfinder.getWidth());
+		Log.i(TAG, "Frame = " + frame + ", " + viewfinder.getWidth());
 		ViewGroup.LayoutParams p = bottomView.getLayoutParams();
-        SurfaceView surfaceView = (SurfaceView) findViewById(R.id.preview);
-        p.height = surfaceView.getHeight()-frame.bottom;
+		SurfaceView surfaceView = (SurfaceView) findViewById(R.id.preview);
+		p.height = surfaceView.getHeight() - frame.bottom;
 		p.width = frame.width();
 		bottomView.setLayoutParams(p);
 
 		if (android.os.Build.VERSION.SDK_INT >= Build.VERSION_CODES.KITKAT && hasNavBar(this))
 		{
 			// Don't draw over nav bar
-			bottomView.setPadding(0,0,0,getNavBarHeight());
+			bottomView.setPadding(0, 0, 0, getNavBarHeight());
 		}
 
 		bottomView.requestLayout();
 		pager.invalidate();
 		viewfinder.invalidate();
+
+		getListView().setPadding(0, frame.top, 0, p.height);
 	}
 
-    /**
-     * Get the height of the software NavBar. Note: This may return a height value even if the device does not display a NavBar, see hasNavBar(Context).
-     * @return The height of the NavBar
-     */
+	/**
+	 * Get the height of the software NavBar. Note: This may return a height value even if the device does not display a NavBar, see hasNavBar(Context).
+	 *
+	 * @return The height of the NavBar
+	 */
 	private int getNavBarHeight()
 	{
 		Resources resources = getResources();
 		int resourceId = resources.getIdentifier("navigation_bar_height", "dimen", "android");
-		if (resourceId > 0) {
+		if (resourceId > 0)
+		{
 			return resources.getDimensionPixelSize(resourceId);
 		}
 		return 0;
 	}
-
-    /**
-     * Test if the device displays a software NavBar.
-     * @param context
-     * @return
-     */
-    public static boolean hasNavBar(Context context)
-    {
-        boolean hasMenuKey = true;
-        if (android.os.Build.VERSION.SDK_INT >= Build.VERSION_CODES.ICE_CREAM_SANDWICH)
-        {
-            hasMenuKey = ViewConfiguration.get(context).hasPermanentMenuKey();
-        }
-        boolean hasBackKey = KeyCharacterMap.deviceHasKey(KeyEvent.KEYCODE_BACK);
-        return !hasBackKey && !hasMenuKey;
-    }
 
 	@Override
 	protected void onPause()
@@ -377,12 +511,21 @@ public class CameraActivity extends ActionBarActivity implements MarkerDetection
 	}
 
 	@Override
+	public void onSaveInstanceState(final Bundle outState)
+	{
+		super.onSaveInstanceState(outState);
+
+		outState.putString("experience", experience.getId());
+		//outState.putString("mode", thread.getMode().name());
+	}
+
+	@Override
 	public boolean onOptionsItemSelected(MenuItem item)
 	{
 		switch (item.getItemId())
 		{
 			case R.id.action_settings:
-				startActivity(new Intent(this, MarkerListActivity.class));
+				startActivity(new Intent(Intent.ACTION_EDIT, Uri.parse("aestheticodes://" + experience.getId())));
 				return true;
 			case R.id.action_switch_camera:
 				try
@@ -401,7 +544,6 @@ public class CameraActivity extends ActionBarActivity implements MarkerDetection
 				return super.onOptionsItemSelected(item);
 		}
 	}
-
 
 
 	@Override
@@ -424,11 +566,11 @@ public class CameraActivity extends ActionBarActivity implements MarkerDetection
 					{
 						progress.setVisibility(View.VISIBLE);
 						progress.setProgress((int) (MAX_PROGRESS * markerSelection.getProgress()));
-                        if (android.os.Build.VERSION.SDK_INT > Build.VERSION_CODES.GINGERBREAD_MR1)
-                        {
-                            // Android 2.3/API 10 does not support setAlpha
-                            progress.setAlpha(1 - markerSelection.expiration());
-                        }
+						if (android.os.Build.VERSION.SDK_INT > Build.VERSION_CODES.GINGERBREAD_MR1)
+						{
+							// Android 2.3/API 10 does not support setAlpha
+							progress.setAlpha(1 - markerSelection.expiration());
+						}
 					}
 					else if (markerSelection.isTimeUp())
 					{
@@ -446,17 +588,15 @@ public class CameraActivity extends ActionBarActivity implements MarkerDetection
 				Marker marker = markerSelection.getLikelyMarker();
 				markerSelection.reset();
 
-				if(marker != null)
+				if (marker != null)
 				{
-					MarkerAction markerDetail = settings.getMarkers().get(marker.getCodeKey());
+					MarkerAction markerDetail = experience.getMarkers().get(marker.getCodeKey());
 					if (markerDetail != null)
 					{
 						cameraManager.stop();
 						if (markerDetail.getShowDetail())
 						{
-							Intent intent = new Intent(this, MarkerActivity.class);
-							intent.putExtra("marker", marker.getCodeKey());
-							startActivity(intent);
+							startActivity(new Intent(Intent.ACTION_VIEW, Uri.parse("aestheticodes://" + experience.getId() + "/" + marker.getCodeKey())));
 						}
 						else
 						{
@@ -467,10 +607,10 @@ public class CameraActivity extends ActionBarActivity implements MarkerDetection
 					{
 						Log.w(TAG, "No details for marker " + marker.getCodeKey());
 
-                        if (MarkerSettings.getSettings().canAddMarkerByScanning())
-                        {
-                            this.addMarkerDialog(marker.getCodeKey());
-                        }
+						if (experience.canAddMarkerByScanning())
+						{
+							this.addMarkerDialog(marker.getCodeKey());
+						}
 					}
 				}
 			}
@@ -478,52 +618,59 @@ public class CameraActivity extends ActionBarActivity implements MarkerDetection
 		else
 		{
 			runOnUiThread(new Runnable()
-            {
-                @Override
-                public void run()
-                {
-                    viewfinder.invalidate();
-                }
-            });
+			{
+				@Override
+				public void run()
+				{
+					viewfinder.invalidate();
+				}
+			});
 		}
 	}
 
-    private void addMarkerDialog(final String code)
-    {
-        markerSelection.pause();
-        final Context context = this;
-        new Handler(getMainLooper()).post(new Runnable() {
-            @Override
-            public void run() {
-                progress.setVisibility(View.INVISIBLE);
-                AlertDialog.Builder builder = new AlertDialog.Builder(context);
-                builder.setTitle("New marker " + code);
-                builder.setMessage("Do you want to add an action for marker " + code + "?");
-                builder.setPositiveButton("Add Action", new DialogInterface.OnClickListener() {
-                    @Override
-                    public void onClick(DialogInterface dialogInterface, int i) {
-                        markerSelection.unpause();
-                        Intent addMarkerIntent =new Intent(context, MarkerListActivity.class);
-                        addMarkerIntent.putExtra("code", code);
-                        startActivity(addMarkerIntent);
-                    }
-                });
-                builder.setNegativeButton("Cancel", new DialogInterface.OnClickListener() {
-                    @Override
-                    public void onClick(DialogInterface dialogInterface, int i) {
-                        markerSelection.unpause();
-                    }
-                });
-                builder.setOnCancelListener(new DialogInterface.OnCancelListener() {
-                    @Override
-                    public void onCancel(DialogInterface dialogInterface) {
-                        markerSelection.unpause();
-                    }
-                });
-                AlertDialog alertDialog = builder.create();
-                alertDialog.show();
-            }
-        });
-
-    }
+	private void addMarkerDialog(final String code)
+	{
+		markerSelection.pause();
+		final Context context = this;
+		new Handler(getMainLooper()).post(new Runnable()
+		{
+			@Override
+			public void run()
+			{
+				progress.setVisibility(View.INVISIBLE);
+				AlertDialog.Builder builder = new AlertDialog.Builder(context);
+				builder.setTitle("New marker " + code);
+				builder.setMessage("Do you want to add an action for marker " + code + "?");
+				builder.setPositiveButton("Add Action", new DialogInterface.OnClickListener()
+				{
+					@Override
+					public void onClick(DialogInterface dialogInterface, int i)
+					{
+						markerSelection.unpause();
+						Intent addMarkerIntent = new Intent(context, MarkerListActivity.class);
+						addMarkerIntent.putExtra("code", code);
+						startActivity(addMarkerIntent);
+					}
+				});
+				builder.setNegativeButton("Cancel", new DialogInterface.OnClickListener()
+				{
+					@Override
+					public void onClick(DialogInterface dialogInterface, int i)
+					{
+						markerSelection.unpause();
+					}
+				});
+				builder.setOnCancelListener(new DialogInterface.OnCancelListener()
+				{
+					@Override
+					public void onCancel(DialogInterface dialogInterface)
+					{
+						markerSelection.unpause();
+					}
+				});
+				AlertDialog alertDialog = builder.create();
+				alertDialog.show();
+			}
+		});
+	}
 }

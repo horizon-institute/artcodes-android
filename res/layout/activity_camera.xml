@@ -37,7 +37,7 @@
 
 		<TextView android:layout_width="fill_parent"
 		          android:layout_height="wrap_content"
-		          android:background="@color/transparent"
+		          android:background="@android:color/transparent"
 		          android:text="@string/pager_mark"
 		          android:textColor="@android:color/white" android:id="@+id/pager_mark"
 		          android:gravity="center_horizontal" />
@@ -53,7 +53,7 @@
 		<TextView android:id="@+id/status_view"
 		          android:layout_width="fill_parent"
 		          android:layout_height="fill_parent"
-		          android:background="@color/transparent"
+		          android:background="@android:color/transparent"
 		          android:text="@string/default_status"
 		          android:textColor="#DEDEDE"
 		          android:gravity="center_horizontal|bottom"

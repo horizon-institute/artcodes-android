@@ -30,9 +30,9 @@ import org.opencv.core.MatOfPoint;
 import org.opencv.core.Rect;
 import org.opencv.core.Scalar;
 import org.opencv.imgproc.Imgproc;
+import uk.ac.horizon.aestheticodes.model.Experience;
 import uk.ac.horizon.aestheticodes.model.Marker;
 import uk.ac.horizon.aestheticodes.model.MarkerDetector;
-import uk.ac.horizon.aestheticodes.model.MarkerSettings;
 import uk.ac.horizon.aestheticodes.model.Mode;
 
 import java.util.ArrayList;
@@ -48,7 +48,7 @@ public class MarkerImageProcessor implements ImageProcessor
 	private final MarkerDetectionListener listener;
 	private Mode mode = Mode.detect;
 
-	public MarkerImageProcessor(CameraManager cameraManager, MarkerDetectionListener listener, MarkerSettings settings)
+	public MarkerImageProcessor(CameraManager cameraManager, MarkerDetectionListener listener, Experience settings)
 	{
 		this.cameraManager = cameraManager;
 		this.listener = listener;

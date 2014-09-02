@@ -24,18 +24,18 @@ import android.content.Intent;
 
 public class ActivitySettingsItem extends SettingsItem
 {
-	private Class<?> activityClass;
+	private Intent intent;
 
-	public ActivitySettingsItem(SettingsActivity activity, String title, Class<?> activityClass)
+	public ActivitySettingsItem(SettingsActivity activity, String title, Intent intent)
 	{
 		super(activity, title);
-		this.activityClass = activityClass;
+		this.intent = intent;
 	}
 
 	@Override
 	public void selected()
 	{
-		activity.startActivity(new Intent(activity, activityClass));
+		activity.startActivity(intent);
 	}
 
 	@Override

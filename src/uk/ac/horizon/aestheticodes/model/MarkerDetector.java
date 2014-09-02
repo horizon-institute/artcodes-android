@@ -37,12 +37,12 @@ public class MarkerDetector
 	//indexes of leaf nodes in contour tree hierarchy.
 	private static final int NEXT_NODE = 0;
 	private static final int FIRST_NODE = 2;
-	private final MarkerSettings settings;
+	private Experience settings;
 
 	/**
 	 * MarkerDetector Constructor
 	 */
-	public MarkerDetector(MarkerSettings settings)
+	public MarkerDetector(Experience settings)
 	{
 		this.settings = settings;
 	}
@@ -172,5 +172,10 @@ public class MarkerDetector
 		double[] nodes = hierarchy.get(0, leafIndex);
 		//check if there is no child node.
 		return nodes[FIRST_NODE] < 0;
+	}
+
+	public void setSettings(Experience settings)
+	{
+		this.settings = settings;
 	}
 }

@@ -27,58 +27,58 @@
 	<uses-feature android:name="android.hardware.camera.any" android:required="true" />
 	<uses-feature android:name="android.hardware.camera.autofocus" android:required="false" />
 
-	<application
-			android:allowBackup="false"
-			android:icon="@drawable/ic_launcher"
-			android:label="@string/app_name"
-			android:theme="@style/Theme.AppCompat.Light">
-		<activity
-				android:name=".activities.CameraActivity"
-				android:label="@string/app_name"
-				android:screenOrientation="portrait"
-				android:configChanges="orientation|keyboardHidden|screenSize"
-				android:launchMode="singleInstance"
-				android:theme="@style/CaptureTheme">
+	<application android:allowBackup="false"
+	             android:icon="@drawable/ic_launcher"
+	             android:label="@string/app_name"
+	             android:theme="@style/Theme.AppCompat.Light">
+		<activity android:name=".activities.CameraActivity"
+		          android:label="@string/app_name"
+		          android:screenOrientation="portrait"
+		          android:configChanges="orientation|keyboardHidden|screenSize"
+		          android:launchMode="singleInstance"
+		          android:theme="@style/CaptureTheme">
 			<intent-filter>
 				<action android:name="android.intent.action.MAIN" />
 				<category android:name="android.intent.category.LAUNCHER" />
 			</intent-filter>
 		</activity>
-		<activity
-				android:name=".activities.MarkerActivity"
-				android:configChanges="orientation|keyboardHidden|screenSize"
-				android:label=""
-				android:parentActivityName=".activities.CameraActivity"
-				android:theme="@style/MarkerTheme">
-			<meta-data
-					android:name="android.support.PARENT_ACTIVITY"
-					android:value="uk.ac.horizon.aestheticodes.activities.CameraActivity" />
+		<activity android:name=".activities.MarkerActivity"
+		          android:configChanges="orientation|keyboardHidden|screenSize"
+		          android:label=""
+		          android:parentActivityName=".activities.CameraActivity"
+		          android:theme="@style/MarkerTheme">
+			<intent-filter>
+				<action android:name="android.intent.action.VIEW" />
+
+				<category android:name="android.intent.category.DEFAULT" />
+				<category android:name="android.intent.category.BROWSABLE" />
+
+				<data android:scheme="aestheticodes" />
+			</intent-filter>
+			<meta-data android:name="android.support.PARENT_ACTIVITY"
+			           android:value="uk.ac.horizon.aestheticodes.activities.CameraActivity" />
 		</activity>
-		<activity
-				android:name=".activities.MarkerListActivity"
-				android:configChanges="orientation|keyboardHidden|screenSize"
-				android:parentActivityName=".activities.CameraActivity"
-				android:label="@string/settings_markers">
-			<meta-data
-					android:name="android.support.PARENT_ACTIVITY"
-					android:value="uk.ac.horizon.aestheticodes.activities.CameraActivity" />
+		<activity android:name=".activities.MarkerListActivity"
+		          android:configChanges="orientation|keyboardHidden|screenSize"
+		          android:parentActivityName=".activities.CameraActivity"
+		          android:label="@string/settings_markers">
+			<intent-filter>
+				<action android:name="android.intent.action.EDIT" />
+
+				<category android:name="android.intent.category.DEFAULT" />
+				<category android:name="android.intent.category.BROWSABLE" />
+
+				<data android:scheme="aestheticodes" />
+			</intent-filter>
+			<meta-data android:name="android.support.PARENT_ACTIVITY"
+			           android:value="uk.ac.horizon.aestheticodes.activities.CameraActivity" />
 		</activity>
-		<activity
-				android:name=".activities.MarkerSettingsActivity"
-				android:configChanges="orientation|keyboardHidden|screenSize"
-				android:parentActivityName=".activities.MarkerListActivity"
-				android:label="@string/settings">
-			<meta-data
-					android:name="android.support.PARENT_ACTIVITY"
-					android:value="uk.ac.horizon.aestheticodes.activities.MarkerListActivity" />
+		<activity android:name=".activities.MarkerSettingsActivity"
+		          android:configChanges="orientation|keyboardHidden|screenSize"
+		          android:label="@string/settings">
 		</activity>
-		<activity
-				android:name=".activities.AboutActivity"
-				android:parentActivityName=".activities.MarkerListActivity"
-				android:configChanges="orientation|keyboardHidden">
-			<meta-data
-					android:name="android.support.PARENT_ACTIVITY"
-					android:value="uk.ac.horizon.aestheticodes.activities.MarkerListActivity" />
+		<activity android:name=".activities.AboutActivity"
+		          android:configChanges="orientation|keyboardHidden">
 		</activity>
 	</application>
 </manifest>

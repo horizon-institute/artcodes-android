@@ -31,9 +31,9 @@ import org.opencv.core.Rect;
 import org.opencv.core.Scalar;
 import org.opencv.core.Size;
 import org.opencv.imgproc.Imgproc;
+import uk.ac.horizon.aestheticodes.model.Experience;
 import uk.ac.horizon.aestheticodes.model.Marker;
 import uk.ac.horizon.aestheticodes.model.MarkerDetector;
-import uk.ac.horizon.aestheticodes.model.MarkerSettings;
 import uk.ac.horizon.aestheticodes.model.Mode;
 import uk.ac.horizon.aestheticodes.settings.ThresholdBehaviour;
 
@@ -51,14 +51,16 @@ public class MarkerDetectionThread extends Thread
 	private final MarkerDetectionListener listener;
 	private boolean running = true;
 	private Mode mode = Mode.detect;
+	private Experience settings;
 
     private long timeOfLastAutoFocus;
 
 
-	public MarkerDetectionThread(CameraManager cameraManager, MarkerDetectionListener listener, MarkerSettings settings)
+	public MarkerDetectionThread(CameraManager cameraManager, MarkerDetectionListener listener, Experience settings)
     {
         this.cameraManager = cameraManager;
         this.listener = listener;
+	    this.settings = settings;
         markerDetector = new MarkerDetector(settings);
         timeOfLastAutoFocus = System.currentTimeMillis();
     }
@@ -78,9 +80,15 @@ public class MarkerDetectionThread extends Thread
 		return imgMat.submat(rowStart, rowStart + size, colStart, colStart + size);
 	}
 
+	public void setSettings(Experience settings)
+	{
+		this.settings = settings;
+		markerDetector.setSettings(settings);
+	}
+
 	private void thresholdImage(Mat image)
 	{
-        ThresholdBehaviour thresholdBehaviour = MarkerSettings.getSettings().getThresholdBehaviour();
+        ThresholdBehaviour thresholdBehaviour = settings.getThresholdBehaviour();
 
         if (framesSinceLastMarker > 2)
         {
@@ -193,7 +201,7 @@ public class MarkerDetectionThread extends Thread
 		}
 	}
 
-	private static void rotate(Mat src, Mat dst, int angle, boolean flip)
+	public static void rotate(Mat src, Mat dst, int angle, boolean flip)
 	{
 		if (src != dst)
 		{

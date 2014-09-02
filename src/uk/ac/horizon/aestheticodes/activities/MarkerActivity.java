@@ -22,88 +22,95 @@ package uk.ac.horizon.aestheticodes.activities;
 import android.content.Intent;
 import android.graphics.Bitmap;
 import android.graphics.drawable.BitmapDrawable;
+import android.graphics.drawable.Drawable;
 import android.net.Uri;
 import android.os.Bundle;
-import android.support.v4.app.FragmentActivity;
+import android.support.v7.app.ActionBarActivity;
 import android.view.View;
-import android.view.WindowManager;
 import android.widget.Button;
 import android.widget.ImageView;
 import android.widget.TextView;
 import com.squareup.picasso.Picasso;
-import uk.ac.horizon.aestheticodes.model.MarkerAction;
+import com.squareup.picasso.Target;
 import uk.ac.horizon.aestheticodes.R;
-import uk.ac.horizon.aestheticodes.model.MarkerSettings;
+import uk.ac.horizon.aestheticodes.model.Experience;
+import uk.ac.horizon.aestheticodes.model.ExperienceManager;
+import uk.ac.horizon.aestheticodes.model.MarkerAction;
 
-public class MarkerActivity extends FragmentActivity
+public class MarkerActivity extends ActionBarActivity
 {
-	private MarkerAction marker;
-
 	@Override
 	public void onCreate(Bundle savedInstanceState)
 	{
 		super.onCreate(savedInstanceState);
-		getWindow().addFlags(WindowManager.LayoutParams.FLAG_KEEP_SCREEN_ON);
 
-		Bundle extras = getIntent().getExtras();
-		if (extras != null)
+		setContentView(R.layout.activity_marker);
+
+		String markerCode = getIntent().getData().getLastPathSegment();
+		String experienceID = getIntent().getData().getHost();
+
+		ExperienceManager experienceManager = new ExperienceManager(this);
+		Experience experience = experienceManager.get(experienceID);
+		final MarkerAction marker = experience.getMarkers().get(markerCode);
+
+		if (experience.getIcon() != null)
 		{
-			String markerCode = extras.getString("marker");
-
-			setContentView(R.layout.activity_marker);
-
-			marker = MarkerSettings.getSettings().getMarkers().get(markerCode);
-
-			Bitmap image = extras.getParcelable("image");
-			ImageView imageView = (ImageView) findViewById(R.id.imageView);
-			if(marker.getImage() != null)
+			Picasso.with(this).load(experience.getIcon()).into(new Target()
 			{
-
-				if(image != null)
-				{
-					BitmapDrawable drawable = new BitmapDrawable(getResources(), image);
-					Picasso.with(this).load(marker.getImage()).placeholder(drawable).into(imageView);
-				}
-				Picasso.with(this).load(marker.getImage()).placeholder(R.drawable.placeholder).into(imageView);
-			}
-			else if(image != null)
-			{
-				imageView.setImageBitmap(image);
-			}
-
-			TextView titleView = (TextView)findViewById(R.id.titleView);
-			if(marker.getTitle() != null)
-			{
-				titleView.setText(marker.getTitle());
-			}
-			else
-			{
-				titleView.setText("Marker " + marker.getCode());
-			}
-
-			TextView descriptionView = (TextView)findViewById(R.id.descriptionView);
-			if(marker.getDescription() != null)
-			{
-				descriptionView.setText(marker.getDescription());
-			}
-			else
-			{
-				descriptionView.setText(marker.getAction());
-			}
-
-			Button button = (Button)findViewById(R.id.button);
-			button.setOnClickListener(new View.OnClickListener() {
 				@Override
-				public void onClick(View view)
+				public void onBitmapLoaded(Bitmap bitmap, Picasso.LoadedFrom from)
 				{
-					startActivity(new Intent(Intent.ACTION_VIEW, Uri.parse(marker.getAction())));
+					getSupportActionBar().setIcon(new BitmapDrawable(getResources(), bitmap));
+				}
+
+				@Override
+				public void onBitmapFailed(Drawable errorDrawable)
+				{
+
+				}
+
+				@Override
+				public void onPrepareLoad(Drawable placeHolderDrawable)
+				{
+
 				}
 			});
-
 		}
 
+		ImageView imageView = (ImageView) findViewById(R.id.imageView);
+		if (marker.getImage() != null)
+		{
+			Picasso.with(this).load(marker.getImage()).placeholder(R.drawable.placeholder).into(imageView);
+		}
 
+		TextView titleView = (TextView) findViewById(R.id.titleView);
+		if (marker.getTitle() != null)
+		{
+			titleView.setText(marker.getTitle());
+		}
+		else
+		{
+			titleView.setText("Marker " + marker.getCode());
+		}
 
+		TextView descriptionView = (TextView) findViewById(R.id.descriptionView);
+		if (marker.getDescription() != null)
+		{
+			descriptionView.setText(marker.getDescription());
+		}
+		else
+		{
+			descriptionView.setText(marker.getAction());
+		}
+
+		Button button = (Button) findViewById(R.id.button);
+		button.setOnClickListener(new View.OnClickListener()
+		{
+			@Override
+			public void onClick(View view)
+			{
+				startActivity(new Intent(Intent.ACTION_VIEW, Uri.parse(marker.getAction())));
+			}
+		});
 	}
-
 }
