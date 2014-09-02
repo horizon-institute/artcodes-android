@@ -108,7 +108,7 @@ public class AddMarkerSettingsItem extends SettingsItem
 
 			final String experienceID = getArguments().getString("experience");
 
-			ExperienceManager experienceManager = new ExperienceManager(getActivity());
+			ExperienceManager experienceManager = new ExperienceManager(getActivity(),null);
 			final Experience experience = experienceManager.get(experienceID);
 
 			View view = inflater.inflate(R.layout.dialog_add_marker, null);

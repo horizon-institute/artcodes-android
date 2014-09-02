@@ -196,6 +196,7 @@ public class CameraActivity extends DrawerActivity implements MarkerDetectionLis
 	private CameraManager cameraManager;
 	private MarkerDetectionThread thread;
 	private ViewfinderView viewfinder;
+	private TextView pager_mark;
 	private ViewPager pager;
 	private ProgressBar progress;
 	private RelativeLayout bottomView;
@@ -259,6 +260,8 @@ public class CameraActivity extends DrawerActivity implements MarkerDetectionLis
 
 		progress = (ProgressBar) findViewById(R.id.progress);
 		progress.setMax(MAX_PROGRESS);
+
+		pager_mark = (TextView) findViewById(R.id.pager_mark);
 
 		pager = (ViewPager) findViewById(R.id.pager);
 		pager.setAdapter(new FragmentPagerAdapter(getSupportFragmentManager())
@@ -328,7 +331,7 @@ public class CameraActivity extends DrawerActivity implements MarkerDetectionLis
 
 		bottomView = (RelativeLayout) findViewById(R.id.bottomView);
 
-		experienceManager = new ExperienceManager(this);
+		experienceManager = new ExperienceManager(this, this);
 		experienceManager.load();
 
 		if (savedInstanceState != null && savedInstanceState.containsKey("experience"))
@@ -350,6 +353,11 @@ public class CameraActivity extends DrawerActivity implements MarkerDetectionLis
 
 	}
 
+	public void experiencesChanged()
+	{
+		experienceAdapter.notifyDataSetChanged();
+	}
+
 	private void experienceChanged()
 	{
 		Log.i(TAG, "experience updated");
@@ -361,11 +369,21 @@ public class CameraActivity extends DrawerActivity implements MarkerDetectionLis
 		}
 		if (experience.getModes().size() <= 1)
 		{
+			if(experience.getModes().size() == 1)
+			{
+				thread.setMode(experience.getModes().get(0));
+			}
+			else
+			{
+				thread.setMode(Mode.detect);
+			}
 			pager.setVisibility(View.INVISIBLE);
+			pager_mark.setVisibility(View.INVISIBLE);
 		}
 		else
 		{
 			pager.setVisibility(View.VISIBLE);
+			pager_mark.setVisibility(View.VISIBLE);
 		}
 
 		List<Experience> experiences = experienceManager.list();

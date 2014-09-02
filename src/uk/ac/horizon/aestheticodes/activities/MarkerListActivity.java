@@ -54,7 +54,7 @@ public class MarkerListActivity extends SettingsActivity
 		Log.i("", getIntent().toString());
 		String experienceID = getIntent().getData().getHost();
 
-		experienceManager = new ExperienceManager(this);
+		experienceManager = new ExperienceManager(this, null);
 		experience = experienceManager.get(experienceID);
 
 		getSupportActionBar().setTitle(getString(R.string.marker_title, experience.getName()));

@@ -49,7 +49,7 @@ public class MarkerSettingsActivity extends SettingsActivity
 		Bundle extras = getIntent().getExtras();
 		String experienceID = extras.getString("experience");
 
-		experienceManager = new ExperienceManager(this);
+		experienceManager = new ExperienceManager(this, null);
 		experience = experienceManager.get(experienceID);
 
 		adapter.add(new IntPropertySettingsItem(this, experience, "minRegions", 1, "maxRegions"));

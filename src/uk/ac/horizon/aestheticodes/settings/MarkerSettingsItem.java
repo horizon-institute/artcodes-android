@@ -56,7 +56,7 @@ public class MarkerSettingsItem extends SettingsItem
 			final String code = getArguments().getString("code");
 			final String experienceID = getArguments().getString("experience");
 
-			ExperienceManager experienceManager = new ExperienceManager(getActivity());
+			ExperienceManager experienceManager = new ExperienceManager(getActivity(),null);
 			final Experience experience = experienceManager.get(experienceID);
 			final MarkerAction action = experience.getMarkers().get(code);
 			// Inflate and set the layout for the dialog

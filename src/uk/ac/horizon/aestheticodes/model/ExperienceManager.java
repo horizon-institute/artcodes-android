@@ -28,10 +28,11 @@ import com.google.gson.Gson;
 import com.google.gson.GsonBuilder;
 import com.google.gson.JsonSyntaxException;
 import com.google.gson.reflect.TypeToken;
+import uk.ac.horizon.aestheticodes.detect.MarkerDetectionListener;
+import uk.ac.horizon.aestheticodes.detect.MarkerDetectionThread;
 import uk.ac.horizon.aestheticodes.settings.MarkerMapAdapter;
 
 import java.io.File;
-import java.io.FileNotFoundException;
 import java.io.FileReader;
 import java.io.FileWriter;
 import java.io.IOException;
@@ -60,44 +61,141 @@ public class ExperienceManager
 		return build.create();
 	}
 
-	private class DownloadSettings extends AsyncTask<Experience, Void, Experience>
+	private static HttpURLConnection createConnection(final String url, final Date lastModified) throws IOException
 	{
-		@Override
-		protected Experience doInBackground(Experience... experiences)
+		HttpURLConnection connection = (HttpURLConnection) new URL(url).openConnection();
+		connection.setReadTimeout(10000 /* milliseconds */);
+		connection.setConnectTimeout(15000 /* milliseconds */);
+		connection.setRequestMethod("GET");
+		connection.setUseCaches(true);
+		if (lastModified != null)
+		{
+			connection.setIfModifiedSince(lastModified.getTime());
+		}
+
+		return connection;
+	}
+
+	private static <T> T read(Class<T> clazz, HttpURLConnection connection) throws IOException
+	{
+		connection.connect();
+		int response = connection.getResponseCode();
+		Log.i(TAG, "The response is: " + response);
+		if (response == HttpURLConnection.HTTP_OK)
 		{
 			try
 			{
-				Experience experience = experiences[0];
-				URL url = new URL(experience.getUpdateURL());
-				HttpURLConnection conn = (HttpURLConnection) url.openConnection();
-				conn.setReadTimeout(10000 /* milliseconds */);
-				conn.setConnectTimeout(15000 /* milliseconds */);
-				conn.setRequestMethod("GET");
-				conn.setUseCaches(true);
-				if (experience.getLastUpdate() != null)
-				{
-					conn.setIfModifiedSince(experience.getLastUpdate().getTime());
-				}
-				// Starts the query
-				conn.connect();
-				int response = conn.getResponseCode();
-				Log.i(TAG, "The response is: " + response);
-				if (response == HttpURLConnection.HTTP_OK)
-				{
-					try
-					{
-						Reader reader = new InputStreamReader(conn.getInputStream());
-						Experience newSettings = gson.fromJson(reader, Experience.class);
-						newSettings.setLastUpdate(new Date(conn.getLastModified()));
+				Reader reader = new InputStreamReader(connection.getInputStream());
+				return gson.fromJson(reader, clazz);
+			}
+			catch (JsonSyntaxException e)
+			{
+				Log.e(TAG, "There was a syntax problem with the downloaded JSON, maybe a proxy server is forwarding us to a login page?", e);
+				return null;
+			}
+		}
+		return null;
+	}
 
-						return newSettings;
-					}
-					catch (JsonSyntaxException e)
+	private class DownloadSettings extends AsyncTask<Experience, Void, Iterable<Experience>>
+	{
+
+		@Override
+		protected Iterable<Experience> doInBackground(Experience... ignored)
+		{
+			try
+			{
+				final Map<String, Experience> experienceMap = new HashMap<String, Experience>();
+				final Map<String, String> experienceURLs = new HashMap<String, String>();
+
+				for (Experience experience : experiences.values())
+				{
+					experienceMap.put(experience.getId(), experience);
+					experienceURLs.put(experience.getId(), experience.getUpdateURL());
+				}
+
+				try
+				{
+					File dir = new File(context.getFilesDir(), "experiences");
+					if(dir.exists())
 					{
-						Log.e(TAG, "There was a syntax problem with the downloaded JSON, maybe a proxy server is forwarding us to a login page?", e);
-						return null;
+						String[] experienceNames = dir.list();
+						for (String experienceName : experienceNames)
+						{
+							// Strip json
+							if (experienceName.endsWith(".json"))
+							{
+								String name = experienceName.substring(0, experienceName.length() - 5);
+								if (!experienceMap.containsKey(name))
+								{
+									Reader reader = new FileReader(new File(context.getFilesDir(), "experiences/" + experienceName));
+									Experience experience = gson.fromJson(reader, Experience.class);
+									experienceMap.put(experience.getId(), experience);
+									experienceURLs.put(experience.getId(), experience.getUpdateURL());
+								}
+							}
+						}
+					}
+
+					String[] experienceNames = context.getAssets().list("experiences");
+					for (String experienceName : experienceNames)
+					{
+						// Strip json
+						String name = experienceName.substring(0, experienceName.length() - 5);
+						if (!experienceMap.containsKey(name))
+						{
+							Reader reader = new InputStreamReader(context.getAssets().open("experiences/" + experienceName));
+							Experience experience = gson.fromJson(reader, Experience.class);
+							experienceMap.put(experience.getId(), experience);
+							experienceURLs.put(experience.getId(), experience.getUpdateURL());
+						}
+					}
+
+				}
+				catch (Exception e)
+				{
+					Log.w(TAG, "Failed to load settings", e);
+				}
+
+				ConnectivityManager cm = (ConnectivityManager) context.getSystemService(Context.CONNECTIVITY_SERVICE);
+				NetworkInfo netInfo = cm.getActiveNetworkInfo();
+				if (netInfo != null && netInfo.isConnectedOrConnecting())
+				{
+
+					HttpURLConnection connection = createConnection("http://www.wornchaos.org/experiences/experiences.json", null);
+					Map newExperienceInfo = read(experienceURLs.getClass(), connection);
+					if (newExperienceInfo != null)
+					{
+						experienceURLs.putAll(newExperienceInfo);
+					}
+
+					for (String experienceID : experienceURLs.keySet())
+					{
+						try
+						{
+							Experience experience = experienceMap.get(experienceID);
+							Date lastModified = null;
+							if (experience != null)
+							{
+								lastModified = experience.getLastUpdate();
+							}
+							connection = createConnection(experienceURLs.get(experienceID), lastModified);
+							experience = read(Experience.class, connection);
+							if (experience != null)
+							{
+								experience.setLastUpdate(new Date(connection.getLastModified()));
+								experience.setChanged(true);
+								experienceMap.put(experience.getId(), experience);
+							}
+						}
+						catch (IOException e)
+						{
+							Log.e(TAG, e.getMessage(), e);
+						}
 					}
 				}
+
+				return experienceMap.values();
 			}
 			catch (IOException e)
 			{
@@ -108,21 +206,28 @@ public class ExperienceManager
 
 		// onPostExecute displays the results of the AsyncTask.
 		@Override
-		protected void onPostExecute(Experience newSettings)
+		protected void onPostExecute(Iterable<Experience> newExperiences)
 		{
-			if (newSettings != null)
+			for (Experience experience : newExperiences)
 			{
-				add(newSettings);
+				add(experience);
+			}
+
+			if(listener != null)
+			{
+				listener.experiencesChanged();
 			}
 		}
 	}
 
 	private final Map<String, Experience> experiences = new HashMap<String, Experience>();
 	private final Context context;
+	private final MarkerDetectionListener listener;
 
-	public ExperienceManager(Context context)
+	public ExperienceManager(Context context, MarkerDetectionListener listener)
 	{
 		this.context = context;
+		this.listener = listener;
 	}
 
 	public Experience get(String id)
@@ -134,19 +239,37 @@ public class ExperienceManager
 		return load(id);
 	}
 
-	public void add(Experience settings)
+	private Reader loadFile(String path) throws IOException
 	{
-		experiences.put(settings.getId(), settings);
-		if (settings.hasChanged())
+		File file = new File(context.getFilesDir(), path);
+		if (file.exists())
+		{
+			return new FileReader(file);
+		}
+
+		return new InputStreamReader(context.getAssets().open(path));
+	}
+
+	public void add(Experience experience)
+	{
+		experiences.put(experience.getId(), experience);
+		if (experience.hasChanged())
 		{
 			try
 			{
-				final FileWriter writer = new FileWriter(new File(context.getFilesDir(), settings.getId() + ".json"));
-				gson.toJson(settings, writer);
-				settings.setChanged(false);
+				File file = new File(context.getFilesDir(), "experiences/" + experience.getId() + ".json");
+				if(!file.exists())
+				{
+					File dir = new File(context.getFilesDir(), "experiences");
+					dir.mkdirs();
+					file.createNewFile();
+				}
+				final FileWriter writer = new FileWriter(file);
+				gson.toJson(experience, writer);
+				experience.setChanged(false);
 				writer.flush();
 				writer.close();
-				Log.i(TAG, "Saving: " + gson.toJson(settings));
+				Log.i(TAG, "Saved: " + gson.toJson(experience));
 			}
 			catch (Exception e)
 			{
@@ -172,83 +295,34 @@ public class ExperienceManager
 
 	public void load()
 	{
-		try
-		{
-			String[] experienceNames = context.getAssets().list("experiences");
-			for(String experienceName: experienceNames)
-			{
-				// Strip json
-				String name = experienceName.substring(0, experienceName.length() - 5);
-				if(!experiences.containsKey(name))
-				{
-					load(name);
-				}
-			}
-
-			experienceNames = context.getFilesDir().list();
-			for(String experienceName: experienceNames)
-			{
-				// Strip json
-				if(experienceName.endsWith(".json"))
-				{
-					String name = experienceName.substring(0, experienceName.length() - 5);
-					if (!experiences.containsKey(name))
-					{
-						load(name);
-					}
-				}
-			}
-		}
-		catch(Exception e)
-		{
-			Log.w(TAG, "Failed to load settings", e);
-		}
+		new DownloadSettings().execute();
 	}
-
 
 	private Experience load(String id)
 	{
-		Log.i(TAG, "Loading " + id);
-		try
+		if (experiences.containsKey(id))
 		{
-
-			InputStreamReader reader = new InputStreamReader(context.getAssets().open("experiences/" + id + ".json"));
-			add(gson.fromJson(reader, Experience.class));
-		}
-		catch (Exception e)
-		{
-			Log.w(TAG, "Failed to load settings", e);
+			return experiences.get(id);
 		}
 
 		try
 		{
-			final FileReader reader = new FileReader(new File(context.getFilesDir(), id + ".json"));
-			add(gson.fromJson(reader, Experience.class));
-		}
-		catch(FileNotFoundException e)
-		{
-			// Do nothing!
+			Reader reader = loadFile("experiences/" + id + ".json");
+			if (reader != null)
+			{
+				Experience experience = gson.fromJson(reader, Experience.class);
+				if (experience != null)
+				{
+					add(experience);
+					return experience;
+				}
+			}
 		}
 		catch (Exception e)
 		{
-			Log.w(TAG, "Failed to load settings", e);
+			Log.e(TAG, e.getMessage(), e);
 		}
-
-		Experience experience = experiences.get(id);
-		if (experience != null)
-		{
-			ConnectivityManager connMgr = (ConnectivityManager) context.getSystemService(Context.CONNECTIVITY_SERVICE);
-			NetworkInfo networkInfo = connMgr.getActiveNetworkInfo();
-			if (networkInfo != null && networkInfo.isConnected())
-			{
-				new DownloadSettings().execute(experience);
-			}
-			else
-			{
-				Log.i(TAG, "No network available");
-			}
-		}
-		return experience;
+		return null;
 	}
 }
 

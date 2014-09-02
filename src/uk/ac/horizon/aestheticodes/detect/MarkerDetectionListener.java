@@ -25,5 +25,6 @@ import java.util.List;
 
 public interface MarkerDetectionListener
 {
+	void experiencesChanged();
 	void markersDetected(List<Marker> markers);
 }
