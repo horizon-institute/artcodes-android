@@ -21,6 +21,7 @@ package uk.ac.horizon.aestheticodes.activities;
 
 import android.content.Intent;
 import android.graphics.Bitmap;
+import android.graphics.PorterDuff;
 import android.graphics.drawable.BitmapDrawable;
 import android.graphics.drawable.Drawable;
 import android.net.Uri;
@@ -104,6 +105,7 @@ public class MarkerActivity extends ActionBarActivity
 		}
 
 		Button button = (Button) findViewById(R.id.button);
+		//open_button.getBackground().setColorFilter(0xFF76a0d6, PorterDuff.Mode.MULTIPLY);
 		button.setOnClickListener(new View.OnClickListener()
 		{
 			@Override

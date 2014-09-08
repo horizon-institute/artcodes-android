@@ -102,7 +102,7 @@ public class MarkerSettingsActivity extends SettingsActivity
 	{
 		switch (item.getItemId())
 		{
-			// Respond to the action bar's Up/Home button
+			// Respond to the action bar's Up/Home open_button
 			case android.R.id.home:
 				NavUtils.navigateUpTo(this, new Intent(Intent.ACTION_EDIT, Uri.parse("aestheticodes://" + experience.getId())));
 				return true;

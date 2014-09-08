@@ -22,14 +22,29 @@
 <ScrollView xmlns:android="http://schemas.android.com/apk/res/android"
             xmlns:tools="http://schemas.android.com/tools" android:orientation="vertical"
             android:layout_width="match_parent"
-            android:layout_height="match_parent" tools:context=".activities.MarkerActivity">
+            android:layout_height="match_parent" tools:context=".activities.MarkerActivity" android:background="#FFF">
 
-	<LinearLayout android:layout_width="fill_parent" android:layout_height="wrap_content"
+	<LinearLayout android:layout_width="fill_parent"
+	              android:layout_height="wrap_content"
 	              android:orientation="vertical">
-		<ImageView
-				android:layout_width="fill_parent"
-				android:layout_height="wrap_content"
-				android:id="@+id/imageView" android:src="@drawable/placeholder" android:adjustViewBounds="true" />
+		<FrameLayout
+				android:layout_width="match_parent"
+				android:layout_height="wrap_content">
+
+			<ImageView
+					android:layout_width="fill_parent"
+					android:layout_height="wrap_content"
+					android:id="@+id/imageView"
+					android:src="@drawable/aestheticodes"
+					android:adjustViewBounds="true"
+					android:layout_marginBottom="10dp" />
+
+			<View
+					android:layout_width="match_parent"
+					android:layout_height="wrap_content"
+					android:background="@drawable/gradient" />
+
+		</FrameLayout>
 
 		<RelativeLayout
 				android:layout_width="fill_parent"
@@ -40,19 +55,26 @@
 					android:textSize="20sp"
 					android:textColor="#FF222222"
 					android:id="@+id/titleView"
-					android:textStyle="bold" android:layout_gravity="top"
-					android:padding="16dp" />
+					android:textStyle="bold"
+					android:layout_gravity="top"
+					android:padding="16dp"
+					android:layout_alignParentTop="true"
+					android:layout_alignParentLeft="true"
+					android:layout_alignParentStart="true"
+					android:layout_alignParentBottom="true"
+					android:gravity="center_vertical" />
 			<Button
 					android:layout_width="100dp"
 					android:layout_height="wrap_content"
 					android:text="Open"
 					android:id="@+id/button"
-					android:layout_gravity="center_vertical|right"
+					android:layout_gravity="center_vertical|end"
 					android:layout_alignParentEnd="true"
-                    android:layout_alignParentRight="true"
+					android:layout_alignParentRight="true"
 					android:layout_marginLeft="16dp"
 					android:layout_marginTop="16dp"
-					android:layout_marginRight="16dp" />
+					android:layout_marginRight="16dp"
+					android:layout_centerVertical="true" />
 		</RelativeLayout>
 		<TextView
 				android:layout_width="wrap_content"

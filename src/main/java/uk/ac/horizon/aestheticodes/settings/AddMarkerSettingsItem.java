@@ -221,7 +221,7 @@ public class AddMarkerSettingsItem extends SettingsItem
 
 			markerCode.addTextChangedListener(watcher);
 			urlView.addTextChangedListener(watcher);
-            // disable the positive button when shown as the URL field will be empty
+            // disable the positive open_button when shown as the URL field will be empty
             dialog.setOnShowListener(new DialogInterface.OnShowListener() {
                 @Override
                 public void onShow(DialogInterface dialogInterface) {

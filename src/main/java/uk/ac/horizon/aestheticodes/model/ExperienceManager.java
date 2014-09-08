@@ -29,7 +29,6 @@ import com.google.gson.GsonBuilder;
 import com.google.gson.JsonSyntaxException;
 import com.google.gson.reflect.TypeToken;
 import uk.ac.horizon.aestheticodes.detect.MarkerDetectionListener;
-import uk.ac.horizon.aestheticodes.detect.MarkerDetectionThread;
 import uk.ac.horizon.aestheticodes.settings.MarkerMapAdapter;
 
 import java.io.File;
@@ -117,7 +116,7 @@ public class ExperienceManager
 				try
 				{
 					File dir = new File(context.getFilesDir(), "experiences");
-					if(dir.exists())
+					if (dir.exists())
 					{
 						String[] experienceNames = dir.list();
 						for (String experienceName : experienceNames)
@@ -208,14 +207,17 @@ public class ExperienceManager
 		@Override
 		protected void onPostExecute(Iterable<Experience> newExperiences)
 		{
-			for (Experience experience : newExperiences)
+			if (newExperiences != null)
 			{
-				add(experience);
-			}
+				for (Experience experience : newExperiences)
+				{
+					add(experience);
+				}
 
-			if(listener != null)
-			{
-				listener.experiencesChanged();
+				if (listener != null)
+				{
+					listener.experiencesChanged();
+				}
 			}
 		}
 	}
@@ -258,7 +260,7 @@ public class ExperienceManager
 			try
 			{
 				File file = new File(context.getFilesDir(), "experiences/" + experience.getId() + ".json");
-				if(!file.exists())
+				if (!file.exists())
 				{
 					File dir = new File(context.getFilesDir(), "experiences");
 					dir.mkdirs();

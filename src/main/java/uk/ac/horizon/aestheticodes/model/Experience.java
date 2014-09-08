@@ -169,15 +169,15 @@ public class Experience
 		}
 	}
 
-	public String getIcon()
-	{
-		return icon;
-	}
-
 	public void setThresholdBehaviour(String thresholdBehaviour)
 	{
 		this.thresholdBehaviour = thresholdBehaviour;
 		this.changed = true;
+	}
+
+	public String getIcon()
+	{
+		return icon;
 	}
 
 	public boolean isValidMarker(List<Integer> markerCodes)
@@ -302,20 +302,16 @@ public class Experience
 	 */
 	private boolean hasValidChecksum(List<Integer> markerCodes)
 	{
+		if (checksumModulo <= 1)
+		{
+			return true;
+		}
 		int numberOfLeaves = 0;
 		for (int code : markerCodes)
 		{
 			numberOfLeaves += code;
 		}
-		if (checksumModulo > 0)
-		{
-			double checksum = numberOfLeaves % checksumModulo;
-			if (checksum == 0)
-			{
-				return true;
-			}
-		}
-		return false;
+		return (numberOfLeaves % checksumModulo) == 0;
 	}
 
 

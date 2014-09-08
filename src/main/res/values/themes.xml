@@ -39,7 +39,7 @@
         <item name="android:textAppearance">@style/TextAppearance.AppCompat.Widget.ActionBar.Title.Inverse</item>
 	</style>
 
-	<style name="MarkerTheme" parent="@style/Theme.AppCompat.Light">
+	<style name="MarkerTheme" parent="@style/Theme.AppCompat.Light.DarkActionBar">
 		<item name="android:windowContentOverlay">@null</item>
         <item name="android:windowActionBarOverlay">true</item>
         <item name="android:windowActionModeOverlay">true</item>

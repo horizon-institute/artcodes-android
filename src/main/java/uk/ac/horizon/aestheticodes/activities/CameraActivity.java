@@ -113,24 +113,35 @@ public class CameraActivity extends DrawerActivity implements MarkerDetectionLis
 				view = inflater.inflate(R.layout.item_experience, viewGroup, false);
 			}
 
+			final TextView eventTitle = (TextView) view.findViewById(R.id.experience_title);
 			final ImageView iconView = (ImageView) view.findViewById(R.id.experience_icon);
-			if (experience.getIcon() == null)
+			if(experience.equals(selected))
 			{
-				iconView.setVisibility(View.GONE);
+				eventTitle.setText(experience.getName() + " Settings");
+
+				iconView.setSelected(true);
+
+				Picasso.with(context).cancelRequest(iconView);
+				iconView.setImageResource(R.drawable.ic_action_settings);
 			}
 			else
 			{
-				Log.i(TAG, "Loading icon " + experience.getIcon());
-				iconView.setVisibility(View.VISIBLE);
-				Picasso.with(context).setLoggingEnabled(true);
-				Picasso.with(context).cancelRequest(iconView);
-				Picasso.with(context).load(experience.getIcon()).into(iconView);
+				eventTitle.setText(experience.getName());
+
+				iconView.setSelected(false);
+				if (experience.getIcon() == null)
+				{
+					iconView.setVisibility(View.GONE);
+				}
+				else
+				{
+					Log.i(TAG, "Loading icon " + experience.getIcon());
+					iconView.setVisibility(View.VISIBLE);
+					Picasso.with(context).setLoggingEnabled(true);
+					Picasso.with(context).cancelRequest(iconView);
+					Picasso.with(context).load(experience.getIcon()).placeholder(R.drawable.ic_action_labels_light).into(iconView);
+				}
 			}
-
-			iconView.setSelected(experience.equals(selected));
-
-			final TextView eventTitle = (TextView) view.findViewById(R.id.experience_title);
-			eventTitle.setText(experience.getName());
 
 			return view;
 		}
@@ -221,8 +232,17 @@ public class CameraActivity extends DrawerActivity implements MarkerDetectionLis
 	{
 		super.selectItem(position);
 
-		experience = experienceManager.list().get(position);
-		experienceChanged();
+		Experience selected = experienceManager.list().get(position);
+		if(selected == experience)
+		{
+			startActivity(new Intent(Intent.ACTION_EDIT, Uri.parse("aestheticodes://" + experience.getId())));
+		}
+		else
+		{
+			experience = selected;
+
+			experienceChanged();
+		}
 	}
 
 	@Override
@@ -542,9 +562,6 @@ public class CameraActivity extends DrawerActivity implements MarkerDetectionLis
 	{
 		switch (item.getItemId())
 		{
-			case R.id.action_settings:
-				startActivity(new Intent(Intent.ACTION_EDIT, Uri.parse("aestheticodes://" + experience.getId())));
-				return true;
 			case R.id.action_switch_camera:
 				try
 				{

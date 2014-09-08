@@ -23,8 +23,4 @@
 	      android:title="@string/action_switch_camera"
 	      android:icon="@drawable/ic_action_switch_camera"
           app:showAsAction="ifRoom" />
-	<item android:id="@+id/action_settings"
-          android:title="@string/action_settings"
-          android:icon="@drawable/ic_action_settings"
-          app:showAsAction="ifRoom"/>
 </menu>
