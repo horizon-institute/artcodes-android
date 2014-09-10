@@ -32,6 +32,7 @@ import org.opencv.core.Scalar;
 import org.opencv.core.Size;
 import org.opencv.imgproc.Imgproc;
 import uk.ac.horizon.aestheticodes.model.Experience;
+import uk.ac.horizon.aestheticodes.model.ExperienceManager;
 import uk.ac.horizon.aestheticodes.model.Marker;
 import uk.ac.horizon.aestheticodes.model.MarkerDetector;
 import uk.ac.horizon.aestheticodes.model.Mode;
@@ -48,20 +49,20 @@ public class MarkerDetectionThread extends Thread
 	private final MarkerDetector markerDetector;
 	private final CameraManager cameraManager;
 	private int framesSinceLastMarker = 0, cumulativeFramesWithoutMarker=0;
-	private final MarkerDetectionListener listener;
+	private final ExperienceEventListener listener;
 	private boolean running = true;
 	private Mode mode = Mode.detect;
-	private Experience settings;
+	private final ExperienceManager experienceManager;
 
     private long timeOfLastAutoFocus;
 
 
-	public MarkerDetectionThread(CameraManager cameraManager, MarkerDetectionListener listener, Experience settings)
+	public MarkerDetectionThread(CameraManager cameraManager, ExperienceEventListener listener, ExperienceManager experienceManager)
     {
         this.cameraManager = cameraManager;
         this.listener = listener;
-	    this.settings = settings;
-        markerDetector = new MarkerDetector(settings);
+	    this.experienceManager = experienceManager;
+        markerDetector = new MarkerDetector(experienceManager);
         timeOfLastAutoFocus = System.currentTimeMillis();
     }
 
@@ -80,15 +81,9 @@ public class MarkerDetectionThread extends Thread
 		return imgMat.submat(rowStart, rowStart + size, colStart, colStart + size);
 	}
 
-	public void setSettings(Experience settings)
-	{
-		this.settings = settings;
-		markerDetector.setSettings(settings);
-	}
-
 	private void thresholdImage(Mat image)
 	{
-        ThresholdBehaviour thresholdBehaviour = settings.getThresholdBehaviour();
+        ThresholdBehaviour thresholdBehaviour = experienceManager.getSelected().getThresholdBehaviour();
 
         if (framesSinceLastMarker > 2)
         {
@@ -293,7 +288,7 @@ public class MarkerDetectionThread extends Thread
 
 						if (listener != null)
 						{
-							listener.markersDetected(markers);
+							listener.markersFound(markers);
 						}
 
 						if (drawImage != null)

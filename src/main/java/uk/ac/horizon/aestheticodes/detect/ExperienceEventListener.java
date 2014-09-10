@@ -19,10 +19,14 @@
 
 package uk.ac.horizon.aestheticodes.detect;
 
-import android.hardware.Camera;
+import uk.ac.horizon.aestheticodes.model.Experience;
+import uk.ac.horizon.aestheticodes.model.Marker;
 
-public interface ImageProcessor
+import java.util.List;
+
+public interface ExperienceEventListener
 {
-	public void processImage(byte[] data);
-	public void initCamera(Camera.Size size);
+	void experienceSelected(Experience experience);
+	void experiencesChanged();
+	void markersFound(List<Marker> markers);
 }

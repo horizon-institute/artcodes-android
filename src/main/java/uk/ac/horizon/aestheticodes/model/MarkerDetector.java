@@ -37,14 +37,14 @@ public class MarkerDetector
 	//indexes of leaf nodes in contour tree hierarchy.
 	private static final int NEXT_NODE = 0;
 	private static final int FIRST_NODE = 2;
-	private Experience settings;
+	private final ExperienceManager experienceManager;
 
 	/**
 	 * MarkerDetector Constructor
 	 */
-	public MarkerDetector(Experience settings)
+	public MarkerDetector(ExperienceManager experienceManager)
 	{
-		this.settings = settings;
+		this.experienceManager = experienceManager;
 	}
 
 	/**
@@ -81,14 +81,14 @@ public class MarkerDetector
 			}
 
 			regions++;
-			if (regions > settings.getMaxRegions())
+			if (regions > experienceManager.getSelected().getMaxRegions())
 			{
 				return null;
 			}
 			if (regionValue == REGION_EMPTY)
 			{
 				emptyRegions++;
-				if (emptyRegions > settings.getMaxEmptyRegions())
+				if (emptyRegions > experienceManager.getSelected().getMaxEmptyRegions())
 				{
 					return null;
 				}
@@ -112,7 +112,7 @@ public class MarkerDetector
 			return null;
 		}
 
-		if (settings.isValidMarker(codes))
+		if (experienceManager.getSelected().isValidMarker(codes))
 		{
 			Collections.sort(codes);
 			return codes;
@@ -148,7 +148,7 @@ public class MarkerDetector
 				nodes = hierarchy.get(0, currentLeafIndex);
 				currentLeafIndex = (int) nodes[NEXT_NODE];
 
-				if (leafCount > settings.getMaxRegionValue())
+				if (leafCount > experienceManager.getSelected().getMaxRegionValue())
 				{
 					return REGION_INVALID;
 				}
@@ -172,10 +172,5 @@ public class MarkerDetector
 		double[] nodes = hierarchy.get(0, leafIndex);
 		//check if there is no child node.
 		return nodes[FIRST_NODE] < 0;
-	}
-
-	public void setSettings(Experience settings)
-	{
-		this.settings = settings;
 	}
 }

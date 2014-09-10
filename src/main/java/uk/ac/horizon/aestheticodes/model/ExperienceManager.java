@@ -28,7 +28,7 @@ import com.google.gson.Gson;
 import com.google.gson.GsonBuilder;
 import com.google.gson.JsonSyntaxException;
 import com.google.gson.reflect.TypeToken;
-import uk.ac.horizon.aestheticodes.detect.MarkerDetectionListener;
+import uk.ac.horizon.aestheticodes.detect.ExperienceEventListener;
 import uk.ac.horizon.aestheticodes.settings.MarkerMapAdapter;
 
 import java.io.File;
@@ -224,12 +224,27 @@ public class ExperienceManager
 
 	private final Map<String, Experience> experiences = new HashMap<String, Experience>();
 	private final Context context;
-	private final MarkerDetectionListener listener;
+	private final ExperienceEventListener listener;
+	private Experience selected;
 
-	public ExperienceManager(Context context, MarkerDetectionListener listener)
+	public ExperienceManager(Context context, ExperienceEventListener listener)
 	{
 		this.context = context;
 		this.listener = listener;
+	}
+
+	public void setSelected(Experience selected)
+	{
+		this.selected = selected;
+		if(listener != null)
+		{
+			listener.experienceSelected(selected);
+		}
+	}
+
+	public Experience getSelected()
+	{
+		return selected;
 	}
 
 	public Experience get(String id)
@@ -255,6 +270,15 @@ public class ExperienceManager
 	public void add(Experience experience)
 	{
 		experiences.put(experience.getId(), experience);
+		if(selected == null)
+		{
+			setSelected(experience);
+		}
+		else if(selected.getId().equals(experience.getId()))
+		{
+			setSelected(experience);
+		}
+
 		if (experience.hasChanged())
 		{
 			try

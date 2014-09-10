@@ -21,23 +21,23 @@
 <LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
                 android:layout_width="fill_parent"
                 android:layout_height="72dp"
-                android:padding="8dp"
                 android:orientation="horizontal"
-                android:background="@drawable/list_selector">
-	<ImageView android:id="@+id/experience_icon"
-	           android:layout_width="48dp"
-	           android:layout_height="48dp"
-	           android:layout_marginEnd="8dp"
-	           android:layout_marginRight="8dp"
-	           android:scaleType="fitCenter"
-	           android:background="@drawable/experience_selector"
-	           android:padding="4dp" android:src="@drawable/ic_action_labels_light" />
+                android:background="@drawable/list_selector" android:gravity="end">
 
 	<TextView android:id="@+id/experience_title"
 	          android:layout_width="wrap_content"
 	          android:layout_height="fill_parent"
 	          android:textSize="16sp"
 	          android:textColor="#FFEEEEEE"
-	          android:gravity="center_vertical" />
+	          android:gravity="center_vertical"
+			  android:text="Some Text"/>
+	<ImageView android:id="@+id/experience_icon"
+	           android:layout_width="48dp"
+	           android:layout_height="48dp"
+	           android:scaleType="fitCenter"
+	           android:background="@drawable/experience_selector"
+	           android:padding="4dp"
+	           android:src="@drawable/ic_action_labels_light"
+	           android:layout_margin="8dp" android:layout_gravity="center_vertical" />
 </LinearLayout>
 

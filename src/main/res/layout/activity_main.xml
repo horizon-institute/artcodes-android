@@ -80,7 +80,7 @@
 	<ListView android:id="@+id/drawer_list"
 	          android:layout_width="280dp"
 	          android:layout_height="match_parent"
-	          android:layout_gravity="start"
+	          android:layout_gravity="end"
 	          android:choiceMode="singleChoice"
 	          android:divider="@android:color/transparent"
 	          android:listSelector="@android:color/transparent"

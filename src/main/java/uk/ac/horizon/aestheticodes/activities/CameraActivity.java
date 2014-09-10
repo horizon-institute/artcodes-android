@@ -34,10 +34,14 @@ import android.os.Handler;
 import android.support.v4.app.Fragment;
 import android.support.v4.app.FragmentPagerAdapter;
 import android.support.v4.view.ViewPager;
+import android.support.v4.widget.DrawerLayout;
+import android.support.v7.app.ActionBarActivity;
 import android.util.Log;
 import android.view.*;
+import android.widget.AdapterView;
 import android.widget.BaseAdapter;
 import android.widget.ImageView;
+import android.widget.ListView;
 import android.widget.ProgressBar;
 import android.widget.RelativeLayout;
 import android.widget.TextView;
@@ -46,7 +50,7 @@ import com.squareup.picasso.Target;
 import org.opencv.android.OpenCVLoader;
 import uk.ac.horizon.aestheticodes.R;
 import uk.ac.horizon.aestheticodes.detect.CameraManager;
-import uk.ac.horizon.aestheticodes.detect.MarkerDetectionListener;
+import uk.ac.horizon.aestheticodes.detect.ExperienceEventListener;
 import uk.ac.horizon.aestheticodes.detect.MarkerDetectionThread;
 import uk.ac.horizon.aestheticodes.detect.ViewfinderView;
 import uk.ac.horizon.aestheticodes.model.Experience;
@@ -58,7 +62,7 @@ import uk.ac.horizon.aestheticodes.model.Mode;
 
 import java.util.List;
 
-public class CameraActivity extends DrawerActivity implements MarkerDetectionListener
+public class CameraActivity extends ActionBarActivity implements ExperienceEventListener
 {
 	private static final String TAG = CameraActivity.class.getName();
 	private static final String MODE_PREFIX = "mode_";
@@ -77,7 +81,6 @@ public class CameraActivity extends DrawerActivity implements MarkerDetectionLis
 		private final Context context;
 		private final LayoutInflater inflater;
 		private final ExperienceManager experienceManager;
-		private Experience selected;
 
 		public ExperienceAdapter(final Context context, final ExperienceManager experienceManager)
 		{
@@ -115,14 +118,14 @@ public class CameraActivity extends DrawerActivity implements MarkerDetectionLis
 
 			final TextView eventTitle = (TextView) view.findViewById(R.id.experience_title);
 			final ImageView iconView = (ImageView) view.findViewById(R.id.experience_icon);
-			if(experience.equals(selected))
+			if (experience.equals(experienceManager.getSelected()))
 			{
-				eventTitle.setText(experience.getName() + " Settings");
+				eventTitle.setText(experience.getName() + " Markers");
 
 				iconView.setSelected(true);
 
 				Picasso.with(context).cancelRequest(iconView);
-				iconView.setImageResource(R.drawable.ic_action_settings);
+				iconView.setImageResource(R.drawable.ic_action_next_item);
 			}
 			else
 			{
@@ -199,10 +202,18 @@ public class CameraActivity extends DrawerActivity implements MarkerDetectionLis
 		return !hasBackKey && !hasMenuKey;
 	}
 
+	private class DrawerItemClickListener implements ListView.OnItemClickListener
+	{
+		@Override
+		public void onItemClick(final AdapterView<?> parent, final View view, final int position, final long id)
+		{
+			selectItem(position);
+		}
+	}
+
 	private final MarkerSelection markerSelection = new MarkerSelection();
 	private ExperienceManager experienceManager;
 	private ExperienceAdapter experienceAdapter;
-	private Experience experience;
 	private SurfaceHolder holder;
 	private CameraManager cameraManager;
 	private MarkerDetectionThread thread;
@@ -211,6 +222,8 @@ public class CameraActivity extends DrawerActivity implements MarkerDetectionLis
 	private ViewPager pager;
 	private ProgressBar progress;
 	private RelativeLayout bottomView;
+	private DrawerLayout drawerLayout;
+	private ListView drawerList;
 
 	/**
 	 * Get an OnClickListener that will change a ViewPager to the given position.
@@ -227,21 +240,19 @@ public class CameraActivity extends DrawerActivity implements MarkerDetectionLis
 		};
 	}
 
-	@Override
 	protected void selectItem(final int position)
 	{
-		super.selectItem(position);
+		drawerList.setSelection(position);
+		drawerLayout.closeDrawer(drawerList);
 
 		Experience selected = experienceManager.list().get(position);
-		if(selected == experience)
+		if (selected == experienceManager.getSelected())
 		{
-			startActivity(new Intent(Intent.ACTION_EDIT, Uri.parse("aestheticodes://" + experience.getId())));
+			startActivity(new Intent(Intent.ACTION_EDIT, Uri.parse("aestheticodes://" + selected.getId())));
 		}
 		else
 		{
-			experience = selected;
-
-			experienceChanged();
+			experienceManager.setSelected(selected);
 		}
 	}
 
@@ -289,18 +300,18 @@ public class CameraActivity extends DrawerActivity implements MarkerDetectionLis
 			@Override
 			public int getCount()
 			{
-				if (experience == null)
+				if (experienceManager == null || experienceManager.getSelected() == null)
 				{
 					return 0;
 				}
-				return experience.getModes().size();
+				return experienceManager.getSelected().getModes().size();
 			}
 
 			@Override
 			public Fragment getItem(int position)
 			{
 				Bundle bundle = new Bundle();
-				bundle.putString("mode", experience.getModes().get(position).name());
+				bundle.putString("mode", experienceManager.getSelected().getModes().get(position).name());
 
 				ModeFragment fragment = new ModeFragment();
 				fragment.setOnClickListener(getOnClickListenerForMode(pager, position));
@@ -319,7 +330,7 @@ public class CameraActivity extends DrawerActivity implements MarkerDetectionLis
 			@Override
 			public void onPageSelected(int position)
 			{
-				thread.setMode(experience.getModes().get(position));
+				thread.setMode(experienceManager.getSelected().getModes().get(position));
 				cameraManager.setResult(null);
 				viewfinder.invalidate();
 				if (progress != null)
@@ -351,45 +362,59 @@ public class CameraActivity extends DrawerActivity implements MarkerDetectionLis
 
 		bottomView = (RelativeLayout) findViewById(R.id.bottomView);
 
+		drawerLayout = (DrawerLayout) findViewById(R.id.drawer_layout);
+		drawerList = (ListView) findViewById(R.id.drawer_list);
+		drawerList.setOnItemClickListener(new DrawerItemClickListener());
+
 		experienceManager = new ExperienceManager(this, this);
 		experienceManager.load();
 
 		if (savedInstanceState != null && savedInstanceState.containsKey("experience"))
 		{
 			Log.i(TAG, "Loading experience " + savedInstanceState.getString("experience"));
-			experience = experienceManager.get(savedInstanceState.getString("experience"));
+			Experience experience = experienceManager.get(savedInstanceState.getString("experience"));
+			if(experience != null)
+			{
+				experienceManager.setSelected(experience);
+			}
 		}
-
-		if (experience == null)
+		else
 		{
-			experience = experienceManager.get("uk.ac.horizon.aestheticodes.default");
+			Experience experience = experienceManager.get("uk.ac.horizon.aestheticodes.default");
+			if(experience != null)
+			{
+				experienceManager.setSelected(experience);
+			}
 		}
 
 		experienceAdapter = new ExperienceAdapter(this, experienceManager);
 
-		createDrawer(experienceAdapter, R.id.drawer_layout, R.id.drawer_list);
-
-		experienceChanged();
-
+		drawerList.setAdapter(experienceAdapter);
 	}
+
+	protected void setItemSelected(final int position)
+	{
+		if(drawerList != null)
+		{
+			drawerList.setSelection(position);
+		}
+	}
+
 
 	public void experiencesChanged()
 	{
 		experienceAdapter.notifyDataSetChanged();
 	}
 
-	private void experienceChanged()
+	@Override
+	public void experienceSelected(Experience experience)
 	{
 		Log.i(TAG, "experience updated");
 		pager.getAdapter().notifyDataSetChanged();
 		setTitle(experience.getName());
-		if (thread != null)
-		{
-			thread.setSettings(experience);
-		}
 		if (experience.getModes().size() <= 1)
 		{
-			if(experience.getModes().size() == 1)
+			if (experience.getModes().size() == 1)
 			{
 				thread.setMode(experience.getModes().get(0));
 			}
@@ -434,7 +459,6 @@ public class CameraActivity extends DrawerActivity implements MarkerDetectionLis
 			});
 		}
 
-		experienceAdapter.selected = experience;
 		experienceAdapter.notifyDataSetChanged();
 	}
 
@@ -464,7 +488,7 @@ public class CameraActivity extends DrawerActivity implements MarkerDetectionLis
 			try
 			{
 				cameraManager.start(holder);
-				thread = new MarkerDetectionThread(cameraManager, this, experience);
+				thread = new MarkerDetectionThread(cameraManager, this, experienceManager);
 				thread.start();
 				if (pager != null)
 				{
@@ -511,7 +535,7 @@ public class CameraActivity extends DrawerActivity implements MarkerDetectionLis
 		pager.invalidate();
 		viewfinder.invalidate();
 
-		getListView().setPadding(0, frame.top, 0, p.height);
+		drawerList.setPadding(0, frame.top, 0, p.height);
 	}
 
 	/**
@@ -553,7 +577,7 @@ public class CameraActivity extends DrawerActivity implements MarkerDetectionLis
 	{
 		super.onSaveInstanceState(outState);
 
-		outState.putString("experience", experience.getId());
+		outState.putString("experience", experienceManager.getSelected().getId());
 		//outState.putString("mode", thread.getMode().name());
 	}
 
@@ -575,6 +599,16 @@ public class CameraActivity extends DrawerActivity implements MarkerDetectionLis
 					Log.e(TAG, e.getMessage(), e);
 				}
 				return true;
+			case R.id.action_experiences:
+				if(drawerLayout.isDrawerOpen(drawerList))
+				{
+					drawerLayout.closeDrawer(drawerList);
+				}
+				else
+				{
+					drawerLayout.openDrawer(drawerList);
+				}
+				return true;
 			default:
 				return super.onOptionsItemSelected(item);
 		}
@@ -582,7 +616,7 @@ public class CameraActivity extends DrawerActivity implements MarkerDetectionLis
 
 
 	@Override
-	public void markersDetected(final List<Marker> markers)
+	public void markersFound(final List<Marker> markers)
 	{
 		if (thread == null)
 		{
@@ -625,13 +659,13 @@ public class CameraActivity extends DrawerActivity implements MarkerDetectionLis
 
 				if (marker != null)
 				{
-					MarkerAction markerDetail = experience.getMarkers().get(marker.getCodeKey());
+					MarkerAction markerDetail = experienceManager.getSelected().getMarkers().get(marker.getCodeKey());
 					if (markerDetail != null)
 					{
 						cameraManager.stop();
 						if (markerDetail.getShowDetail())
 						{
-							startActivity(new Intent(Intent.ACTION_VIEW, Uri.parse("aestheticodes://" + experience.getId() + "/" + marker.getCodeKey())));
+							startActivity(new Intent(Intent.ACTION_VIEW, Uri.parse("aestheticodes://" + experienceManager.getSelected().getId() + "/" + marker.getCodeKey())));
 						}
 						else
 						{
@@ -642,7 +676,7 @@ public class CameraActivity extends DrawerActivity implements MarkerDetectionLis
 					{
 						Log.w(TAG, "No details for marker " + marker.getCodeKey());
 
-						if (experience.canAddMarkerByScanning())
+						if (experienceManager.getSelected().canAddMarkerByScanning())
 						{
 							this.addMarkerDialog(marker.getCodeKey());
 						}
