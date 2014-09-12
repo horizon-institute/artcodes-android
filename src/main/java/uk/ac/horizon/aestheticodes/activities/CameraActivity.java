@@ -22,6 +22,7 @@ import android.app.AlertDialog;
 import android.content.Context;
 import android.content.DialogInterface;
 import android.content.Intent;
+import android.content.SharedPreferences;
 import android.content.res.Resources;
 import android.graphics.Bitmap;
 import android.graphics.Rect;
@@ -330,14 +331,7 @@ public class CameraActivity extends ActionBarActivity implements ExperienceEvent
 			@Override
 			public void onPageSelected(int position)
 			{
-				thread.setMode(experienceManager.getSelected().getModes().get(position));
-				cameraManager.setResult(null);
-				viewfinder.invalidate();
-				if (progress != null)
-				{
-					markerSelection.reset();
-					progress.setVisibility(View.INVISIBLE);
-				}
+				setMode(experienceManager.getSelected().getModes().get(position));
 			}
 
 			@Override
@@ -367,61 +361,77 @@ public class CameraActivity extends ActionBarActivity implements ExperienceEvent
 		drawerList.setOnItemClickListener(new DrawerItemClickListener());
 
 		experienceManager = new ExperienceManager(this, this);
+		experienceAdapter = new ExperienceAdapter(this, experienceManager);
 		experienceManager.load();
 
-		if (savedInstanceState != null && savedInstanceState.containsKey("experience"))
+		SharedPreferences preferences = getPreferences(MODE_PRIVATE);
+		Log.i(TAG, "Loading experience " + preferences.getString("experience", "uk.ac.horizon.aestheticodes.default"));
+		Experience experience = experienceManager.get(preferences.getString("experience", "uk.ac.horizon.aestheticodes.default"));
+		if (experience != null)
 		{
-			Log.i(TAG, "Loading experience " + savedInstanceState.getString("experience"));
-			Experience experience = experienceManager.get(savedInstanceState.getString("experience"));
-			if(experience != null)
-			{
-				experienceManager.setSelected(experience);
-			}
+			experienceManager.setSelected(experience);
 		}
-		else
-		{
-			Experience experience = experienceManager.get("uk.ac.horizon.aestheticodes.default");
-			if(experience != null)
-			{
-				experienceManager.setSelected(experience);
-			}
-		}
-
-		experienceAdapter = new ExperienceAdapter(this, experienceManager);
 
 		drawerList.setAdapter(experienceAdapter);
 	}
 
 	protected void setItemSelected(final int position)
 	{
-		if(drawerList != null)
+		if (drawerList != null)
 		{
 			drawerList.setSelection(position);
 		}
 	}
-
 
 	public void experiencesChanged()
 	{
 		experienceAdapter.notifyDataSetChanged();
 	}
 
+	private void setMode(Mode mode)
+	{
+		if (thread != null)
+		{
+			thread.setMode(mode);
+		}
+		cameraManager.setResult(null);
+		viewfinder.invalidate();
+		if (progress != null)
+		{
+			markerSelection.reset();
+			progress.setVisibility(View.INVISIBLE);
+		}
+	}
+
 	@Override
 	public void experienceSelected(Experience experience)
 	{
 		Log.i(TAG, "experience updated");
-		pager.getAdapter().notifyDataSetChanged();
 		setTitle(experience.getName());
-		if (experience.getModes().size() <= 1)
+		pager.getAdapter().notifyDataSetChanged();
+		Mode mode;
+		if(thread != null)
 		{
-			if (experience.getModes().size() == 1)
+			mode = thread.getMode();
+		}
+		else
+		{
+			mode = Mode.detect;
+		}
+		if(!experience.getModes().contains(mode))
+		{
+			if(experience.getModes().isEmpty())
 			{
-				thread.setMode(experience.getModes().get(0));
+				setMode(Mode.detect);
 			}
 			else
 			{
-				thread.setMode(Mode.detect);
+				setMode(experience.getModes().get(0));
 			}
+		}
+
+		if (experience.getModes().size() <= 1)
+		{
 			pager.setVisibility(View.INVISIBLE);
 			pager_mark.setVisibility(View.INVISIBLE);
 		}
@@ -437,6 +447,7 @@ public class CameraActivity extends ActionBarActivity implements ExperienceEvent
 
 		if (experience.getIcon() != null)
 		{
+			Log.i(TAG, "Setting icon to " + experience.getIcon());
 			Picasso.with(this).load(experience.getIcon()).into(new Target()
 			{
 				@Override
@@ -458,6 +469,8 @@ public class CameraActivity extends ActionBarActivity implements ExperienceEvent
 				}
 			});
 		}
+
+		getPreferences(MODE_PRIVATE).edit().putString("experience", experience.getId()).commit();
 
 		experienceAdapter.notifyDataSetChanged();
 	}
@@ -490,9 +503,10 @@ public class CameraActivity extends ActionBarActivity implements ExperienceEvent
 				cameraManager.start(holder);
 				thread = new MarkerDetectionThread(cameraManager, this, experienceManager);
 				thread.start();
+
 				if (pager != null)
 				{
-					thread.setMode(Mode.values()[pager.getCurrentItem()]);
+					thread.setMode(experienceManager.getSelected().getModes().get(pager.getCurrentItem()));
 				}
 
 				if (progress != null)
@@ -573,15 +587,6 @@ public class CameraActivity extends ActionBarActivity implements ExperienceEvent
 	}
 
 	@Override
-	public void onSaveInstanceState(final Bundle outState)
-	{
-		super.onSaveInstanceState(outState);
-
-		outState.putString("experience", experienceManager.getSelected().getId());
-		//outState.putString("mode", thread.getMode().name());
-	}
-
-	@Override
 	public boolean onOptionsItemSelected(MenuItem item)
 	{
 		switch (item.getItemId())
@@ -600,7 +605,7 @@ public class CameraActivity extends ActionBarActivity implements ExperienceEvent
 				}
 				return true;
 			case R.id.action_experiences:
-				if(drawerLayout.isDrawerOpen(drawerList))
+				if (drawerLayout.isDrawerOpen(drawerList))
 				{
 					drawerLayout.closeDrawer(drawerList);
 				}

@@ -81,7 +81,8 @@ public class MarkerActivity extends ActionBarActivity
 		ImageView imageView = (ImageView) findViewById(R.id.imageView);
 		if (marker.getImage() != null)
 		{
-			Picasso.with(this).load(marker.getImage()).placeholder(R.drawable.placeholder).into(imageView);
+			Picasso.with(this).setLoggingEnabled(true);
+			Picasso.with(this).load(marker.getImage()).placeholder(R.drawable.aestheticodes).into(imageView);
 		}
 
 		TextView titleView = (TextView) findViewById(R.id.titleView);

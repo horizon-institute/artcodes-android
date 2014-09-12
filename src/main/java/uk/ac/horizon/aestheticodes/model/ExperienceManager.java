@@ -269,6 +269,10 @@ public class ExperienceManager
 
 	public void add(Experience experience)
 	{
+		if(experience == null)
+		{
+			return;
+		}
 		experiences.put(experience.getId(), experience);
 		if(selected == null)
 		{
@@ -312,7 +316,14 @@ public class ExperienceManager
 			@Override
 			public int compare(Experience experience, Experience experience2)
 			{
-				return experience.getName().compareTo(experience2.getName());
+				if(experience.getName() != null && experience2.getName() != null)
+				{
+					return experience.getName().compareTo(experience2.getName());
+				}
+				else
+				{
+					return 0;
+				}
 			}
 		});
 
