@@ -108,7 +108,7 @@ public class AddMarkerSettingsItem extends SettingsItem
 
 			final String experienceID = getArguments().getString("experience");
 
-			ExperienceManager experienceManager = new ExperienceManager(getActivity(),null);
+			final ExperienceManager experienceManager = ExperienceManager.get(getActivity());
 			final Experience experience = experienceManager.get(experienceID);
 
 			View view = inflater.inflate(R.layout.dialog_add_marker, null);
@@ -116,12 +116,13 @@ public class AddMarkerSettingsItem extends SettingsItem
 			final EditText markerCode = (EditText) view.findViewById(R.id.markerCode);
 			markerCode.setFilters(new InputFilter[] { new MarkerCodeInputFilter(experience) });
             final EditText urlView = (EditText) view.findViewById(R.id.markerURL);
-            if (this.presetCode != null)
-            {
-                markerCode.setText(this.presetCode);
-                markerCode.setEnabled(false);
-                urlView.requestFocus();
-            }
+
+			if(getArguments().containsKey("code"))
+			{
+				markerCode.setText(getArguments().getString("code"));
+				markerCode.setEnabled(false);
+				urlView.requestFocus();
+			}
 
 			builder.setView(view);
 			builder.setPositiveButton(R.string.dialog_action_set, new DialogInterface.OnClickListener()
@@ -140,7 +141,8 @@ public class AddMarkerSettingsItem extends SettingsItem
                     }
 					experience.setChanged(true);
 					experience.getMarkers().put(action.getCode(), action);
-					((SettingsActivity)getActivity()).refresh();
+
+					((SettingsActivity)getActivity()).setProperty(action.getCode(), action);
 				}
 			});
 			builder.setNegativeButton(R.string.dialog_action_cancel, new DialogInterface.OnClickListener()
@@ -235,11 +237,6 @@ public class AddMarkerSettingsItem extends SettingsItem
 
 			return dialog;
 		}
-
-        private String presetCode = null;
-        public void presetCode(String code) {
-            this.presetCode = code;
-        }
 	}
 
 

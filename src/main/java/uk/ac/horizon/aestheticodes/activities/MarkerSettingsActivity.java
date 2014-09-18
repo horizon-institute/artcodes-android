@@ -30,13 +30,17 @@ import android.view.MenuItem;
 import com.squareup.picasso.Picasso;
 import com.squareup.picasso.Target;
 import uk.ac.horizon.aestheticodes.R;
+import uk.ac.horizon.aestheticodes.detect.ExperienceEventListener;
 import uk.ac.horizon.aestheticodes.model.Experience;
 import uk.ac.horizon.aestheticodes.model.ExperienceManager;
+import uk.ac.horizon.aestheticodes.model.Marker;
 import uk.ac.horizon.aestheticodes.settings.IntPropertySettingsItem;
 import uk.ac.horizon.aestheticodes.settings.Property;
 import uk.ac.horizon.aestheticodes.settings.SettingsActivity;
 
-public class MarkerSettingsActivity extends SettingsActivity
+import java.util.List;
+
+public class MarkerSettingsActivity extends SettingsActivity implements ExperienceEventListener
 {
 	private ExperienceManager experienceManager;
 	private Experience experience;
@@ -49,7 +53,7 @@ public class MarkerSettingsActivity extends SettingsActivity
 		Bundle extras = getIntent().getExtras();
 		String experienceID = extras.getString("experience");
 
-		experienceManager = new ExperienceManager(this, null);
+		experienceManager = ExperienceManager.get(this);
 		experience = experienceManager.get(experienceID);
 
 		adapter.add(new IntPropertySettingsItem(this, experience, "minRegions", 1, "maxRegions"));
@@ -91,13 +95,6 @@ public class MarkerSettingsActivity extends SettingsActivity
 	}
 
 	@Override
-	public void refresh()
-	{
-		experienceManager.add(experience);
-		adapter.notifyDataSetChanged();
-	}
-
-	@Override
 	public boolean onOptionsItemSelected(MenuItem item)
 	{
 		switch (item.getItemId())
@@ -111,9 +108,51 @@ public class MarkerSettingsActivity extends SettingsActivity
 	}
 
 	@Override
+	public void saveChanges()
+	{
+		experienceManager.add(experience);
+	}
+
+
+	@Override
 	public void setProperty(String propertyName, Object value)
 	{
 		Property property = new Property(experience, propertyName);
 		property.set(value);
+		experienceManager.add(experience);
+	}
+
+
+	@Override
+	public void experienceSelected(Experience experience)
+	{
+
+	}
+
+	@Override
+	public void experiencesChanged()
+	{
+		refresh();
+	}
+
+	@Override
+	protected void onPause()
+	{
+		super.onPause();
+		experienceManager.removeListener(this);
+	}
+
+	@Override
+	protected void onResume()
+	{
+		super.onResume();
+		experienceManager.addListener(this);
+		refresh();
+	}
+
+	@Override
+	public void markersFound(List<Marker> markers)
+	{
+
 	}
 }

@@ -28,8 +28,10 @@ import android.util.Log;
 import com.squareup.picasso.Picasso;
 import com.squareup.picasso.Target;
 import uk.ac.horizon.aestheticodes.R;
+import uk.ac.horizon.aestheticodes.detect.ExperienceEventListener;
 import uk.ac.horizon.aestheticodes.model.Experience;
 import uk.ac.horizon.aestheticodes.model.ExperienceManager;
+import uk.ac.horizon.aestheticodes.model.Marker;
 import uk.ac.horizon.aestheticodes.model.MarkerAction;
 import uk.ac.horizon.aestheticodes.settings.ActivitySettingsItem;
 import uk.ac.horizon.aestheticodes.settings.AddMarkerSettingsItem;
@@ -41,7 +43,7 @@ import java.util.Collections;
 import java.util.Comparator;
 import java.util.List;
 
-public class MarkerListActivity extends SettingsActivity
+public class MarkerListActivity extends SettingsActivity implements ExperienceEventListener
 {
 	private ExperienceManager experienceManager;
 	private Experience experience;
@@ -54,7 +56,7 @@ public class MarkerListActivity extends SettingsActivity
 		Log.i("", getIntent().toString());
 		String experienceID = getIntent().getData().getHost();
 
-		experienceManager = new ExperienceManager(this, null);
+		experienceManager = ExperienceManager.get(this);
 		experience = experienceManager.get(experienceID);
 
 		getSupportActionBar().setTitle(getString(R.string.marker_title, experience.getName()));
@@ -82,12 +84,16 @@ public class MarkerListActivity extends SettingsActivity
 			});
 		}
 
-		if (this.getIntent().hasExtra("code"))
+		String code = getIntent().getData().getLastPathSegment();
+		Log.i("", "Code: " +  code);
+		if (code != null && !code.isEmpty())
 		{
-			String code = this.getIntent().getStringExtra("code");
 			final AddMarkerSettingsItem.AddMarkerDialogFragment dialogFragment = new AddMarkerSettingsItem.AddMarkerDialogFragment();
-			dialogFragment.presetCode(code);
-			dialogFragment.show(this.getSupportFragmentManager(), "missiles");
+			final Bundle bundle = new Bundle();
+			bundle.putString("experience", experience.getId());
+			bundle.putString("code", code);
+			dialogFragment.setArguments(bundle);
+			dialogFragment.show(getSupportFragmentManager(), "missiles");
 		}
 
 		refresh();
@@ -132,7 +138,44 @@ public class MarkerListActivity extends SettingsActivity
 		adapter.add(new ActivitySettingsItem(this, "About", intent));
 
 		adapter.notifyDataSetChanged();
+	}
 
+	@Override
+	public void saveChanges()
+	{
 		experienceManager.add(experience);
+	}
+
+	@Override
+	public void experienceSelected(Experience experience)
+	{
+
+	}
+
+	@Override
+	public void experiencesChanged()
+	{
+		refresh();
+	}
+
+	@Override
+	protected void onPause()
+	{
+		super.onPause();
+		experienceManager.removeListener(this);
+	}
+
+	@Override
+	protected void onResume()
+	{
+		super.onResume();
+		experienceManager.addListener(this);
+		refresh();
+	}
+
+	@Override
+	public void markersFound(List<Marker> markers)
+	{
+
 	}
 }

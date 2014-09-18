@@ -169,12 +169,6 @@ public class Experience
 		}
 	}
 
-	public void setThresholdBehaviour(String thresholdBehaviour)
-	{
-		this.thresholdBehaviour = thresholdBehaviour;
-		this.changed = true;
-	}
-
 	public String getIcon()
 	{
 		return icon;

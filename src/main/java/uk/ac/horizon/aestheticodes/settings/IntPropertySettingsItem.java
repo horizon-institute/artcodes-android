@@ -94,7 +94,6 @@ public class IntPropertySettingsItem extends PropertySettingsItem
 				{
 					final int value = slider.getProgress() + minValue;
 					((SettingsActivity)getActivity()).setProperty(propertyName, value);
-					((SettingsActivity)getActivity()).refresh();
 				}
 			});
 			builder.setNegativeButton(R.string.dialog_action_cancel, new DialogInterface.OnClickListener()

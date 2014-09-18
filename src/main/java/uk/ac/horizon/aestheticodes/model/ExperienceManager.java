@@ -40,10 +40,12 @@ import java.io.Reader;
 import java.net.HttpURLConnection;
 import java.net.URL;
 import java.util.ArrayList;
+import java.util.Collection;
 import java.util.Collections;
 import java.util.Comparator;
 import java.util.Date;
 import java.util.HashMap;
+import java.util.HashSet;
 import java.util.List;
 import java.util.Map;
 
@@ -214,7 +216,7 @@ public class ExperienceManager
 					add(experience);
 				}
 
-				if (listener != null)
+				for(ExperienceEventListener listener: listeners)
 				{
 					listener.experiencesChanged();
 				}
@@ -224,19 +226,39 @@ public class ExperienceManager
 
 	private final Map<String, Experience> experiences = new HashMap<String, Experience>();
 	private final Context context;
-	private final ExperienceEventListener listener;
+	private final Collection<ExperienceEventListener> listeners = new HashSet<ExperienceEventListener>();
 	private Experience selected;
 
-	public ExperienceManager(Context context, ExperienceEventListener listener)
+	private static ExperienceManager experienceManager;
+
+	public static ExperienceManager get(Context context)
+	{
+		if(experienceManager == null)
+		{
+			experienceManager = new ExperienceManager(context.getApplicationContext());
+		}
+		return experienceManager;
+	}
+
+	private ExperienceManager(Context context)
 	{
 		this.context = context;
-		this.listener = listener;
+	}
+
+	public void addListener(ExperienceEventListener listener)
+	{
+		listeners.add(listener);
+	}
+
+	public void removeListener(ExperienceEventListener listener)
+	{
+		listeners.remove(listener);
 	}
 
 	public void setSelected(Experience selected)
 	{
 		this.selected = selected;
-		if(listener != null)
+		for(ExperienceEventListener listener: listeners)
 		{
 			listener.experienceSelected(selected);
 		}
@@ -267,22 +289,8 @@ public class ExperienceManager
 		return new InputStreamReader(context.getAssets().open(path));
 	}
 
-	public void add(Experience experience)
+	public void save(Experience experience)
 	{
-		if(experience == null)
-		{
-			return;
-		}
-		experiences.put(experience.getId(), experience);
-		if(selected == null)
-		{
-			setSelected(experience);
-		}
-		else if(selected.getId().equals(experience.getId()))
-		{
-			setSelected(experience);
-		}
-
 		if (experience.hasChanged())
 		{
 			try
@@ -305,6 +313,30 @@ public class ExperienceManager
 			{
 				Log.w(TAG, "Failed to save settings", e);
 			}
+		}
+	}
+
+	public void add(Experience experience)
+	{
+		if(experience == null)
+		{
+			return;
+		}
+		experiences.put(experience.getId(), experience);
+		if(selected == null)
+		{
+			setSelected(experience);
+		}
+		else if(selected.getId().equals(experience.getId()))
+		{
+			setSelected(experience);
+		}
+
+		save(experience);
+
+		for(ExperienceEventListener listener: listeners)
+		{
+			listener.experiencesChanged();
 		}
 	}
 

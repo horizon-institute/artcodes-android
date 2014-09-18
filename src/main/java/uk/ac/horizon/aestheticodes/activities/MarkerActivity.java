@@ -50,7 +50,7 @@ public class MarkerActivity extends ActionBarActivity
 		String markerCode = getIntent().getData().getLastPathSegment();
 		String experienceID = getIntent().getData().getHost();
 
-		ExperienceManager experienceManager = new ExperienceManager(this, null);
+		ExperienceManager experienceManager = ExperienceManager.get(this);
 		Experience experience = experienceManager.get(experienceID);
 		final MarkerAction marker = experience.getMarkers().get(markerCode);
 

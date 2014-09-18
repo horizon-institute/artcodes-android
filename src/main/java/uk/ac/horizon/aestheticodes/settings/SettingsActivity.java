@@ -37,7 +37,7 @@ import uk.ac.horizon.aestheticodes.R;
 import java.util.ArrayList;
 import java.util.List;
 
-public class SettingsActivity extends ActionBarActivity
+public abstract class SettingsActivity extends ActionBarActivity
 {
 	public static class Adapter extends BaseAdapter
 	{
@@ -201,7 +201,10 @@ public class SettingsActivity extends ActionBarActivity
 		adapter.notifyDataSetChanged();
 	}
 
+	public abstract void saveChanges();
+
 	public void setProperty(String propertyName, Object value)
 	{
+		saveChanges();
 	}
 }

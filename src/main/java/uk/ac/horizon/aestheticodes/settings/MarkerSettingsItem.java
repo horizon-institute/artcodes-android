@@ -56,7 +56,7 @@ public class MarkerSettingsItem extends SettingsItem
 			final String code = getArguments().getString("code");
 			final String experienceID = getArguments().getString("experience");
 
-			ExperienceManager experienceManager = new ExperienceManager(getActivity(),null);
+			ExperienceManager experienceManager = ExperienceManager.get(getActivity());
 			final Experience experience = experienceManager.get(experienceID);
 			final MarkerAction action = experience.getMarkers().get(code);
 			// Inflate and set the layout for the dialog
@@ -82,7 +82,7 @@ public class MarkerSettingsItem extends SettingsItem
 						action.setAction(urlView.getText().toString());
 					}
 					experience.setChanged(true);
-					settingsActivity.refresh();
+					settingsActivity.saveChanges();
 				}
 			});
 			builder.setNegativeButton(R.string.dialog_action_cancel, new DialogInterface.OnClickListener()
@@ -108,7 +108,7 @@ public class MarkerSettingsItem extends SettingsItem
 						{
 							// delete the marker:
 							experience.deleteMarker(code);
-							settingsActivity.refresh();
+							settingsActivity.saveChanges();
 						}
 					});
 					confirmBuilder.setNegativeButton(R.string.confirmDeleteDialogNegative, new DialogInterface.OnClickListener()

@@ -360,7 +360,8 @@ public class CameraActivity extends ActionBarActivity implements ExperienceEvent
 		drawerList = (ListView) findViewById(R.id.drawer_list);
 		drawerList.setOnItemClickListener(new DrawerItemClickListener());
 
-		experienceManager = new ExperienceManager(this, this);
+		experienceManager = ExperienceManager.get(this);
+		experienceManager.addListener(this);
 		experienceAdapter = new ExperienceAdapter(this, experienceManager);
 		experienceManager.load();
 
@@ -401,6 +402,8 @@ public class CameraActivity extends ActionBarActivity implements ExperienceEvent
 			markerSelection.reset();
 			progress.setVisibility(View.INVISIBLE);
 		}
+
+		pager.setCurrentItem(experienceManager.getSelected().getModes().indexOf(mode), true);
 	}
 
 	@Override
@@ -492,6 +495,13 @@ public class CameraActivity extends ActionBarActivity implements ExperienceEvent
 	{
 		super.onResume();
 		startCamera();
+	}
+
+	@Override
+	protected void onStop()
+	{
+		super.onStop();
+		experienceManager.removeListener(this);
 	}
 
 	private void startCamera()
@@ -721,9 +731,7 @@ public class CameraActivity extends ActionBarActivity implements ExperienceEvent
 					public void onClick(DialogInterface dialogInterface, int i)
 					{
 						markerSelection.unpause();
-						Intent addMarkerIntent = new Intent(context, MarkerListActivity.class);
-						addMarkerIntent.putExtra("code", code);
-						startActivity(addMarkerIntent);
+						startActivity(new Intent(Intent.ACTION_EDIT, Uri.parse("aestheticodes://" + experienceManager.getSelected().getId() + "/" + code)));
 					}
 				});
 				builder.setNegativeButton("Cancel", new DialogInterface.OnClickListener()
