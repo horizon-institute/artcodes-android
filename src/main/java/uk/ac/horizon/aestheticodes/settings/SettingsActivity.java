@@ -21,7 +21,6 @@ package uk.ac.horizon.aestheticodes.settings;
 
 import android.content.Context;
 import android.os.Bundle;
-import android.support.v4.app.FragmentActivity;
 import android.support.v4.app.NavUtils;
 import android.support.v7.app.ActionBarActivity;
 import android.view.LayoutInflater;
@@ -196,7 +195,7 @@ public abstract class SettingsActivity extends ActionBarActivity
 		return super.onOptionsItemSelected(item);
 	}
 
-	public void refresh()
+	protected void refresh()
 	{
 		adapter.notifyDataSetChanged();
 	}

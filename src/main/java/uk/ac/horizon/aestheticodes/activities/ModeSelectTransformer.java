@@ -19,14 +19,17 @@
 
 package uk.ac.horizon.aestheticodes.activities;
 
+import android.annotation.TargetApi;
+import android.os.Build;
 import android.support.v4.view.ViewPager;
 import android.view.View;
 
-public class ModeSelectTransformer implements ViewPager.PageTransformer
+class ModeSelectTransformer implements ViewPager.PageTransformer
 {
 	private static final float MIN_SCALE = 0.85f;
 	private static final float MIN_ALPHA = 0.3f;
 
+	@TargetApi(Build.VERSION_CODES.HONEYCOMB)
 	public void transformPage(View view, float position)
 	{
 		if (position < -1)

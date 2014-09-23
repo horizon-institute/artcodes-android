@@ -31,7 +31,6 @@ import org.opencv.core.Rect;
 import org.opencv.core.Scalar;
 import org.opencv.core.Size;
 import org.opencv.imgproc.Imgproc;
-import uk.ac.horizon.aestheticodes.model.Experience;
 import uk.ac.horizon.aestheticodes.model.ExperienceManager;
 import uk.ac.horizon.aestheticodes.model.Marker;
 import uk.ac.horizon.aestheticodes.model.MarkerDetector;
@@ -46,32 +45,8 @@ public class MarkerDetectionThread extends Thread
 	private static final String TAG = MarkerDetectionThread.class.getName();
 	private static final Scalar detectedColour = new Scalar(255, 255, 0, 255);
 	private static final Scalar outlineColour = new Scalar(0, 0, 0, 255);
-	private final MarkerDetector markerDetector;
-	private final CameraManager cameraManager;
-	private int framesSinceLastMarker = 0, cumulativeFramesWithoutMarker=0;
-	private final ExperienceEventListener listener;
-	private boolean running = true;
-	private Mode mode = Mode.detect;
-	private final ExperienceManager experienceManager;
 
-    private long timeOfLastAutoFocus;
-
-
-	public MarkerDetectionThread(CameraManager cameraManager, ExperienceEventListener listener, ExperienceManager experienceManager)
-    {
-        this.cameraManager = cameraManager;
-        this.listener = listener;
-	    this.experienceManager = experienceManager;
-        markerDetector = new MarkerDetector(experienceManager);
-        timeOfLastAutoFocus = System.currentTimeMillis();
-    }
-
-	public void setRunning(boolean running)
-	{
-		this.running = running;
-	}
-
-	public static Mat cropImage(Mat imgMat)
+	private static Mat cropImage(Mat imgMat)
 	{
 		final int size = Math.min(imgMat.rows(), imgMat.cols());
 
@@ -81,20 +56,68 @@ public class MarkerDetectionThread extends Thread
 		return imgMat.submat(rowStart, rowStart + size, colStart, colStart + size);
 	}
 
+	private static void rotate(Mat src, Mat dst, int angle, boolean flip)
+	{
+		if (src != dst)
+		{
+			src.copyTo(dst);
+		}
+
+		angle = ((angle / 90) % 4) * 90;
+
+		//0 : flip vertical; 1 flip horizontal
+
+		int flip_horizontal_or_vertical = angle > 0 ? 1 : 0;
+		if (flip)
+		{
+			flip_horizontal_or_vertical = -1;
+		}
+		int number = Math.abs(angle / 90);
+
+		for (int i = 0; i != number; ++i)
+		{
+			Core.transpose(dst, dst);
+			Core.flip(dst, dst, flip_horizontal_or_vertical);
+		}
+	}
+
+	private final MarkerDetector markerDetector;
+	private final CameraManager cameraManager;
+	private final ExperienceEventListener listener;
+	private final ExperienceManager experienceManager;
+	private int framesSinceLastMarker = 0, cumulativeFramesWithoutMarker = 0;
+	private boolean running = true;
+	private Mode mode = Mode.detect;
+	private long timeOfLastAutoFocus;
+
+	public MarkerDetectionThread(CameraManager cameraManager, ExperienceEventListener listener, ExperienceManager experienceManager)
+	{
+		this.cameraManager = cameraManager;
+		this.listener = listener;
+		this.experienceManager = experienceManager;
+		markerDetector = new MarkerDetector(experienceManager);
+		timeOfLastAutoFocus = System.currentTimeMillis();
+	}
+
+	public void setRunning(boolean running)
+	{
+		this.running = running;
+	}
+
 	private void thresholdImage(Mat image)
 	{
-        ThresholdBehaviour thresholdBehaviour = experienceManager.getSelected().getThresholdBehaviour();
+		ThresholdBehaviour thresholdBehaviour = experienceManager.getSelected().getThresholdBehaviour();
 
-        if (framesSinceLastMarker > 2)
-        {
-            ++cumulativeFramesWithoutMarker;
-        }
+		if (framesSinceLastMarker > 2)
+		{
+			++cumulativeFramesWithoutMarker;
+		}
 
 		if (thresholdBehaviour == ThresholdBehaviour.temporalTile)
 		{
 			Imgproc.GaussianBlur(image, image, new Size(5, 5), 0);
 
-			final int numberOfTiles = (cumulativeFramesWithoutMarker%9)+1;
+			final int numberOfTiles = (cumulativeFramesWithoutMarker % 9) + 1;
 			final int tileHeight = (int) image.size().height / numberOfTiles;
 			final int tileWidth = (int) image.size().width / numberOfTiles;
 
@@ -196,31 +219,6 @@ public class MarkerDetectionThread extends Thread
 		}
 	}
 
-	public static void rotate(Mat src, Mat dst, int angle, boolean flip)
-	{
-		if (src != dst)
-		{
-			src.copyTo(dst);
-		}
-
-		angle = ((angle / 90) % 4) * 90;
-
-		//0 : flip vertical; 1 flip horizontal
-
-		int flip_horizontal_or_vertical = angle > 0 ? 1 : 0;
-		if (flip)
-		{
-			flip_horizontal_or_vertical = -1;
-		}
-		int number = Math.abs(angle / 90);
-
-		for (int i = 0; i != number; ++i)
-		{
-			Core.transpose(dst, dst);
-			Core.flip(dst, dst, flip_horizontal_or_vertical);
-		}
-	}
-
 	@Override
 	public void run()
 	{
@@ -262,12 +260,14 @@ public class MarkerDetectionThread extends Thread
 
 						// find markers.
 						List<Marker> markers = findMarkers(croppedImage, drawImage);
-						if(markers.size() == 0)
+						if (markers.size() == 0)
 						{
-                            ++framesSinceLastMarker;
-						} else {
-                            framesSinceLastMarker = 0;
-                        }
+							++framesSinceLastMarker;
+						}
+						else
+						{
+							framesSinceLastMarker = 0;
+						}
 
 						if (mode == Mode.detect || drawImage == null)
 						{
@@ -310,18 +310,18 @@ public class MarkerDetectionThread extends Thread
 					Log.e(TAG, e.getMessage(), e);
 				}
 
-                // Test if camera needs to be focused
-                if (CameraManager.deviceNeedsManualAutoFocus && this.framesSinceLastMarker>2 && System.currentTimeMillis()-this.timeOfLastAutoFocus>=5000)
-                {
-                    this.timeOfLastAutoFocus = System.currentTimeMillis();
-                    this.cameraManager.performManualAutoFocus(new Camera.AutoFocusCallback()
-                    {
-                        @Override
-                        public void onAutoFocus(boolean b, Camera camera)
-                        {
-                        }
-                    });
-                }
+				// Test if camera needs to be focused
+				if (CameraManager.deviceNeedsManualAutoFocus && this.framesSinceLastMarker > 2 && System.currentTimeMillis() - this.timeOfLastAutoFocus >= 5000)
+				{
+					this.timeOfLastAutoFocus = System.currentTimeMillis();
+					this.cameraManager.performManualAutoFocus(new Camera.AutoFocusCallback()
+					{
+						@Override
+						public void onAutoFocus(boolean b, Camera camera)
+						{
+						}
+					});
+				}
 			}
 		}
 		catch (Exception e)

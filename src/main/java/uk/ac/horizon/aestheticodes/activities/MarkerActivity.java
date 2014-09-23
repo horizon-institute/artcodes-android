@@ -21,7 +21,6 @@ package uk.ac.horizon.aestheticodes.activities;
 
 import android.content.Intent;
 import android.graphics.Bitmap;
-import android.graphics.PorterDuff;
 import android.graphics.drawable.BitmapDrawable;
 import android.graphics.drawable.Drawable;
 import android.net.Uri;

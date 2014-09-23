@@ -19,12 +19,11 @@
 
 package uk.ac.horizon.aestheticodes.settings;
 
-import android.content.Context;
 import android.content.Intent;
 
 public class ActivitySettingsItem extends SettingsItem
 {
-	private Intent intent;
+	private final Intent intent;
 
 	public ActivitySettingsItem(SettingsActivity activity, String title, Intent intent)
 	{

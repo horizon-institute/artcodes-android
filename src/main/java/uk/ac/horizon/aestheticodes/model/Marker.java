@@ -115,7 +115,7 @@ public class Marker
 		return null;
 	}
 
-	public boolean isCodeEqual(Marker marker)
+	boolean isCodeEqual(Marker marker)
 	{
 		return getCodeKey().equals(marker.getCodeKey());
 	}

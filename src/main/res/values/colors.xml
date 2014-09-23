@@ -18,10 +18,8 @@
   ~     along with this program.  If not, see <http://www.gnu.org/licenses/>.
   -->
 
-<resources xmlns:android="http://schemas.android.com/apk/res/android">
+<resources>
 	<color name="selected_item">#660066FF</color>
     <color name="viewfinder_mask">#60000000</color>
-    <color name="result_view">#b0000000</color>
-	<color name="drawer_background">#333333</color>
 	<color name="list_background">#fafafa</color>
 </resources>

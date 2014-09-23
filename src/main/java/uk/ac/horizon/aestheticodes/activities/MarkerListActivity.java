@@ -122,7 +122,7 @@ public class MarkerListActivity extends SettingsActivity implements ExperienceEv
 
 		if (experience.canAddMarker())
 		{
-			adapter.add(new AddMarkerSettingsItem(this, experience, "Add Marker"));
+			adapter.add(new AddMarkerSettingsItem(this, experience, getString(R.string.marker_add)));
 		}
 
 		if(experience.isEditable())
@@ -130,12 +130,12 @@ public class MarkerListActivity extends SettingsActivity implements ExperienceEv
 			Intent intent = new Intent(this, MarkerSettingsActivity.class);
 			intent.putExtra("experience", experience.getId());
 
-			adapter.add(new ActivitySettingsItem(this, "Settings", intent));
+			adapter.add(new ActivitySettingsItem(this, getString(R.string.settings), intent));
 		}
 
 		Intent intent = new Intent(this, AboutActivity.class);
 
-		adapter.add(new ActivitySettingsItem(this, "About", intent));
+		adapter.add(new ActivitySettingsItem(this, getString(R.string.about), intent));
 
 		adapter.notifyDataSetChanged();
 	}

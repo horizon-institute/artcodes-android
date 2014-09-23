@@ -18,6 +18,7 @@
  */
 package uk.ac.horizon.aestheticodes.settings;
 
-public enum ThresholdBehaviour {
-    temporalTile, resize;
+public enum ThresholdBehaviour
+{
+	temporalTile, resize
 }

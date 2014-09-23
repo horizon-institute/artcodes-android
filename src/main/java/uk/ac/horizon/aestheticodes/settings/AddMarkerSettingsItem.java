@@ -19,11 +19,13 @@
 
 package uk.ac.horizon.aestheticodes.settings;
 
+import android.annotation.SuppressLint;
 import android.app.AlertDialog;
 import android.app.Dialog;
 import android.content.DialogInterface;
 import android.os.Bundle;
 import android.os.Handler;
+import android.support.annotation.NonNull;
 import android.support.v4.app.DialogFragment;
 import android.text.Editable;
 import android.text.InputFilter;
@@ -94,6 +96,7 @@ public class AddMarkerSettingsItem extends SettingsItem
 	{
 		final Handler handler = new Handler();
 
+		@NonNull
 		@Override
 		public Dialog onCreateDialog(Bundle savedInstanceState)
 		{
@@ -111,6 +114,7 @@ public class AddMarkerSettingsItem extends SettingsItem
 			final ExperienceManager experienceManager = ExperienceManager.get(getActivity());
 			final Experience experience = experienceManager.get(experienceID);
 
+			@SuppressLint("InflateParams")
 			View view = inflater.inflate(R.layout.dialog_add_marker, null);
 
 			final EditText markerCode = (EditText) view.findViewById(R.id.markerCode);
@@ -158,7 +162,7 @@ public class AddMarkerSettingsItem extends SettingsItem
 
 			final TextWatcher watcher = new TextWatcher()
 			{
-				Runnable userStoppedTyping = new Runnable()
+				final Runnable userStoppedTyping = new Runnable()
 				{
 					@Override
 					public void run()

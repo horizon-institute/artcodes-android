@@ -18,11 +18,13 @@
  */
 package uk.ac.horizon.aestheticodes.settings;
 
+import android.annotation.SuppressLint;
 import android.app.AlertDialog;
 import android.app.Dialog;
 import android.content.Context;
 import android.content.DialogInterface;
 import android.os.Bundle;
+import android.support.annotation.NonNull;
 import android.support.v4.app.DialogFragment;
 import android.view.LayoutInflater;
 import android.view.View;
@@ -34,6 +36,7 @@ public class IntPropertySettingsItem extends PropertySettingsItem
 {
 	public static class SetIntDialogFragment extends DialogFragment
 	{
+		@NonNull
 		@Override
 		public Dialog onCreateDialog(Bundle savedInstanceState)
 		{
@@ -49,6 +52,7 @@ public class IntPropertySettingsItem extends PropertySettingsItem
 				builder.setMessage(description);
 			}
 
+			@SuppressLint("InflateParams")
 			View view = inflater.inflate(R.layout.dialog_slider, null);
 
 			final TextView sliderValue = (TextView) view.findViewById(R.id.sliderValue);
@@ -108,8 +112,8 @@ public class IntPropertySettingsItem extends PropertySettingsItem
 		}
 	}
 
-	private Object min;
-	private Object max;
+	private final Object min;
+	private final Object max;
 	private Object off;
 
 	public IntPropertySettingsItem(SettingsActivity activity, Object settings, String property, Object min, Object max)
@@ -149,7 +153,7 @@ public class IntPropertySettingsItem extends PropertySettingsItem
 		return valueObject;
 	}
 
-	protected static String getDetail(Context context, String propertyName, Integer value, Integer offValue)
+	private static String getDetail(Context context, String propertyName, Integer value, Integer offValue)
 	{
 		//Integer offValue = getInteger(off);
 		if(offValue != null && offValue.equals(value))

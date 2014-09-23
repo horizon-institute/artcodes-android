@@ -21,15 +21,15 @@ package uk.ac.horizon.aestheticodes.settings;
 
 public abstract class PropertySettingsItem extends SettingsItem
 {
-	protected Property property;
+	final Property property;
 
-	public PropertySettingsItem(SettingsActivity activity, Object settings, String property)
+	PropertySettingsItem(SettingsActivity activity, Object settings, String property)
 	{
 		super(activity);
 		this.property = new Property(settings, property);
 	}
 
-	public String getDescription()
+	String getDescription()
 	{
 		String propertyName = property.getName();
 		int resource = activity.getResources().getIdentifier(propertyName + "_desc", "string", activity.getPackageName());

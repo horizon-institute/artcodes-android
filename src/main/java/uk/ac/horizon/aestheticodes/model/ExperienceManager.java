@@ -289,6 +289,7 @@ public class ExperienceManager
 		return new InputStreamReader(context.getAssets().open(path));
 	}
 
+	@SuppressWarnings("ResultOfMethodCallIgnored")
 	public void save(Experience experience)
 	{
 		if (experience.hasChanged())

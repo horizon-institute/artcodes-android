@@ -37,6 +37,7 @@ import java.util.Map;
  * validate a marker. It defines the number of validation branches, leaves in a
  * validation branch and the checksumModulo modulo.
  */
+@SuppressWarnings("FieldCanBeLocal")
 public class Experience
 {
 	private final List<Mode> modes = new ArrayList<Mode>();
@@ -51,14 +52,13 @@ public class Experience
 	private int validationRegions = 2;
 	private int validationRegionValue = 1;
 	private int checksumModulo = 3;
-	private boolean editable = true;
-	private boolean addMarkers = true;
-	private boolean addMarkerByScanning = false;
+	private final boolean editable = true;
+	private final boolean addMarkers = true;
+	private final boolean addMarkerByScanning = false;
 	private Date lastUpdate;
 	private transient boolean changed = false;
-	private String updateURL = "http://www.wornchaos.org/settings.json";
-
-	private String thresholdBehaviour = null;
+	private final String updateURL = "http://www.wornchaos.org/settings.json";
+	private final String thresholdBehaviour = null;
 
 	public Experience()
 	{
@@ -209,7 +209,7 @@ public class Experience
 		this.changed = changed;
 	}
 
-	public boolean isValidMarker(List<Integer> markerCodes, boolean partial)
+	boolean isValidMarker(List<Integer> markerCodes, boolean partial)
 	{
 		return markerCodes != null
 				&& hasValidNumberofRegions(markerCodes)

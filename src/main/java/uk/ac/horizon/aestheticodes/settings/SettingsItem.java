@@ -19,8 +19,6 @@
 
 package uk.ac.horizon.aestheticodes.settings;
 
-import android.content.Context;
-
 public class SettingsItem
 {
 	public enum Type
@@ -28,15 +26,15 @@ public class SettingsItem
 		header, single_line, two_line, two_line_disabled
 	}
 
+	final SettingsActivity activity;
 	private String title;
-	protected final SettingsActivity activity;
 
-	protected SettingsItem(SettingsActivity activity)
+	SettingsItem(SettingsActivity activity)
 	{
 		this.activity = activity;
 	}
 
-	public SettingsItem(SettingsActivity activity, String title)
+	SettingsItem(SettingsActivity activity, String title)
 	{
 		this.activity = activity;
 		this.title = title;

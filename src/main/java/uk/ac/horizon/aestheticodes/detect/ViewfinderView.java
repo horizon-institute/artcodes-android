@@ -40,7 +40,7 @@ public final class ViewfinderView extends View
 
 	private final Paint paint;
 	private final int maskColor;
-	Set<SizeChangedListener> sizeChangeListeners = new HashSet<SizeChangedListener>();
+	private final Set<SizeChangedListener> sizeChangeListeners = new HashSet<SizeChangedListener>();
 	private CameraManager cameraManager;
 
 	public ViewfinderView(Context context, AttributeSet attrs)

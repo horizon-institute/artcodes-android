@@ -354,7 +354,7 @@ public class CameraManager implements Camera.PreviewCallback, SurfaceHolder.Call
 		framingRect = null;
 	}
 
-	public void updateOrientation()
+	void updateOrientation()
 	{
         if (camera!=null)
         {

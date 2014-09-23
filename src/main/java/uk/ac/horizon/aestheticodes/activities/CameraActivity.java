@@ -241,7 +241,7 @@ public class CameraActivity extends ActionBarActivity implements ExperienceEvent
 		};
 	}
 
-	protected void selectItem(final int position)
+	void selectItem(final int position)
 	{
 		drawerList.setSelection(position);
 		drawerLayout.closeDrawer(drawerList);
@@ -258,6 +258,7 @@ public class CameraActivity extends ActionBarActivity implements ExperienceEvent
 	}
 
 	@Override
+	@SuppressWarnings("deprecation")
 	public void onCreate(Bundle savedInstanceState)
 	{
 		super.onCreate(savedInstanceState);
@@ -344,7 +345,10 @@ public class CameraActivity extends ActionBarActivity implements ExperienceEvent
 
 		pager.setCurrentItem(0);
 		pager.setOffscreenPageLimit(3);
-		pager.setPageTransformer(true, new ModeSelectTransformer());
+		if(android.os.Build.VERSION.SDK_INT >= Build.VERSION_CODES.HONEYCOMB)
+		{
+			pager.setPageTransformer(true, new ModeSelectTransformer());
+		}
 		pager.setPageMargin((int) (getResources().getDisplayMetrics().widthPixels / -1.3));
 		pager.setClickable(true);
 
@@ -352,6 +356,7 @@ public class CameraActivity extends ActionBarActivity implements ExperienceEvent
 		holder = surfaceView.getHolder();
 		holder.addCallback(cameraManager);
 		// deprecated setting, but required on Android versions prior to 3.0
+		//noinspection deprecation
 		holder.setType(SurfaceHolder.SURFACE_TYPE_PUSH_BUFFERS);
 
 		bottomView = (RelativeLayout) findViewById(R.id.bottomView);
@@ -376,7 +381,7 @@ public class CameraActivity extends ActionBarActivity implements ExperienceEvent
 		drawerList.setAdapter(experienceAdapter);
 	}
 
-	protected void setItemSelected(final int position)
+	void setItemSelected(final int position)
 	{
 		if (drawerList != null)
 		{
@@ -650,9 +655,8 @@ public class CameraActivity extends ActionBarActivity implements ExperienceEvent
 					{
 						progress.setVisibility(View.VISIBLE);
 						progress.setProgress((int) (MAX_PROGRESS * markerSelection.getProgress()));
-						if (android.os.Build.VERSION.SDK_INT > Build.VERSION_CODES.GINGERBREAD_MR1)
+						if (android.os.Build.VERSION.SDK_INT >= Build.VERSION_CODES.HONEYCOMB)
 						{
-							// Android 2.3/API 10 does not support setAlpha
 							progress.setAlpha(1 - markerSelection.expiration());
 						}
 					}

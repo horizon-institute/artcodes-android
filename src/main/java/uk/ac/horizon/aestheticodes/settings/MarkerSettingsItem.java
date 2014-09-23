@@ -19,11 +19,13 @@
 
 package uk.ac.horizon.aestheticodes.settings;
 
+import android.annotation.SuppressLint;
 import android.app.AlertDialog;
 import android.app.Dialog;
 import android.content.DialogInterface;
 import android.os.Bundle;
 import android.os.Handler;
+import android.support.annotation.NonNull;
 import android.support.v4.app.DialogFragment;
 import android.text.Editable;
 import android.text.TextWatcher;
@@ -43,6 +45,7 @@ public class MarkerSettingsItem extends SettingsItem
 	{
 		private final Handler handler = new Handler();
 
+		@NonNull
 		@Override
 		public Dialog onCreateDialog(Bundle savedInstanceState)
 		{
@@ -63,6 +66,7 @@ public class MarkerSettingsItem extends SettingsItem
 			// Pass null as the parent view because its going in the dialog layout
 			builder.setTitle(getResources().getString(R.string.dialog_marker_title_prefix) + " " + action.getCode());
 
+			@SuppressLint("InflateParams")
 			View view = inflater.inflate(R.layout.dialog_edit_marker, null);
 
 			final EditText urlView = (EditText) view.findViewById(R.id.markerURL);
@@ -130,7 +134,7 @@ public class MarkerSettingsItem extends SettingsItem
 
 			urlView.addTextChangedListener(new TextWatcher()
 			{
-				Runnable userStoppedTyping = new Runnable()
+				final Runnable userStoppedTyping = new Runnable()
 				{
 					@Override
 					public void run()

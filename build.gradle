@@ -21,7 +21,7 @@ buildscript {
 		mavenCentral()
 	}
 	dependencies {
-		classpath 'com.android.tools.build:gradle:+'
+		classpath 'com.android.tools.build:gradle:0.13.0'
 	}
 }
 
@@ -37,19 +37,19 @@ repositories {
 }
 
 dependencies {
-    compile 'org.opencv:opencv-android:+'
-    compile 'com.android.support:appcompat-v7:19.+'
-    compile 'com.google.code.gson:gson:+'
-	compile 'com.squareup.picasso:picasso:+'
+    compile 'org.opencv:opencv-android:2.4.8'
+    compile 'com.android.support:appcompat-v7:20.0.0'
+    compile 'com.google.code.gson:gson:2.3'
+	compile 'com.squareup.picasso:picasso:2.3.4'
 }
 
 android {
-	compileSdkVersion 19
-	buildToolsVersion "19.1.0"
+	compileSdkVersion 20
+	buildToolsVersion "20.0.0"
 
 	defaultConfig {
 		minSdkVersion 10
-		targetSdkVersion 19
+		targetSdkVersion 20
 		versionCode 22
 		versionName '2.2.1'
 	}
@@ -74,5 +74,5 @@ android {
 }
 
 task wrapper(type: Wrapper) {
-	gradleVersion = '1.12'
+	gradleVersion = '2.1'
 }

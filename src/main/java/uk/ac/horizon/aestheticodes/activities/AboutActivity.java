@@ -19,7 +19,6 @@
 
 package uk.ac.horizon.aestheticodes.activities;
 
-import android.app.Activity;
 import android.os.Bundle;
 import android.support.v7.app.ActionBarActivity;
 import android.webkit.WebView;
@@ -29,30 +28,24 @@ import uk.ac.horizon.aestheticodes.R;
 
 public class AboutActivity extends ActionBarActivity
 {
-	WebView webView;
-
 	@Override
 	public void onCreate(Bundle savedInstanceState)
 	{
 		super.onCreate(savedInstanceState);
 
-		webView = new WebView(this);
-
-		final Activity activity = this;
-
+		final WebView webView = new WebView(this);
 		webView.setWebViewClient(new WebViewClient()
 		{
 			public void onReceivedError(WebView view, int errorCode, String description, String failingUrl)
 			{
-				Toast.makeText(activity, description, Toast.LENGTH_SHORT).show();
+				Toast.makeText(AboutActivity.this, description, Toast.LENGTH_SHORT).show();
 			}
 		});
 
-		activity.setTitle("About Aestheticodes");
+		setTitle("About Aestheticodes");
 		setContentView(webView);
-        webView.loadUrl(getResources().getString(R.string.about_aestheticodes));
+		webView.loadUrl(getResources().getString(R.string.about_aestheticodes));
 
 		getSupportActionBar().setDisplayHomeAsUpEnabled(true);
-
 	}
 }

@@ -26,7 +26,6 @@ import com.google.gson.JsonElement;
 import com.google.gson.JsonParseException;
 import com.google.gson.JsonSerializationContext;
 import com.google.gson.JsonSerializer;
-import uk.ac.horizon.aestheticodes.model.Marker;
 import uk.ac.horizon.aestheticodes.model.MarkerAction;
 
 import java.lang.reflect.Type;
@@ -46,7 +45,7 @@ public class MarkerMapAdapter implements JsonDeserializer<Map<String, MarkerActi
 
 		Map<String, MarkerAction> result = new HashMap<String, MarkerAction>();
 		JsonArray array = json.getAsJsonArray();
-		for (JsonElement element: array)
+		for (JsonElement element : array)
 		{
 			if (element.isJsonObject())
 			{
@@ -65,7 +64,7 @@ public class MarkerMapAdapter implements JsonDeserializer<Map<String, MarkerActi
 	public JsonElement serialize(Map<String, MarkerAction> src, Type typeOfSrc, JsonSerializationContext context)
 	{
 		final JsonArray array = new JsonArray();
-		for(MarkerAction marker: src.values())
+		for (MarkerAction marker : src.values())
 		{
 			array.add(context.serialize(marker));
 		}
