@@ -18,6 +18,7 @@
  */
 package uk.ac.horizon.aestheticodes.activities;
 
+import android.annotation.TargetApi;
 import android.app.AlertDialog;
 import android.content.Context;
 import android.content.DialogInterface;
@@ -192,6 +193,7 @@ public class CameraActivity extends ActionBarActivity implements ExperienceEvent
 	/**
 	 * Test if the device displays a software NavBar.
 	 */
+	@TargetApi(Build.VERSION_CODES.ICE_CREAM_SANDWICH)
 	public static boolean hasNavBar(Context context)
 	{
 		boolean hasMenuKey = true;
@@ -649,6 +651,7 @@ public class CameraActivity extends ActionBarActivity implements ExperienceEvent
 			runOnUiThread(new Runnable()
 			{
 				@Override
+				@TargetApi(Build.VERSION_CODES.HONEYCOMB)
 				public void run()
 				{
 					if (markerSelection.hasStarted())

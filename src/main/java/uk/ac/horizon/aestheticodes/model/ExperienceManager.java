@@ -100,6 +100,15 @@ public class ExperienceManager
 
 	private class DownloadSettings extends AsyncTask<Experience, Void, Iterable<Experience>>
 	{
+		@SuppressWarnings("unchecked")
+		private void readExperienceURLs(Map<String, String> experienceURLs, HttpURLConnection connection) throws IOException
+		{
+			Map<String, String> newExperienceInfo = read(experienceURLs.getClass(), connection);
+			if (newExperienceInfo != null)
+			{
+				experienceURLs.putAll(newExperienceInfo);
+			}
+		}
 
 		@Override
 		protected Iterable<Experience> doInBackground(Experience... ignored)
@@ -162,13 +171,7 @@ public class ExperienceManager
 				NetworkInfo netInfo = cm.getActiveNetworkInfo();
 				if (netInfo != null && netInfo.isConnectedOrConnecting())
 				{
-
-					HttpURLConnection connection = createConnection("http://www.wornchaos.org/experiences/experiences.json", null);
-					Map newExperienceInfo = read(experienceURLs.getClass(), connection);
-					if (newExperienceInfo != null)
-					{
-						experienceURLs.putAll(newExperienceInfo);
-					}
+					readExperienceURLs(experienceURLs, createConnection("http://www.wornchaos.org/experiences/experiences.json", null));
 
 					for (String experienceID : experienceURLs.keySet())
 					{
@@ -180,7 +183,7 @@ public class ExperienceManager
 							{
 								lastModified = experience.getLastUpdate();
 							}
-							connection = createConnection(experienceURLs.get(experienceID), lastModified);
+							HttpURLConnection connection = createConnection(experienceURLs.get(experienceID), lastModified);
 							experience = read(Experience.class, connection);
 							if (experience != null)
 							{
