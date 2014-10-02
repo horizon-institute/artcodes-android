@@ -502,13 +502,13 @@ public class CameraActivity extends ActionBarActivity implements ExperienceEvent
 	{
 		super.onResume();
 		startCamera();
+		experienceManager.addListener(this);
 	}
 
 	@Override
 	protected void onStop()
 	{
 		super.onStop();
-		experienceManager.removeListener(this);
 	}
 
 	private void startCamera()
@@ -590,7 +590,7 @@ public class CameraActivity extends ActionBarActivity implements ExperienceEvent
 	{
 		super.onPause();
 		stopCamera();
-
+		experienceManager.removeListener(this);
 	}
 
 	private void stopCamera()
