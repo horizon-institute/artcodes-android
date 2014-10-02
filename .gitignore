@@ -1,8 +1,7 @@
-.gradle
-build
+.idea/
+.gradle/
+build/
 gradle.properties
 local.properties
-.idea/
-picasso-2.3.3/
 settings.gradle
 *.keystore
