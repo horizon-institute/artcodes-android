@@ -60,7 +60,7 @@
 			<meta-data android:name="android.support.PARENT_ACTIVITY"
 			           android:value="uk.ac.horizon.aestheticodes.activities.CameraActivity" />
 		</activity>
-		<activity android:name=".activities.MarkerListActivity"
+		<activity android:name=".activities.ExperienceActivity"
 		          android:configChanges="orientation|keyboardHidden|screenSize"
 		          android:parentActivityName=".activities.CameraActivity"
 		          android:label="@string/settings_markers">

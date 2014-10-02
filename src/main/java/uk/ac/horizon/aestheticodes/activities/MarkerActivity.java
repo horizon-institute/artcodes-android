@@ -20,9 +20,6 @@
 package uk.ac.horizon.aestheticodes.activities;
 
 import android.content.Intent;
-import android.graphics.Bitmap;
-import android.graphics.drawable.BitmapDrawable;
-import android.graphics.drawable.Drawable;
 import android.net.Uri;
 import android.os.Bundle;
 import android.support.v7.app.ActionBarActivity;
@@ -31,7 +28,6 @@ import android.widget.Button;
 import android.widget.ImageView;
 import android.widget.TextView;
 import com.squareup.picasso.Picasso;
-import com.squareup.picasso.Target;
 import uk.ac.horizon.aestheticodes.R;
 import uk.ac.horizon.aestheticodes.model.Experience;
 import uk.ac.horizon.aestheticodes.model.ExperienceManager;
@@ -55,26 +51,7 @@ public class MarkerActivity extends ActionBarActivity
 
 		if (experience.getIcon() != null)
 		{
-			Picasso.with(this).load(experience.getIcon()).into(new Target()
-			{
-				@Override
-				public void onBitmapLoaded(Bitmap bitmap, Picasso.LoadedFrom from)
-				{
-					getSupportActionBar().setIcon(new BitmapDrawable(getResources(), bitmap));
-				}
-
-				@Override
-				public void onBitmapFailed(Drawable errorDrawable)
-				{
-
-				}
-
-				@Override
-				public void onPrepareLoad(Drawable placeHolderDrawable)
-				{
-
-				}
-			});
+			Picasso.with(this).load(experience.getIcon()).into(new ActionBarTarget(this));
 		}
 
 		ImageView imageView = (ImageView) findViewById(R.id.imageView);
@@ -105,6 +82,10 @@ public class MarkerActivity extends ActionBarActivity
 		}
 
 		Button button = (Button) findViewById(R.id.button);
+		if(marker.getActionText() != null)
+		{
+			button.setText(marker.getActionText());
+		}
 		//open_button.getBackground().setColorFilter(0xFF76a0d6, PorterDuff.Mode.MULTIPLY);
 		button.setOnClickListener(new View.OnClickListener()
 		{

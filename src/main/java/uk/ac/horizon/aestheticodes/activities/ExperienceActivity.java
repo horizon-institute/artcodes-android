@@ -20,13 +20,9 @@
 package uk.ac.horizon.aestheticodes.activities;
 
 import android.content.Intent;
-import android.graphics.Bitmap;
-import android.graphics.drawable.BitmapDrawable;
-import android.graphics.drawable.Drawable;
 import android.os.Bundle;
 import android.util.Log;
 import com.squareup.picasso.Picasso;
-import com.squareup.picasso.Target;
 import uk.ac.horizon.aestheticodes.R;
 import uk.ac.horizon.aestheticodes.detect.ExperienceEventListener;
 import uk.ac.horizon.aestheticodes.model.Experience;
@@ -43,7 +39,7 @@ import java.util.Collections;
 import java.util.Comparator;
 import java.util.List;
 
-public class MarkerListActivity extends SettingsActivity implements ExperienceEventListener
+public class ExperienceActivity extends SettingsActivity implements ExperienceEventListener
 {
 	private ExperienceManager experienceManager;
 	private Experience experience;
@@ -62,26 +58,7 @@ public class MarkerListActivity extends SettingsActivity implements ExperienceEv
 		getSupportActionBar().setTitle(getString(R.string.marker_title, experience.getName()));
 		if (experience.getIcon() != null)
 		{
-			Picasso.with(this).load(experience.getIcon()).into(new Target()
-			{
-				@Override
-				public void onBitmapLoaded(Bitmap bitmap, Picasso.LoadedFrom from)
-				{
-					getSupportActionBar().setIcon(new BitmapDrawable(getResources(), bitmap));
-				}
-
-				@Override
-				public void onBitmapFailed(Drawable errorDrawable)
-				{
-
-				}
-
-				@Override
-				public void onPrepareLoad(Drawable placeHolderDrawable)
-				{
-
-				}
-			});
+			Picasso.with(this).load(experience.getIcon()).into(new ActionBarTarget(this));
 		}
 
 		String code = getIntent().getData().getLastPathSegment();

@@ -20,15 +20,11 @@
 package uk.ac.horizon.aestheticodes.activities;
 
 import android.content.Intent;
-import android.graphics.Bitmap;
-import android.graphics.drawable.BitmapDrawable;
-import android.graphics.drawable.Drawable;
 import android.net.Uri;
 import android.os.Bundle;
 import android.support.v4.app.NavUtils;
 import android.view.MenuItem;
 import com.squareup.picasso.Picasso;
-import com.squareup.picasso.Target;
 import uk.ac.horizon.aestheticodes.R;
 import uk.ac.horizon.aestheticodes.detect.ExperienceEventListener;
 import uk.ac.horizon.aestheticodes.model.Experience;
@@ -70,28 +66,8 @@ public class MarkerSettingsActivity extends SettingsActivity implements Experien
 		getSupportActionBar().setTitle(getString(R.string.marker_settings_title, experience.getName()));
 		if (experience.getIcon() != null)
 		{
-			Picasso.with(this).load(experience.getIcon()).into(new Target()
-			{
-				@Override
-				public void onBitmapLoaded(Bitmap bitmap, Picasso.LoadedFrom from)
-				{
-					getSupportActionBar().setIcon(new BitmapDrawable(getResources(), bitmap));
-				}
-
-				@Override
-				public void onBitmapFailed(Drawable errorDrawable)
-				{
-
-				}
-
-				@Override
-				public void onPrepareLoad(Drawable placeHolderDrawable)
-				{
-
-				}
-			});
+			Picasso.with(this).load(experience.getIcon()).into(new ActionBarTarget(this));
 		}
-
 	}
 
 	@Override
