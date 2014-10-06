@@ -50,8 +50,8 @@ android {
 	defaultConfig {
 		minSdkVersion 10
 		targetSdkVersion 20
-		versionCode 22
-		versionName '2.2.1'
+		versionCode 23
+		versionName '2.2.2'
 	}
 
 	signingConfigs {
