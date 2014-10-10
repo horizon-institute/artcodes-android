@@ -42,9 +42,20 @@ public class Experience
 {
 	private final List<Mode> modes = new ArrayList<Mode>();
 	private final Map<String, MarkerAction> markers = new HashMap<String, MarkerAction>();
+	private final List<Constraint> constraints = new ArrayList<Constraint>();
+	private final boolean editable = true;
+	private final boolean addMarkers = true;
+	private final boolean addMarkerByScanning = false;
+	private final String updateURL = "http://www.wornchaos.org/settings.json";
+	private final String thresholdBehaviour = null;
+
 	private String id;
 	private String name;
 	private String icon;
+	private String image;
+	private String description;
+	private String owner;
+	private String color = "#";
 	private int minRegions = 5;
 	private int maxRegions = 5;
 	private int maxEmptyRegions = 0;
@@ -52,13 +63,8 @@ public class Experience
 	private int validationRegions = 2;
 	private int validationRegionValue = 1;
 	private int checksumModulo = 3;
-	private final boolean editable = true;
-	private final boolean addMarkers = true;
-	private final boolean addMarkerByScanning = false;
 	private Date lastUpdate;
 	private transient boolean changed = false;
-	private final String updateURL = "http://www.wornchaos.org/settings.json";
-	private final String thresholdBehaviour = null;
 
 	public Experience()
 	{
@@ -117,6 +123,61 @@ public class Experience
 	{
 		this.maxRegionValue = maxRegionValue;
 		changed = true;
+	}
+
+	public String getNextUnusedMarker()
+	{
+		for (int size = minRegions; size <= maxRegions; size++)
+		{
+			final List<Integer> marker = new ArrayList<Integer>();
+			for (int index = 0; index < size; index++)
+			{
+				marker.add(1);
+			}
+
+			while (true)
+			{
+				if (isValidMarker(marker, false))
+				{
+					StringBuilder result = new StringBuilder();
+					for (int index = 0; index < size; index++)
+					{
+						if (index != 0)
+						{
+							result.append(":");
+						}
+						result.append(marker.get(index));
+					}
+
+					String code = result.toString();
+					Log.i(Experience.class.getName(), code + " is valid");
+					if (!markers.containsKey(code))
+					{
+						return code;
+					}
+				}
+
+				for (int i = (size - 1); i >= 0; i--)
+				{
+					int value = marker.get(i) + 1;
+					marker.set(i, value);
+					if (value <= maxRegionValue)
+					{
+						break;
+					}
+					else if (i == 0)
+					{
+						return null;
+					}
+					else
+					{
+						marker.set(i, marker.get(i - 1));
+					}
+				}
+			}
+		}
+
+		return null;
 	}
 
 	public int getValidationRegions()
@@ -379,5 +440,15 @@ public class Experience
 	public String getName()
 	{
 		return name;
+	}
+
+	public String getDescription()
+	{
+		return description;
+	}
+
+	public String getImage()
+	{
+		return image;
 	}
 }

@@ -64,10 +64,14 @@
 			<meta-data android:name="android.support.PARENT_ACTIVITY"
 			           android:value="uk.ac.horizon.aestheticodes.activities.CameraActivity" />
 		</activity>
+		<activity android:name=".activities.MarkerEditActivity"
+		          android:configChanges="orientation|keyboardHidden|screenSize">
+		</activity>
 		<activity android:name=".activities.ExperienceActivity"
 		          android:configChanges="orientation|keyboardHidden|screenSize"
 		          android:parentActivityName=".activities.CameraActivity"
-		          android:label="@string/settings_markers">
+		          android:label=""
+		          android:theme="@style/MarkerTheme">
 			<intent-filter>
 				<action android:name="android.intent.action.EDIT" />
 
@@ -79,7 +83,7 @@
 			<meta-data android:name="android.support.PARENT_ACTIVITY"
 			           android:value="uk.ac.horizon.aestheticodes.activities.CameraActivity" />
 		</activity>
-		<activity android:name=".activities.MarkerSettingsActivity"
+		<activity android:name=".activities.ExperienceSettingsActivity"
 		          android:configChanges="orientation|keyboardHidden|screenSize"
 		          android:label="@string/settings">
 		</activity>

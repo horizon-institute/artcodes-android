@@ -61,7 +61,9 @@
 			          android:layout_alignParentLeft="true"
 			          android:layout_alignParentStart="true"
 			          android:layout_alignParentBottom="true"
-			          android:gravity="center_vertical" />
+			          android:gravity="center_vertical"
+			          android:layout_toLeftOf="@+id/button"
+			          android:layout_toStartOf="@+id/button" />
 
 			<Button android:layout_width="100dp"
 			        android:layout_height="wrap_content"

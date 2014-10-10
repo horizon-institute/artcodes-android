@@ -107,7 +107,7 @@ public abstract class SettingsActivity extends ActionBarActivity
 					view = inflater.inflate(R.layout.item_settings_item, viewGroup, false);
 				}
 
-				final ImageView iconView = (ImageView) view.findViewById(R.id.settings_item_icon);
+				final ImageView iconView = (ImageView) view.findViewById(R.id.experienceIcon);
 				if (item.getIcon() == 0)
 				{
 					iconView.setVisibility(View.GONE);
@@ -135,7 +135,7 @@ public abstract class SettingsActivity extends ActionBarActivity
 				final TextView eventTitle = (TextView) view.findViewById(R.id.settings_item_detail);
 				eventTitle.setText(item.getDetail());
 
-				final ImageView iconView = (ImageView) view.findViewById(R.id.settings_item_icon);
+				final ImageView iconView = (ImageView) view.findViewById(R.id.experienceIcon);
 				if (item.getIcon() == 0)
 				{
 					iconView.setVisibility(View.GONE);
@@ -147,7 +147,7 @@ public abstract class SettingsActivity extends ActionBarActivity
 				}
 			}
 
-			final TextView eventTitle = (TextView) view.findViewById(R.id.settings_item_title);
+			final TextView eventTitle = (TextView) view.findViewById(R.id.experienceTitle);
 			eventTitle.setText(item.getTitle());
 
 			return view;

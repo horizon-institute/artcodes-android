@@ -20,101 +20,67 @@
 package uk.ac.horizon.aestheticodes.activities;
 
 import android.content.Intent;
+import android.net.Uri;
 import android.os.Bundle;
-import android.util.Log;
+import android.support.v4.app.NavUtils;
+import android.view.MenuItem;
 import com.squareup.picasso.Picasso;
 import uk.ac.horizon.aestheticodes.R;
 import uk.ac.horizon.aestheticodes.detect.ExperienceEventListener;
 import uk.ac.horizon.aestheticodes.model.Experience;
 import uk.ac.horizon.aestheticodes.model.ExperienceManager;
 import uk.ac.horizon.aestheticodes.model.Marker;
-import uk.ac.horizon.aestheticodes.model.MarkerAction;
-import uk.ac.horizon.aestheticodes.settings.ActivitySettingsItem;
-import uk.ac.horizon.aestheticodes.settings.AddMarkerSettingsItem;
-import uk.ac.horizon.aestheticodes.settings.MarkerSettingsItem;
+import uk.ac.horizon.aestheticodes.settings.IntPropertySettingsItem;
+import uk.ac.horizon.aestheticodes.settings.Property;
 import uk.ac.horizon.aestheticodes.settings.SettingsActivity;
 
-import java.util.ArrayList;
-import java.util.Collections;
-import java.util.Comparator;
 import java.util.List;
 
-public class ExperienceActivity extends SettingsActivity implements ExperienceEventListener
+public class ExperienceSettingsActivity extends SettingsActivity implements ExperienceEventListener
 {
 	private ExperienceManager experienceManager;
 	private Experience experience;
 
 	@Override
-	protected void onCreate(Bundle savedInstanceState)
+	public void onCreate(Bundle savedInstanceState)
 	{
 		super.onCreate(savedInstanceState);
 
-		Log.i("", getIntent().toString());
-		String experienceID = getIntent().getData().getHost();
+		Bundle extras = getIntent().getExtras();
+		String experienceID = extras.getString("experience");
 
 		experienceManager = ExperienceManager.get(this);
 		experience = experienceManager.get(experienceID);
 
-		getSupportActionBar().setTitle(getString(R.string.marker_title, experience.getName()));
+		adapter.add(new IntPropertySettingsItem(this, experience, "minRegions", 1, "maxRegions"));
+		adapter.add(new IntPropertySettingsItem(this, experience, "maxRegions", "minRegions", 12));
+		adapter.add(new IntPropertySettingsItem(this, experience, "maxRegionValue", 1, 9));
+		adapter.add(new IntPropertySettingsItem(this, experience, "maxEmptyRegions", 0, "maxRegions", 0));
+		adapter.add(new IntPropertySettingsItem(this, experience, "validationRegions", 0, "maxRegions", 0));
+		adapter.add(new IntPropertySettingsItem(this, experience, "validationRegionValue", 1, "maxRegionValue"));
+		adapter.add(new IntPropertySettingsItem(this, experience, "checksumModulo", 1, 12, 1));
+
+		adapter.notifyDataSetChanged();
+
+		getSupportActionBar().setDisplayHomeAsUpEnabled(true);
+		getSupportActionBar().setTitle(getString(R.string.experience_settings, experience.getName()));
 		if (experience.getIcon() != null)
 		{
 			Picasso.with(this).load(experience.getIcon()).into(new ActionBarTarget(this));
 		}
-
-		String code = getIntent().getData().getLastPathSegment();
-		Log.i("", "Code: " +  code);
-		if (code != null && !code.isEmpty())
-		{
-			final AddMarkerSettingsItem.AddMarkerDialogFragment dialogFragment = new AddMarkerSettingsItem.AddMarkerDialogFragment();
-			final Bundle bundle = new Bundle();
-			bundle.putString("experience", experience.getId());
-			bundle.putString("code", code);
-			dialogFragment.setArguments(bundle);
-			dialogFragment.show(getSupportFragmentManager(), "missiles");
-		}
-
-		refresh();
 	}
 
 	@Override
-	public void refresh()
+	public boolean onOptionsItemSelected(MenuItem item)
 	{
-		adapter.clear();
-		final List<MarkerAction> actions = new ArrayList<MarkerAction>(experience.getMarkers().values());
-		Collections.sort(actions, new Comparator<MarkerAction>()
+		switch (item.getItemId())
 		{
-			@Override
-			public int compare(MarkerAction markerAction, MarkerAction markerAction2)
-			{
-				return markerAction.getCode().compareTo(markerAction2.getCode());
-			}
-		});
-		for (MarkerAction action : actions)
-		{
-			if (action.isVisible())
-			{
-				adapter.add(new MarkerSettingsItem(this, experience, action));
-			}
+			// Respond to the action bar's Up/Home open_button
+			case android.R.id.home:
+				NavUtils.navigateUpTo(this, new Intent(Intent.ACTION_EDIT, Uri.parse("aestheticodes://" + experience.getId())));
+				return true;
 		}
-
-		if (experience.canAddMarker())
-		{
-			adapter.add(new AddMarkerSettingsItem(this, experience, getString(R.string.marker_add)));
-		}
-
-		if(experience.isEditable())
-		{
-			Intent intent = new Intent(this, MarkerSettingsActivity.class);
-			intent.putExtra("experience", experience.getId());
-
-			adapter.add(new ActivitySettingsItem(this, getString(R.string.settings), intent));
-		}
-
-		Intent intent = new Intent(this, AboutActivity.class);
-
-		adapter.add(new ActivitySettingsItem(this, getString(R.string.about), intent));
-
-		adapter.notifyDataSetChanged();
+		return super.onOptionsItemSelected(item);
 	}
 
 	@Override
@@ -122,6 +88,16 @@ public class ExperienceActivity extends SettingsActivity implements ExperienceEv
 	{
 		experienceManager.add(experience);
 	}
+
+
+	@Override
+	public void setProperty(String propertyName, Object value)
+	{
+		Property property = new Property(experience, propertyName);
+		property.set(value);
+		experienceManager.add(experience);
+	}
+
 
 	@Override
 	public void experienceSelected(Experience experience)

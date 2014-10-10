@@ -24,7 +24,7 @@
                 android:layout_height="72dp"
                 android:padding="16dp">
 
-	<ImageView android:id="@+id/settings_item_icon"
+	<ImageView android:id="@+id/experienceIcon"
 	           android:layout_width="40dp"
 	           android:layout_height="40dp"
 	           android:layout_marginEnd="16dp"
@@ -35,21 +35,21 @@
 	           android:scaleType="fitCenter"
 	           tools:ignore="ContentDescription" />
 
-	<TextView android:id="@+id/settings_item_title"
+	<TextView android:id="@+id/experienceTitle"
 	          android:layout_width="wrap_content"
 	          android:layout_height="wrap_content"
 	          android:layout_alignParentTop="true"
 	          android:textSize="16sp"
 	          android:textColor="#FF999999"
-	          android:layout_toRightOf="@+id/settings_item_icon"
-	          android:layout_toEndOf="@+id/settings_item_icon" />
+	          android:layout_toRightOf="@+id/experienceIcon"
+	          android:layout_toEndOf="@+id/experienceIcon" />
 
 	<TextView android:id="@+id/settings_item_detail"
 	          android:layout_width="wrap_content"
 	          android:layout_height="wrap_content"
-	          android:layout_below="@+id/settings_item_title"
+	          android:layout_below="@+id/experienceTitle"
 	          android:textSize="14sp"
 	          android:textColor="#FFAAAAAA"
-	          android:layout_toRightOf="@+id/settings_item_icon"
-	          android:layout_toEndOf="@+id/settings_item_icon" />
+	          android:layout_toRightOf="@+id/experienceIcon"
+	          android:layout_toEndOf="@+id/experienceIcon" />
 </RelativeLayout>

@@ -64,11 +64,12 @@ public class ExperienceManager
 
 	private static HttpURLConnection createConnection(final String url, final Date lastModified) throws IOException
 	{
+		Log.i(TAG, "Creating connection for " + url);
 		HttpURLConnection connection = (HttpURLConnection) new URL(url).openConnection();
 		connection.setReadTimeout(10000 /* milliseconds */);
 		connection.setConnectTimeout(15000 /* milliseconds */);
 		connection.setRequestMethod("GET");
-		connection.setUseCaches(true);
+		connection.setUseCaches(false);
 		if (lastModified != null)
 		{
 			connection.setIfModifiedSince(lastModified.getTime());
@@ -106,7 +107,15 @@ public class ExperienceManager
 			Map<String, String> newExperienceInfo = read(experienceURLs.getClass(), connection);
 			if (newExperienceInfo != null)
 			{
+				for(String experienceID: newExperienceInfo.keySet())
+				{
+					Log.i(TAG, experienceID);
+				}
 				experienceURLs.putAll(newExperienceInfo);
+			}
+			else
+			{
+				Log.i(ExperienceManager.class.getName(), "New experiences == null");
 			}
 		}
 
