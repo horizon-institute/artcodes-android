@@ -20,7 +20,6 @@
 package uk.ac.horizon.aestheticodes.model;
 
 import android.util.Log;
-import uk.ac.horizon.aestheticodes.settings.ThresholdBehaviour;
 
 import java.util.ArrayList;
 import java.util.Arrays;
@@ -40,22 +39,25 @@ import java.util.Map;
 @SuppressWarnings("FieldCanBeLocal")
 public class Experience
 {
+	public static enum Mode
+	{
+		detect, outline, threshold
+	}
+
+	public static enum ThresholdBehaviour
+	{
+		temporalTile, resize
+	}
+
 	private final List<Mode> modes = new ArrayList<Mode>();
 	private final Map<String, MarkerAction> markers = new HashMap<String, MarkerAction>();
 	private final List<Constraint> constraints = new ArrayList<Constraint>();
-	private final boolean editable = true;
-	private final boolean addMarkers = true;
-	private final boolean addMarkerByScanning = false;
-	private final String updateURL = "http://www.wornchaos.org/settings.json";
-	private final String thresholdBehaviour = null;
-
 	private String id;
 	private String name;
 	private String icon;
 	private String image;
 	private String description;
-	private String owner;
-	private String color = "#";
+	//private String color = "#";
 	private int minRegions = 5;
 	private int maxRegions = 5;
 	private int maxEmptyRegions = 0;
@@ -65,6 +67,11 @@ public class Experience
 	private int checksumModulo = 3;
 	private Date lastUpdate;
 	private transient boolean changed = false;
+	private boolean editable = true;
+	private boolean addMarkers = true;
+	private boolean addMarkerByScanning = false;
+	private String updateURL = "http://www.wornchaos.org/settings.json";
+	private String thresholdBehaviour = null;
 
 	public Experience()
 	{
@@ -368,7 +375,6 @@ public class Experience
 		}
 		return (numberOfLeaves % checksumModulo) == 0;
 	}
-
 
 	private boolean hasValidNumberofRegions(List<Integer> marker)
 	{

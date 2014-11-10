@@ -35,7 +35,7 @@
 	           android:scaleType="fitCenter"
 	           tools:ignore="ContentDescription" />
 
-	<TextView android:id="@+id/experienceTitle"
+	<TextView android:id="@+id/markerCode"
 	          android:layout_width="wrap_content"
 	          android:layout_height="wrap_content"
 	          android:layout_alignParentTop="true"
@@ -47,7 +47,7 @@
 	<TextView android:id="@+id/settings_item_detail"
 	          android:layout_width="wrap_content"
 	          android:layout_height="wrap_content"
-	          android:layout_below="@+id/experienceTitle"
+	          android:layout_below="@+id/markerCode"
 	          android:textSize="14sp"
 	          android:textColor="#FFAAAAAA"
 	          android:layout_toRightOf="@+id/experienceIcon"

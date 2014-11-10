@@ -33,7 +33,7 @@
 	           android:scaleType="fitCenter"
 	           tools:ignore="ContentDescription" />
 
-	<TextView android:id="@+id/experienceTitle"
+	<TextView android:id="@+id/markerCode"
 	          android:layout_width="wrap_content"
 	          android:layout_height="fill_parent"
 	          android:textSize="16sp"

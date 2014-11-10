@@ -25,16 +25,8 @@ public class MarkerAction
 	private String action;
 	private String title;
 	private String description;
-	private String actionText = "Open";
-	private boolean visible = true;
-	private boolean editable = true;
 	private String image;
 	private boolean showDetail = true;
-
-	public String getActionText()
-	{
-		return actionText;
-	}
 
 	public String getCode()
 	{
@@ -64,26 +56,6 @@ public class MarkerAction
 	public String getDescription()
 	{
 		return description;
-	}
-
-	public boolean isVisible()
-	{
-		return visible;
-	}
-
-	public void setVisible(boolean visible)
-	{
-		this.visible = visible;
-	}
-
-	public boolean isEditable()
-	{
-		return editable;
-	}
-
-	public void setEditable(boolean editable)
-	{
-		this.editable = editable;
 	}
 
 	public String getImage()

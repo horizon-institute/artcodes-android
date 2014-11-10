@@ -21,10 +21,10 @@
       tools:context=".activities.CameraActivity" xmlns:app="http://schemas.android.com/apk/res-auto">
 	<item android:id="@+id/action_switch_camera"
 	      android:title="@string/action_switch_camera"
-	      android:icon="@drawable/ic_action_switch_camera"
+	      android:icon="@drawable/ic_switch_camera"
           app:showAsAction="ifRoom" />
 	<item android:id="@+id/action_experiences"
 	      android:title="@string/action_experiences"
-	      android:icon="@drawable/ic_fa_bars"
+	      android:icon="@drawable/ic_menu"
 	      app:showAsAction="ifRoom" />
 </menu>

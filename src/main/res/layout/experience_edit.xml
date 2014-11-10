@@ -1,0 +1,247 @@
+<?xml version="1.0" encoding="utf-8"?>
+
+<!--
+  ~ Aestheticodes recognises a different marker scheme that allows the
+  ~ creation of aesthetically pleasing, even beautiful, codes.
+  ~ Copyright (C) 2014  Aestheticodes
+  ~
+  ~     This program is free software: you can redistribute it and/or modify
+  ~     it under the terms of the GNU Affero General Public License as published
+  ~     by the Free Software Foundation, either version 3 of the License, or
+  ~     (at your option) any later version.
+  ~
+  ~     This program is distributed in the hope that it will be useful,
+  ~     but WITHOUT ANY WARRANTY; without even the implied warranty of
+  ~     MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+  ~     GNU Affero General Public License for more details.
+  ~
+  ~     You should have received a copy of the GNU Affero General Public License
+  ~     along with this program.  If not, see <http://www.gnu.org/licenses/>.
+  -->
+
+<ScrollView xmlns:android="http://schemas.android.com/apk/res/android"
+            xmlns:tools="http://schemas.android.com/tools"
+            android:orientation="vertical"
+            android:layout_width="match_parent"
+            android:layout_height="match_parent"
+            tools:context=".activities.ExperienceEditActivity"
+            android:background="@android:color/white">
+
+	<LinearLayout android:layout_width="fill_parent"
+	              android:layout_height="wrap_content"
+	              android:orientation="vertical">
+
+		<ImageView android:layout_width="fill_parent"
+		           android:layout_height="wrap_content"
+		           android:id="@+id/experienceImage"
+		           android:src="@drawable/aestheticodes"
+		           android:adjustViewBounds="true"
+		           tools:ignore="ContentDescription" />
+		<ImageButton
+				android:id="@+id/experienceFloatingAction"
+				android:layout_width="56dp"
+				android:layout_height="56dp"
+				android:layout_gravity="end|right"
+				android:src="@drawable/ic_edit_white_24dp"
+				android:layout_marginTop="-28dp"
+				android:layout_marginRight="16dp"
+				android:layout_marginEnd="16dp"
+				android:background="@drawable/floating_action_button"
+				android:contentDescription="@string/experience_edit"
+				android:elevation="1dp"
+				android:focusable="false" />
+		<LinearLayout android:orientation="vertical"
+		              android:layout_width="fill_parent"
+		              android:layout_height="fill_parent"
+		              android:padding="16dp">
+			<EditText android:layout_width="match_parent"
+			          android:layout_height="wrap_content"
+			          android:id="@+id/experienceTitle"
+			          android:hint="Title" />
+			<EditText android:layout_width="match_parent"
+			          android:layout_height="wrap_content"
+			          android:inputType="textMultiLine"
+			          android:id="@+id/experienceDescription"
+			          android:hint="Description"
+			          android:layout_marginTop="8dp" />
+
+			<TextView android:layout_width="wrap_content"
+			          android:layout_height="match_parent"
+			          android:gravity="center_vertical"
+			          android:height="48dp"
+			          android:text="Markers" style="@style/Base.TextAppearance.AppCompat.Small" />
+			<LinearLayout android:orientation="vertical"
+			              android:layout_width="fill_parent"
+			              android:layout_height="fill_parent"
+			              android:id="@+id/markerList">
+			</LinearLayout>
+			<LinearLayout android:orientation="horizontal"
+			              android:layout_width="fill_parent"
+			              android:layout_height="fill_parent"
+			              android:clickable="true"
+			              android:onClick="addMarker"
+			              android:id="@+id/markerAdd"
+			              android:paddingTop="8dp"
+			              android:paddingBottom="8dp" android:background="?attr/selectableItemBackground">
+				<ImageView android:layout_width="wrap_content"
+				           android:layout_height="wrap_content"
+				           android:layout_marginEnd="16dp"
+				           android:layout_marginRight="16dp"
+				           android:scaleType="fitCenter"
+				           tools:ignore="ContentDescription"
+				           android:src="@drawable/ic_add_24dp"
+				           android:paddingTop="8dp"
+				           android:paddingRight="16dp"
+				           android:paddingBottom="8dp" android:tint="#999" />
+				<TextView
+						android:layout_width="wrap_content"
+						android:layout_height="fill_parent"
+						android:textSize="16sp"
+						android:textColor="#333"
+						android:gravity="center_vertical"
+						android:text="Add Marker" />
+			</LinearLayout>
+			<LinearLayout android:orientation="horizontal"
+			              android:layout_width="fill_parent"
+			              android:layout_height="fill_parent"
+			              android:clickable="true"
+			              android:onClick="toggleMarkerSettings"
+			              android:paddingTop="8dp"
+			              android:paddingBottom="8dp" android:background="?attr/selectableItemBackground">
+				<ImageView android:layout_width="wrap_content"
+				           android:layout_height="wrap_content"
+				           android:layout_marginEnd="16dp"
+				           android:layout_marginRight="16dp"
+				           android:scaleType="fitCenter"
+				           tools:ignore="ContentDescription"
+				           android:src="@drawable/ic_settings_24dp"
+				           android:paddingTop="8dp"
+				           android:paddingRight="16dp"
+				           android:paddingBottom="8dp" android:tint="#999" />
+				<TextView
+						android:layout_width="wrap_content"
+						android:layout_height="fill_parent"
+						android:textSize="16sp"
+						android:gravity="center_vertical"
+						android:text="@string/markerSettings"
+						android:textColor="#333"
+						android:layout_weight="1" />
+				<ImageView
+						android:layout_width="wrap_content"
+						android:layout_height="wrap_content"
+						android:id="@+id/markerSettingsIcon" android:src="@drawable/ic_expand_more_24dp"
+						android:layout_gravity="center_vertical" android:tint="#999" />
+			</LinearLayout>
+			<LinearLayout
+					android:orientation="vertical"
+					android:layout_width="fill_parent"
+					android:layout_height="fill_parent">
+				<LinearLayout
+						android:orientation="vertical"
+						android:layout_width="fill_parent"
+						android:layout_height="fill_parent"
+						android:id="@+id/markerSettings"
+						>
+					<LinearLayout android:layout_width="fill_parent"
+					              android:layout_height="72dp"
+					              android:paddingTop="16dp"
+					              android:paddingBottom="16dp"
+					              android:orientation="vertical"
+					              android:paddingLeft="56dp" android:background="?attr/selectableItemBackground">
+
+						<TextView android:layout_width="wrap_content"
+						          android:layout_height="wrap_content"
+						          android:textSize="16sp"
+						          android:textColor="#333"
+						          android:text="@string/regions" />
+
+						<TextView android:id="@+id/markerRegions"
+						          android:layout_width="wrap_content"
+						          android:layout_height="wrap_content"
+						          android:textSize="14sp"
+						          android:textColor="#999" />
+					</LinearLayout>
+					<LinearLayout android:layout_width="fill_parent"
+					              android:layout_height="72dp"
+					              android:paddingTop="16dp"
+					              android:paddingBottom="16dp"
+					              android:orientation="vertical"
+					              android:paddingLeft="56dp" android:background="?attr/selectableItemBackground">
+
+						<TextView android:layout_width="wrap_content"
+						          android:layout_height="wrap_content"
+						          android:textSize="16sp"
+						          android:textColor="#333"
+						          android:text="@string/maxRegionValue" />
+
+						<TextView android:id="@+id/markerRegionValue"
+						          android:layout_width="wrap_content"
+						          android:layout_height="wrap_content"
+						          android:textSize="14sp"
+						          android:textColor="#999" />
+					</LinearLayout>
+					<LinearLayout android:layout_width="fill_parent"
+					              android:layout_height="72dp"
+					              android:paddingTop="16dp"
+					              android:paddingBottom="16dp"
+					              android:orientation="vertical"
+					              android:paddingLeft="56dp" android:background="?attr/selectableItemBackground">
+
+						<TextView android:layout_width="wrap_content"
+						          android:layout_height="wrap_content"
+						          android:textSize="16sp"
+						          android:textColor="#333"
+						          android:text="@string/validationRegions" />
+
+						<TextView android:id="@+id/markerValidationRegions"
+						          android:layout_width="wrap_content"
+						          android:layout_height="wrap_content"
+						          android:textSize="14sp"
+						          android:textColor="#999" />
+					</LinearLayout>
+					<LinearLayout android:layout_width="fill_parent"
+					              android:layout_height="72dp"
+					              android:paddingTop="16dp"
+					              android:paddingBottom="16dp"
+					              android:orientation="vertical"
+					              android:paddingLeft="56dp"
+					              android:paddingStart="56dp" android:background="?attr/selectableItemBackground">
+
+						<TextView android:layout_width="wrap_content"
+						          android:layout_height="wrap_content"
+						          android:textSize="16sp"
+						          android:textColor="#333"
+						          android:text="@string/validationRegionValue" />
+
+						<TextView android:id="@+id/markerValidationRegionValue"
+						          android:layout_width="wrap_content"
+						          android:layout_height="wrap_content"
+						          android:textSize="14sp"
+						          android:textColor="#999" />
+					</LinearLayout>
+					<LinearLayout android:layout_width="fill_parent"
+					              android:layout_height="72dp"
+					              android:paddingTop="16dp"
+					              android:paddingBottom="16dp"
+					              android:orientation="vertical"
+					              android:paddingLeft="56dp"
+					              android:paddingStart="56dp" android:background="?attr/selectableItemBackground">
+
+						<TextView android:layout_width="wrap_content"
+						          android:layout_height="wrap_content"
+						          android:textSize="16sp"
+						          android:textColor="#333"
+						          android:text="@string/checksumModulo" />
+
+						<TextView android:id="@+id/markerChecksum"
+						          android:layout_width="wrap_content"
+						          android:layout_height="wrap_content"
+						          android:textSize="14sp"
+						          android:textColor="#999" />
+					</LinearLayout>
+				</LinearLayout>
+			</LinearLayout>
+		</LinearLayout>
+
+	</LinearLayout>
+</ScrollView>

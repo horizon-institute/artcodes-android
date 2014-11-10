@@ -20,6 +20,7 @@
 package uk.ac.horizon.aestheticodes.model;
 
 import org.opencv.core.Mat;
+import uk.ac.horizon.aestheticodes.controller.ExperienceManager;
 
 import java.util.ArrayList;
 import java.util.Collections;

@@ -21,7 +21,7 @@
 	<string name="app_name">Aestheticodes</string>
 	<string name="experience_settings">%s Settings</string>
 	<string name="experience_title">%s Markers</string>
-	<string name="marker_title">Marker %s</string>
+	<string name="code_text">Marker %s</string>
 	<string name="action_experiences">Experiences</string>
 	<string name="action_switch_camera">Switch Camera</string>
 	<string name="about">About</string>
@@ -30,7 +30,7 @@
 	<string name="dialog_action_cancel">Cancel</string>
 	<string name="dialog_action_delete">Delete</string>
 	<string name="dialog_marker_title_prefix">Marker</string>
-	<string name="mode_detect" tools:ignore="UnusedResources">Detect</string>
+	<string name="mode_detect" tools:ignore="UnusedResources">Detecting</string>
 	<string name="mode_outline" tools:ignore="UnusedResources">Outline</string>
 	<string name="mode_threshold" tools:ignore="UnusedResources">Threshold</string>
 	<string name="pager_mark">■</string>
@@ -41,19 +41,9 @@
 	<string name="about_aestheticodes">http://aestheticodes.com/info/</string>
 	<string name="default_status">Place an Aestheticode inside the viewfinder to scan it</string>
 	<string name="URL">URL</string>
-	<string name="minRegions" tools:ignore="UnusedResources">Min Regions</string>
-	<string name="minRegions_desc" tools:ignore="UnusedResources">The minimum number of regions in a valid
-		Aestheticode.
-	</string>
-	<plurals name="minRegions_value" tools:ignore="UnusedResources">
-		<item quantity="one">1 Region</item>
-		<item quantity="other">%d Regions</item>
-	</plurals>
-	<string name="maxRegions" tools:ignore="UnusedResources">Max Regions</string>
-	<string name="maxRegions_desc" tools:ignore="UnusedResources">The maximum number of regions in a valid
-		Aestheticode.
-	</string>
-	<plurals name="maxRegions_value" tools:ignore="UnusedResources">
+	<string name="regions">Regions</string>
+	<string name="minRegions_desc" tools:ignore="UnusedResources">The number of regions in a valid Aestheticode.</string>
+	<plurals name="minRegions_text" tools:ignore="UnusedResources">
 		<item quantity="one">1 Region</item>
 		<item quantity="other">%d Regions</item>
 	</plurals>
@@ -66,7 +56,7 @@
 		Aestheticode.
 	</string>
 	<string name="maxEmptyRegions_off" tools:ignore="UnusedResources">None</string>
-	<plurals name="maxEmptyRegions_value" tools:ignore="UnusedResources">
+	<plurals name="maxEmptyRegions_text" tools:ignore="UnusedResources">
 		<item quantity="one">Maximum 1 Empty Region</item>
 		<item quantity="other">Maximum %d Empty Regions</item>
 	</plurals>
@@ -75,7 +65,7 @@
 		specified value in a valid Aestheticode.
 	</string>
 	<string name="validationRegions_off" tools:ignore="UnusedResources">Off</string>
-	<plurals name="validationRegions_value" tools:ignore="UnusedResources">
+	<plurals name="validationRegions_text" tools:ignore="UnusedResources">
 		<item quantity="one">1 Validation Region</item>
 		<item quantity="other">%d Validation Regions</item>
 	</plurals>
@@ -98,4 +88,10 @@
 	<string name="confirmDeleteDialogPositive">Delete</string>
 	<string name="confirmDeleteDialogNegative">Cancel</string>
 	<string name="open">Open</string>
+	<string name="experience_add">Add Experience</string>
+	<string name="experiences">Experiences</string>
+	<string name="experience_edit">Edit Experience</string>
+	<string name="markerTitle">Title</string>
+	<string name="markerDescription">Description</string>
+	<string name="markerSettings">Marker Settings</string>
 </resources>
