@@ -26,16 +26,16 @@ import com.google.gson.JsonElement;
 import com.google.gson.JsonParseException;
 import com.google.gson.JsonSerializationContext;
 import com.google.gson.JsonSerializer;
-import uk.ac.horizon.aestheticodes.model.MarkerAction;
+import uk.ac.horizon.aestheticodes.model.Marker;
 
 import java.lang.reflect.Type;
 import java.util.HashMap;
 import java.util.Map;
 
-public class MarkerMapAdapter implements JsonDeserializer<Map<String, MarkerAction>>, JsonSerializer<Map<String, MarkerAction>>
+public class MarkerMapAdapter implements JsonDeserializer<Map<String, Marker>>, JsonSerializer<Map<String, Marker>>
 {
 	@Override
-	public Map<String, MarkerAction> deserialize(JsonElement json, Type unused, JsonDeserializationContext context)
+	public Map<String, Marker> deserialize(JsonElement json, Type unused, JsonDeserializationContext context)
 			throws JsonParseException
 	{
 		if (!json.isJsonArray())
@@ -43,13 +43,13 @@ public class MarkerMapAdapter implements JsonDeserializer<Map<String, MarkerActi
 			throw new JsonParseException("Unexpected type: " + json.getClass().getSimpleName());
 		}
 
-		Map<String, MarkerAction> result = new HashMap<String, MarkerAction>();
+		Map<String, Marker> result = new HashMap<String, Marker>();
 		JsonArray array = json.getAsJsonArray();
 		for (JsonElement element : array)
 		{
 			if (element.isJsonObject())
 			{
-				MarkerAction marker = context.deserialize(element, MarkerAction.class);
+				Marker marker = context.deserialize(element, Marker.class);
 				result.put(marker.getCode(), marker);
 			}
 			else
@@ -61,10 +61,10 @@ public class MarkerMapAdapter implements JsonDeserializer<Map<String, MarkerActi
 	}
 
 	@Override
-	public JsonElement serialize(Map<String, MarkerAction> src, Type typeOfSrc, JsonSerializationContext context)
+	public JsonElement serialize(Map<String, Marker> src, Type typeOfSrc, JsonSerializationContext context)
 	{
 		final JsonArray array = new JsonArray();
-		for (MarkerAction marker : src.values())
+		for (Marker marker : src.values())
 		{
 			array.add(context.serialize(marker));
 		}

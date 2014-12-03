@@ -1,78 +1,94 @@
 <?xml version="1.0" encoding="utf-8"?>
 <!--
-  ~ Aestheticodes recognises a different marker scheme that allows the
-  ~ creation of aesthetically pleasing, even beautiful, codes.
-  ~ Copyright (C) 2014  Aestheticodes
-  ~
-  ~     This program is free software: you can redistribute it and/or modify
-  ~     it under the terms of the GNU Affero General Public License as published
-  ~     by the Free Software Foundation, either version 3 of the License, or
-  ~     (at your option) any later version.
-  ~
-  ~     This program is distributed in the hope that it will be useful,
-  ~     but WITHOUT ANY WARRANTY; without even the implied warranty of
-  ~     MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
-  ~     GNU Affero General Public License for more details.
-  ~
-  ~     You should have received a copy of the GNU Affero General Public License
-  ~     along with this program.  If not, see <http://www.gnu.org/licenses/>.
-  -->
+~ Aestheticodes recognises a different marker scheme that allows the
+~ creation of aesthetically pleasing, even beautiful, codes.
+~ Copyright (C) 2014  Aestheticodes
+~
+~     This program is free software: you can redistribute it and/or modify
+~     it under the terms of the GNU Affero General Public License as published
+~     by the Free Software Foundation, either version 3 of the License, or
+~     (at your option) any later version.
+~
+~     This program is distributed in the hope that it will be useful,
+~     but WITHOUT ANY WARRANTY; without even the implied warranty of
+~     MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+~     GNU Affero General Public License for more details.
+~
+~     You should have received a copy of the GNU Affero General Public License
+~     along with this program.  If not, see <http://www.gnu.org/licenses/>.
+-->
 <manifest xmlns:android="http://schemas.android.com/apk/res/android"
-          xmlns:tools="http://schemas.android.com/tools" package="uk.ac.horizon.aestheticodes">
+    xmlns:tools="http://schemas.android.com/tools"
+    package="uk.ac.horizon.aestheticodes" >
 
-	<uses-permission android:name="android.permission.CAMERA" />
-	<uses-permission android:name="android.permission.INTERNET" />
-	<uses-permission android:name="android.permission.ACCESS_NETWORK_STATE" />
+    <uses-permission android:name="android.permission.CAMERA" />
+    <uses-permission android:name="android.permission.INTERNET" />
+    <uses-permission android:name="android.permission.ACCESS_NETWORK_STATE" />
+    <uses-permission android:name="android.permission.GET_ACCOUNTS" />
+    <uses-permission android:name="android.permission.USE_CREDENTIALS" />
 
-	<uses-feature android:name="android.hardware.camera" android:required="false" />
-	<uses-feature android:name="android.hardware.camera.any" android:required="false" />
-	<uses-feature android:name="android.hardware.camera.front" android:required="false" />
-	<uses-feature android:name="android.hardware.camera.autofocus" android:required="false" />
-	<uses-feature android:name="android.hardware.camera.flash" android:required="false" />
-	<uses-feature android:name="android.hardware.touchscreen" />
+    <uses-feature android:name="android.hardware.camera" android:required="false" />
+    <uses-feature android:name="android.hardware.camera.any" android:required="false" />
+    <uses-feature android:name="android.hardware.camera.front" android:required="false" />
+    <uses-feature android:name="android.hardware.camera.autofocus" android:required="false" />
+    <uses-feature android:name="android.hardware.camera.flash" android:required="false" />
+    <uses-feature android:name="android.hardware.touchscreen" />
 
-	<application android:allowBackup="false"
-	             android:icon="@drawable/ic_launcher"
-	             android:label="@string/app_name"
-	             android:supportsRtl="true"
-	             android:theme="@style/Theme.Aestheticodes"
-	             tools:ignore="UnusedAttribute">
-		<activity android:name=".activities.CameraActivity"
-		          android:screenOrientation="portrait"
-		          android:launchMode="singleInstance"
-		          android:theme="@style/Theme.Aestheticodes.Camera">
-			<intent-filter>
-				<action android:name="android.intent.action.MAIN" />
-				<category android:name="android.intent.category.LAUNCHER" />
-			</intent-filter>
-		</activity>
-		<activity android:name=".activities.MarkerActivity"
-		          android:parentActivityName=".activities.CameraActivity"
-		          android:theme="@style/Theme.Aestheticodes.Transparent">
-			<intent-filter>
-				<action android:name="android.intent.action.VIEW" />
+    <application
+        android:allowBackup="false"
+        android:icon="@drawable/ic_launcher"
+        android:label="@string/app_name"
+        android:supportsRtl="true"
+        android:theme="@style/Theme.Aestheticodes"
+        tools:ignore="UnusedAttribute" >
+        <activity
+            android:name="uk.ac.horizon.aestheticodes.activities.CameraActivity"
+            android:screenOrientation="portrait"
+            android:theme="@style/Theme.Aestheticodes.Camera" >
+            <intent-filter>
+                <action android:name="android.intent.action.MAIN" />
 
-				<category android:name="android.intent.category.DEFAULT" />
-				<category android:name="android.intent.category.BROWSABLE" />
+                <category android:name="android.intent.category.LAUNCHER" />
+            </intent-filter>
+        </activity>
+        <activity
+            android:name="uk.ac.horizon.aestheticodes.activities.MarkerActivity"
+            android:parentActivityName="uk.ac.horizon.aestheticodes.activities.CameraActivity"
+            android:theme="@style/Theme.Aestheticodes.Transparent" >
+            <intent-filter>
+                <action android:name="android.intent.action.VIEW" />
 
-				<data android:scheme="aestheticodes" />
-			</intent-filter>
-			<meta-data android:name="android.support.PARENT_ACTIVITY"
-			           android:value="uk.ac.horizon.aestheticodes.activities.CameraActivity" />
-		</activity>
-		<activity android:name=".activities.ExperienceActivity"
-		          android:parentActivityName=".activities.ExperienceListActivity"
-		          android:theme="@style/Theme.Aestheticodes.Transparent">
-			<meta-data android:name="android.support.PARENT_ACTIVITY"
-			           android:value="uk.ac.horizon.aestheticodes.activities.ExperienceListActivity" />
-		</activity>
-		<activity android:name=".activities.ExperienceListActivity"
-		          android:parentActivityName=".activities.CameraActivity"
-		          android:label="@string/experiences">
-			<meta-data android:name="android.support.PARENT_ACTIVITY"
-			           android:value="uk.ac.horizon.aestheticodes.activities.CameraActivity" />
-		</activity>
-		<activity android:name=".activities.ExperienceEditActivity">
-		</activity>
-	</application>
-</manifest>
+                <category android:name="android.intent.category.DEFAULT" />
+                <category android:name="android.intent.category.BROWSABLE" />
+
+                <data android:scheme="aestheticodes" />
+            </intent-filter>
+
+            <meta-data
+                android:name="android.support.PARENT_ACTIVITY"
+                android:value="uk.ac.horizon.aestheticodes.activities.CameraActivity" />
+            </activity>
+            <activity
+                android:name="uk.ac.horizon.aestheticodes.activities.ExperienceActivity"
+                android:parentActivityName="uk.ac.horizon.aestheticodes.activities.ExperienceListActivity"
+                android:theme="@style/Theme.Aestheticodes.Transparent" >
+                <meta-data
+                    android:name="android.support.PARENT_ACTIVITY"
+                    android:value="uk.ac.horizon.aestheticodes.activities.ExperienceListActivity" />
+                </activity>
+                <activity
+                    android:name="uk.ac.horizon.aestheticodes.activities.ExperienceListActivity"
+                    android:label="@string/experiences"
+                    android:parentActivityName="uk.ac.horizon.aestheticodes.activities.CameraActivity" >
+                    <meta-data
+                        android:name="android.support.PARENT_ACTIVITY"
+                        android:value="uk.ac.horizon.aestheticodes.activities.CameraActivity" />
+                    </activity>
+                    <activity
+                        android:name="uk.ac.horizon.aestheticodes.activities.ExperienceEditActivity"
+                        android:label="Edit Experience" >
+                    </activity>
+                </application>
+
+            </manifest>
+            

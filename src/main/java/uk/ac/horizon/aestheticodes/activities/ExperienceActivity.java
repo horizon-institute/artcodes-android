@@ -19,16 +19,22 @@
 
 package uk.ac.horizon.aestheticodes.activities;
 
+import android.app.AlertDialog;
+import android.content.DialogInterface;
 import android.content.Intent;
-import android.graphics.Color;
 import android.os.Bundle;
+import android.support.v4.app.NavUtils;
 import android.support.v7.app.ActionBarActivity;
+import android.util.Log;
+import android.view.Menu;
+import android.view.MenuItem;
 import android.view.View;
-import android.widget.ImageButton;
 import uk.ac.horizon.aestheticodes.R;
-import uk.ac.horizon.aestheticodes.bindings.ViewBindings;
-import uk.ac.horizon.aestheticodes.model.Experience;
+import uk.ac.horizon.aestheticodes.properties.bindings.ColorImageBinding;
+import uk.ac.horizon.aestheticodes.properties.bindings.VisibilityBinding;
 import uk.ac.horizon.aestheticodes.controller.ExperienceManager;
+import uk.ac.horizon.aestheticodes.model.Experience;
+import uk.ac.horizon.aestheticodes.properties.Properties;
 
 public class ExperienceActivity extends ActionBarActivity
 {
@@ -47,18 +53,58 @@ public class ExperienceActivity extends ActionBarActivity
 
 		setContentView(R.layout.experience);
 
-		final ViewBindings viewBindings = new ViewBindings(this, experience);
-		viewBindings.bind(R.id.experienceTitle, "name");
-		viewBindings.bind(R.id.experienceDescription, "description");
-		viewBindings.bind(R.id.experienceIcon, "icon");
-		viewBindings.bind(R.id.experienceImage, "image");
-
-		final ImageButton imageButton = (ImageButton) findViewById(R.id.experienceFloatingAction);
-		if (!experience.isEditable())
-		{
-			imageButton.setVisibility(View.GONE);
-		}
+		final Properties properties = new Properties(this, experience);
+		properties.get("name").bindTo(R.id.experienceTitle);
+		properties.get("description").bindTo(R.id.experienceDescription);
+		properties.get("icon").bindTo(R.id.experienceIcon);
+		properties.get("image").bindTo(new ColorImageBinding(R.id.experienceImage, R.id.experienceFloatingAction));
+		//properties.get("editable").bindTo(new VisibilityBinding(R.id.experienceFloatingAction));
+		properties.load();
 	}
+
+	@Override
+	public boolean onCreateOptionsMenu(Menu menu)
+	{
+		getMenuInflater().inflate(R.menu.experience_actions, menu);
+
+		return super.onCreateOptionsMenu(menu);
+	}
+
+	@Override
+	public boolean onOptionsItemSelected(MenuItem item)
+	{
+		switch (item.getItemId())
+		{
+			case R.id.action_delete:
+				Log.i("", "Delete experience");
+				AlertDialog.Builder confirmBuilder = new AlertDialog.Builder(this);
+				confirmBuilder.setTitle(getResources().getString(R.string.experienceDeleteConfirmTitle, experience.getName()));
+				confirmBuilder.setMessage(getResources().getString(R.string.experienceDeleteConfirmMessage, experience.getName()));
+				confirmBuilder.setPositiveButton(R.string.deleteConfirm, new DialogInterface.OnClickListener()
+				{
+					@Override
+					public void onClick(DialogInterface dialogInterface, int i)
+					{
+						ExperienceManager experienceManager = ExperienceManager.get(ExperienceActivity.this);
+						experienceManager.delete(experience);
+						NavUtils.navigateUpTo(ExperienceActivity.this, new Intent(ExperienceActivity.this, ExperienceListActivity.class));
+					}
+				});
+				confirmBuilder.setNegativeButton(R.string.deleteCancel, new DialogInterface.OnClickListener()
+				{
+					@Override
+					public void onClick(DialogInterface dialogInterface, int i)
+					{
+						// nothing
+					}
+				});
+
+				confirmBuilder.create().show();
+				return true;
+		}
+		return super.onOptionsItemSelected(item);
+	}
+
 
 	public void editExperience(View view)
 	{

@@ -51,7 +51,7 @@
 					android:background="@drawable/floating_action_button"
 					android:onClick="open"
 					android:contentDescription="@string/open"
-					android:elevation="1dp" />
+					android:elevation="3dp" android:tint="#FFF" />
 
 			<TextView android:layout_width="wrap_content"
 			          android:layout_height="wrap_content"

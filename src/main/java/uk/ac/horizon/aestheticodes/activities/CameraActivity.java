@@ -30,28 +30,22 @@ import android.net.Uri;
 import android.os.Build;
 import android.os.Bundle;
 import android.os.Handler;
-import android.support.v4.app.Fragment;
-import android.support.v4.app.FragmentPagerAdapter;
-import android.support.v4.view.ViewPager;
 import android.support.v7.app.ActionBar;
 import android.support.v7.app.ActionBarActivity;
+import android.support.v7.widget.PopupMenu;
 import android.util.Log;
 import android.view.*;
-import android.widget.ProgressBar;
-import android.widget.RelativeLayout;
 import android.widget.TextView;
 import org.opencv.android.OpenCVLoader;
 import uk.ac.horizon.aestheticodes.R;
-import uk.ac.horizon.aestheticodes.adapters.ExperienceAdapter;
-import uk.ac.horizon.aestheticodes.adapters.ModeSelectTransformer;
+import uk.ac.horizon.aestheticodes.controller.ExperienceManager;
 import uk.ac.horizon.aestheticodes.detect.CameraManager;
 import uk.ac.horizon.aestheticodes.detect.ExperienceEventListener;
 import uk.ac.horizon.aestheticodes.detect.MarkerDetectionThread;
 import uk.ac.horizon.aestheticodes.detect.ViewfinderView;
 import uk.ac.horizon.aestheticodes.model.Experience;
-import uk.ac.horizon.aestheticodes.controller.ExperienceManager;
 import uk.ac.horizon.aestheticodes.model.Marker;
-import uk.ac.horizon.aestheticodes.model.MarkerAction;
+import uk.ac.horizon.aestheticodes.model.MarkerCode;
 import uk.ac.horizon.aestheticodes.model.MarkerSelection;
 
 import java.util.List;
@@ -60,50 +54,13 @@ public class CameraActivity extends ActionBarActivity implements ExperienceEvent
 {
 	private static final String TAG = CameraActivity.class.getName();
 	private static final String MODE_PREFIX = "mode_";
-	private static final int MAX_PROGRESS = 1000;
+	private static final String MODE_ACTIVE_PREFIX = "mode_active_";
 
 	static
 	{
 		if (!OpenCVLoader.initDebug())
 		{
 			Log.e(TAG, "Error Initializing OpenCV");
-		}
-	}
-
-	public static final class ModeFragment extends Fragment
-	{
-		private View.OnClickListener onClickListener;
-
-
-		public ModeFragment()
-		{
-		}
-
-		public void setOnClickListener(View.OnClickListener onClickListener)
-		{
-			this.onClickListener = onClickListener;
-		}
-
-
-		@Override
-		public View onCreateView(LayoutInflater inflater, ViewGroup container, Bundle savedInstanceState)
-		{
-			final View layoutView = inflater.inflate(R.layout.mode_listitem, container, false);
-			final TextView view = (TextView) layoutView.findViewById(R.id.modeText);
-			final String mode = getArguments().getString("mode");
-			int id = getActivity().getResources().getIdentifier(MODE_PREFIX + mode, "string", getActivity().getPackageName());
-			if (id != 0)
-			{
-				view.setText(getString(id));
-			}
-			else
-			{
-				view.setText(mode);
-			}
-
-			view.setOnClickListener(onClickListener);
-
-			return layoutView;
 		}
 	}
 
@@ -129,34 +86,20 @@ public class CameraActivity extends ActionBarActivity implements ExperienceEvent
 	private CameraManager cameraManager;
 	private MarkerDetectionThread thread;
 	private ViewfinderView viewfinder;
-	//private TextView pager_mark;
-	private ViewPager pager;
-	private ProgressBar progress;
-	private RelativeLayout bottomView;
-	private MenuItem cameraSwitch;
+	private View bottomView;
+	private PopupMenu modeMenu;
+	private View modeMenuButton;
+	private TextView modeText;
+	private MarkerDetectionThread.Mode mode = MarkerDetectionThread.Mode.detect;
 
-	/**
-	 * Get an OnClickListener that will change a ViewPager to the given position.
-	 */
-	private View.OnClickListener getOnClickListenerForMode(final ViewPager pager, final int position)
+	private String getTextString(String name, String defaultValue)
 	{
-		return new View.OnClickListener()
+		int resource = getResources().getIdentifier(name, "string", getPackageName());
+		if (resource != 0)
 		{
-			@Override
-			public void onClick(View view)
-			{
-				pager.setCurrentItem(position);
-			}
-		};
-	}
-
-	void selectItem(final int position)
-	{
-		Experience selected = experienceManager.list().get(position);
-		if (selected != experienceManager.getSelected())
-		{
-			experienceManager.setSelected(selected);
+			return getString(resource);
 		}
+		return defaultValue;
 	}
 
 	@Override
@@ -193,67 +136,6 @@ public class CameraActivity extends ActionBarActivity implements ExperienceEvent
 			}
 		});
 
-		progress = (ProgressBar) findViewById(R.id.progress);
-		progress.setMax(MAX_PROGRESS);
-
-		//pager_mark = (TextView) findViewById(R.id.pager_mark);
-
-		pager = (ViewPager) findViewById(R.id.pager);
-		pager.setAdapter(new FragmentPagerAdapter(getSupportFragmentManager())
-		{
-			@Override
-			public int getCount()
-			{
-				if (experienceManager == null || experienceManager.getSelected() == null)
-				{
-					return 0;
-				}
-				return experienceManager.getSelected().getModes().size();
-			}
-
-			@Override
-			public Fragment getItem(int position)
-			{
-				Bundle bundle = new Bundle();
-				bundle.putString("mode", experienceManager.getSelected().getModes().get(position).name());
-
-				ModeFragment fragment = new ModeFragment();
-				fragment.setOnClickListener(getOnClickListenerForMode(pager, position));
-				fragment.setArguments(bundle);
-				return fragment;
-			}
-		});
-		pager.setOnPageChangeListener(new ViewPager.OnPageChangeListener()
-		{
-			@Override
-			public void onPageScrolled(int position, float positionOffset, int positionOffsetPixels)
-			{
-
-			}
-
-			@Override
-			public void onPageSelected(int position)
-			{
-				setMode(experienceManager.getSelected().getModes().get(position));
-			}
-
-			@Override
-			public void onPageScrollStateChanged(int state)
-			{
-
-			}
-
-		});
-
-		pager.setCurrentItem(0);
-		pager.setOffscreenPageLimit(3);
-		if (android.os.Build.VERSION.SDK_INT >= Build.VERSION_CODES.HONEYCOMB)
-		{
-			pager.setPageTransformer(true, new ModeSelectTransformer());
-		}
-		pager.setPageMargin((int) (getResources().getDisplayMetrics().widthPixels / -1.3));
-		pager.setClickable(true);
-
 		final SurfaceView surfaceView = (SurfaceView) findViewById(R.id.preview);
 		holder = surfaceView.getHolder();
 		holder.addCallback(cameraManager);
@@ -261,7 +143,7 @@ public class CameraActivity extends ActionBarActivity implements ExperienceEvent
 		//noinspection deprecation
 		holder.setType(SurfaceHolder.SURFACE_TYPE_PUSH_BUFFERS);
 
-		bottomView = (RelativeLayout) findViewById(R.id.bottomView);
+		bottomView = findViewById(R.id.bottomView);
 
 		experienceManager = ExperienceManager.get(this);
 		experienceManager.addListener(this);
@@ -272,12 +154,15 @@ public class CameraActivity extends ActionBarActivity implements ExperienceEvent
 			@Override
 			public boolean onNavigationItemSelected(int position, long l)
 			{
-				selectItem(position);
+				final Experience selected = (Experience) experienceAdapter.getItem(position);
+				if (selected != experienceManager.getSelected())
+				{
+					experienceManager.setSelected(selected);
+				}
 				return true;
 			}
 		});
 		experienceManager.load();
-
 
 		SharedPreferences preferences = getPreferences(MODE_PRIVATE);
 		Log.i(TAG, "Loading experience " + preferences.getString("experience", "uk.ac.horizon.aestheticodes.default"));
@@ -286,6 +171,10 @@ public class CameraActivity extends ActionBarActivity implements ExperienceEvent
 		{
 			experienceManager.setSelected(experience);
 		}
+
+		modeMenuButton = findViewById(R.id.modeMenuButton);
+		modeText = (TextView) findViewById(R.id.modeText);
+		modeMenu = new PopupMenu(this, modeMenuButton);
 	}
 
 	void setItemSelected(final int position)
@@ -295,24 +184,21 @@ public class CameraActivity extends ActionBarActivity implements ExperienceEvent
 
 	public void experiencesChanged()
 	{
-		experienceAdapter.notifyDataSetChanged();
 	}
 
-	private void setMode(Experience.Mode mode)
+	private void setMode(MarkerDetectionThread.Mode mode)
 	{
+		Log.i("", "Set mode to " + mode);
 		if (thread != null)
 		{
 			thread.setMode(mode);
 		}
+		this.mode = mode;
 		cameraManager.setResult(null);
 		viewfinder.invalidate();
-		if (progress != null)
-		{
-			markerSelection.reset();
-			progress.setVisibility(View.INVISIBLE);
-		}
-
-		pager.setCurrentItem(experienceManager.getSelected().getModes().indexOf(mode), true);
+		markerSelection.reset();
+		modeText.setText(getTextString(MODE_ACTIVE_PREFIX + mode.name(), mode.name()));
+		updateMenu();
 	}
 
 	@Override
@@ -320,50 +206,78 @@ public class CameraActivity extends ActionBarActivity implements ExperienceEvent
 	{
 		Log.i(TAG, "experience updated");
 		setTitle(experience.getName());
-		pager.getAdapter().notifyDataSetChanged();
-		Experience.Mode mode;
-		if (thread != null)
-		{
-			mode = thread.getMode();
-		}
-		else
-		{
-			mode = Experience.Mode.detect;
-		}
-		if (!experience.getModes().contains(mode))
-		{
-			if (experience.getModes().isEmpty())
-			{
-				setMode(Experience.Mode.detect);
-			}
-			else
-			{
-				setMode(experience.getModes().get(0));
-			}
-		}
 
-		if (experience.getModes().size() <= 1)
-		{
-			pager.setVisibility(View.INVISIBLE);
-		}
-		else
-		{
-			pager.setVisibility(View.VISIBLE);
-		}
+		updateMenu();
 
-		List<Experience> experiences = experienceManager.list();
+		List<Experience> experiences = experienceAdapter.getExperiences();
 		int index = experiences.indexOf(experience);
 		setItemSelected(index);
 
 		//if (experience.getIcon() != null)
 		//{
 		//	Log.i(TAG, "Setting icon to " + experience.getIcon());
-			//Picasso.with(this).load(experience.getIcon()).into(new ActionBarTarget(this));
+		//Picasso.with(this).load(experience.getIcon()).into(new ActionBarTarget(this));
 		//}
 
 		getPreferences(MODE_PRIVATE).edit().putString("experience", experience.getId()).commit();
+	}
 
-		experienceAdapter.notifyDataSetChanged();
+	private void updateMenu()
+	{
+		if (modeMenu != null)
+		{
+			modeMenu.getMenu().clear();
+			for (final MarkerDetectionThread.Mode amode : MarkerDetectionThread.Mode.values())
+			{
+				MenuItem item = modeMenu.getMenu().add(getTextString(MODE_PREFIX + amode.name(), amode.name()));
+				item.setOnMenuItemClickListener(new MenuItem.OnMenuItemClickListener()
+				{
+					@Override
+					public boolean onMenuItemClick(MenuItem item)
+					{
+						setMode(amode);
+						return true;
+					}
+				});
+				if (amode == mode)
+				{
+					item.setEnabled(false);
+				}
+			}
+			if (cameraManager.getCameraCount() > 1)
+			{
+				MenuItem switchItem = modeMenu.getMenu().add(getString(R.string.action_switch_camera));
+				switchItem.setIcon(R.drawable.ic_switch_camera);
+				switchItem.setOnMenuItemClickListener(new MenuItem.OnMenuItemClickListener()
+				{
+					@Override
+					public boolean onMenuItemClick(MenuItem item)
+					{
+						try
+						{
+							stopCamera();
+							cameraManager.flip();
+							viewfinder.invalidate();
+							startCamera();
+						}
+						catch (Exception e)
+						{
+							Log.e(TAG, e.getMessage(), e);
+						}
+						return true;
+					}
+				});
+			}
+
+			if (modeMenu.getMenu().hasVisibleItems())
+			{
+				modeMenuButton.setVisibility(View.VISIBLE);
+			}
+			else
+			{
+				modeMenuButton.setVisibility(View.GONE);
+			}
+		}
 	}
 
 	@Override
@@ -372,8 +286,8 @@ public class CameraActivity extends ActionBarActivity implements ExperienceEvent
 		MenuInflater inflater = getMenuInflater();
 		inflater.inflate(R.menu.capture_actions, menu);
 
-		cameraSwitch = menu.findItem(R.id.action_switch_camera);
-		updateCameraIcon();
+		//cameraSwitch = menu.findItem(R.id.action_switch_camera);
+		//updateCameraIcon();
 
 		return super.onCreateOptionsMenu(menu);
 	}
@@ -400,42 +314,14 @@ public class CameraActivity extends ActionBarActivity implements ExperienceEvent
 			{
 				cameraManager.start(holder);
 				thread = new MarkerDetectionThread(cameraManager, this, experienceManager);
+				thread.setMode(mode);
 				thread.start();
-
-				updateCameraIcon();
-
-				if (pager != null)
-				{
-					thread.setMode(experienceManager.getSelected().getModes().get(pager.getCurrentItem()));
-				}
-
-				if (progress != null)
-				{
-					markerSelection.reset();
-					progress.setVisibility(View.INVISIBLE);
-				}
-
+				markerSelection.reset();
 				layout();
 			}
 			catch (Exception e)
 			{
 				Log.e(TAG, e.getMessage(), e);
-			}
-		}
-	}
-
-	private void updateCameraIcon()
-	{
-		if(cameraSwitch != null && cameraManager != null)
-		{
-			cameraSwitch.setVisible(cameraManager.getCameraCount() > 1);
-			if(cameraManager.isFront())
-			{
-				cameraSwitch.setIcon(R.drawable.ic_switch_camera_front);
-			}
-			else
-			{
-				cameraSwitch.setIcon(R.drawable.ic_switch_camera_back);
 			}
 		}
 	}
@@ -462,7 +348,6 @@ public class CameraActivity extends ActionBarActivity implements ExperienceEvent
 		}
 
 		bottomView.requestLayout();
-		pager.invalidate();
 		viewfinder.invalidate();
 	}
 
@@ -480,6 +365,11 @@ public class CameraActivity extends ActionBarActivity implements ExperienceEvent
 			return resources.getDimensionPixelSize(resourceId);
 		}
 		return 0;
+	}
+
+	public void showMenu(View view)
+	{
+		modeMenu.show();
 	}
 
 	@Override
@@ -505,20 +395,7 @@ public class CameraActivity extends ActionBarActivity implements ExperienceEvent
 	{
 		switch (item.getItemId())
 		{
-			case R.id.action_switch_camera:
-				try
-				{
-					stopCamera();
-					cameraManager.flip();
-					viewfinder.invalidate();
-					startCamera();
-				}
-				catch (Exception e)
-				{
-					Log.e(TAG, e.getMessage(), e);
-				}
-				return true;
-			case R.id.action_experiences:
+			case R.id.experiences:
 				startActivity(new Intent(this, ExperienceListActivity.class));
 				return true;
 			default:
@@ -528,71 +405,41 @@ public class CameraActivity extends ActionBarActivity implements ExperienceEvent
 
 
 	@Override
-	public void markersFound(final List<Marker> markers)
+	public void markersFound(final List<MarkerCode> markers)
 	{
 		if (thread == null)
 		{
 			return;
 		}
-		if (thread.getMode() == Experience.Mode.detect)
+		if (thread.getMode() == MarkerDetectionThread.Mode.detect)
 		{
 			markerSelection.addMarkers(markers);
 
-			runOnUiThread(new Runnable()
-			{
-				@Override
-				@TargetApi(Build.VERSION_CODES.HONEYCOMB)
-				public void run()
-				{
-					if (markerSelection.hasStarted())
-					{
-						progress.setVisibility(View.VISIBLE);
-						progress.setProgress((int) (MAX_PROGRESS * markerSelection.getProgress()));
-						if (android.os.Build.VERSION.SDK_INT >= Build.VERSION_CODES.HONEYCOMB)
-						{
-							progress.setAlpha(1 - markerSelection.expiration());
-						}
-					}
-					else if (markerSelection.isTimeUp())
-					{
-						progress.setVisibility(View.INVISIBLE);
-					}
-				}
-			});
-
-			if (markerSelection.isTimeUp())
+			String markerCode = markerSelection.getFoundMarker();
+			if (markerCode != null)
 			{
 				markerSelection.reset();
-			}
-			else if (markerSelection.isFinished())
-			{
-				Marker marker = markerSelection.getLikelyMarker();
-				markerSelection.reset();
-
+				Marker marker = experienceManager.getSelected().getMarkers().get(markerCode);
 				if (marker != null)
 				{
-					MarkerAction markerDetail = experienceManager.getSelected().getMarkers().get(marker.getCodeKey());
-					if (markerDetail != null)
+					cameraManager.stop();
+					if (marker.getShowDetail())
 					{
-						cameraManager.stop();
-						if (markerDetail.getShowDetail())
-						{
-							startActivity(new Intent(Intent.ACTION_VIEW, Uri.parse("aestheticodes://" + experienceManager.getSelected().getId() + "/" + marker.getCodeKey())));
-						}
-						else
-						{
-							startActivity(new Intent(Intent.ACTION_VIEW, Uri.parse(markerDetail.getAction())));
-						}
+						startActivity(new Intent(Intent.ACTION_VIEW, Uri.parse("aestheticodes://" + experienceManager.getSelected().getId() + "/" + markerCode)));
 					}
 					else
 					{
-						Log.w(TAG, "No details for marker " + marker.getCodeKey());
-
-						if (experienceManager.getSelected().canAddMarkerByScanning())
-						{
-							this.addMarkerDialog(marker.getCodeKey());
-						}
+						startActivity(new Intent(Intent.ACTION_VIEW, Uri.parse(marker.getAction())));
 					}
+				}
+				else
+				{
+					Log.w(TAG, "No details for marker " + markerCode);
+
+					// TODO if (experienceManager.getSelected().canAddMarkerByScanning())
+					//{
+					//	this.addMarkerDialog(marker.getCodeKey());
+					//}
 				}
 			}
 		}
@@ -618,7 +465,7 @@ public class CameraActivity extends ActionBarActivity implements ExperienceEvent
 			@Override
 			public void run()
 			{
-				progress.setVisibility(View.INVISIBLE);
+				//progress.setVisibility(View.INVISIBLE);
 				AlertDialog.Builder builder = new AlertDialog.Builder(context);
 				builder.setTitle("New marker " + code);
 				builder.setMessage("Do you want to add an action for marker " + code + "?");

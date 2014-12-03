@@ -30,7 +30,7 @@ import com.google.gson.JsonSyntaxException;
 import com.google.gson.reflect.TypeToken;
 import uk.ac.horizon.aestheticodes.detect.ExperienceEventListener;
 import uk.ac.horizon.aestheticodes.model.Experience;
-import uk.ac.horizon.aestheticodes.model.MarkerAction;
+import uk.ac.horizon.aestheticodes.model.Marker;
 
 import java.io.File;
 import java.io.FileReader;
@@ -40,30 +40,26 @@ import java.io.InputStreamReader;
 import java.io.Reader;
 import java.net.HttpURLConnection;
 import java.net.URL;
-import java.util.ArrayList;
 import java.util.Collection;
-import java.util.Collections;
-import java.util.Comparator;
-import java.util.Date;
 import java.util.HashMap;
 import java.util.HashSet;
-import java.util.List;
 import java.util.Map;
 
 public class ExperienceManager
 {
 	private static final String TAG = ExperienceManager.class.getName();
 	private static final Gson gson = createParser();
+	private static ExperienceManager experienceManager;
 
 	private static Gson createParser()
 	{
 		GsonBuilder build = new GsonBuilder();
-		build.registerTypeAdapter(new TypeToken<Map<String, MarkerAction>>()
+		build.registerTypeAdapter(new TypeToken<Map<String, Marker>>()
 		{}.getType(), new MarkerMapAdapter());
 		return build.create();
 	}
 
-	private static HttpURLConnection createConnection(final String url, final Date lastModified) throws IOException
+	private static HttpURLConnection createConnection(final String url, final String etag) throws IOException
 	{
 		Log.i(TAG, "Creating connection for " + url);
 		HttpURLConnection connection = (HttpURLConnection) new URL(url).openConnection();
@@ -71,9 +67,10 @@ public class ExperienceManager
 		connection.setConnectTimeout(15000 /* milliseconds */);
 		connection.setRequestMethod("GET");
 		connection.setUseCaches(false);
-		if (lastModified != null)
+
+		if (etag != null)
 		{
-			connection.setIfModifiedSince(lastModified.getTime());
+			connection.setRequestProperty("If-None-Match", etag);
 		}
 
 		return connection;
@@ -100,19 +97,31 @@ public class ExperienceManager
 		return null;
 	}
 
-	private class DownloadSettings extends AsyncTask<Experience, Void, Iterable<Experience>>
+	public static ExperienceManager get(Context context)
+	{
+		if (experienceManager == null)
+		{
+			experienceManager = new ExperienceManager(context);
+		}
+		return experienceManager;
+	}
+
+	private class LoadExperiences extends AsyncTask<Void, Experience, Void>
 	{
 		@SuppressWarnings("unchecked")
-		private void readExperienceURLs(Map<String, String> experienceURLs, HttpURLConnection connection) throws IOException
+		private void readExperienceURLs(Map<String, String> experienceURLs, String experiencesURL) throws IOException
 		{
-			Map<String, String> newExperienceInfo = read(experienceURLs.getClass(), connection);
+			URL rootURL = new URL(experiencesURL);
+
+			Map<String, String> newExperienceInfo = read(experienceURLs.getClass(), createConnection(experiencesURL, null));
 			if (newExperienceInfo != null)
 			{
-				for(String experienceID: newExperienceInfo.keySet())
+				for (String experienceID : newExperienceInfo.keySet())
 				{
-					Log.i(TAG, experienceID);
+					URL experienceURL = new URL(rootURL, newExperienceInfo.get(experienceID));
+					experienceURLs.put(experienceID, experienceURL.toString());
+					Log.i(TAG, experienceID + " = " + experienceURL.toString());
 				}
-				experienceURLs.putAll(newExperienceInfo);
 			}
 			else
 			{
@@ -121,7 +130,19 @@ public class ExperienceManager
 		}
 
 		@Override
-		protected Iterable<Experience> doInBackground(Experience... ignored)
+		protected void onProgressUpdate(Experience... newExperiences)
+		{
+			if (newExperiences != null)
+			{
+				for (Experience experience : newExperiences)
+				{
+					add(experience);
+				}
+			}
+		}
+
+		@Override
+		protected Void doInBackground(Void... params)
 		{
 			try
 			{
@@ -148,10 +169,20 @@ public class ExperienceManager
 								String name = experienceName.substring(0, experienceName.length() - 5);
 								if (!experienceMap.containsKey(name))
 								{
-									Reader reader = new FileReader(new File(context.getFilesDir(), "experiences/" + experienceName));
-									Experience experience = gson.fromJson(reader, Experience.class);
-									experienceMap.put(experience.getId(), experience);
-									experienceURLs.put(experience.getId(), experience.getUpdateURL());
+									try
+									{
+										Experience experience = gson.fromJson(new FileReader(new File(context.getFilesDir(), "experiences/" + experienceName)), Experience.class);
+										experienceMap.put(experience.getId(), experience);
+										if (experience.getUpdateURL() != null)
+										{
+											experienceURLs.put(experience.getId(), experience.getUpdateURL());
+										}
+										publishProgress(experience);
+									}
+									catch (Exception e)
+									{
+										Log.w(TAG, "Failed to load settings", e);
+									}
 								}
 							}
 						}
@@ -164,13 +195,22 @@ public class ExperienceManager
 						String name = experienceName.substring(0, experienceName.length() - 5);
 						if (!experienceMap.containsKey(name))
 						{
-							Reader reader = new InputStreamReader(context.getAssets().open("experiences/" + experienceName));
-							Experience experience = gson.fromJson(reader, Experience.class);
-							experienceMap.put(experience.getId(), experience);
-							experienceURLs.put(experience.getId(), experience.getUpdateURL());
+							try
+							{
+								Experience experience = gson.fromJson(new InputStreamReader(context.getAssets().open("experiences/" + experienceName)), Experience.class);
+								experienceMap.put(experience.getId(), experience);
+								if (experience.getUpdateURL() != null)
+								{
+									experienceURLs.put(experience.getId(), experience.getUpdateURL());
+								}
+								publishProgress(experience);
+							}
+							catch (Exception e)
+							{
+								Log.w(TAG, "Failed to load settings", e);
+							}
 						}
 					}
-
 				}
 				catch (Exception e)
 				{
@@ -181,25 +221,31 @@ public class ExperienceManager
 				NetworkInfo netInfo = cm.getActiveNetworkInfo();
 				if (netInfo != null && netInfo.isConnectedOrConnecting())
 				{
-					readExperienceURLs(experienceURLs, createConnection("http://www.wornchaos.org/experiences/experiences.json", null));
+					readExperienceURLs(experienceURLs, "http://aestheticodes.appspot.com/experiences/experiences.json");
 
 					for (String experienceID : experienceURLs.keySet())
 					{
 						try
 						{
-							Experience experience = experienceMap.get(experienceID);
-							Date lastModified = null;
-							if (experience != null)
+							if (experienceURLs.get(experienceID) != null)
 							{
-								lastModified = experience.getLastUpdate();
-							}
-							HttpURLConnection connection = createConnection(experienceURLs.get(experienceID), lastModified);
-							experience = read(Experience.class, connection);
-							if (experience != null)
-							{
-								experience.setLastUpdate(new Date(connection.getLastModified()));
-								experience.setChanged(true);
-								experienceMap.put(experience.getId(), experience);
+
+								Experience experience = experienceMap.get(experienceID);
+								String etag = null;
+								if (experience != null)
+								{
+									etag = experience.getEtag();
+								}
+								HttpURLConnection connection = createConnection(experienceURLs.get(experienceID), etag);
+								experience = read(Experience.class, connection);
+								if (experience != null)
+								{
+									experience.setUpdateURL(experienceURLs.get(experienceID));
+									experience.setEtag(connection.getHeaderField("ETag"));
+									experience.setChanged(true);
+									experienceMap.put(experience.getId(), experience);
+									publishProgress(experience);
+								}
 							}
 						}
 						catch (IOException e)
@@ -208,32 +254,13 @@ public class ExperienceManager
 						}
 					}
 				}
-
-				return experienceMap.values();
 			}
 			catch (IOException e)
 			{
 				Log.e(TAG, e.getMessage(), e);
 			}
+
 			return null;
-		}
-
-		// onPostExecute displays the results of the AsyncTask.
-		@Override
-		protected void onPostExecute(Iterable<Experience> newExperiences)
-		{
-			if (newExperiences != null)
-			{
-				for (Experience experience : newExperiences)
-				{
-					add(experience);
-				}
-
-				for(ExperienceEventListener listener: listeners)
-				{
-					listener.experiencesChanged();
-				}
-			}
 		}
 	}
 
@@ -242,18 +269,7 @@ public class ExperienceManager
 	private final Collection<ExperienceEventListener> listeners = new HashSet<ExperienceEventListener>();
 	private Experience selected;
 
-	private static ExperienceManager experienceManager;
-
-	public static ExperienceManager get(Context context)
-	{
-		if(experienceManager == null)
-		{
-			experienceManager = new ExperienceManager(context.getApplicationContext());
-		}
-		return experienceManager;
-	}
-
-	private ExperienceManager(Context context)
+	public ExperienceManager(Context context)
 	{
 		this.context = context;
 	}
@@ -268,18 +284,18 @@ public class ExperienceManager
 		listeners.remove(listener);
 	}
 
-	public void setSelected(Experience selected)
-	{
-		this.selected = selected;
-		for(ExperienceEventListener listener: listeners)
-		{
-			listener.experienceSelected(selected);
-		}
-	}
-
 	public Experience getSelected()
 	{
 		return selected;
+	}
+
+	public void setSelected(final Experience selected)
+	{
+		this.selected = selected;
+		for (final ExperienceEventListener listener : listeners)
+		{
+			listener.experienceSelected(selected);
+		}
 	}
 
 	public Experience get(String id)
@@ -306,8 +322,9 @@ public class ExperienceManager
 	}
 
 	@SuppressWarnings("ResultOfMethodCallIgnored")
-	public void save(Experience experience)
+	private void save(Experience experience)
 	{
+		// TODO Check if exists
 		if (experience.hasChanged())
 		{
 			try
@@ -335,7 +352,7 @@ public class ExperienceManager
 
 	public void add(Experience experience)
 	{
-		if(experience == null)
+		if (experience == null)
 		{
 			return;
 		}
@@ -343,52 +360,60 @@ public class ExperienceManager
 		{
 			experiences.put(experience.getId(), experience);
 		}
-		if(selected == null)
+		if (selected == null)
 		{
 			setSelected(experience);
 		}
-		else if(selected.getId().equals(experience.getId()))
+		else if (selected.getId().equals(experience.getId()))
 		{
 			setSelected(experience);
 		}
 
 		save(experience);
 
-		for(ExperienceEventListener listener: listeners)
+		for (final ExperienceEventListener listener : listeners)
 		{
 			listener.experiencesChanged();
 		}
 	}
 
-	public List<Experience> list()
+	public void delete(Experience experience)
 	{
-		final List<Experience> list = new ArrayList<Experience>();
+		// TODO
+		if(selected != null && selected.getId().equals(experience.getId()))
+		{
+			// TODO
+			setSelected(null);
+		}
+
+		experiences.remove(experience.getId());
+
+		File file = new File(context.getFilesDir(), "experiences/" + experience.getId() + ".json");
+		if (file.exists())
+		{
+			if(!file.delete())
+			{
+				Log.i("", "Experience not deleted?");
+			}
+		}
+
+		for (final ExperienceEventListener listener : listeners)
+		{
+			listener.experiencesChanged();
+		}
+	}
+
+	public Collection<Experience> getExperiences()
+	{
 		synchronized (experiences)
 		{
-			list.addAll(experiences.values());
+			return experiences.values();
 		}
-		Collections.sort(list, new Comparator<Experience>()
-		{
-			@Override
-			public int compare(Experience experience, Experience experience2)
-			{
-				if(experience.getName() != null && experience2.getName() != null)
-				{
-					return experience.getName().compareTo(experience2.getName());
-				}
-				else
-				{
-					return 0;
-				}
-			}
-		});
-
-		return list;
 	}
 
 	public void load()
 	{
-		new DownloadSettings().execute();
+		new LoadExperiences().execute();
 	}
 
 	private Experience load(String id)

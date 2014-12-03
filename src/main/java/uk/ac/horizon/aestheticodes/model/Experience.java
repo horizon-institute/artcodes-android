@@ -19,11 +19,7 @@
 
 package uk.ac.horizon.aestheticodes.model;
 
-import android.util.Log;
-
 import java.util.ArrayList;
-import java.util.Arrays;
-import java.util.Date;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
@@ -36,27 +32,22 @@ import java.util.Map;
  * validate a marker. It defines the number of validation branches, leaves in a
  * validation branch and the checksumModulo modulo.
  */
-@SuppressWarnings("FieldCanBeLocal")
 public class Experience
 {
-	public static enum Mode
-	{
-		detect, outline, threshold
-	}
-
-	public static enum ThresholdBehaviour
+	public static enum Threshold
 	{
 		temporalTile, resize
 	}
 
-	private final List<Mode> modes = new ArrayList<Mode>();
-	private final Map<String, MarkerAction> markers = new HashMap<String, MarkerAction>();
-	private final List<Constraint> constraints = new ArrayList<Constraint>();
+	private final Map<String, Marker> markers = new HashMap<String, Marker>();
+
 	private String id;
 	private String name;
 	private String icon;
 	private String image;
 	private String description;
+	private String etag;
+	private String owner;
 	//private String color = "#";
 	private int minRegions = 5;
 	private int maxRegions = 5;
@@ -65,22 +56,12 @@ public class Experience
 	private int validationRegions = 2;
 	private int validationRegionValue = 1;
 	private int checksumModulo = 3;
-	private Date lastUpdate;
 	private transient boolean changed = false;
-	private boolean editable = true;
-	private boolean addMarkers = true;
-	private boolean addMarkerByScanning = false;
-	private String updateURL = "http://www.wornchaos.org/settings.json";
-	private String thresholdBehaviour = null;
+	private String updateURL;
+	private Threshold threshold = Threshold.temporalTile;
 
 	public Experience()
 	{
-		modes.addAll(Arrays.asList(Mode.values()));
-	}
-
-	public List<Mode> getModes()
-	{
-		return modes;
 	}
 
 	public int getMinRegions()
@@ -92,11 +73,6 @@ public class Experience
 	{
 		this.minRegions = minRegions;
 		changed = true;
-	}
-
-	public boolean isEditable()
-	{
-		return editable;
 	}
 
 	public int getMaxRegions()
@@ -157,7 +133,6 @@ public class Experience
 					}
 
 					String code = result.toString();
-					Log.i(Experience.class.getName(), code + " is valid");
 					if (!markers.containsKey(code))
 					{
 						return code;
@@ -220,21 +195,9 @@ public class Experience
 		changed = true;
 	}
 
-	public ThresholdBehaviour getThresholdBehaviour()
+	public Threshold getThreshold()
 	{
-		if (this.thresholdBehaviour == null || this.thresholdBehaviour.equals("temporalTile"))
-		{
-			return ThresholdBehaviour.temporalTile;
-		}
-		else if (this.thresholdBehaviour.equals("resize"))
-		{
-			return ThresholdBehaviour.resize;
-		}
-		else
-		{
-			Log.w(this.getClass().getName(), "Unsupported threshold behaviour: " + this.thresholdBehaviour);
-			return ThresholdBehaviour.temporalTile;
-		}
+		return threshold;
 	}
 
 	public String getIcon()
@@ -242,12 +205,12 @@ public class Experience
 		return icon;
 	}
 
-	public boolean isValidMarker(List<Integer> markerCodes)
+	public boolean isValidMarker(List<Integer> markerCode)
 	{
-		return isValidMarker(markerCodes, false);
+		return isValidMarker(markerCode, false);
 	}
 
-	public Map<String, MarkerAction> getMarkers()
+	public Map<String, Marker> getMarkers()
 	{
 		return markers;
 	}
@@ -277,14 +240,14 @@ public class Experience
 		this.changed = changed;
 	}
 
-	boolean isValidMarker(List<Integer> markerCodes, boolean partial)
+	boolean isValidMarker(List<Integer> markerCode, boolean partial)
 	{
-		return markerCodes != null
-				&& hasValidNumberofRegions(markerCodes)
-				&& hasValidNumberofEmptyRegions(markerCodes)
-				&& hasValidNumberOfLeaves(markerCodes)
-				&& hasValidationRegions(markerCodes)
-				&& hasValidChecksum(markerCodes);
+		return markerCode != null
+				&& hasValidNumberofRegions(markerCode)
+				&& hasValidNumberofEmptyRegions(markerCode)
+				&& hasValidNumberOfLeaves(markerCode)
+				&& hasValidationRegions(markerCode)
+				&& hasValidChecksum(markerCode);
 	}
 
 	public boolean isValidMarker(String marker, boolean partial)
@@ -304,7 +267,7 @@ public class Experience
 		}
 
 		int prevValue = 0;
-		List<Integer> codes = new ArrayList<Integer>();
+		List<Integer> markerCode = new ArrayList<Integer>();
 		for (String value : values)
 		{
 			try
@@ -315,7 +278,7 @@ public class Experience
 					return false;
 				}
 
-				codes.add(codeValue);
+				markerCode.add(codeValue);
 
 				prevValue = codeValue;
 			}
@@ -325,7 +288,7 @@ public class Experience
 			}
 		}
 
-		return partial || isValidMarker(codes);
+		return partial || isValidMarker(markerCode);
 
 	}
 
@@ -338,14 +301,14 @@ public class Experience
 	 * @return true if the number of validation branches are >= validation
 	 * branch value in the preference otherwise it returns false.
 	 */
-	private boolean hasValidationRegions(List<Integer> markerCodes)
+	private boolean hasValidationRegions(List<Integer> markerCode)
 	{
 		if (validationRegions <= 0)
 		{
 			return true;
 		}
 		int validationRegionCount = 0;
-		for (int code : markerCodes)
+		for (int code : markerCode)
 		{
 			if (code == validationRegionValue)
 			{
@@ -412,20 +375,9 @@ public class Experience
 		return updateURL;
 	}
 
-	public boolean canAddMarker()
+	public void setUpdateURL(String updateURL)
 	{
-		return addMarkers;
-	}
-
-	public Date getLastUpdate()
-	{
-		return lastUpdate;
-	}
-
-	public void setLastUpdate(Date lastUpdate)
-	{
-		this.lastUpdate = lastUpdate;
-		changed = true;
+		this.updateURL = updateURL;
 	}
 
 	public boolean hasChanged()
@@ -433,14 +385,14 @@ public class Experience
 		return changed;
 	}
 
-	public boolean canAddMarkerByScanning()
-	{
-		return addMarkerByScanning;
-	}
-
 	public String getId()
 	{
 		return id;
+	}
+
+	public void setId(String id)
+	{
+		this.id = id;
 	}
 
 	public String getName()
@@ -456,5 +408,16 @@ public class Experience
 	public String getImage()
 	{
 		return image;
+	}
+
+	public String getEtag()
+	{
+		return etag;
+	}
+
+	public void setEtag(String etag)
+	{
+		this.etag = etag;
+		changed = true;
 	}
 }

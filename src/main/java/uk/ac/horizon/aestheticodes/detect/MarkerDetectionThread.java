@@ -33,7 +33,7 @@ import org.opencv.core.Size;
 import org.opencv.imgproc.Imgproc;
 import uk.ac.horizon.aestheticodes.model.Experience;
 import uk.ac.horizon.aestheticodes.controller.ExperienceManager;
-import uk.ac.horizon.aestheticodes.model.Marker;
+import uk.ac.horizon.aestheticodes.model.MarkerCode;
 import uk.ac.horizon.aestheticodes.model.MarkerDetector;
 
 import java.util.ArrayList;
@@ -41,6 +41,11 @@ import java.util.List;
 
 public class MarkerDetectionThread extends Thread
 {
+	public static enum Mode
+	{
+		detect, outline, threshold
+	}
+
 	private static final String TAG = MarkerDetectionThread.class.getName();
 	private static final Scalar detectedColour = new Scalar(255, 255, 0, 255);
 	private static final Scalar outlineColour = new Scalar(0, 0, 0, 255);
@@ -86,7 +91,7 @@ public class MarkerDetectionThread extends Thread
 	private final ExperienceManager experienceManager;
 	private int framesSinceLastMarker = 0, cumulativeFramesWithoutMarker = 0;
 	private boolean running = true;
-	private Experience.Mode mode = Experience.Mode.detect;
+	private Mode mode = Mode.detect;
 	private long timeOfLastAutoFocus;
 
 	public MarkerDetectionThread(CameraManager cameraManager, ExperienceEventListener listener, ExperienceManager experienceManager)
@@ -105,14 +110,14 @@ public class MarkerDetectionThread extends Thread
 
 	private void thresholdImage(Mat image)
 	{
-		Experience.ThresholdBehaviour thresholdBehaviour = experienceManager.getSelected().getThresholdBehaviour();
+		Experience.Threshold threshold = experienceManager.getSelected().getThreshold();
 
 		if (framesSinceLastMarker > 2)
 		{
 			++cumulativeFramesWithoutMarker;
 		}
 
-		if (thresholdBehaviour == Experience.ThresholdBehaviour.temporalTile)
+		if (threshold == Experience.Threshold.temporalTile)
 		{
 			Imgproc.GaussianBlur(image, image, new Size(5, 5), 0);
 
@@ -155,7 +160,7 @@ public class MarkerDetectionThread extends Thread
 
 			Imgproc.threshold(image, image, 127, 255, Imgproc.THRESH_OTSU);
 		}
-		else if (thresholdBehaviour == Experience.ThresholdBehaviour.resize)
+		else if (threshold == Experience.Threshold.resize)
 		{
 			Imgproc.resize(image, image, new Size(540, 540));
 
@@ -167,14 +172,14 @@ public class MarkerDetectionThread extends Thread
 		}
 	}
 
-	private List<Marker> findMarkers(Mat inputImage, Mat drawImage)
+	private List<MarkerCode> findMarkers(Mat inputImage, Mat drawImage)
 	{
 		final ArrayList<MatOfPoint> contours = new ArrayList<MatOfPoint>();
 		final Mat hierarchy = new Mat();
 		try
 		{
 			// holds all the markers identified in the camera.
-			List<Marker> markersDetected = new ArrayList<Marker>();
+			List<MarkerCode> markersDetected = new ArrayList<MarkerCode>();
 			// Find blobs using connect component.
 			Imgproc.findContours(inputImage, contours, hierarchy, Imgproc.RETR_TREE, Imgproc.CHAIN_APPROX_NONE);
 
@@ -184,12 +189,12 @@ public class MarkerDetectionThread extends Thread
 				if (code != null)
 				{
 					// if marker found then add in the list.
-					Marker marker = new Marker();
+					MarkerCode marker = new MarkerCode();
 					marker.setCode(code);
 					marker.setComponentIndex(i);
 					markersDetected.add(marker);
 
-					if ((mode == Experience.Mode.outline || mode == Experience.Mode.threshold) && drawImage != null)
+					if ((mode == Mode.outline || mode == Mode.threshold) && drawImage != null)
 					{
 						Imgproc.drawContours(drawImage, contours, i, outlineColour, 7);
 						Imgproc.drawContours(drawImage, contours, i, detectedColour, 5);
@@ -197,9 +202,9 @@ public class MarkerDetectionThread extends Thread
 				}
 			}
 
-			if ((mode != Experience.Mode.detect || mode == Experience.Mode.threshold) && drawImage != null)
+			if ((mode != Mode.detect || mode == Mode.threshold) && drawImage != null)
 			{
-				for (Marker marker : markersDetected)
+				for (MarkerCode marker : markersDetected)
 				{
 					Rect bounds = Imgproc.boundingRect(contours.get(marker.getComponentIndex()));
 					String markerCode = marker.getCodeKey();
@@ -242,11 +247,11 @@ public class MarkerDetectionThread extends Thread
 						thresholdImage(croppedImage);
 
 						Mat drawImage = null;
-						if (mode != Experience.Mode.detect)
+						if (mode != Mode.detect)
 						{
 							rotate(croppedImage, croppedImage, 360 + 90 - cameraManager.getRotation(), cameraManager.isFront());
 
-							if (mode == Experience.Mode.threshold)
+							if (mode == Mode.threshold)
 							{
 								drawImage = new Mat(croppedImage.rows(), croppedImage.cols(), CvType.CV_8UC3);
 								Imgproc.cvtColor(croppedImage, drawImage, Imgproc.COLOR_GRAY2BGR);
@@ -258,7 +263,7 @@ public class MarkerDetectionThread extends Thread
 						}
 
 						// find markers.
-						List<Marker> markers = findMarkers(croppedImage, drawImage);
+						List<MarkerCode> markers = findMarkers(croppedImage, drawImage);
 						if (markers.size() == 0)
 						{
 							++framesSinceLastMarker;
@@ -268,7 +273,7 @@ public class MarkerDetectionThread extends Thread
 							framesSinceLastMarker = 0;
 						}
 
-						if (mode == Experience.Mode.detect || drawImage == null)
+						if (mode == Mode.detect || drawImage == null)
 						{
 							cameraManager.setResult(null);
 						}
@@ -331,12 +336,12 @@ public class MarkerDetectionThread extends Thread
 		Log.i(TAG, "Finishing processing thread");
 	}
 
-	public Experience.Mode getMode()
+	public Mode getMode()
 	{
 		return mode;
 	}
 
-	public void setMode(Experience.Mode mode)
+	public void setMode(Mode mode)
 	{
 		Log.i(TAG, "Set mode " + mode);
 		this.mode = mode;

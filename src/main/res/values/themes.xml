@@ -31,18 +31,24 @@
 	</style>
 
 	<style name="Theme.Aestheticodes.Transparent" parent="Theme.AppCompat.Light.DarkActionBar">
-		<item name="android:windowBackground">@android:color/white</item>
 		<item name="android:background">@null</item>
 		<item name="background">@null</item>
 
-		<item name="android:windowContentOverlay">@null</item>
 		<item name="android:actionBarStyle" tools:ignore="NewApi">@style/Aestheticodes.ActionBar.Transparent</item>
 		<item name="actionBarStyle">@style/Aestheticodes.ActionBar.Transparent</item>
 
 		<item name="android:windowActionBarOverlay" tools:ignore="NewApi">true</item>
 		<item name="android:windowActionModeOverlay" tools:ignore="NewApi">true</item>
-		<item name="android:windowTranslucentStatus" tools:ignore="NewApi">true</item>
 		<item name="windowActionBarOverlay">true</item>
+
+		<item name="android:colorPrimary" tools:ignore="NewApi">@color/apptheme_primary</item>
+		<item name="android:colorPrimaryDark" tools:ignore="NewApi">@color/apptheme_primary_dark</item>
+		<item name="android:colorAccent" tools:ignore="NewApi">@color/apptheme_primary</item>
+		<item name="android:windowBackground">@android:color/white</item>
+
+		<item name="colorPrimary">@color/apptheme_primary</item>
+		<item name="colorPrimaryDark">@color/apptheme_primary_dark</item>
+		<item name="colorAccent">@color/apptheme_primary</item>
 	</style>
 
 	<style name="Theme.Aestheticodes.Camera" parent="@style/Theme.AppCompat">
@@ -56,6 +62,7 @@
 		<item name="android:windowTranslucentStatus" tools:ignore="NewApi">true</item>
 		<item name="android:windowTranslucentNavigation" tools:ignore="NewApi">true</item>
 		<item name="actionDropDownStyle">@style/Theme.Aestheticodes.Spinner</item>
+		<item name="popupMenuStyle">@style/Aestheticodes.PopupMenu</item>
 	</style>
 
 	<!-- Action Bar Styles -->
@@ -78,7 +85,7 @@
 
 	<style name="Theme.Aestheticodes.Spinner" parent="Widget.AppCompat.Spinner.DropDown.ActionBar">
 		<item name="android:dropDownVerticalOffset">-4dip</item>
-		<item name="android:dropDownHorizontalOffset">-8dip</item>
+		<item name="android:dropDownHorizontalOffset">-16dip</item>
 	</style>
 
 	<!-- Button style -->
@@ -88,5 +95,9 @@
 		<item name="android:textSize">12sp</item>
 		<item name="android:textAllCaps" tools:ignore="NewApi">true</item>
 		<item name="textAllCaps">true</item>
+	</style>
+
+	<style name="Aestheticodes.PopupMenu" parent="@style/Widget.AppCompat.PopupMenu">
+		<item name="android:popupBackground">@color/viewfinder_mask</item>
 	</style>
 </resources>

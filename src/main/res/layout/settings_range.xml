@@ -33,19 +33,39 @@
 	          android:textSize="16sp"
 	          android:layout_marginBottom="8dp" />
 
-	<SeekBar android:layout_width="fill_parent"
-	         android:layout_height="wrap_content"
-	         android:id="@+id/sliderMin"
-	         android:layout_weight="1"
-	         android:progress="5"
-	         android:max="10"
-	         android:layout_gravity="center_vertical" />
+	<LinearLayout
+			android:orientation="horizontal"
+			android:layout_width="fill_parent"
+			android:layout_height="fill_parent">
+		<TextView
+				android:layout_width="70dp"
+				android:layout_height="wrap_content"
+				android:text="Minimum"
+				android:id="@+id/textView" android:layout_gravity="center_vertical" />
+		<SeekBar android:layout_width="fill_parent"
+		         android:layout_height="wrap_content"
+		         android:id="@+id/sliderMin"
+		         android:layout_weight="1"
+		         android:progress="5"
+		         android:max="10"
+		         android:layout_gravity="center_vertical" />
+	</LinearLayout>
 
-	<SeekBar android:layout_width="fill_parent"
-	         android:layout_height="wrap_content"
-	         android:id="@+id/sliderMax"
-	         android:layout_weight="1"
-	         android:progress="5"
-	         android:max="10"
-	         android:layout_gravity="center_vertical" />
+	<LinearLayout
+			android:orientation="horizontal"
+			android:layout_width="fill_parent"
+			android:layout_height="fill_parent">
+		<TextView
+				android:layout_width="70dp"
+				android:layout_height="wrap_content"
+				android:text="Maximum"
+				android:id="@+id/textView2" android:layout_gravity="center_vertical" />
+		<SeekBar android:layout_width="fill_parent"
+		         android:layout_height="wrap_content"
+		         android:id="@+id/sliderMax"
+		         android:layout_weight="1"
+		         android:progress="5"
+		         android:max="10"
+		         android:layout_gravity="center_vertical" />
+	</LinearLayout>
 </LinearLayout>

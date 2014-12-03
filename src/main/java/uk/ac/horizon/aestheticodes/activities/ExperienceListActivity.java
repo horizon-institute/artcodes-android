@@ -26,32 +26,23 @@ import android.view.View;
 import android.widget.AdapterView;
 import android.widget.ListView;
 import uk.ac.horizon.aestheticodes.R;
-import uk.ac.horizon.aestheticodes.adapters.ExperienceAdapter;
-import uk.ac.horizon.aestheticodes.detect.ExperienceEventListener;
 import uk.ac.horizon.aestheticodes.model.Experience;
 import uk.ac.horizon.aestheticodes.controller.ExperienceManager;
-import uk.ac.horizon.aestheticodes.model.Marker;
 
-import java.util.List;
-
-public class ExperienceListActivity extends ActionBarActivity implements ExperienceEventListener
+public class ExperienceListActivity extends ActionBarActivity
 {
-	private ExperienceManager experienceManager;
-	private ExperienceAdapter experienceAdapter;
-
 	@Override
 	protected void onCreate(Bundle savedInstanceState)
 	{
 		super.onCreate(savedInstanceState);
 
-		experienceManager = ExperienceManager.get(this);
+		final ExperienceManager experienceManager = ExperienceManager.get(this);
 
 		setContentView(R.layout.experience_list);
 
-		ListView listView = (ListView) findViewById(R.id.experienceList);
+		final ListView listView = (ListView) findViewById(R.id.experienceList);
 
-		experienceAdapter = new ExperienceAdapter(this, experienceManager);
-		experienceManager.load();
+		final ExperienceAdapter experienceAdapter = new ExperienceAdapter(this, experienceManager);
 		listView.setAdapter(experienceAdapter);
 		listView.setOnItemClickListener(new AdapterView.OnItemClickListener()
 		{
@@ -68,6 +59,9 @@ public class ExperienceListActivity extends ActionBarActivity implements Experie
 				}
 			}
 		});
+
+		experienceManager.load();
+		getSupportActionBar().setDisplayHomeAsUpEnabled(true);
 	}
 
 	public void addExperience(View view)
@@ -75,35 +69,15 @@ public class ExperienceListActivity extends ActionBarActivity implements Experie
 		startActivity(new Intent(this, ExperienceEditActivity.class));
 	}
 
-	public void experiencesChanged()
-	{
-		experienceAdapter.notifyDataSetChanged();
-	}
-
-
-	@Override
-	public void experienceSelected(Experience experience)
-	{
-
-	}
-
 	@Override
 	protected void onPause()
 	{
 		super.onPause();
-		experienceManager.removeListener(this);
 	}
 
 	@Override
 	protected void onResume()
 	{
 		super.onResume();
-		experienceManager.addListener(this);
-	}
-
-	@Override
-	public void markersFound(List<Marker> markers)
-	{
-
 	}
 }

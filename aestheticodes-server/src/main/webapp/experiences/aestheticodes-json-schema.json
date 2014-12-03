@@ -1,0 +1,111 @@
+{
+    "$schema": "http://json-schema.org/draft-04/schema#",
+    "title": "Aestheticodes App Settings",
+    "description": "The settings used in the Aestheticodes app.",
+    "type": "object",
+    
+    "properties": {
+        "minRegions": {
+            "description": "The minimum number of regions in a valid Aestheticode (inclusive).",
+            "type": "integer",
+            "minimum": 0
+        },
+        "maxRegions": {
+            "description": "The maximum number of regions in a valid Aestheticode (inclusive).",
+            "type": "integer",
+            "minimum": 0
+        },
+        "maxEmptyRegions": {
+            "description": "The maximum number of empty regions in a valid Aestheticode (inclusive).",
+            "type": "integer",
+            "minimum": 0
+        },
+        "maxRegionValue": {
+            "description": "The maximum value a region can have in a valid Aestheticode (inclusive).",
+            "type": "integer",
+            "minimum": 0
+        },
+        "validationRegions": {
+            "description": "The number of regions that must have a specified value in a valid Aestheticode.",
+            "type": "integer",
+            "minimum": 0
+        },
+        "validationRegionValue": {
+            "description": "The value that validation regions must have in a valid Aestheticode.",
+            "type": "integer",
+            "minimum": 0
+        },
+        "checksumModulo": {
+            "description": "The Aestheticode checksum: the sum of all regions must be divisible by this value to be valid.",
+            "type": "integer",
+            "minimum": 0
+        },
+        "markerOccurrence": {
+            "description": "Minimum number of marker occurrence.",
+            "type": "integer",
+            "minimum": 0
+        },
+        "modes": {
+            "description": "The modes available to the user.",
+            "type": "array",
+            "items": {
+                "type": "string"
+            },
+            "minItems": 1,
+            "uniqueItems": true
+        },
+        "editable": {
+            "description": "Can the user edit predefined settings?",
+            "type": "boolean"
+        },
+        "addMarkers": {
+            "description": "Can the user add new markers?",
+            "type": "boolean"
+        },
+        "markers": {
+        	"description": "The list of markers and their actions.",
+            "type": "array",
+            
+            "items": {
+                "type": "object",
+                "properties": {
+                	"code": {
+                		"description": "The numerical code of the Aestheticode.",
+                		"type": "string",
+                		"pattern": "^[0-9]+(:[0-9]+)*$"
+                	},
+                	"action": {
+                		"description": "The URI of the action.",
+                		"type": "string"
+                	},
+                	"image": {
+                		"description": "The URI of an image for this Aestheticode.",
+                		"type": "string"
+                	},
+                	"title": {
+                		"description": "The title of this Aestheticode.",
+                		"type": "string"
+                	},
+                	"description": {
+                		"description": "The description of this Aestheticode.",
+                		"type": "string"
+                	},
+                	"editable": {
+                		"description": "Is this action editable?",
+                		"type": "boolean"
+                	},
+                	"visible": {
+                		"description": "Should this code appear on the settings screen?",
+                		"type": "boolean"
+                	},
+                	"showDetail": {
+                		"description": "If true the image and description are shown when scanned, otherwise the URI is opened.",
+                		"type": "boolean"
+                	}
+                },
+                "required": ["code","action"]
+            }
+        }
+    },
+    "required": ["minRegions","maxRegions","maxEmptyRegions","maxRegionValue","validationRegions","validationRegionValue","checksumModulo","markerOccurrence","markers"]
+}

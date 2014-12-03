@@ -1,0 +1,25 @@
+{
+    "markers": [
+        {
+            "code": "1:1:1:1:1",
+            "image": "http://wanderanywhere.com/wp-content/uploads/2014/10/Wollaton_Hall_Nov2010-300x226.jpg",
+            "title": "Wollaton Park",
+            "action": "http://wanderanywhere.com/mobile/preselect/11",
+            "editable": false,
+            "description": "A collection of heritage information about Wollaton Park, enhanced with GIS data provided by Nottingham City Council. It is being used in University of Nottingham research into location-based experiences."        }
+    ],
+    "id": "com.wanderanywhere",
+    "name": "Wander Anywhere",
+    "icon": "http://wanderanywhere.com/wp-content/uploads/2014/06/logo.png",
+    "minRegions": 5,
+    "maxRegions": 5,
+    "maxEmptyRegions": 0,
+    "maxRegionValue": 6,
+    "validationRegions": 2,
+    "validationRegionValue": 1,
+    "checksumModulo": 5,
+    "editable": false,
+    "addMarkers": false,
+    "addMarkerByScanning": false,
+    "thresholdBehaviour": "temporalTile"
+}

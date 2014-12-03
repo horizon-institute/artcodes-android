@@ -1,0 +1,44 @@
+{
+    "markers": [
+        {
+            "code": "1:1:1:1:2",
+            "action": "http://www.aestheticodes.com"
+        },
+        {
+            "code": "1:1:1:4:5",
+            "action": "http://www.aestheticodes.com"
+        },
+        {
+            "code": "1:1:2:3:5",
+            "action": "http://www.aestheticodes.com"
+        },
+        {
+            "code": "1:1:2:4:4",
+            "action": "http://www.aestheticodes.com"
+        },
+        {
+            "code": "1:1:3:3:4",
+            "editable": false,
+            "showDetail": true,
+            "title": "Tarantula Nebula",
+            "description": "To celebrate its 22nd anniversary in orbit, the Hubble Space Telescope has released a dramatic new image of the star-forming region 30 Doradus, also known as the Tarantula Nebula because its glowing filaments resemble spider legs. A new image from all three of NASA's Great Observatories - Chandra, Hubble, and Spitzer - has also been created to mark the event.",
+            "image": "http://www.nasa.gov/images/content/641181main_30dor2_665.jpg",
+            "action": "http://www.nasa.gov/mission_pages/chandra/multimedia/tarantula2012.html"
+        }
+    ],
+    "id": "uk.ac.horizon.aestheticodes.default",
+    "name": "Aestheticodes",
+    "description": "Aestheticodes marks a paradigm shift in visual recognition, offering difference to discerning brands. We design visually beautiful images and encode them, resulting in the same interactivity as that of the QR code but with a more visually engaging and playful experience. Images can be the identical with unique codes or the opposite visually unique with identical codes. This interplay offers a new opportunity for visual interaction within, product, packaging, service and interaction design.",
+    "icon": "http://www.wornchaos.org/experiences/uk.ac.horizon.aestheticodes.default.png",
+    "minRegions": 5,
+    "maxRegions": 5,
+    "maxEmptyRegions": 0,
+    "maxRegionValue": 6,
+    "validationRegions": 2,
+    "validationRegionValue": 1,
+    "checksumModulo": 3,
+    "editable": true,
+    "addMarkers": true,
+    "addMarkerByScanning": true,
+    "thresholdBehaviour": "temporalTile"
+}

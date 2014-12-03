@@ -1,0 +1,48 @@
+{
+    "markers": [
+        {
+            "code": "1:1:1:1:2",
+            "title": "Crops For the Future",
+            "description": "Crops For the Future (CFF) is the world’s first centre dedicated to research on underutilised crops for food and non-food uses. CFF focus on the uses of agricultural biodiversity to diversify crop and agricultural systems, address changing climates, improve food security and economic well-being and improve nutrition. ",
+            "image": "http://www.wornchaos.org/experiences/Dome_CFF.png",
+            "action": "http://www.cffresearch.org/Our_Research-@-LandingArticle.aspx#Research_Programmes"
+        },
+        {
+            "code": "1:1:1:1:3",
+            "title": "Crops For the Future",
+            "description": "Crops For the Future (CFF) is the world’s first centre dedicated to research on underutilised crops for food and non-food uses. CFF focus on the uses of agricultural biodiversity to diversify crop and agricultural systems, address changing climates, improve food security and economic well-being and improve nutrition. ",
+            "image": "http://www.wornchaos.org/experiences/Dome_CFF.png",
+            "action": "http://www.cffresearch.org"
+        },
+        {
+            "code": "1:1:1:2:2",
+            "title": "Crops For the Future",
+            "description": "Crops For the Future (CFF) is the world’s first centre dedicated to research on underutilised crops for food and non-food uses. CFF focus on the uses of agricultural biodiversity to diversify crop and agricultural systems, address changing climates, improve food security and economic well-being and improve nutrition.",
+            "image": "http://www.wornchaos.org/experiences/Dome_CFF.png",
+            "action": "http://www.cffresearch.org/Our_Research-@-LandingArticle.aspx#Research_Programmes"
+        },
+        {
+            "code": "1:1:1:2:3",
+            "title": "Crops For the Future",
+            "description": "Crops For the Future (CFF) is the world’s first centre dedicated to research on underutilised crops for food and non-food uses. CFF focus on the uses of agricultural biodiversity to diversify crop and agricultural systems, address changing climates, improve food security and economic well-being and improve nutrition. ",
+            "image": "http://www.wornchaos.org/experiences/Dome_CFF.png",
+            "action": "http://bambaragroundnut.org/ "
+        }
+    ],
+    "id": "org.cropsforthefuture",
+    "name": "FutureCrop",
+    "icon": "http://www.wornchaos.org/experiences/CFF_logo.png",
+    "image": "http://www.wornchaos.org/experiences/Dome_CFF.png",
+    "description": "Crops For the Future (CFF) is the world’s first centre dedicated to research on underutilised crops for food and non-food uses. CFF focus on the uses of agricultural biodiversity to diversify crop and agricultural systems, address changing climates, improve food security and economic well-being and improve nutrition.",
+    "minRegions": 5,
+    "maxRegions": 5,
+    "maxEmptyRegions": 0,
+    "maxRegionValue": 6,
+    "validationRegions": 2,
+    "validationRegionValue": 1,
+    "checksumModulo": 1,
+    "editable": true,
+    "addMarkers": true,
+    "addMarkerByScanning": true,
+    "thresholdBehaviour": "temporalTile"
+}

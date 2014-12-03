@@ -19,17 +19,18 @@
 
 package uk.ac.horizon.aestheticodes.model;
 
+import android.util.Log;
+
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
 public class MarkerSelection
 {
-	private static final float duration = 1000;
-	private final Map<String, Marker> occurrences = new HashMap<String, Marker>();
-	private long last = 0;
+	private static final int TIMEOUT = 2000;
+	private static final int REQUIRED = 5;
+	private final Map<String, MarkerCode> occurrences = new HashMap<String, MarkerCode>();
 	private long lastUpdate = 0;
-	private long total = 0;
 
     private boolean paused = false;
 
@@ -42,7 +43,7 @@ public class MarkerSelection
         this.paused = false;
     }
 
-	public void addMarkers(List<Marker> markers)
+	public void addMarkers(List<MarkerCode> markers)
 	{
         if (paused)
         {
@@ -53,102 +54,56 @@ public class MarkerSelection
 		final long now = System.currentTimeMillis();
 		if(markers.size() > 0)
 		{
-			if (occurrences.size() == 0)
-			{
-				total = 0;
-			}
-			else
-			{
-				total += now - last;
-			}
 			lastUpdate = now;
 		}
 
-		last = now;
-
-		if (isTimeUp(now))
+		if (hasTimedOut(lastUpdate, now))
 		{
-			total = 0;
+			reset();
 		}
 		else
 		{
-			for (Marker marker : markers)
+			for (MarkerCode markerCode : markers)
 			{
 				//increase occurrence if this marker is already in the list.
-				Marker existing = occurrences.get(marker.getCodeKey());
+				MarkerCode existing = occurrences.get(markerCode.getCodeKey());
 				if (existing != null)
 				{
-					existing.setOccurrences(marker.getOccurrences() + existing.getOccurrences());
+					existing.setOccurrences(markerCode.getOccurrences() + existing.getOccurrences());
 				}
 				else
 				{
-					occurrences.put(marker.getCodeKey(), marker);
+					occurrences.put(markerCode.getCodeKey(), markerCode);
 				}
 			}
 		}
 	}
 
-	private boolean isTimeUp(long time)
+	private boolean hasTimedOut(long lastUpdate, long now)
 	{
-		return time > lastUpdate + (2*duration);
+		return now - lastUpdate > TIMEOUT;
 	}
 
-	public float expiration()
+	public String getFoundMarker()
 	{
-		final long now = System.currentTimeMillis();
-		long timeout = now - lastUpdate;
-		if(timeout > duration)
-		{
-			return (timeout - duration) / duration;
-		}
-		return 0;
-	}
-
-	public boolean isTimeUp()
-	{
-		return isTimeUp(System.currentTimeMillis());
-	}
-
-	public boolean isFinished()
-	{
-		return total > duration;
-	}
-
-	public Marker getLikelyMarker()
-	{
-		Marker likely = null;
-		for (Marker marker : occurrences.values())
+		MarkerCode likely = null;
+		for (MarkerCode marker : occurrences.values())
 		{
 			if (likely == null || marker.getOccurrences() > likely.getOccurrences())
 			{
 				likely = marker;
 			}
 		}
-		return likely;
+		if(likely != null && likely.getOccurrences() > REQUIRED)
+		{
+			Log.i(MarkerSelection.class.getName(), "Detected " + likely.getOccurrences());
+			return likely.getCodeKey();
+		}
+		return null;
 	}
 
 	public void reset()
 	{
 		occurrences.clear();
-	}
-
-	public float getProgress()
-	{
-		final long now = System.currentTimeMillis();
-		if (occurrences.size() == 0)
-		{
-			return 0;
-		}
-		else if (isTimeUp(now))
-		{
-			return 0;
-		}
-
-		return total / duration;
-	}
-
-	public boolean hasStarted()
-	{
-		return occurrences.size() != 0;
 	}
 }
