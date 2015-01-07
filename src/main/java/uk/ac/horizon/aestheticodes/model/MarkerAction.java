@@ -25,10 +25,16 @@ public class MarkerAction
 	private String action;
 	private String title;
 	private String description;
+	private String actionText = "Open";
 	private boolean visible = true;
 	private boolean editable = true;
 	private String image;
 	private boolean showDetail = true;
+
+	public String getActionText()
+	{
+		return actionText;
+	}
 
 	public String getCode()
 	{

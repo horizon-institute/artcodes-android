@@ -68,7 +68,7 @@ public class ExperienceManager
 		connection.setReadTimeout(10000 /* milliseconds */);
 		connection.setConnectTimeout(15000 /* milliseconds */);
 		connection.setRequestMethod("GET");
-		connection.setUseCaches(true);
+		connection.setUseCaches(false);
 		if (lastModified != null)
 		{
 			connection.setIfModifiedSince(lastModified.getTime());
