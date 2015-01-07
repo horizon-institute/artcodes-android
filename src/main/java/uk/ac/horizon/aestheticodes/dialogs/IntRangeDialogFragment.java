@@ -28,10 +28,9 @@ import android.support.v4.app.DialogFragment;
 import android.support.v4.app.FragmentManager;
 import android.view.LayoutInflater;
 import android.view.View;
-import android.widget.SeekBar;
-import android.widget.TextView;
 import uk.ac.horizon.aestheticodes.R;
 import uk.ac.horizon.aestheticodes.activities.ExperienceEditActivity;
+import uk.ac.horizon.aestheticodes.properties.Property;
 
 public class IntRangeDialogFragment extends DialogFragment
 {
@@ -40,66 +39,69 @@ public class IntRangeDialogFragment extends DialogFragment
 	public Dialog onCreateDialog(Bundle savedInstanceState)
 	{
 		AlertDialog.Builder builder = new AlertDialog.Builder(getActivity());
+
+		final String minPropertyName = getArguments().getString("minProperty");
+		final Property minProperty = ((ExperienceEditActivity)getActivity()).getProperties().get(minPropertyName);
+		final String maxPropertyName = getArguments().getString("maxProperty");
+		final Property maxProperty = ((ExperienceEditActivity)getActivity()).getProperties().get(maxPropertyName);
+
 		LayoutInflater inflater = getActivity().getLayoutInflater();
-		builder.setTitle("Set " + getArguments().getString("title"));
-		String description = getArguments().getString("description");
+		@SuppressLint("InflateParams")
+		final View view = inflater.inflate(R.layout.settings_range, null);
+
+		minProperty.bindTo(view.findViewById(R.id.sliderValue));
+		minProperty.bindTo(view.findViewById(R.id.sliderMin));
+
+		maxProperty.bindTo(view.findViewById(R.id.sliderValue));
+		maxProperty.bindTo(view.findViewById(R.id.sliderMax));
+
+		minProperty.load();
+		maxProperty.load();
+
+		builder.setTitle(getString(R.string.property_set, minProperty.getFormat().getTextString(null, null)));
+		String description = minProperty.getFormat().getTextString("desc", null);
 		if (description != null)
 		{
 			builder.setMessage(description);
 		}
-
-		@SuppressLint("InflateParams")
-		View view = inflater.inflate(R.layout.settings_range, null);
-
-//		sliderValue = (TextView) view.findViewById(R.id.sliderValue);
-//		sliderMin = (SeekBar) view.findViewById(R.id.sliderMin);
-//		sliderMax = (SeekBar) view.findViewById(R.id.sliderMax);
-//
-//		minPropertyName = getArguments().getString("minPropertyName");
-//		final String maxPropertyName = getArguments().getString("maxPropertyName");
-//		min = getInt(getArguments(), "min");
-//		final int max = getInt(getArguments(), "max");
-//		final int minValue = getInt(getArguments(), "minValue");
-//		final int maxValue = getInt(getArguments(), "maxValue");
-//
-//		sliderMin.setMax(max - min);
-//		sliderMin.setProgress(minValue - min);
-//		sliderMin.setOnSeekBarChangeListener(listener);
-//
-//		sliderMax.setMax(max - min);
-//		sliderMax.setProgress(maxValue - min);
-//		sliderMax.setOnSeekBarChangeListener(listener);
-//
-//		update();
-
 		builder.setView(view);
 		builder.setPositiveButton(R.string.dialog_action_set, new DialogInterface.OnClickListener()
 		{
 			public void onClick(DialogInterface dialog, int id)
 			{
-//				final int minValue = sliderMin.getProgress() + min;
-//				final int maxValue = sliderMax.getProgress() + min;
-//				((ExperienceEditActivity)getActivity()).getProperties().get(minPropertyName).set(minValue);
-//				((ExperienceEditActivity)getActivity()).getProperties().get(maxPropertyName).set(maxValue);
-//				//((SettingsActivity)getActivity()).setProperty(minPropertyName, value);
+				minProperty.unbind(R.id.sliderValue);
+				minProperty.unbind(R.id.sliderMin);
+
+				maxProperty.unbind(R.id.sliderValue);
+				maxProperty.unbind(R.id.sliderMax);
+
+				minProperty.save();
+				maxProperty.save();
 			}
 		});
 		builder.setNegativeButton(R.string.dialog_action_cancel, new DialogInterface.OnClickListener()
 		{
 			public void onClick(DialogInterface dialog, int id)
 			{
-				// User cancelled the dialog
+				minProperty.unbind(R.id.sliderValue);
+				minProperty.unbind(R.id.sliderMin);
+
+				maxProperty.unbind(R.id.sliderValue);
+				maxProperty.unbind(R.id.sliderMax);
+
+				minProperty.load();
+				maxProperty.load();
 			}
 		});
-		// Create the AlertDialog object and return it
 		return builder.create();
 	}
 
-	public static void create(FragmentManager fragmentManager, String propertyName)
+	public static void create(FragmentManager fragmentManager, String minProperty, String maxProperty)
 	{
 		DialogFragment newFragment = new IntRangeDialogFragment();
 		Bundle bundle = new Bundle();
-		bundle.putString("propertyName", propertyName);
+		bundle.putString("minProperty", minProperty);
+		bundle.putString("maxProperty", maxProperty);
 		newFragment.setArguments(bundle);
 		newFragment.show(fragmentManager, "IntDialog");
 	}

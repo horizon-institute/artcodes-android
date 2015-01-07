@@ -21,6 +21,7 @@ package uk.ac.horizon.aestheticodes.properties.bindings;
 
 import android.os.Handler;
 import android.text.Editable;
+import android.text.InputFilter;
 import android.text.TextWatcher;
 import android.view.View;
 import android.widget.EditText;
@@ -29,6 +30,8 @@ import uk.ac.horizon.aestheticodes.properties.Property;
 
 public class EditTextBinding extends ViewBinding
 {
+	private Format format;
+
 	public EditTextBinding(View view)
 	{
 		super(view);
@@ -37,13 +40,19 @@ public class EditTextBinding extends ViewBinding
 	@Override
 	public void update(Object value, Format format)
 	{
+		this.format = format;
 		if(view instanceof EditText)
 		{
 			EditText editText = (EditText)view;
-			editText.setError(null);
-			if(!editText.getText().toString().equals(value))
+			if(format instanceof InputFilter)
 			{
-				editText.setText(format.getDisplayString(value));
+				editText.setFilters(new InputFilter[] {(InputFilter)format});
+			}
+			editText.setError(null);
+			String editString = format.getEditString(value);
+			if(!editText.getText().toString().equals(editString))
+			{
+				editText.setText(editString);
 			}
 		}
 	}
@@ -55,6 +64,15 @@ public class EditTextBinding extends ViewBinding
 		{
 			EditText editText = (EditText)view;
 			editText.setError(error);
+		}
+	}
+
+	@Override
+	public void save(Property property)
+	{
+		if(view instanceof EditText)
+		{
+			property.set(format.getSaveValue(((EditText)view).getText().toString()));
 		}
 	}
 
@@ -81,7 +99,7 @@ public class EditTextBinding extends ViewBinding
 					@Override
 					public void run()
 					{
-						property.set(editText.getText().toString());
+						save(property);
 					}
 				};
 
@@ -95,6 +113,16 @@ public class EditTextBinding extends ViewBinding
 				@Override
 				public void afterTextChanged(Editable editable)
 				{
+				}
+			});
+			editText.setOnFocusChangeListener(new View.OnFocusChangeListener() {
+				@Override
+				public void onFocusChange(View v, boolean hasFocus)
+				{
+					if(!hasFocus)
+					{
+						save(property);
+					}
 				}
 			});
 			return true;

@@ -25,15 +25,16 @@ import android.os.Bundle;
 import android.support.v7.app.ActionBarActivity;
 import android.view.View;
 import uk.ac.horizon.aestheticodes.R;
+import uk.ac.horizon.aestheticodes.model.Marker;
 import uk.ac.horizon.aestheticodes.properties.bindings.ColorImageBinding;
 import uk.ac.horizon.aestheticodes.controller.ExperienceManager;
 import uk.ac.horizon.aestheticodes.model.Experience;
-import uk.ac.horizon.aestheticodes.model.Marker;
 import uk.ac.horizon.aestheticodes.properties.Properties;
 
 public class MarkerActivity extends ActionBarActivity
 {
 	private Marker marker;
+	private Properties properties;
 
 	@Override
 	public void onCreate(Bundle savedInstanceState)
@@ -49,7 +50,7 @@ public class MarkerActivity extends ActionBarActivity
 		Experience experience = experienceManager.get(experienceID);
 		marker = experience.getMarkers().get(markerCode);
 
-		Properties properties = new Properties(this, marker);
+		properties = new Properties(this, marker);
 		properties.get("title")
 				.defaultTo(getString(R.string.code_text, marker.getCode()))
 				.bindTo(R.id.markerTitle);

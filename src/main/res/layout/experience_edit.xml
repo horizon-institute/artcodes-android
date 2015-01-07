@@ -185,109 +185,104 @@
 		</LinearLayout>
 		<LinearLayout android:orientation="vertical"
 		              android:layout_width="fill_parent"
-		              android:layout_height="fill_parent">
-			<LinearLayout android:orientation="vertical"
-			              android:layout_width="fill_parent"
-			              android:layout_height="fill_parent"
-			              android:id="@+id/markerSettings"
-			              android:visibility="gone">
-				<LinearLayout android:layout_width="fill_parent"
-				              android:layout_height="72dp"
-				              android:paddingTop="16dp"
-				              android:paddingBottom="16dp"
-				              android:orientation="vertical"
-				              android:paddingLeft="56dp">
+		              android:id="@+id/markerSettings"
+		              android:layout_height="fill_parent" android:visibility="gone">
+			<LinearLayout android:layout_width="fill_parent"
+			              android:layout_height="72dp"
+			              android:paddingTop="16dp"
+			              android:paddingBottom="16dp"
+			              android:orientation="vertical"
+			              android:paddingLeft="56dp">
 
-					<TextView android:layout_width="wrap_content"
-					          android:layout_height="wrap_content"
-					          android:textSize="16sp"
-					          android:textColor="#333"
-					          android:text="@string/minRegions" />
+				<TextView android:layout_width="wrap_content"
+				          android:layout_height="wrap_content"
+				          android:textSize="16sp"
+				          android:textColor="#333"
+				          android:text="@string/minRegions" />
 
-					<TextView android:id="@+id/markerRegions"
-					          android:layout_width="wrap_content"
-					          android:layout_height="wrap_content"
-					          android:textSize="14sp"
-					          android:textColor="#999" />
-				</LinearLayout>
-				<LinearLayout android:layout_width="fill_parent"
-				              android:layout_height="72dp"
-				              android:paddingTop="16dp"
-				              android:paddingBottom="16dp"
-				              android:orientation="vertical"
-				              android:paddingLeft="56dp">
+				<TextView android:id="@+id/markerRegions"
+				          android:layout_width="wrap_content"
+				          android:layout_height="wrap_content"
+				          android:textSize="14sp"
+				          android:textColor="#999" />
+			</LinearLayout>
+			<LinearLayout android:layout_width="fill_parent"
+			              android:layout_height="72dp"
+			              android:paddingTop="16dp"
+			              android:paddingBottom="16dp"
+			              android:orientation="vertical"
+			              android:paddingLeft="56dp">
 
-					<TextView android:layout_width="wrap_content"
-					          android:layout_height="wrap_content"
-					          android:textSize="16sp"
-					          android:textColor="#333"
-					          android:text="@string/maxRegionValue" />
+				<TextView android:layout_width="wrap_content"
+				          android:layout_height="wrap_content"
+				          android:textSize="16sp"
+				          android:textColor="#333"
+				          android:text="@string/maxRegionValue" />
 
-					<TextView android:id="@+id/markerRegionValue"
-					          android:layout_width="wrap_content"
-					          android:layout_height="wrap_content"
-					          android:textSize="14sp"
-					          android:textColor="#999" />
-				</LinearLayout>
-				<LinearLayout android:layout_width="fill_parent"
-				              android:layout_height="72dp"
-				              android:paddingTop="16dp"
-				              android:paddingBottom="16dp"
-				              android:orientation="vertical"
-				              android:paddingLeft="56dp">
+				<TextView android:id="@+id/markerRegionValue"
+				          android:layout_width="wrap_content"
+				          android:layout_height="wrap_content"
+				          android:textSize="14sp"
+				          android:textColor="#999" />
+			</LinearLayout>
+			<LinearLayout android:layout_width="fill_parent"
+			              android:layout_height="72dp"
+			              android:paddingTop="16dp"
+			              android:paddingBottom="16dp"
+			              android:orientation="vertical"
+			              android:paddingLeft="56dp">
 
-					<TextView android:layout_width="wrap_content"
-					          android:layout_height="wrap_content"
-					          android:textSize="16sp"
-					          android:textColor="#333"
-					          android:text="@string/validationRegions" />
+				<TextView android:layout_width="wrap_content"
+				          android:layout_height="wrap_content"
+				          android:textSize="16sp"
+				          android:textColor="#333"
+				          android:text="@string/validationRegions" />
 
-					<TextView android:id="@+id/markerValidationRegions"
-					          android:layout_width="wrap_content"
-					          android:layout_height="wrap_content"
-					          android:textSize="14sp"
-					          android:textColor="#999" />
-				</LinearLayout>
-				<LinearLayout android:layout_width="fill_parent"
-				              android:layout_height="72dp"
-				              android:paddingTop="16dp"
-				              android:paddingBottom="16dp"
-				              android:orientation="vertical"
-				              android:paddingLeft="56dp"
-				              android:paddingStart="56dp">
+				<TextView android:id="@+id/markerValidationRegions"
+				          android:layout_width="wrap_content"
+				          android:layout_height="wrap_content"
+				          android:textSize="14sp"
+				          android:textColor="#999" />
+			</LinearLayout>
+			<LinearLayout android:layout_width="fill_parent"
+			              android:layout_height="72dp"
+			              android:paddingTop="16dp"
+			              android:paddingBottom="16dp"
+			              android:orientation="vertical"
+			              android:paddingLeft="56dp"
+			              android:paddingStart="56dp">
 
-					<TextView android:layout_width="wrap_content"
-					          android:layout_height="wrap_content"
-					          android:textSize="16sp"
-					          android:textColor="#333"
-					          android:text="@string/validationRegionValue" />
+				<TextView android:layout_width="wrap_content"
+				          android:layout_height="wrap_content"
+				          android:textSize="16sp"
+				          android:textColor="#333"
+				          android:text="@string/validationRegionValue" />
 
-					<TextView android:id="@+id/markerValidationRegionValue"
-					          android:layout_width="wrap_content"
-					          android:layout_height="wrap_content"
-					          android:textSize="14sp"
-					          android:textColor="#999" />
-				</LinearLayout>
-				<LinearLayout android:layout_width="fill_parent"
-				              android:layout_height="72dp"
-				              android:paddingTop="16dp"
-				              android:paddingBottom="16dp"
-				              android:orientation="vertical"
-				              android:paddingLeft="56dp"
-				              android:paddingStart="56dp">
+				<TextView android:id="@+id/markerValidationRegionValue"
+				          android:layout_width="wrap_content"
+				          android:layout_height="wrap_content"
+				          android:textSize="14sp"
+				          android:textColor="#999" />
+			</LinearLayout>
+			<LinearLayout android:layout_width="fill_parent"
+			              android:layout_height="72dp"
+			              android:paddingTop="16dp"
+			              android:paddingBottom="16dp"
+			              android:orientation="vertical"
+			              android:paddingLeft="56dp"
+			              android:paddingStart="56dp">
 
-					<TextView android:layout_width="wrap_content"
-					          android:layout_height="wrap_content"
-					          android:textSize="16sp"
-					          android:textColor="#333"
-					          android:text="@string/checksumModulo" />
+				<TextView android:layout_width="wrap_content"
+				          android:layout_height="wrap_content"
+				          android:textSize="16sp"
+				          android:textColor="#333"
+				          android:text="@string/checksumModulo" />
 
-					<TextView android:id="@+id/markerChecksum"
-					          android:layout_width="wrap_content"
-					          android:layout_height="wrap_content"
-					          android:textSize="14sp"
-					          android:textColor="#999" />
-				</LinearLayout>
+				<TextView android:id="@+id/markerChecksum"
+				          android:layout_width="wrap_content"
+				          android:layout_height="wrap_content"
+				          android:textSize="14sp"
+				          android:textColor="#999" />
 			</LinearLayout>
 		</LinearLayout>
 	</LinearLayout>

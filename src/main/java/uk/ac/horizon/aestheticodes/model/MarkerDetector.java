@@ -98,7 +98,7 @@ public class MarkerDetector
 			{
 				if (codes == null)
 				{
-					codes = new ArrayList<Integer>();
+					codes = new ArrayList<>();
 				}
 				codes.add(regionValue);
 			}

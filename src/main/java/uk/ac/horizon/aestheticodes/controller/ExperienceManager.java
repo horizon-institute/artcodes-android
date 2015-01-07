@@ -19,15 +19,24 @@
 
 package uk.ac.horizon.aestheticodes.controller;
 
+import android.accounts.Account;
+import android.accounts.AccountManager;
 import android.content.Context;
+import android.content.Intent;
+import android.content.SharedPreferences;
 import android.net.ConnectivityManager;
 import android.net.NetworkInfo;
 import android.os.AsyncTask;
 import android.util.Log;
+import com.google.android.gms.auth.GoogleAuthUtil;
 import com.google.gson.Gson;
 import com.google.gson.GsonBuilder;
-import com.google.gson.JsonSyntaxException;
 import com.google.gson.reflect.TypeToken;
+import org.apache.http.HttpResponse;
+import org.apache.http.client.HttpClient;
+import org.apache.http.client.methods.HttpPut;
+import org.apache.http.entity.StringEntity;
+import org.apache.http.impl.client.DefaultHttpClient;
 import uk.ac.horizon.aestheticodes.detect.ExperienceEventListener;
 import uk.ac.horizon.aestheticodes.model.Experience;
 import uk.ac.horizon.aestheticodes.model.Marker;
@@ -35,18 +44,50 @@ import uk.ac.horizon.aestheticodes.model.Marker;
 import java.io.File;
 import java.io.FileReader;
 import java.io.FileWriter;
-import java.io.IOException;
 import java.io.InputStreamReader;
-import java.io.Reader;
-import java.net.HttpURLConnection;
 import java.net.URL;
+import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.Collection;
 import java.util.HashMap;
 import java.util.HashSet;
+import java.util.List;
 import java.util.Map;
+import java.util.Set;
 
 public class ExperienceManager
 {
+	private static final class ExperienceResults
+	{
+		private final Map<String, Experience> experiences = new HashMap<>();
+	}
+
+	private static final class ExperienceUpdates
+	{
+		private final List<Object> experiences = new ArrayList<>();
+	}
+
+	private static final class ExperienceOp
+	{
+		private final String id;
+		private final Experience.Operation op;
+		private final Integer version;
+
+		public ExperienceOp(String id, Experience.Operation op)
+		{
+			this.id = id;
+			this.op = op;
+			this.version = null;
+		}
+
+		public ExperienceOp(String id, int version)
+		{
+			this.id = id;
+			this.op = null;
+			this.version = version;
+		}
+	}
+
 	private static final String TAG = ExperienceManager.class.getName();
 	private static final Gson gson = createParser();
 	private static ExperienceManager experienceManager;
@@ -59,44 +100,6 @@ public class ExperienceManager
 		return build.create();
 	}
 
-	private static HttpURLConnection createConnection(final String url, final String etag) throws IOException
-	{
-		Log.i(TAG, "Creating connection for " + url);
-		HttpURLConnection connection = (HttpURLConnection) new URL(url).openConnection();
-		connection.setReadTimeout(10000 /* milliseconds */);
-		connection.setConnectTimeout(15000 /* milliseconds */);
-		connection.setRequestMethod("GET");
-		connection.setUseCaches(false);
-
-		if (etag != null)
-		{
-			connection.setRequestProperty("If-None-Match", etag);
-		}
-
-		return connection;
-	}
-
-	private static <T> T read(Class<T> clazz, HttpURLConnection connection) throws IOException
-	{
-		connection.connect();
-		int response = connection.getResponseCode();
-		Log.i(TAG, "The response is: " + response);
-		if (response == HttpURLConnection.HTTP_OK)
-		{
-			try
-			{
-				Reader reader = new InputStreamReader(connection.getInputStream());
-				return gson.fromJson(reader, clazz);
-			}
-			catch (JsonSyntaxException e)
-			{
-				Log.e(TAG, "There was a syntax problem with the downloaded JSON, maybe a proxy server is forwarding us to a login page?", e);
-				return null;
-			}
-		}
-		return null;
-	}
-
 	public static ExperienceManager get(Context context)
 	{
 		if (experienceManager == null)
@@ -106,256 +109,216 @@ public class ExperienceManager
 		return experienceManager;
 	}
 
-	private class LoadExperiences extends AsyncTask<Void, Experience, Void>
+	private final class UpdateExperiences extends AsyncTask<Void, Experience, Collection<String>>
 	{
-		@SuppressWarnings("unchecked")
-		private void readExperienceURLs(Map<String, String> experienceURLs, String experiencesURL) throws IOException
+		@Override
+		protected Collection<String> doInBackground(Void... params)
 		{
-			URL rootURL = new URL(experiencesURL);
-
-			Map<String, String> newExperienceInfo = read(experienceURLs.getClass(), createConnection(experiencesURL, null));
-			if (newExperienceInfo != null)
+			Set<String> removals = new HashSet<>();
+			try
 			{
-				for (String experienceID : newExperienceInfo.keySet())
+				Collection<Experience> experienceList = null;
+				if (!loaded)
 				{
-					URL experienceURL = new URL(rootURL, newExperienceInfo.get(experienceID));
-					experienceURLs.put(experienceID, experienceURL.toString());
-					Log.i(TAG, experienceID + " = " + experienceURL.toString());
+					Log.i("", "Loading...");
+					try
+					{
+						Experience[] experiencesLoaded = null;
+						File experienceFile = new File(context.getFilesDir(), "experiences.json");
+						if (experienceFile.exists())
+						{
+							try
+							{
+								Log.i("", "Loading " + experienceFile.getAbsolutePath());
+								experiencesLoaded = gson.fromJson(new FileReader(experienceFile), Experience[].class);
+							}
+							catch (Exception e)
+							{
+								Log.w("", e.getMessage(), e);
+							}
+						}
+
+						if (experiencesLoaded == null)
+						{
+							Log.i("", "Loading default.json");
+							experiencesLoaded = gson.fromJson(new InputStreamReader(context.getAssets().open("default.json")), Experience[].class);
+						}
+
+						if (experiencesLoaded != null)
+						{
+							Log.i("", "Loaded");
+							publishProgress(experiencesLoaded);
+							loaded = true;
+							experienceList = Arrays.asList(experiencesLoaded);
+						}
+					}
+					catch (Exception e)
+					{
+						Log.w(TAG, "Failed to load settings", e);
+					}
+				}
+
+				if (experienceList == null)
+				{
+					experienceList = experiences.values();
+				}
+
+				Log.i(TAG, "Updating...");
+				ConnectivityManager cm = (ConnectivityManager) context.getSystemService(Context.CONNECTIVITY_SERVICE);
+				NetworkInfo netInfo = cm.getActiveNetworkInfo();
+				if (netInfo != null && netInfo.isConnectedOrConnecting())
+				{
+					boolean changes = false;
+					final ExperienceUpdates updates = new ExperienceUpdates();
+					for (Experience experience : experienceList)
+					{
+						Log.i("", experience.getId());
+						if (experience.getOp() == null || experience.getOp() == Experience.Operation.retrieve)
+						{
+							updates.experiences.add(new ExperienceOp(experience.getId(), experience.getVersion()));
+						}
+						else if (experience.getOp() == Experience.Operation.remove)
+						{
+							updates.experiences.add(new ExperienceOp(experience.getId(), Experience.Operation.remove));
+							changes = true;
+						}
+						else if(experience.getOp() != Experience.Operation.temp)
+						{
+							updates.experiences.add(experience);
+							changes = true;
+						}
+
+					}
+
+					if (changes || !init)
+					{
+						HttpResponse response = put("https://aestheticodes.appspot.com/_ah/api/experiences/v1/experiences", updates);
+						if (response.getStatusLine().getStatusCode() == 200)
+						{
+							init = true;
+							ExperienceResults results = gson.fromJson(new InputStreamReader(response.getEntity().getContent()), ExperienceResults.class);
+							for (String experienceID : results.experiences.keySet())
+							{
+								Experience experience = results.experiences.get(experienceID);
+								if (experience.getId() == null)
+								{
+									experience.setId(experienceID);
+								}
+
+								if (!experienceID.equals(experience.getId()))
+								{
+									publishProgress(experience);
+									removals.add(experienceID);
+								}
+								else if (experience.getOp() == Experience.Operation.remove)
+								{
+									removals.add(experience.getId());
+								}
+								else
+								{
+									publishProgress(experience);
+								}
+							}
+						}
+					}
 				}
 			}
-			else
+			catch (Exception e)
 			{
-				Log.i(ExperienceManager.class.getName(), "New experiences == null");
+				Log.e(TAG, e.getMessage(), e);
+			}
+
+			return removals;
+		}
+
+		@Override
+		protected void onPostExecute(Collection<String> removals)
+		{
+			for (String experienceID : removals)
+			{
+				Log.i("", "Removing " + experienceID);
+				experiences.remove(experienceID);
+
+				if (selected != null && selected.getId().equals(experienceID))
+				{
+					if (experiences.size() >= 1)
+					{
+						setSelected(experiences.values().iterator().next());
+					}
+					else
+					{
+						Experience experience = new Experience();
+						experience.setName("Aestheticodes");
+						setSelected(experience);
+					}
+				}
+			}
+			save();
+
+			for (final ExperienceEventListener listener : listeners)
+			{
+				listener.experiencesChanged();
 			}
 		}
 
 		@Override
 		protected void onProgressUpdate(Experience... newExperiences)
 		{
-			if (newExperiences != null)
+			if (newExperiences == null)
 			{
-				for (Experience experience : newExperiences)
-				{
-					add(experience);
-				}
-			}
-		}
-
-		@Override
-		protected Void doInBackground(Void... params)
-		{
-			try
-			{
-				final Map<String, Experience> experienceMap = new HashMap<String, Experience>();
-				final Map<String, String> experienceURLs = new HashMap<String, String>();
-
-				for (Experience experience : experiences.values())
-				{
-					experienceMap.put(experience.getId(), experience);
-					experienceURLs.put(experience.getId(), experience.getUpdateURL());
-				}
-
-				try
-				{
-					File dir = new File(context.getFilesDir(), "experiences");
-					if (dir.exists())
-					{
-						String[] experienceNames = dir.list();
-						for (String experienceName : experienceNames)
-						{
-							// Strip json
-							if (experienceName.endsWith(".json"))
-							{
-								String name = experienceName.substring(0, experienceName.length() - 5);
-								if (!experienceMap.containsKey(name))
-								{
-									try
-									{
-										Experience experience = gson.fromJson(new FileReader(new File(context.getFilesDir(), "experiences/" + experienceName)), Experience.class);
-										experienceMap.put(experience.getId(), experience);
-										if (experience.getUpdateURL() != null)
-										{
-											experienceURLs.put(experience.getId(), experience.getUpdateURL());
-										}
-										publishProgress(experience);
-									}
-									catch (Exception e)
-									{
-										Log.w(TAG, "Failed to load settings", e);
-									}
-								}
-							}
-						}
-					}
-
-					String[] experienceNames = context.getAssets().list("experiences");
-					for (String experienceName : experienceNames)
-					{
-						// Strip json
-						String name = experienceName.substring(0, experienceName.length() - 5);
-						if (!experienceMap.containsKey(name))
-						{
-							try
-							{
-								Experience experience = gson.fromJson(new InputStreamReader(context.getAssets().open("experiences/" + experienceName)), Experience.class);
-								experienceMap.put(experience.getId(), experience);
-								if (experience.getUpdateURL() != null)
-								{
-									experienceURLs.put(experience.getId(), experience.getUpdateURL());
-								}
-								publishProgress(experience);
-							}
-							catch (Exception e)
-							{
-								Log.w(TAG, "Failed to load settings", e);
-							}
-						}
-					}
-				}
-				catch (Exception e)
-				{
-					Log.w(TAG, "Failed to load settings", e);
-				}
-
-				ConnectivityManager cm = (ConnectivityManager) context.getSystemService(Context.CONNECTIVITY_SERVICE);
-				NetworkInfo netInfo = cm.getActiveNetworkInfo();
-				if (netInfo != null && netInfo.isConnectedOrConnecting())
-				{
-					readExperienceURLs(experienceURLs, "http://aestheticodes.appspot.com/experiences/experiences.json");
-
-					for (String experienceID : experienceURLs.keySet())
-					{
-						try
-						{
-							if (experienceURLs.get(experienceID) != null)
-							{
-
-								Experience experience = experienceMap.get(experienceID);
-								String etag = null;
-								if (experience != null)
-								{
-									etag = experience.getEtag();
-								}
-								HttpURLConnection connection = createConnection(experienceURLs.get(experienceID), etag);
-								experience = read(Experience.class, connection);
-								if (experience != null)
-								{
-									experience.setUpdateURL(experienceURLs.get(experienceID));
-									experience.setEtag(connection.getHeaderField("ETag"));
-									experience.setChanged(true);
-									experienceMap.put(experience.getId(), experience);
-									publishProgress(experience);
-								}
-							}
-						}
-						catch (IOException e)
-						{
-							Log.e(TAG, e.getMessage(), e);
-						}
-					}
-				}
-			}
-			catch (IOException e)
-			{
-				Log.e(TAG, e.getMessage(), e);
+				return;
 			}
 
-			return null;
+			for (Experience experience : newExperiences)
+			{
+				synchronized (experiences)
+				{
+					experiences.put(experience.getId(), experience);
+				}
+				if (selected != null && selected.getId().equals(experience.getId()))
+				{
+					setSelected(experience);
+				}
+			}
+
+			if (selected == null)
+			{
+				SharedPreferences preferences = context.getSharedPreferences(ExperienceManager.class.getSimpleName(), Context.MODE_PRIVATE);
+				Log.i(TAG, "Loading experience " + preferences.getString("experience", "uk.ac.horizon.aestheticodes.default"));
+				Experience experience = experienceManager.get(preferences.getString("experience", "uk.ac.horizon.aestheticodes.default"));
+				if (experience != null)
+				{
+					experienceManager.setSelected(experience);
+				}
+			}
+
+			for (final ExperienceEventListener listener : listeners)
+			{
+				listener.experiencesChanged();
+			}
 		}
 	}
 
-	private final Map<String, Experience> experiences = new HashMap<String, Experience>();
+	private final Map<String, Experience> experiences = new HashMap<>();
 	private final Context context;
-	private final Collection<ExperienceEventListener> listeners = new HashSet<ExperienceEventListener>();
+	private final Collection<ExperienceEventListener> listeners = new HashSet<>();
 	private Experience selected;
+	private boolean loaded = false;
+	private boolean init = false;
 
 	public ExperienceManager(Context context)
 	{
 		this.context = context;
 	}
 
-	public void addListener(ExperienceEventListener listener)
-	{
-		listeners.add(listener);
-	}
-
-	public void removeListener(ExperienceEventListener listener)
-	{
-		listeners.remove(listener);
-	}
-
-	public Experience getSelected()
-	{
-		return selected;
-	}
-
-	public void setSelected(final Experience selected)
-	{
-		this.selected = selected;
-		for (final ExperienceEventListener listener : listeners)
-		{
-			listener.experienceSelected(selected);
-		}
-	}
-
-	public Experience get(String id)
-	{
-		synchronized (experiences)
-		{
-			if (experiences.containsKey(id))
-			{
-				return experiences.get(id);
-			}
-		}
-		return load(id);
-	}
-
-	private Reader loadFile(String path) throws IOException
-	{
-		File file = new File(context.getFilesDir(), path);
-		if (file.exists())
-		{
-			return new FileReader(file);
-		}
-
-		return new InputStreamReader(context.getAssets().open(path));
-	}
-
-	@SuppressWarnings("ResultOfMethodCallIgnored")
-	private void save(Experience experience)
-	{
-		// TODO Check if exists
-		if (experience.hasChanged())
-		{
-			try
-			{
-				File file = new File(context.getFilesDir(), "experiences/" + experience.getId() + ".json");
-				if (!file.exists())
-				{
-					File dir = new File(context.getFilesDir(), "experiences");
-					dir.mkdirs();
-					file.createNewFile();
-				}
-				final FileWriter writer = new FileWriter(file);
-				gson.toJson(experience, writer);
-				experience.setChanged(false);
-				writer.flush();
-				writer.close();
-				Log.i(TAG, "Saved: " + gson.toJson(experience));
-			}
-			catch (Exception e)
-			{
-				Log.w(TAG, "Failed to save settings", e);
-			}
-		}
-	}
 
 	public void add(Experience experience)
 	{
-		if (experience == null)
+		if (experience == null || experience.getId() == null)
 		{
 			return;
 		}
+		Log.i("", "Adding " + experience.getId());
 		synchronized (experiences)
 		{
 			experiences.put(experience.getId(), experience);
@@ -369,38 +332,27 @@ public class ExperienceManager
 			setSelected(experience);
 		}
 
-		save(experience);
-
 		for (final ExperienceEventListener listener : listeners)
 		{
 			listener.experiencesChanged();
 		}
 	}
 
-	public void delete(Experience experience)
+	public void addListener(ExperienceEventListener listener)
 	{
-		// TODO
-		if(selected != null && selected.getId().equals(experience.getId()))
-		{
-			// TODO
-			setSelected(null);
-		}
+		listeners.add(listener);
+	}
 
-		experiences.remove(experience.getId());
-
-		File file = new File(context.getFilesDir(), "experiences/" + experience.getId() + ".json");
-		if (file.exists())
+	public Experience get(String id)
+	{
+		synchronized (experiences)
 		{
-			if(!file.delete())
+			if (experiences.containsKey(id))
 			{
-				Log.i("", "Experience not deleted?");
+				return experiences.get(id);
 			}
 		}
-
-		for (final ExperienceEventListener listener : listeners)
-		{
-			listener.experiencesChanged();
-		}
+		return null;
 	}
 
 	public Collection<Experience> getExperiences()
@@ -411,39 +363,141 @@ public class ExperienceManager
 		}
 	}
 
-	public void load()
+	public Experience getSelected()
 	{
-		new LoadExperiences().execute();
+		return selected;
 	}
 
-	private Experience load(String id)
+	public void setSelected(final Experience selected)
 	{
-		synchronized (experiences)
+		this.selected = selected;
+
+		context.getSharedPreferences(ExperienceManager.class.getSimpleName(), Context.MODE_PRIVATE).edit().putString("experience", selected.getId()).commit();
+
+		for (final ExperienceEventListener listener : listeners)
 		{
-			if (experiences.containsKey(id))
-			{
-				return experiences.get(id);
-			}
+			listener.experienceSelected(selected);
+		}
+	}
+
+	public void handleIntent(Intent intent)
+	{
+		if (intent == null)
+		{
+			return;
 		}
 
-		try
+		String experienceID = intent.getStringExtra("experienceID");
+		if (experienceID != null)
 		{
-			Reader reader = loadFile("experiences/" + id + ".json");
-			if (reader != null)
+			Experience experience = experienceManager.get(experienceID);
+			if (experience != null)
 			{
-				Experience experience = gson.fromJson(reader, Experience.class);
+				experienceManager.setSelected(experience);
+			}
+		}
+		String experienceJSON = intent.getStringExtra("experience");
+		if (experienceJSON != null)
+		{
+			try
+			{
+				Experience experience = gson.fromJson(experienceJSON, Experience.class);
 				if (experience != null)
 				{
 					add(experience);
-					return experience;
+					setSelected(experience);
 				}
+			}
+			catch(Exception e)
+			{
+				Log.w("", e.getMessage(), e);
+			}
+		}
+
+	}
+
+	public void load()
+	{
+		new UpdateExperiences().execute();
+	}
+
+	public void removeListener(ExperienceEventListener listener)
+	{
+		listeners.remove(listener);
+	}
+
+	public void save()
+	{
+		try
+		{
+			final File experienceFile = new File(context.getFilesDir(), "experiences.json");
+			final FileWriter writer = new FileWriter(experienceFile);
+			final Collection<Experience> saveExperiences = new ArrayList<>();
+			synchronized (experiences)
+			{
+				for (Experience experience : experiences.values())
+				{
+					if (experience.getOp() != Experience.Operation.temp)
+					{
+						saveExperiences.add(experience);
+					}
+				}
+			}
+			Log.i(TAG, "Saving: " +  gson.toJson(saveExperiences));
+			gson.toJson(saveExperiences, writer);
+
+			writer.flush();
+			writer.close();
+		}
+		catch (Exception e)
+		{
+			Log.e("", e.getMessage(), e);
+		}
+	}
+
+	private HttpResponse put(String url, Object data) throws Exception
+	{
+		HttpClient client = new DefaultHttpClient();
+		HttpPut put = new HttpPut(new URL(url).toURI());
+		put.addHeader("content-type", "application/json");
+		put.setEntity(new StringEntity(gson.toJson(data)));
+
+		String token = null;
+		try
+		{
+			String scope = "audience:server:client_id:878322710115-51s00gn8breo1fqqd4lmuavjsp2jmuo7.apps.googleusercontent.com";
+			AccountManager accountManager = AccountManager.get(context);
+			Account[] accounts = accountManager.getAccountsByType("com.google");
+			if (accounts.length >= 1)
+			{
+				Log.i("", "Getting token for " + accounts[0].name);
+				token = GoogleAuthUtil.getToken(context, accounts[0].name, scope);
+				put.addHeader("Authorization", "Bearer " + token);
+				Log.i("", token);
 			}
 		}
 		catch (Exception e)
 		{
-			Log.e(TAG, e.getMessage(), e);
+			Log.e("", e.getMessage(), e);
 		}
-		return null;
+
+		Log.i("", "PUT " + url);
+		Log.i("", gson.toJson(data));
+		HttpResponse response = client.execute(put);
+		if (response.getStatusLine().getStatusCode() == 401)
+		{
+			Log.w("", "Response " + response.getStatusLine().getStatusCode());
+			if (token != null)
+			{
+				GoogleAuthUtil.invalidateToken(context, token);
+			}
+		}
+		else if (response.getStatusLine().getStatusCode() != 200)
+		{
+			Log.w("", "Response " + response.getStatusLine().getStatusCode() + ": " + response.getStatusLine().getReasonPhrase());
+		}
+
+		return response;
 	}
 }
 

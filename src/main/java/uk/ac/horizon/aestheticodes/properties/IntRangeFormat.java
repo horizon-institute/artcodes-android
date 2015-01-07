@@ -19,20 +19,50 @@
 
 package uk.ac.horizon.aestheticodes.properties;
 
+import android.util.Log;
+
 public class IntRangeFormat extends IntFormat
 {
+	private Property minProperty;
 	private Property maxProperty;
 
-	public IntRangeFormat(Property maxProperty, Object min, Object max)
+	public IntRangeFormat(Property minProperty, Property maxProperty, Object min, Object max)
 	{
 		super(min, max);
+		this.minProperty = minProperty;
 		this.maxProperty = maxProperty;
+	}
+
+	@Override
+	public Object getSaveValue(Object value)
+	{
+		if(value == null)
+		{
+			return null;
+		}
+		else if(value instanceof Integer)
+		{
+			int intValue = (Integer)value;
+			int minValue = getIntValue(minProperty);
+			int maxValue = getIntValue(maxProperty);
+			Log.i("", "Setting value " + intValue + " of " + minValue + "-" + maxValue);
+			if(intValue < minValue)
+			{
+				minProperty.set(intValue);
+			}
+			if(intValue > maxValue)
+			{
+				maxProperty.set(intValue);
+			}
+		}
+
+		return value;
 	}
 
 	@Override
 	public String getDisplayString(Object value)
 	{
-		int minValue = getIntValue(value);
+		int minValue = getIntValue(minProperty);
 		int maxValue = getIntValue(maxProperty);
 		if(minValue == maxValue)
 		{
@@ -70,47 +100,11 @@ public class IntRangeFormat extends IntFormat
 				{
 					return context.getString(resource, valueString);
 				}
-
 			}
 			else
 			{
-				return context.getResources().getQuantityString(resource, maxValue, value);
+				return context.getResources().getQuantityString(resource, maxValue, valueString);
 			}
 		}
 	}
-
-//	@Override
-//	protected void updateView()
-//	{
-//		super.updateView();
-//
-//		ViewParent parent = view.getParent();
-//		if (parent instanceof View)
-//		{
-//			View view = (View) parent;
-//			view.setOnClickListener(new View.OnClickListener()
-//			{
-//				@Override
-//				public void onClick(View v)
-//				{
-//					if(context instanceof FragmentActivity)
-//					{
-//						DialogFragment newFragment = new IntRangeDialogFragment();
-//						Object value = get();
-//						Bundle bundle = new Bundle();
-//						setInt(bundle, "min", min);
-//						setInt(bundle, "max", max);
-//						setInt(bundle, "minValue", value);
-//						setInt(bundle, "maxValue", maxName);
-//						bundle.putString("title", getTextString(name, value));
-//						bundle.putString("description", getTextString(name  +"_desc", value));
-//						bundle.putString("minPropertyName", name);
-//						bundle.putString("maxPropertyName", maxName);
-//						newFragment.setArguments(bundle);
-//						newFragment.show(((FragmentActivity)context).getSupportFragmentManager(), "missiles");
-//					}
-//				}
-//			});
-//		}
-//	}
 }

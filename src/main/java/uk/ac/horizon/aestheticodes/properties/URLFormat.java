@@ -26,25 +26,28 @@ public class URLFormat extends Format
 	private static final String HTTP = "http://";
 	private boolean required = false;
 
-//	@Override
-//	public void save()
-//	{
-//		if (view instanceof EditText)
-//		{
-//			String text = ((EditText)view).getText().toString();
-//			if(text == null || text.isEmpty())
-//			{
-//				set(null);
-//				return;
-//			}
-//			else if(!text.contains("://"))
-//			{
-//				text = HTTP + text;
-//			}
-//			set(text);
-//		}
-//	}
-//
+	@Override
+	public Object getSaveValue(Object value)
+	{
+		if(value == null)
+		{
+			return null;
+		}
+		else if(value instanceof String)
+		{
+			String text = (String)value;
+			if(text.isEmpty())
+			{
+				return null;
+			}
+			else if(!text.contains("://"))
+			{
+				return HTTP + text;
+			}
+		}
+
+		return value;
+	}
 
 	@Override
 	public String getDisplayString(Object value)
@@ -62,8 +65,8 @@ public class URLFormat extends Format
 	{
 		if(value instanceof String)
 		{
-			String text = (String)value;
-			if(text.isEmpty())
+			String text = (String)getSaveValue((String)value);
+			if(text == null)
 			{
 				if(required)
 				{

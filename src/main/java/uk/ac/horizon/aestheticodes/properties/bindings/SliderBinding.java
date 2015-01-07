@@ -33,6 +33,7 @@ public class SliderBinding extends ViewBinding
 	}
 
 	private int min;
+	private IntFormat intFormat;
 
 	@Override
 	public void update(Object value, Format format)
@@ -42,7 +43,7 @@ public class SliderBinding extends ViewBinding
 			SeekBar slider = (SeekBar) view;
 			if(format instanceof IntFormat)
 			{
-				IntFormat intFormat = (IntFormat)format;
+				intFormat = (IntFormat)format;
 				int max = intFormat.getMax();
 				min = intFormat.getMin();
 				slider.setMax(max - min);
@@ -63,7 +64,7 @@ public class SliderBinding extends ViewBinding
 				@Override
 				public void onProgressChanged(SeekBar seekBar, int progress, boolean fromUser)
 				{
-					property.set(progress + min);
+					property.set(intFormat.getSaveValue(progress + min));
 				}
 
 				@Override

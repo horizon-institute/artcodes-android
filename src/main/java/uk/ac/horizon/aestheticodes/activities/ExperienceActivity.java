@@ -38,7 +38,9 @@ import uk.ac.horizon.aestheticodes.properties.Properties;
 
 public class ExperienceActivity extends ActionBarActivity
 {
+	private ExperienceManager experienceManager;
 	private Experience experience;
+	private Properties properties;
 
 	@Override
 	protected void onCreate(Bundle savedInstanceState)
@@ -48,12 +50,12 @@ public class ExperienceActivity extends ActionBarActivity
 		Bundle extras = getIntent().getExtras();
 		String experienceID = extras.getString("experience");
 
-		final ExperienceManager experienceManager = ExperienceManager.get(this);
+		experienceManager = ExperienceManager.get(this);
 		experience = experienceManager.get(experienceID);
 
 		setContentView(R.layout.experience);
 
-		final Properties properties = new Properties(this, experience);
+		properties = new Properties(this, experience);
 		properties.get("name").bindTo(R.id.experienceTitle);
 		properties.get("description").bindTo(R.id.experienceDescription);
 		properties.get("icon").bindTo(R.id.experienceIcon);
@@ -85,8 +87,8 @@ public class ExperienceActivity extends ActionBarActivity
 					@Override
 					public void onClick(DialogInterface dialogInterface, int i)
 					{
-						ExperienceManager experienceManager = ExperienceManager.get(ExperienceActivity.this);
-						experienceManager.delete(experience);
+						experience.setOp(Experience.Operation.remove);
+						experienceManager.save();
 						NavUtils.navigateUpTo(ExperienceActivity.this, new Intent(ExperienceActivity.this, ExperienceListActivity.class));
 					}
 				});

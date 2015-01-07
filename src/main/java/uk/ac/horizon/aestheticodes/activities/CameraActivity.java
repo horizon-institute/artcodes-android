@@ -23,8 +23,8 @@ import android.app.AlertDialog;
 import android.content.Context;
 import android.content.DialogInterface;
 import android.content.Intent;
-import android.content.SharedPreferences;
 import android.content.res.Resources;
+import android.graphics.Color;
 import android.graphics.Rect;
 import android.net.Uri;
 import android.os.Build;
@@ -92,317 +92,27 @@ public class CameraActivity extends ActionBarActivity implements ExperienceEvent
 	private TextView modeText;
 	private MarkerDetectionThread.Mode mode = MarkerDetectionThread.Mode.detect;
 
-	private String getTextString(String name, String defaultValue)
-	{
-		int resource = getResources().getIdentifier(name, "string", getPackageName());
-		if (resource != 0)
-		{
-			return getString(resource);
-		}
-		return defaultValue;
-	}
-
 	@Override
-	@SuppressWarnings("deprecation")
-	public void onCreate(Bundle savedInstanceState)
+	public void experienceSelected(Experience experience)
 	{
-		super.onCreate(savedInstanceState);
-		getWindow().addFlags(WindowManager.LayoutParams.FLAG_KEEP_SCREEN_ON);
+		Log.i(TAG, "experience updated");
 
-		setContentView(R.layout.activity_main);
-
-		cameraManager = new CameraManager(this);
-
-		viewfinder = (ViewfinderView) findViewById(R.id.viewfinder);
-		viewfinder.setCameraManager(cameraManager);
-
-		// earlier versions of Android do not support addOnLayoutChangeListener
-		// edited ViewfinderView class for alternative
-		/*viewfinder.addOnLayoutChangeListener(new View.OnLayoutChangeListener() {
-			@Override
-			public void onLayoutChange(View view, int i, int i2, int i3, int i4, int i5, int i6, int i7, int i8)
-			{
-				Log.i(TAG, "Layout!");
-				layout();
-			}
-		});*/
-		viewfinder.addSizeChangedListener(new ViewfinderView.SizeChangedListener()
+		if(experience != null)
 		{
-			@Override
-			public void sizeHasChanged()
-			{
-				Log.i(TAG, "Layout!");
-				layout();
-			}
-		});
+			startThread();
 
-		final SurfaceView surfaceView = (SurfaceView) findViewById(R.id.preview);
-		holder = surfaceView.getHolder();
-		holder.addCallback(cameraManager);
-		// deprecated setting, but required on Android versions prior to 3.0
-		//noinspection deprecation
-		holder.setType(SurfaceHolder.SURFACE_TYPE_PUSH_BUFFERS);
+			setTitle(experience.getName());
 
-		bottomView = findViewById(R.id.bottomView);
-
-		experienceManager = ExperienceManager.get(this);
-		experienceManager.addListener(this);
-		experienceAdapter = new ExperienceAdapter(getSupportActionBar().getThemedContext(), experienceManager);
-		getSupportActionBar().setNavigationMode(ActionBar.NAVIGATION_MODE_LIST);
-		getSupportActionBar().setListNavigationCallbacks(experienceAdapter, new ActionBar.OnNavigationListener()
-		{
-			@Override
-			public boolean onNavigationItemSelected(int position, long l)
-			{
-				final Experience selected = (Experience) experienceAdapter.getItem(position);
-				if (selected != experienceManager.getSelected())
-				{
-					experienceManager.setSelected(selected);
-				}
-				return true;
-			}
-		});
-		experienceManager.load();
-
-		SharedPreferences preferences = getPreferences(MODE_PRIVATE);
-		Log.i(TAG, "Loading experience " + preferences.getString("experience", "uk.ac.horizon.aestheticodes.default"));
-		Experience experience = experienceManager.get(preferences.getString("experience", "uk.ac.horizon.aestheticodes.default"));
-		if (experience != null)
-		{
-			experienceManager.setSelected(experience);
+			List<Experience> experiences = experienceAdapter.getExperiences();
+			int index = experiences.indexOf(experience);
+			getSupportActionBar().setSelectedNavigationItem(index);
 		}
-
-		modeMenuButton = findViewById(R.id.modeMenuButton);
-		modeText = (TextView) findViewById(R.id.modeText);
-		modeMenu = new PopupMenu(this, modeMenuButton);
-	}
-
-	void setItemSelected(final int position)
-	{
-		getSupportActionBar().setSelectedNavigationItem(position);
+		updateMenu();
 	}
 
 	public void experiencesChanged()
 	{
 	}
-
-	private void setMode(MarkerDetectionThread.Mode mode)
-	{
-		Log.i("", "Set mode to " + mode);
-		if (thread != null)
-		{
-			thread.setMode(mode);
-		}
-		this.mode = mode;
-		cameraManager.setResult(null);
-		viewfinder.invalidate();
-		markerSelection.reset();
-		modeText.setText(getTextString(MODE_ACTIVE_PREFIX + mode.name(), mode.name()));
-		updateMenu();
-	}
-
-	@Override
-	public void experienceSelected(Experience experience)
-	{
-		Log.i(TAG, "experience updated");
-		setTitle(experience.getName());
-
-		updateMenu();
-
-		List<Experience> experiences = experienceAdapter.getExperiences();
-		int index = experiences.indexOf(experience);
-		setItemSelected(index);
-
-		//if (experience.getIcon() != null)
-		//{
-		//	Log.i(TAG, "Setting icon to " + experience.getIcon());
-		//Picasso.with(this).load(experience.getIcon()).into(new ActionBarTarget(this));
-		//}
-
-		getPreferences(MODE_PRIVATE).edit().putString("experience", experience.getId()).commit();
-	}
-
-	private void updateMenu()
-	{
-		if (modeMenu != null)
-		{
-			modeMenu.getMenu().clear();
-			for (final MarkerDetectionThread.Mode amode : MarkerDetectionThread.Mode.values())
-			{
-				MenuItem item = modeMenu.getMenu().add(getTextString(MODE_PREFIX + amode.name(), amode.name()));
-				item.setOnMenuItemClickListener(new MenuItem.OnMenuItemClickListener()
-				{
-					@Override
-					public boolean onMenuItemClick(MenuItem item)
-					{
-						setMode(amode);
-						return true;
-					}
-				});
-				if (amode == mode)
-				{
-					item.setEnabled(false);
-				}
-			}
-			if (cameraManager.getCameraCount() > 1)
-			{
-				MenuItem switchItem = modeMenu.getMenu().add(getString(R.string.action_switch_camera));
-				switchItem.setIcon(R.drawable.ic_switch_camera);
-				switchItem.setOnMenuItemClickListener(new MenuItem.OnMenuItemClickListener()
-				{
-					@Override
-					public boolean onMenuItemClick(MenuItem item)
-					{
-						try
-						{
-							stopCamera();
-							cameraManager.flip();
-							viewfinder.invalidate();
-							startCamera();
-						}
-						catch (Exception e)
-						{
-							Log.e(TAG, e.getMessage(), e);
-						}
-						return true;
-					}
-				});
-			}
-
-			if (modeMenu.getMenu().hasVisibleItems())
-			{
-				modeMenuButton.setVisibility(View.VISIBLE);
-			}
-			else
-			{
-				modeMenuButton.setVisibility(View.GONE);
-			}
-		}
-	}
-
-	@Override
-	public boolean onCreateOptionsMenu(Menu menu)
-	{
-		MenuInflater inflater = getMenuInflater();
-		inflater.inflate(R.menu.capture_actions, menu);
-
-		//cameraSwitch = menu.findItem(R.id.action_switch_camera);
-		//updateCameraIcon();
-
-		return super.onCreateOptionsMenu(menu);
-	}
-
-	@Override
-	public void onResume()
-	{
-		super.onResume();
-		startCamera();
-		experienceManager.addListener(this);
-	}
-
-	@Override
-	protected void onStop()
-	{
-		super.onStop();
-	}
-
-	private void startCamera()
-	{
-		if (cameraManager != null)
-		{
-			try
-			{
-				cameraManager.start(holder);
-				thread = new MarkerDetectionThread(cameraManager, this, experienceManager);
-				thread.setMode(mode);
-				thread.start();
-				markerSelection.reset();
-				layout();
-			}
-			catch (Exception e)
-			{
-				Log.e(TAG, e.getMessage(), e);
-			}
-		}
-	}
-
-	private void layout()
-	{
-		Rect frame = cameraManager.getFrame(viewfinder.getWidth(), viewfinder.getHeight());
-		if (frame == null)
-		{
-			return;
-		}
-
-		Log.i(TAG, "Frame = " + frame + ", " + viewfinder.getWidth());
-		ViewGroup.LayoutParams p = bottomView.getLayoutParams();
-		SurfaceView surfaceView = (SurfaceView) findViewById(R.id.preview);
-		p.height = surfaceView.getHeight() - frame.bottom;
-		p.width = frame.width();
-		bottomView.setLayoutParams(p);
-
-		if (android.os.Build.VERSION.SDK_INT >= Build.VERSION_CODES.KITKAT && hasNavBar(this))
-		{
-			// Don't draw over nav bar
-			bottomView.setPadding(0, 0, 0, getNavBarHeight());
-		}
-
-		bottomView.requestLayout();
-		viewfinder.invalidate();
-	}
-
-	/**
-	 * Get the height of the software NavBar. Note: This may return a height value even if the device does not display a NavBar, see hasNavBar(Context).
-	 *
-	 * @return The height of the NavBar
-	 */
-	private int getNavBarHeight()
-	{
-		Resources resources = getResources();
-		int resourceId = resources.getIdentifier("navigation_bar_height", "dimen", "android");
-		if (resourceId > 0)
-		{
-			return resources.getDimensionPixelSize(resourceId);
-		}
-		return 0;
-	}
-
-	public void showMenu(View view)
-	{
-		modeMenu.show();
-	}
-
-	@Override
-	protected void onPause()
-	{
-		super.onPause();
-		stopCamera();
-		experienceManager.removeListener(this);
-	}
-
-	private void stopCamera()
-	{
-		if (cameraManager != null)
-		{
-			cameraManager.release();
-			thread.setRunning(false);
-			thread = null;
-		}
-	}
-
-	@Override
-	public boolean onOptionsItemSelected(MenuItem item)
-	{
-		switch (item.getItemId())
-		{
-			case R.id.experiences:
-				startActivity(new Intent(this, ExperienceListActivity.class));
-				return true;
-			default:
-				return super.onOptionsItemSelected(item);
-		}
-	}
-
 
 	@Override
 	public void markersFound(final List<MarkerCode> markers)
@@ -411,8 +121,17 @@ public class CameraActivity extends ActionBarActivity implements ExperienceEvent
 		{
 			return;
 		}
-		if (thread.getMode() == MarkerDetectionThread.Mode.detect)
+		if (mode == MarkerDetectionThread.Mode.detect)
 		{
+			if(markers.isEmpty())
+			{
+				modeText.setTextColor(Color.WHITE);
+			}
+			else
+			{
+				modeText.setTextColor(Color.YELLOW);
+			}
+
 			markerSelection.addMarkers(markers);
 
 			String markerCode = markerSelection.getFoundMarker();
@@ -454,6 +173,111 @@ public class CameraActivity extends ActionBarActivity implements ExperienceEvent
 				}
 			});
 		}
+	}
+
+	@Override
+	@SuppressWarnings("deprecation")
+	public void onCreate(Bundle savedInstanceState)
+	{
+		super.onCreate(savedInstanceState);
+		getWindow().addFlags(WindowManager.LayoutParams.FLAG_KEEP_SCREEN_ON);
+
+		setContentView(R.layout.activity_main);
+
+		cameraManager = new CameraManager(this);
+
+		viewfinder = (ViewfinderView) findViewById(R.id.viewfinder);
+		viewfinder.setCameraManager(cameraManager);
+		viewfinder.addSizeChangedListener(new ViewfinderView.SizeChangedListener()
+		{
+			@Override
+			public void sizeHasChanged()
+			{
+				layout();
+			}
+		});
+
+		final SurfaceView surfaceView = (SurfaceView) findViewById(R.id.preview);
+		holder = surfaceView.getHolder();
+		holder.addCallback(cameraManager);
+		// deprecated setting, but required on Android versions prior to 3.0
+		//noinspection deprecation
+		holder.setType(SurfaceHolder.SURFACE_TYPE_PUSH_BUFFERS);
+
+		bottomView = findViewById(R.id.bottomView);
+
+		experienceManager = ExperienceManager.get(this);
+		experienceManager.addListener(this);
+		experienceAdapter = new ExperienceAdapter(getSupportActionBar().getThemedContext(), experienceManager);
+		getSupportActionBar().setNavigationMode(ActionBar.NAVIGATION_MODE_LIST);
+		getSupportActionBar().setListNavigationCallbacks(experienceAdapter, new ActionBar.OnNavigationListener()
+		{
+			@Override
+			public boolean onNavigationItemSelected(int position, long l)
+			{
+				final Experience selected = (Experience) experienceAdapter.getItem(position);
+				if (selected != experienceManager.getSelected())
+				{
+					experienceManager.setSelected(selected);
+				}
+				return true;
+			}
+		});
+
+		modeMenuButton = findViewById(R.id.modeMenuButton);
+		modeText = (TextView) findViewById(R.id.modeText);
+		modeMenu = new PopupMenu(this, modeMenuButton);
+	}
+
+	@Override
+	public boolean onCreateOptionsMenu(Menu menu)
+	{
+		MenuInflater inflater = getMenuInflater();
+		inflater.inflate(R.menu.capture_actions, menu);
+
+		return super.onCreateOptionsMenu(menu);
+	}
+
+	@Override
+	public boolean onOptionsItemSelected(MenuItem item)
+	{
+		switch (item.getItemId())
+		{
+			case R.id.experiences:
+				startActivity(new Intent(this, ExperienceListActivity.class));
+				return true;
+			default:
+				return super.onOptionsItemSelected(item);
+		}
+	}
+
+	@Override
+	protected void onNewIntent(Intent intent)
+	{
+		super.onNewIntent(intent);
+		experienceManager.handleIntent(intent);
+	}
+
+	@Override
+	public void onResume()
+	{
+		super.onResume();
+		startCamera();
+		experienceManager.addListener(this);
+		experienceManager.load();
+	}
+
+	public void showMenu(View view)
+	{
+		modeMenu.show();
+	}
+
+	@Override
+	protected void onPause()
+	{
+		super.onPause();
+		stopCamera();
+		experienceManager.removeListener(this);
 	}
 
 	private void addMarkerDialog(final String code)
@@ -498,5 +322,179 @@ public class CameraActivity extends ActionBarActivity implements ExperienceEvent
 				alertDialog.show();
 			}
 		});
+	}
+
+	/**
+	 * Get the height of the software NavBar. Note: This may return a height value even if the device does not display a NavBar, see hasNavBar(Context).
+	 *
+	 * @return The height of the NavBar
+	 */
+	private int getNavBarHeight()
+	{
+		Resources resources = getResources();
+		int resourceId = resources.getIdentifier("navigation_bar_height", "dimen", "android");
+		if (resourceId > 0)
+		{
+			return resources.getDimensionPixelSize(resourceId);
+		}
+		return 0;
+	}
+
+	private String getTextString(String name, String defaultValue)
+	{
+		int resource = getResources().getIdentifier(name, "string", getPackageName());
+		if (resource != 0)
+		{
+			return getString(resource);
+		}
+		return defaultValue;
+	}
+
+	private void layout()
+	{
+		Rect frame = cameraManager.getFrame(viewfinder.getWidth(), viewfinder.getHeight());
+		if (frame == null)
+		{
+			return;
+		}
+
+		Log.i(TAG, "Frame = " + frame + ", " + viewfinder.getWidth());
+		ViewGroup.LayoutParams p = bottomView.getLayoutParams();
+		SurfaceView surfaceView = (SurfaceView) findViewById(R.id.preview);
+		p.height = surfaceView.getHeight() - frame.bottom;
+		p.width = frame.width();
+		bottomView.setLayoutParams(p);
+
+		if (android.os.Build.VERSION.SDK_INT >= Build.VERSION_CODES.KITKAT && hasNavBar(this))
+		{
+			// Don't draw over nav bar
+			bottomView.setPadding(0, 0, 0, getNavBarHeight());
+		}
+
+		bottomView.requestLayout();
+		viewfinder.invalidate();
+	}
+
+	private void setMode(MarkerDetectionThread.Mode mode)
+	{
+		Log.i("", "Set mode to " + mode);
+		if (thread != null)
+		{
+			thread.setMode(mode);
+		}
+		this.mode = mode;
+		cameraManager.setResult(null);
+		viewfinder.invalidate();
+		markerSelection.reset();
+		modeText.setText(getTextString(MODE_ACTIVE_PREFIX + mode.name(), mode.name()));
+		updateMenu();
+	}
+
+	private void startCamera()
+	{
+		if (cameraManager != null)
+		{
+			try
+			{
+				cameraManager.start(holder);
+				startThread();
+				markerSelection.reset();
+				layout();
+			}
+			catch (Exception e)
+			{
+				Log.e(TAG, e.getMessage(), e);
+			}
+		}
+	}
+
+	private void startThread()
+	{
+		if(thread == null)
+		{
+			if (experienceManager.getSelected() != null)
+			{
+				thread = new MarkerDetectionThread(cameraManager, this, experienceManager);
+				thread.setMode(mode);
+				thread.start();
+			}
+		}
+	}
+
+	private void stopThread()
+	{
+		if(thread != null)
+		{
+			thread.setRunning(false);
+			thread = null;
+		}
+	}
+
+	private void stopCamera()
+	{
+		if (cameraManager != null)
+		{
+			cameraManager.release();
+			stopThread();
+		}
+	}
+
+	private void updateMenu()
+	{
+		if (modeMenu != null)
+		{
+			modeMenu.getMenu().clear();
+			for (final MarkerDetectionThread.Mode amode : MarkerDetectionThread.Mode.values())
+			{
+				MenuItem item = modeMenu.getMenu().add(getTextString(MODE_PREFIX + amode.name(), amode.name()));
+				item.setOnMenuItemClickListener(new MenuItem.OnMenuItemClickListener()
+				{
+					@Override
+					public boolean onMenuItemClick(MenuItem item)
+					{
+						setMode(amode);
+						return true;
+					}
+				});
+				if (amode == mode)
+				{
+					item.setEnabled(false);
+				}
+			}
+
+			if (cameraManager.getCameraCount() > 1)
+			{
+				MenuItem switchItem = modeMenu.getMenu().add(getString(R.string.action_switch_camera));
+				switchItem.setIcon(R.drawable.ic_switch_camera);
+				switchItem.setOnMenuItemClickListener(new MenuItem.OnMenuItemClickListener()
+				{
+					@Override
+					public boolean onMenuItemClick(MenuItem item)
+					{
+						try
+						{
+							stopCamera();
+							cameraManager.flip();
+							viewfinder.invalidate();
+							startCamera();
+						}
+						catch (Exception e)
+						{
+							Log.e(TAG, e.getMessage(), e);
+						}
+						return true;
+					}
+				});
+			}
+
+			if (modeMenu.getMenu().hasVisibleItems())
+			{
+				modeMenuButton.setVisibility(View.VISIBLE);
+			}
+			else
+			{
+				modeMenuButton.setVisibility(View.GONE);
+			}
+		}
 	}
 }

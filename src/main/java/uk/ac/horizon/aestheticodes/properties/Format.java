@@ -20,6 +20,7 @@
 package uk.ac.horizon.aestheticodes.properties;
 
 import android.content.Context;
+import android.text.InputFilter;
 
 public class Format
 {
@@ -61,6 +62,23 @@ public class Format
 			return value.toString();
 		}
 		return text;
+	}
+
+	public Object getSaveValue(Object value)
+	{
+		if(value == null || (value instanceof String && ((String)value).isEmpty()))
+		{
+			return null;
+		}
+		else
+		{
+			return value;
+		}
+	}
+
+	public String getEditString(Object value)
+	{
+		return getDisplayString(value);
 	}
 
 	public String getTextString(String postfix, Object value)

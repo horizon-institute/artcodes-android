@@ -31,12 +31,14 @@ import uk.ac.horizon.aestheticodes.controller.ExperienceManager;
 
 public class ExperienceListActivity extends ActionBarActivity
 {
+	private ExperienceManager experienceManager;
+
 	@Override
 	protected void onCreate(Bundle savedInstanceState)
 	{
 		super.onCreate(savedInstanceState);
 
-		final ExperienceManager experienceManager = ExperienceManager.get(this);
+		experienceManager = ExperienceManager.get(this);
 
 		setContentView(R.layout.experience_list);
 
@@ -60,7 +62,6 @@ public class ExperienceListActivity extends ActionBarActivity
 			}
 		});
 
-		experienceManager.load();
 		getSupportActionBar().setDisplayHomeAsUpEnabled(true);
 	}
 
@@ -70,14 +71,9 @@ public class ExperienceListActivity extends ActionBarActivity
 	}
 
 	@Override
-	protected void onPause()
-	{
-		super.onPause();
-	}
-
-	@Override
 	protected void onResume()
 	{
 		super.onResume();
+		experienceManager.load();
 	}
 }

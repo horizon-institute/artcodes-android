@@ -45,7 +45,15 @@ public abstract class ViewBinding
 		{
 			view = property.getProperties().findView((Integer)view);
 		}
+
+		context = property.getProperties().getContext();
+
 		return view != null;
+	}
+
+	public void save(Property property)
+	{
+
 	}
 
 	public void setError(String error)

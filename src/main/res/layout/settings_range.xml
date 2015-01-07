@@ -25,7 +25,7 @@
               android:padding="16dp">
 
 	<TextView android:layout_width="fill_parent"
-	          android:layout_height="wrap_content"
+	          android:layout_height="0dp"
 	          android:id="@+id/sliderValue"
 	          android:layout_weight="1"
 	          android:gravity="center"
@@ -40,9 +40,9 @@
 		<TextView
 				android:layout_width="70dp"
 				android:layout_height="wrap_content"
-				android:text="Minimum"
-				android:id="@+id/textView" android:layout_gravity="center_vertical" />
-		<SeekBar android:layout_width="fill_parent"
+				android:text="@string/minimum"
+				android:layout_gravity="center_vertical" />
+		<SeekBar android:layout_width="0dp"
 		         android:layout_height="wrap_content"
 		         android:id="@+id/sliderMin"
 		         android:layout_weight="1"
@@ -58,9 +58,9 @@
 		<TextView
 				android:layout_width="70dp"
 				android:layout_height="wrap_content"
-				android:text="Maximum"
-				android:id="@+id/textView2" android:layout_gravity="center_vertical" />
-		<SeekBar android:layout_width="fill_parent"
+				android:text="@string/maximum"
+				android:layout_gravity="center_vertical" />
+		<SeekBar android:layout_width="0dp"
 		         android:layout_height="wrap_content"
 		         android:id="@+id/sliderMax"
 		         android:layout_weight="1"

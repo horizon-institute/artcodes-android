@@ -31,8 +31,8 @@ import android.view.View;
 import android.view.WindowManager;
 import uk.ac.horizon.aestheticodes.R;
 import uk.ac.horizon.aestheticodes.activities.ExperienceEditActivity;
-import uk.ac.horizon.aestheticodes.properties.bindings.VisibilityBinding;
 import uk.ac.horizon.aestheticodes.model.Marker;
+import uk.ac.horizon.aestheticodes.properties.bindings.VisibilityBinding;
 import uk.ac.horizon.aestheticodes.properties.MarkerFormat;
 import uk.ac.horizon.aestheticodes.properties.Properties;
 import uk.ac.horizon.aestheticodes.properties.URLFormat;
@@ -98,7 +98,6 @@ public class MarkerEditDialog extends DialogFragment
 					Marker marker = (Marker) properties.save();
 					ExperienceEditActivity activity = (ExperienceEditActivity) getActivity();
 					activity.getExperience().getMarkers().put(marker.getCode(), marker);
-					activity.getExperience().setChanged(true);
 					activity.updateMarkers();
 				}
 			}

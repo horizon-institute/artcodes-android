@@ -41,6 +41,7 @@
         android:supportsRtl="true"
         android:theme="@style/Theme.Aestheticodes"
         tools:ignore="UnusedAttribute" >
+	    <meta-data android:name="com.google.android.gms.version" android:value="@integer/google_play_services_version" />
         <activity
             android:name="uk.ac.horizon.aestheticodes.activities.CameraActivity"
             android:screenOrientation="portrait"
@@ -50,6 +51,10 @@
 
                 <category android:name="android.intent.category.LAUNCHER" />
             </intent-filter>
+	        <intent-filter>
+		        <action android:name="uk.ac.horizon.aestheticodes.SCAN" />
+		        <category android:name="android.intent.category.DEFAULT" />
+	        </intent-filter>
         </activity>
         <activity
             android:name="uk.ac.horizon.aestheticodes.activities.MarkerActivity"

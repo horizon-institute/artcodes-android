@@ -54,6 +54,7 @@
 		           android:paddingBottom="8dp"
 		           android:src="@drawable/ic_more_vert_white_24dp"
 		           android:tint="#BBB"
-		           android:background="?attr/selectableItemBackground" android:onClick="showMenu" />
+		           android:background="?attr/selectableItemBackground"
+		           android:onClick="showMenu" />
 	</RelativeLayout>
 </merge>

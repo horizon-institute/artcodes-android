@@ -30,7 +30,7 @@ import java.util.List;
 public final class Property
 {
 	private final String name;
-	private final List<ViewBinding> bindings = new ArrayList<ViewBinding>();
+	private final List<ViewBinding> bindings = new ArrayList<>();
 	private final Properties properties;
 	private Field field;
 	private Object value;
@@ -100,12 +100,9 @@ public final class Property
 				field.setAccessible(true);
 			}
 			set(field.get(properties.getObject()));
+			refresh();
 		}
-		catch (NoSuchFieldException e)
-		{
-			e.printStackTrace();
-		}
-		catch (IllegalAccessException e)
+		catch (NoSuchFieldException | IllegalAccessException e)
 		{
 			e.printStackTrace();
 		}
@@ -113,6 +110,10 @@ public final class Property
 
 	public void save()
 	{
+		for(ViewBinding binding: bindings)
+		{
+			binding.save(this);
+		}
 		try
 		{
 			field.set(properties.getObject(), value);
@@ -152,7 +153,7 @@ public final class Property
 		}
 	}
 
-	public void refresh()
+	private void refresh()
 	{
 		for (ViewBinding binding : bindings)
 		{
@@ -162,7 +163,7 @@ public final class Property
 
 	public void unbind(int viewID)
 	{
-		final List<ViewBinding> removals = new ArrayList<ViewBinding>();
+		final List<ViewBinding> removals = new ArrayList<>();
 		for(ViewBinding binding: bindings)
 		{
 			if(binding.hasViewID(viewID))

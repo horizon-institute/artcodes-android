@@ -73,6 +73,7 @@ public class IntDialogFragment extends DialogFragment
 			{
 				property.unbind(R.id.sliderValue);
 				property.unbind(R.id.slider);
+				property.load();
 			}
 		});
 

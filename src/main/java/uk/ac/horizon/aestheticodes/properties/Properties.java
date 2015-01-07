@@ -47,7 +47,7 @@ public class Properties
 		this.root = root;
 	}
 
-	Context getContext()
+	public Context getContext()
 	{
 		return context;
 	}

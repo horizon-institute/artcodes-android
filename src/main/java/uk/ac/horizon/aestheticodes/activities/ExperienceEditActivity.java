@@ -33,13 +33,14 @@ import android.widget.LinearLayout;
 import uk.ac.horizon.aestheticodes.R;
 import uk.ac.horizon.aestheticodes.dialogs.IntDialogFragment;
 import uk.ac.horizon.aestheticodes.dialogs.IntRangeDialogFragment;
+import uk.ac.horizon.aestheticodes.model.Marker;
+import uk.ac.horizon.aestheticodes.properties.Format;
 import uk.ac.horizon.aestheticodes.properties.Properties;
 import uk.ac.horizon.aestheticodes.properties.IntFormat;
 import uk.ac.horizon.aestheticodes.properties.IntRangeFormat;
 import uk.ac.horizon.aestheticodes.controller.ExperienceManager;
 import uk.ac.horizon.aestheticodes.dialogs.MarkerEditDialog;
 import uk.ac.horizon.aestheticodes.model.Experience;
-import uk.ac.horizon.aestheticodes.model.Marker;
 import uk.ac.horizon.aestheticodes.properties.URLFormat;
 import uk.ac.horizon.aestheticodes.properties.bindings.ClickBinding;
 
@@ -55,6 +56,7 @@ public class ExperienceEditActivity extends ActionBarActivity
 	private LinearLayout markerSettings;
 	private ImageView markerSettingsIcon;
 	private Properties properties;
+	private ExperienceManager experienceManager;
 
 	@Override
 	protected void onCreate(Bundle savedInstanceState)
@@ -64,12 +66,12 @@ public class ExperienceEditActivity extends ActionBarActivity
 		setContentView(R.layout.experience_edit);
 
 		final Bundle extras = getIntent().getExtras();
+		experienceManager = ExperienceManager.get(this);
 		if(extras != null)
 		{
 			final String experienceID = extras.getString("experience");
 			if (experienceID != null)
 			{
-				ExperienceManager experienceManager = new ExperienceManager(this);
 				experience = experienceManager.get(experienceID);
 			}
 		}
@@ -78,6 +80,7 @@ public class ExperienceEditActivity extends ActionBarActivity
 		{
 			experience = new Experience();
 			experience.setId(UUID.randomUUID().toString());
+			experience.setOp(Experience.Operation.create);
 		}
 
 		properties = new Properties(this, experience);
@@ -133,14 +136,17 @@ public class ExperienceEditActivity extends ActionBarActivity
 					}
 				});
 
-		properties.get("minRegions").formatAs(new IntRangeFormat(properties.get("maxRegions"), 1, 9))
+		Format format = new IntRangeFormat(properties.get("minRegions"), properties.get("maxRegions"), 1, 9);
+		properties.get("maxRegions").formatAs(format)
+				.bindTo(R.id.markerRegions);
+		properties.get("minRegions").formatAs(format)
 				.bindTo(R.id.markerRegions)
 				.bindTo(new ClickBinding(R.id.markerRegions, true)
 				{
 					@Override
 					public void onClick(View v)
 					{
-						IntRangeDialogFragment.create(getSupportFragmentManager(), "minRegions");
+						IntRangeDialogFragment.create(getSupportFragmentManager(), "minRegions", "maxRegions");
 					}
 				});
 		properties.load();
@@ -158,7 +164,7 @@ public class ExperienceEditActivity extends ActionBarActivity
 	{
 		final LinearLayout markerList = (LinearLayout) findViewById(R.id.markerList);
 		markerList.removeAllViews();
-		final List<Marker> markers = new ArrayList<Marker>(experience.getMarkers().values());
+		final List<Marker> markers = new ArrayList<>(experience.getMarkers().values());
 		Collections.sort(markers, new Comparator<Marker>()
 		{
 			@Override
@@ -199,9 +205,12 @@ public class ExperienceEditActivity extends ActionBarActivity
 			// Respond to the action bar's Up/Home open_button
 			case android.R.id.home:
 				properties.save();
-				experience.setChanged(true);
-				ExperienceManager experienceManager = ExperienceManager.get(this);
 				experienceManager.add(experience);
+				if(experience.getOp() == null)
+				{
+					experience.setOp(Experience.Operation.update);
+				}
+				experienceManager.save();
 				Intent intent = new Intent(this, ExperienceActivity.class);
 				intent.putExtra("experience", experience.getId());
 

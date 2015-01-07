@@ -86,7 +86,7 @@ public class ExperienceAdapter extends BaseAdapter implements ExperienceEventLis
 		if(viewGroup.getClass().getName().endsWith("SpinnerCompat"))
 		{
 
-			layout.setPadding(0,0,8,0);
+			layout.setPadding(0,0,48,0);
 		}
 
 		final TextView eventTitle = (TextView) view.findViewById(R.id.markerCode);
@@ -94,7 +94,7 @@ public class ExperienceAdapter extends BaseAdapter implements ExperienceEventLis
 		eventTitle.setText(experience.getName());
 
 		iconView.setSelected(false);
-		if (experience.getIcon() != null)
+		if (experience.getIcon() != null && !experience.getIcon().isEmpty())
 		{
 			Picasso.with(context).cancelRequest(iconView);
 			Picasso.with(context).load(experience.getIcon()).placeholder(R.drawable.ic_action_labels_light).into(iconView);
@@ -121,7 +121,14 @@ public class ExperienceAdapter extends BaseAdapter implements ExperienceEventLis
 	@Override
 	public void experiencesChanged()
 	{
-		List<Experience> newExperiences = new ArrayList<Experience>(experienceManager.getExperiences());
+		List<Experience> newExperiences = new ArrayList<Experience>();
+		for(Experience experience: experienceManager.getExperiences())
+		{
+			if(experience.getOp() != Experience.Operation.remove)
+			{
+				newExperiences.add(experience);
+			}
+		}
 		Collections.sort(newExperiences, new Comparator<Experience>()
 		{
 			@Override

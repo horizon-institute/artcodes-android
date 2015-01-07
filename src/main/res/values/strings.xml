@@ -19,15 +19,10 @@
   -->
 <resources xmlns:tools="http://schemas.android.com/tools">
 	<string name="app_name">Aestheticodes</string>
-	<string name="experience_settings">%s Settings</string>
 	<string name="property_set">Set %s</string>
-	<string name="experience_title">%s Markers</string>
 	<string name="code_text">Marker %s</string>
 	<string name="action_experiences">Experiences</string>
 	<string name="action_switch_camera">Switch Camera</string>
-	<string name="action_switch_camera_front">Switch to Front Camera</string>
-	<string name="action_switch_camera_back">Switch to Back Camera</string>
-	<string name="about">About</string>
 	<string name="marker_add">Add Marker</string>
 	<string name="dialog_action_set">Set</string>
 	<string name="dialog_action_cancel">Cancel</string>
@@ -39,10 +34,7 @@
 	<string name="mode_active_outline" tools:ignore="UnusedResources">Outlining…</string>
 	<string name="mode_active_threshold" tools:ignore="UnusedResources">Thresholding…</string>
 	<string name="markerCode">Marker Code</string>
-	<string name="settings_markers">Markers</string>
 	<!-- Default WebSites -->
-	<string name="about_aestheticodes">http://aestheticodes.com/info/</string>
-	<string name="default_status">Place an Aestheticode inside the viewfinder to scan it</string>
 	<string name="URL">URL</string>
 	<string name="minRegions">Regions</string>
 	<string name="minRegions_desc" tools:ignore="UnusedResources">The number of regions in a valid Aestheticode.</string>
@@ -108,4 +100,7 @@
 	<string name="experienceImage">Image</string>
 	<string name="markers">Markers</string>
 	<string name="markerShowDetail">Show Detail Screen</string>
+	<string name="delete">Delete</string>
+	<string name="minimum">Minimum</string>
+	<string name="maximum">Maximum</string>
 </resources>

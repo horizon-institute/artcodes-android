@@ -21,58 +21,11 @@ package uk.ac.horizon.aestheticodes.properties;
 
 import android.text.InputFilter;
 import android.text.Spanned;
-import android.widget.TextView;
 import uk.ac.horizon.aestheticodes.model.Experience;
 
-public class MarkerFormat extends Format
+public class MarkerFormat extends Format implements InputFilter
 {
-	private static class MarkerCodeInputFilter implements InputFilter
-	{
-		private final Experience experience;
-
-		public MarkerCodeInputFilter(Experience experience)
-		{
-			this.experience = experience;
-		}
-
-		@Override
-		public CharSequence filter(CharSequence source, int sourceStart, int sourceEnd, Spanned destination, int destinationStart, int destinationEnd)
-		{
-			String sourceValue = source.subSequence(sourceStart, sourceEnd).toString();
-			if (sourceValue.equals(" "))
-			{
-				sourceValue = ":";
-			}
-
-			String result = destination.subSequence(0, destinationStart).toString() + sourceValue +
-					destination.subSequence(destinationEnd, destination.length()).toString();
-			if(result.equals(""))
-			{
-				return sourceValue;
-			}
-			boolean resultValid = experience.isValidMarker(result, true);
-
-			if (!resultValid && !sourceValue.startsWith(":"))
-			{
-				sourceValue = ":" + sourceValue;
-				resultValid = experience.isValidMarker(destination.subSequence(0, destinationStart).toString() + sourceValue +
-						destination.subSequence(destinationEnd, destination.length()).toString(), true);
-			}
-
-			if (resultValid && !source.subSequence(sourceStart, sourceEnd).toString().equals(sourceValue))
-			{
-				return sourceValue;
-			}
-
-			if (resultValid)
-			{
-				return null;
-			}
-			return "";
-		}
-	}
-
-	private Experience experience;
+	private final Experience experience;
 
 	public MarkerFormat(Experience experience)
 	{
@@ -80,11 +33,53 @@ public class MarkerFormat extends Format
 	}
 
 	@Override
+	public CharSequence filter(CharSequence source, int sourceStart, int sourceEnd, Spanned destination, int destinationStart, int destinationEnd)
+	{
+		String sourceValue = source.subSequence(sourceStart, sourceEnd).toString();
+		if (sourceValue.equals(" "))
+		{
+			sourceValue = ":";
+		}
+
+		String result = destination.subSequence(0, destinationStart).toString() + sourceValue +
+				destination.subSequence(destinationEnd, destination.length()).toString();
+		if (result.equals(""))
+		{
+			return sourceValue;
+		}
+		boolean resultValid = experience.isValidMarker(result, true);
+
+		if (!resultValid && !sourceValue.startsWith(":"))
+		{
+			sourceValue = ":" + sourceValue;
+			resultValid = experience.isValidMarker(destination.subSequence(0, destinationStart).toString() + sourceValue +
+					destination.subSequence(destinationEnd, destination.length()).toString(), true);
+		}
+
+		if (resultValid && !source.subSequence(sourceStart, sourceEnd).toString().equals(sourceValue))
+		{
+			return sourceValue;
+		}
+
+		if (resultValid)
+		{
+			return null;
+		}
+		return "";
+	}
+
+	@Override
+	public String getTextString(String postfix, Object value)
+	{
+		return value.toString();
+	}
+
+	@Override
 	public String getError(Object value)
 	{
-		if(value instanceof String)
+		if (value instanceof String)
 		{
-			String text = (String)value;
+			String text = (String) value;
 			if (!experience.isValidMarker(text, false))
 			{
 				return "Invalid code";

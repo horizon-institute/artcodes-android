@@ -33,64 +33,77 @@ import com.squareup.picasso.Picasso;
 import com.squareup.picasso.Target;
 import uk.ac.horizon.aestheticodes.R;
 import uk.ac.horizon.aestheticodes.properties.Format;
+import uk.ac.horizon.aestheticodes.properties.Property;
 
-public class ColorImageBinding extends ViewBinding
+public class ColorImageBinding extends ViewBinding implements Target
 {
-	private class FABColorTarget implements Target
-	{
-		@Override
-		public void onBitmapLoaded(Bitmap bitmap, Picasso.LoadedFrom from)
-		{
-			if(view instanceof ImageView)
-			{
-				final ImageView imageView = (ImageView)view;
-				// TODO Animate?
-				imageView.setImageBitmap(bitmap);
-			}
-			Log.i(FABColorTarget.class.getName(), "View = " + view);
-			Palette.generateAsync(bitmap, new Palette.PaletteAsyncListener()
-			{
-				public void onGenerated(Palette palette)
-				{
-					if (android.os.Build.VERSION.SDK_INT >= Build.VERSION_CODES.LOLLIPOP && context instanceof Activity)
-					{
-						((Activity)context).getWindow().setStatusBarColor(palette.getDarkVibrantColor(context.getResources().getColor(R.color.apptheme_primary_dark)));
-					}
-
-					if (colorView != null)
-					{
-						colorView.getBackground().setColorFilter(new LightingColorFilter(Color.BLACK, palette.getDarkVibrantColor(context.getResources().getColor(R.color.apptheme_primary))));
-					}
-				}
-			});
-		}
-
-		@Override
-		public void onBitmapFailed(Drawable errorDrawable)
-		{
-
-		}
-
-		@Override
-		public void onPrepareLoad(Drawable placeHolderDrawable)
-		{
-
-		}
-	}
-
-	private View colorView;
+	private Object colorView;
 
 	public ColorImageBinding(int viewID, int colorViewID)
 	{
 		super(viewID);
+		this.colorView = colorViewID;
+	}
+
+	@Override
+	public boolean init(Property property)
+	{
+		super.init(property);
+		if (colorView instanceof Integer)
+		{
+			colorView = property.getProperties().findView((Integer) colorView);
+		}
+		return view != null && colorView != null;
+	}
+
+	@Override
+	public void onBitmapFailed(Drawable errorDrawable)
+	{
+
+	}
+
+	@Override
+	public void onBitmapLoaded(Bitmap bitmap, Picasso.LoadedFrom from)
+	{
+		Log.i("", "Image received");
+		if (view instanceof ImageView)
+		{
+			Log.i("", "Setting view");
+			final ImageView imageView = (ImageView) view;
+			// TODO Animate?
+			imageView.setImageBitmap(bitmap);
+		}
+		Log.i("", "View = " + view);
+		Palette.generateAsync(bitmap, new Palette.PaletteAsyncListener()
+		{
+			public void onGenerated(Palette palette)
+			{
+				if (android.os.Build.VERSION.SDK_INT >= Build.VERSION_CODES.LOLLIPOP && context instanceof Activity)
+				{
+					((Activity) context).getWindow().setStatusBarColor(palette.getDarkVibrantColor(context.getResources().getColor(R.color.apptheme_primary_dark)));
+				}
+
+				if (colorView instanceof View)
+				{
+					((View) colorView).getBackground().setColorFilter(new LightingColorFilter(Color.BLACK, palette.getVibrantColor(context.getResources().getColor(R.color.apptheme_primary))));
+				}
+			}
+		});
+	}
+
+	@Override
+	public void onPrepareLoad(Drawable placeHolderDrawable)
+	{
+
 	}
 
 	@Override
 	public void update(Object value, Format format)
 	{
-		if (value instanceof String)
+		if (value instanceof String && !((String) value).isEmpty())
 		{
-			Picasso.with(context).load((String)value).into(new FABColorTarget());
+			Picasso.with(context).cancelRequest(this);
+			Picasso.with(context).load((String) value).into(this);
 		}
 	}
 }

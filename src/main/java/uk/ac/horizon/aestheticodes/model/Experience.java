@@ -24,16 +24,13 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
-/**
- * This class defines the constraints for markers.It contains two sets
- * of parameters. The first set defines the markers which needs to be
- * identified. For example max & min branches in a marker, empty branches and
- * max leaves in a branch. The second set of parameters are used to define to
- * validate a marker. It defines the number of validation branches, leaves in a
- * validation branch and the checksumModulo modulo.
- */
 public class Experience
 {
+	public static enum Operation
+	{
+		create, retrieve, update, deleted, remove, temp
+	}
+
 	public static enum Threshold
 	{
 		temporalTile, resize
@@ -46,9 +43,14 @@ public class Experience
 	private String icon;
 	private String image;
 	private String description;
-	private String etag;
-	private String owner;
-	//private String color = "#";
+	private int version = 1;
+	private String ownerID;
+
+	private String originalID;
+	private int originalVersion;
+
+	private Operation op = null;
+
 	private int minRegions = 5;
 	private int maxRegions = 5;
 	private int maxEmptyRegions = 0;
@@ -56,8 +58,6 @@ public class Experience
 	private int validationRegions = 2;
 	private int validationRegionValue = 1;
 	private int checksumModulo = 3;
-	private transient boolean changed = false;
-	private String updateURL;
 	private Threshold threshold = Threshold.temporalTile;
 
 	public Experience()
@@ -72,7 +72,6 @@ public class Experience
 	public void setMinRegions(int minRegions)
 	{
 		this.minRegions = minRegions;
-		changed = true;
 	}
 
 	public int getMaxRegions()
@@ -83,7 +82,6 @@ public class Experience
 	public void setMaxRegions(int maxRegions)
 	{
 		this.maxRegions = maxRegions;
-		changed = true;
 	}
 
 	public int getMaxEmptyRegions()
@@ -94,7 +92,6 @@ public class Experience
 	public void setMaxEmptyRegions(int maxEmptyRegions)
 	{
 		this.maxEmptyRegions = maxEmptyRegions;
-		changed = true;
 	}
 
 	public int getMaxRegionValue()
@@ -105,7 +102,11 @@ public class Experience
 	public void setMaxRegionValue(int maxRegionValue)
 	{
 		this.maxRegionValue = maxRegionValue;
-		changed = true;
+	}
+
+	public void setName(String name)
+	{
+		this.name = name;
 	}
 
 	public String getNextUnusedMarker()
@@ -162,6 +163,11 @@ public class Experience
 		return null;
 	}
 
+	public void add(Marker marker)
+	{
+		markers.put(marker.getCode(), marker);
+	}
+
 	public int getValidationRegions()
 	{
 		return validationRegions;
@@ -170,7 +176,6 @@ public class Experience
 	public void setValidationRegions(int validationRegions)
 	{
 		this.validationRegions = validationRegions;
-		changed = true;
 	}
 
 	public int getValidationRegionValue()
@@ -181,7 +186,6 @@ public class Experience
 	public void setValidationRegionValue(int validationRegionValue)
 	{
 		this.validationRegionValue = validationRegionValue;
-		changed = true;
 	}
 
 	public int getChecksumModulo()
@@ -192,7 +196,6 @@ public class Experience
 	public void setChecksumModulo(int checksumModulo)
 	{
 		this.checksumModulo = checksumModulo;
-		changed = true;
 	}
 
 	public Threshold getThreshold()
@@ -205,9 +208,9 @@ public class Experience
 		return icon;
 	}
 
-	public boolean isValidMarker(List<Integer> markerCode)
+	public boolean isValidMarker(List<Integer> markerCodes)
 	{
-		return isValidMarker(markerCode, false);
+		return isValidMarker(markerCodes, false);
 	}
 
 	public Map<String, Marker> getMarkers()
@@ -226,7 +229,6 @@ public class Experience
 		if (this.markers.containsKey(code))
 		{
 			this.markers.remove(code);
-			this.setChanged(true);
 			return true;
 		}
 		else
@@ -235,19 +237,14 @@ public class Experience
 		}
 	}
 
-	public void setChanged(boolean changed)
+	boolean isValidMarker(List<Integer> markerCodes, boolean partial)
 	{
-		this.changed = changed;
-	}
-
-	boolean isValidMarker(List<Integer> markerCode, boolean partial)
-	{
-		return markerCode != null
-				&& hasValidNumberofRegions(markerCode)
-				&& hasValidNumberofEmptyRegions(markerCode)
-				&& hasValidNumberOfLeaves(markerCode)
-				&& hasValidationRegions(markerCode)
-				&& hasValidChecksum(markerCode);
+		return markerCodes != null
+				&& hasValidNumberofRegions(markerCodes)
+				&& hasValidNumberofEmptyRegions(markerCodes)
+				&& hasValidNumberOfLeaves(markerCodes)
+				&& hasValidationRegions(markerCodes)
+				&& hasValidChecksum(markerCodes);
 	}
 
 	public boolean isValidMarker(String marker, boolean partial)
@@ -267,7 +264,7 @@ public class Experience
 		}
 
 		int prevValue = 0;
-		List<Integer> markerCode = new ArrayList<Integer>();
+		List<Integer> codes = new ArrayList<Integer>();
 		for (String value : values)
 		{
 			try
@@ -278,7 +275,7 @@ public class Experience
 					return false;
 				}
 
-				markerCode.add(codeValue);
+				codes.add(codeValue);
 
 				prevValue = codeValue;
 			}
@@ -288,7 +285,7 @@ public class Experience
 			}
 		}
 
-		return partial || isValidMarker(markerCode);
+		return partial || isValidMarker(codes);
 
 	}
 
@@ -301,14 +298,14 @@ public class Experience
 	 * @return true if the number of validation branches are >= validation
 	 * branch value in the preference otherwise it returns false.
 	 */
-	private boolean hasValidationRegions(List<Integer> markerCode)
+	private boolean hasValidationRegions(List<Integer> markerCodes)
 	{
 		if (validationRegions <= 0)
 		{
 			return true;
 		}
 		int validationRegionCount = 0;
-		for (int code : markerCode)
+		for (int code : markerCodes)
 		{
 			if (code == validationRegionValue)
 			{
@@ -370,21 +367,6 @@ public class Experience
 		return true;
 	}
 
-	public String getUpdateURL()
-	{
-		return updateURL;
-	}
-
-	public void setUpdateURL(String updateURL)
-	{
-		this.updateURL = updateURL;
-	}
-
-	public boolean hasChanged()
-	{
-		return changed;
-	}
-
 	public String getId()
 	{
 		return id;
@@ -410,14 +392,58 @@ public class Experience
 		return image;
 	}
 
-	public String getEtag()
+	public int getVersion()
 	{
-		return etag;
+		return version;
 	}
 
-	public void setEtag(String etag)
+	public void setVersion(int version)
 	{
-		this.etag = etag;
-		changed = true;
+		this.version = version;
+	}
+
+	public void setIcon(String icon)
+	{
+		this.icon = icon;
+	}
+
+	public void setImage(String image)
+	{
+		this.image = image;
+	}
+
+	public void setDescription(String description)
+	{
+		this.description = description;
+	}
+
+	public Operation getOp()
+	{
+		return op;
+	}
+
+	public String getOwnerID()
+	{
+		return ownerID;
+	}
+
+	public void setOwnerID(String ownerID)
+	{
+		this.ownerID = ownerID;
+	}
+
+	public void setOriginalID(String originalID)
+	{
+		this.originalID = originalID;
+	}
+
+	public void setOp(Operation op)
+	{
+		this.op = op;
+	}
+
+	public String getOriginalID()
+	{
+		return originalID;
 	}
 }
