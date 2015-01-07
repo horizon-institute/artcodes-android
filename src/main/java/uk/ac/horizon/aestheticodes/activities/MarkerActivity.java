@@ -24,76 +24,46 @@ import android.net.Uri;
 import android.os.Bundle;
 import android.support.v7.app.ActionBarActivity;
 import android.view.View;
-import android.widget.Button;
-import android.widget.ImageView;
-import android.widget.TextView;
-import com.squareup.picasso.Picasso;
 import uk.ac.horizon.aestheticodes.R;
+import uk.ac.horizon.aestheticodes.model.Marker;
+import uk.ac.horizon.aestheticodes.properties.bindings.ColorImageBinding;
+import uk.ac.horizon.aestheticodes.controller.ExperienceManager;
 import uk.ac.horizon.aestheticodes.model.Experience;
-import uk.ac.horizon.aestheticodes.model.ExperienceManager;
-import uk.ac.horizon.aestheticodes.model.MarkerAction;
+import uk.ac.horizon.aestheticodes.properties.Properties;
 
 public class MarkerActivity extends ActionBarActivity
 {
+	private Marker marker;
+	private Properties properties;
+
 	@Override
 	public void onCreate(Bundle savedInstanceState)
 	{
 		super.onCreate(savedInstanceState);
 
-		setContentView(R.layout.activity_marker);
+		setContentView(R.layout.marker);
 
 		String markerCode = getIntent().getData().getLastPathSegment();
 		String experienceID = getIntent().getData().getHost();
 
 		ExperienceManager experienceManager = ExperienceManager.get(this);
 		Experience experience = experienceManager.get(experienceID);
-		final MarkerAction marker = experience.getMarkers().get(markerCode);
+		marker = experience.getMarkers().get(markerCode);
 
-		if (experience.getIcon() != null)
-		{
-			Picasso.with(this).load(experience.getIcon()).into(new ActionBarTarget(this));
-		}
+		properties = new Properties(this, marker);
+		properties.get("title")
+				.defaultTo(getString(R.string.code_text, marker.getCode()))
+				.bindTo(R.id.markerTitle);
+		properties.get("description")
+				.defaultTo(marker.getAction())
+				.bindTo(R.id.markerDescription);
+		properties.get("image")
+				.bindTo(new ColorImageBinding(R.id.markerImage, R.id.markerAction));
+		properties.load();
+	}
 
-		ImageView imageView = (ImageView) findViewById(R.id.imageView);
-		if (marker.getImage() != null)
-		{
-			Picasso.with(this).setLoggingEnabled(true);
-			Picasso.with(this).load(marker.getImage()).placeholder(R.drawable.aestheticodes).into(imageView);
-		}
-
-		TextView titleView = (TextView) findViewById(R.id.titleView);
-		if (marker.getTitle() != null)
-		{
-			titleView.setText(marker.getTitle());
-		}
-		else
-		{
-			titleView.setText("Marker " + marker.getCode());
-		}
-
-		TextView descriptionView = (TextView) findViewById(R.id.descriptionView);
-		if (marker.getDescription() != null)
-		{
-			descriptionView.setText(marker.getDescription());
-		}
-		else
-		{
-			descriptionView.setText(marker.getAction());
-		}
-
-		Button button = (Button) findViewById(R.id.button);
-		if(marker.getActionText() != null)
-		{
-			button.setText(marker.getActionText());
-		}
-		//open_button.getBackground().setColorFilter(0xFF76a0d6, PorterDuff.Mode.MULTIPLY);
-		button.setOnClickListener(new View.OnClickListener()
-		{
-			@Override
-			public void onClick(View view)
-			{
-				startActivity(new Intent(Intent.ACTION_VIEW, Uri.parse(marker.getAction())));
-			}
-		});
+	public void open(View view)
+	{
+		startActivity(new Intent(Intent.ACTION_VIEW, Uri.parse(marker.getAction())));
 	}
 }

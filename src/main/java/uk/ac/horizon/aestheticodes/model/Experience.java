@@ -19,32 +19,38 @@
 
 package uk.ac.horizon.aestheticodes.model;
 
-import android.util.Log;
-import uk.ac.horizon.aestheticodes.settings.ThresholdBehaviour;
-
 import java.util.ArrayList;
-import java.util.Arrays;
-import java.util.Date;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
-/**
- * This class defines the constraints for markers.It contains two sets
- * of parameters. The first set defines the markers which needs to be
- * identified. For example max & min branches in a marker, empty branches and
- * max leaves in a branch. The second set of parameters are used to define to
- * validate a marker. It defines the number of validation branches, leaves in a
- * validation branch and the checksumModulo modulo.
- */
-@SuppressWarnings("FieldCanBeLocal")
 public class Experience
 {
-	private final List<Mode> modes = new ArrayList<Mode>();
-	private final Map<String, MarkerAction> markers = new HashMap<String, MarkerAction>();
+	public static enum Operation
+	{
+		create, retrieve, update, deleted, remove, temp
+	}
+
+	public static enum Threshold
+	{
+		temporalTile, resize
+	}
+
+	private final Map<String, Marker> markers = new HashMap<String, Marker>();
+
 	private String id;
 	private String name;
 	private String icon;
+	private String image;
+	private String description;
+	private int version = 1;
+	private String ownerID;
+
+	private String originalID;
+	private int originalVersion;
+
+	private Operation op = null;
+
 	private int minRegions = 5;
 	private int maxRegions = 5;
 	private int maxEmptyRegions = 0;
@@ -52,22 +58,10 @@ public class Experience
 	private int validationRegions = 2;
 	private int validationRegionValue = 1;
 	private int checksumModulo = 3;
-	private final boolean editable = true;
-	private final boolean addMarkers = true;
-	private final boolean addMarkerByScanning = false;
-	private Date lastUpdate;
-	private transient boolean changed = false;
-	private final String updateURL = "http://www.wornchaos.org/settings.json";
-	private final String thresholdBehaviour = null;
+	private Threshold threshold = Threshold.temporalTile;
 
 	public Experience()
 	{
-		modes.addAll(Arrays.asList(Mode.values()));
-	}
-
-	public List<Mode> getModes()
-	{
-		return modes;
 	}
 
 	public int getMinRegions()
@@ -78,12 +72,6 @@ public class Experience
 	public void setMinRegions(int minRegions)
 	{
 		this.minRegions = minRegions;
-		changed = true;
-	}
-
-	public boolean isEditable()
-	{
-		return editable;
 	}
 
 	public int getMaxRegions()
@@ -94,7 +82,6 @@ public class Experience
 	public void setMaxRegions(int maxRegions)
 	{
 		this.maxRegions = maxRegions;
-		changed = true;
 	}
 
 	public int getMaxEmptyRegions()
@@ -105,7 +92,6 @@ public class Experience
 	public void setMaxEmptyRegions(int maxEmptyRegions)
 	{
 		this.maxEmptyRegions = maxEmptyRegions;
-		changed = true;
 	}
 
 	public int getMaxRegionValue()
@@ -116,7 +102,70 @@ public class Experience
 	public void setMaxRegionValue(int maxRegionValue)
 	{
 		this.maxRegionValue = maxRegionValue;
-		changed = true;
+	}
+
+	public void setName(String name)
+	{
+		this.name = name;
+	}
+
+	public String getNextUnusedMarker()
+	{
+		for (int size = minRegions; size <= maxRegions; size++)
+		{
+			final List<Integer> marker = new ArrayList<Integer>();
+			for (int index = 0; index < size; index++)
+			{
+				marker.add(1);
+			}
+
+			while (true)
+			{
+				if (isValidMarker(marker, false))
+				{
+					StringBuilder result = new StringBuilder();
+					for (int index = 0; index < size; index++)
+					{
+						if (index != 0)
+						{
+							result.append(":");
+						}
+						result.append(marker.get(index));
+					}
+
+					String code = result.toString();
+					if (!markers.containsKey(code))
+					{
+						return code;
+					}
+				}
+
+				for (int i = (size - 1); i >= 0; i--)
+				{
+					int value = marker.get(i) + 1;
+					marker.set(i, value);
+					if (value <= maxRegionValue)
+					{
+						break;
+					}
+					else if (i == 0)
+					{
+						return null;
+					}
+					else
+					{
+						marker.set(i, marker.get(i - 1));
+					}
+				}
+			}
+		}
+
+		return null;
+	}
+
+	public void add(Marker marker)
+	{
+		markers.put(marker.getCode(), marker);
 	}
 
 	public int getValidationRegions()
@@ -127,7 +176,6 @@ public class Experience
 	public void setValidationRegions(int validationRegions)
 	{
 		this.validationRegions = validationRegions;
-		changed = true;
 	}
 
 	public int getValidationRegionValue()
@@ -138,7 +186,6 @@ public class Experience
 	public void setValidationRegionValue(int validationRegionValue)
 	{
 		this.validationRegionValue = validationRegionValue;
-		changed = true;
 	}
 
 	public int getChecksumModulo()
@@ -149,24 +196,11 @@ public class Experience
 	public void setChecksumModulo(int checksumModulo)
 	{
 		this.checksumModulo = checksumModulo;
-		changed = true;
 	}
 
-	public ThresholdBehaviour getThresholdBehaviour()
+	public Threshold getThreshold()
 	{
-		if (this.thresholdBehaviour == null || this.thresholdBehaviour.equals("temporalTile"))
-		{
-			return ThresholdBehaviour.temporalTile;
-		}
-		else if (this.thresholdBehaviour.equals("resize"))
-		{
-			return ThresholdBehaviour.resize;
-		}
-		else
-		{
-			Log.w(this.getClass().getName(), "Unsupported threshold behaviour: " + this.thresholdBehaviour);
-			return ThresholdBehaviour.temporalTile;
-		}
+		return threshold;
 	}
 
 	public String getIcon()
@@ -179,7 +213,7 @@ public class Experience
 		return isValidMarker(markerCodes, false);
 	}
 
-	public Map<String, MarkerAction> getMarkers()
+	public Map<String, Marker> getMarkers()
 	{
 		return markers;
 	}
@@ -195,18 +229,12 @@ public class Experience
 		if (this.markers.containsKey(code))
 		{
 			this.markers.remove(code);
-			this.setChanged(true);
 			return true;
 		}
 		else
 		{
 			return false;
 		}
-	}
-
-	public void setChanged(boolean changed)
-	{
-		this.changed = changed;
 	}
 
 	boolean isValidMarker(List<Integer> markerCodes, boolean partial)
@@ -308,7 +336,6 @@ public class Experience
 		return (numberOfLeaves % checksumModulo) == 0;
 	}
 
-
 	private boolean hasValidNumberofRegions(List<Integer> marker)
 	{
 		return ((marker.size() >= minRegions) && (marker.size() <= maxRegions));
@@ -340,44 +367,83 @@ public class Experience
 		return true;
 	}
 
-	public String getUpdateURL()
-	{
-		return updateURL;
-	}
-
-	public boolean canAddMarker()
-	{
-		return addMarkers;
-	}
-
-	public Date getLastUpdate()
-	{
-		return lastUpdate;
-	}
-
-	public void setLastUpdate(Date lastUpdate)
-	{
-		this.lastUpdate = lastUpdate;
-		changed = true;
-	}
-
-	public boolean hasChanged()
-	{
-		return changed;
-	}
-
-	public boolean canAddMarkerByScanning()
-	{
-		return addMarkerByScanning;
-	}
-
 	public String getId()
 	{
 		return id;
 	}
 
+	public void setId(String id)
+	{
+		this.id = id;
+	}
+
 	public String getName()
 	{
 		return name;
+	}
+
+	public String getDescription()
+	{
+		return description;
+	}
+
+	public String getImage()
+	{
+		return image;
+	}
+
+	public int getVersion()
+	{
+		return version;
+	}
+
+	public void setVersion(int version)
+	{
+		this.version = version;
+	}
+
+	public void setIcon(String icon)
+	{
+		this.icon = icon;
+	}
+
+	public void setImage(String image)
+	{
+		this.image = image;
+	}
+
+	public void setDescription(String description)
+	{
+		this.description = description;
+	}
+
+	public Operation getOp()
+	{
+		return op;
+	}
+
+	public String getOwnerID()
+	{
+		return ownerID;
+	}
+
+	public void setOwnerID(String ownerID)
+	{
+		this.ownerID = ownerID;
+	}
+
+	public void setOriginalID(String originalID)
+	{
+		this.originalID = originalID;
+	}
+
+	public void setOp(Operation op)
+	{
+		this.op = op;
+	}
+
+	public String getOriginalID()
+	{
+		return originalID;
 	}
 }

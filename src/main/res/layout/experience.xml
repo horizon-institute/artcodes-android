@@ -1,0 +1,105 @@
+<?xml version="1.0" encoding="utf-8"?>
+
+<!--
+  ~ Aestheticodes recognises a different marker scheme that allows the
+  ~ creation of aesthetically pleasing, even beautiful, codes.
+  ~ Copyright (C) 2014  Aestheticodes
+  ~
+  ~     This program is free software: you can redistribute it and/or modify
+  ~     it under the terms of the GNU Affero General Public License as published
+  ~     by the Free Software Foundation, either version 3 of the License, or
+  ~     (at your option) any later version.
+  ~
+  ~     This program is distributed in the hope that it will be useful,
+  ~     but WITHOUT ANY WARRANTY; without even the implied warranty of
+  ~     MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+  ~     GNU Affero General Public License for more details.
+  ~
+  ~     You should have received a copy of the GNU Affero General Public License
+  ~     along with this program.  If not, see <http://www.gnu.org/licenses/>.
+  -->
+
+<merge xmlns:android="http://schemas.android.com/apk/res/android"
+       xmlns:tools="http://schemas.android.com/tools"
+       android:layout_width="match_parent"
+       android:layout_height="wrap_content"
+       tools:context=".activities.ExperienceActivity">
+
+	<ScrollView
+			android:orientation="vertical"
+			android:layout_width="match_parent"
+			android:layout_height="match_parent"
+			tools:context=".activities.ExperienceActivity">
+
+		<LinearLayout android:layout_width="fill_parent"
+		              android:layout_height="wrap_content"
+		              android:orientation="vertical">
+
+			<ImageView android:layout_width="fill_parent"
+			           android:layout_height="wrap_content"
+			           android:id="@+id/experienceImage"
+			           android:src="@drawable/aestheticodes"
+			           android:adjustViewBounds="true"
+			           tools:ignore="ContentDescription"
+			           android:layout_marginLeft="-1dp" android:layout_marginTop="-1dp"
+			           android:layout_marginRight="-1dp" />
+
+			<ImageButton
+					android:id="@+id/experienceFloatingAction"
+					android:layout_width="56dp"
+					android:layout_height="56dp"
+					android:layout_gravity="end|right"
+					android:src="@drawable/ic_edit_white_24dp"
+					android:layout_marginTop="-28dp"
+					android:layout_marginRight="16dp"
+					android:layout_marginEnd="16dp"
+					android:background="@drawable/floating_action_button"
+					android:contentDescription="@string/experience_edit"
+					android:elevation="2dp"
+					android:onClick="editExperience"
+					android:layout_marginBottom="-28dp" />
+
+			<RelativeLayout android:layout_width="fill_parent"
+			                android:layout_height="72dp"
+			                android:padding="16dp"
+			                android:elevation="1dp">
+
+				<ImageView android:id="@+id/experienceIcon"
+				           android:layout_width="40dp"
+				           android:layout_height="40dp"
+				           android:layout_marginEnd="16dp"
+				           android:layout_marginRight="16dp"
+				           android:layout_alignParentStart="true"
+				           android:layout_alignParentLeft="true"
+				           android:layout_alignParentTop="true"
+				           android:scaleType="fitCenter"
+				           tools:ignore="ContentDescription"
+				           android:src="@drawable/ic_launcher" />
+
+				<TextView android:id="@+id/experienceTitle"
+				          android:layout_width="wrap_content"
+				          android:layout_height="wrap_content"
+				          android:layout_alignParentTop="false"
+				          android:layout_toRightOf="@+id/experienceIcon"
+				          android:layout_toEndOf="@+id/experienceIcon"
+				          android:layout_centerVertical="true"
+				          style="@style/TextAppearance.AppCompat.Title" />
+			</RelativeLayout>
+
+			<TextView android:layout_width="wrap_content"
+			          android:layout_height="wrap_content"
+			          android:id="@+id/experienceDescription"
+			          android:layout_gravity="center_horizontal"
+			          android:singleLine="false"
+			          android:paddingLeft="16dp"
+			          android:paddingRight="16dp"
+			          android:paddingBottom="16dp"
+			          android:elevation="1dp"
+			          style="@style/TextAppearance.AppCompat.Body1" />
+		</LinearLayout>
+	</ScrollView>
+	<View android:layout_width="match_parent"
+	      android:layout_height="80dp"
+	      android:background="@drawable/image_protection_scrim" />
+</merge>
+

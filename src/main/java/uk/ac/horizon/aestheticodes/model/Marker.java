@@ -19,120 +19,72 @@
 
 package uk.ac.horizon.aestheticodes.model;
 
-import java.util.ArrayList;
-import java.util.List;
-
-/**
- * This class holds the marker code and the index of the root component.
- *
- * @author pszsa1
- */
 public class Marker
 {
-	private int index;
-	private List<Integer> code;
-	private int occurrences = 1;
+	private String code;
+	private String action;
+	private String title;
+	private String description;
+	private String image;
+	private boolean showDetail = true;
 
-	//constructors
-	public Marker()
-	{
-		super();
-	}
-
-	public Marker(List<Integer> code)
-	{
-		super();
-		this.code = code;
-	}
-
-	public Marker(String code)
-	{
-		super();
-		setCode(code);
-	}
-
-	public int getOccurrences()
-	{
-		return occurrences;
-	}
-
-	public void setOccurrences(int value)
-	{
-		this.occurrences = value;
-	}
-
-	private static List<Integer> getCodeArrayFromString(String code)
-	{
-		String tmpCodes[] = code.split(":");
-		List<Integer> codes = new ArrayList<Integer>();
-		for (String tmpCode : tmpCodes)
-		{
-			codes.add(Integer.valueOf(tmpCode));
-		}
-		return codes;
-	}
-
-	public int getComponentIndex()
-	{
-		return index;
-	}
-
-	public void setComponentIndex(int componentIndex)
-	{
-		index = componentIndex;
-	}
-
-	public List<Integer> getCode()
+	public String getCode()
 	{
 		return code;
 	}
 
 	public void setCode(String code)
 	{
-		setCode(getCodeArrayFromString(code));
-	}
-
-	public void setCode(List<Integer> code)
-	{
 		this.code = code;
 	}
 
-	public String getCodeKey()
+	public String getAction()
 	{
-		if (code != null)
-		{
-			StringBuilder codeString = new StringBuilder();
-			for (int i = 0; i < code.size(); i++)
-			{
-				if (i > 0)
-				{
-					codeString.append(":");
-				}
-				codeString.append(code.get(i));
-			}
-			return codeString.toString();
-		}
-		return null;
+		return action;
 	}
 
-	boolean isCodeEqual(Marker marker)
+	public void setAction(String action)
 	{
-		return getCodeKey().equals(marker.getCodeKey());
+		this.action = action;
 	}
 
-	// Object methods for use in Map, HashMap etc.
-	public int hashCode()
+	public String getTitle()
 	{
-		int hash = 0;
-		for (int i : code)
-		{
-			hash += i;
-		}
-		return hash;
+		return title;
 	}
 
-	public boolean equals(Object m)
+	public String getDescription()
 	{
-		return m.getClass() == this.getClass() && isCodeEqual((Marker) m);
+		return description;
+	}
+
+	public String getImage()
+	{
+		return image;
+	}
+
+	public void setImage(String image)
+	{
+		this.image = image;
+	}
+
+	public boolean getShowDetail()
+	{
+		return showDetail;
+	}
+
+	public void setShowDetail(boolean showDetail)
+	{
+		this.showDetail = showDetail;
+	}
+
+	public void setTitle(String title)
+	{
+		this.title = title;
+	}
+
+	public void setDescription(String description)
+	{
+		this.description = description;
 	}
 }

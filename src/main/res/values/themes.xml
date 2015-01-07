@@ -18,40 +18,87 @@
   ~     along with this program.  If not, see <http://www.gnu.org/licenses/>.
   -->
 <resources xmlns:tools="http://schemas.android.com/tools">
-	<style name="CaptureTheme" parent="@style/Theme.AppCompat.Light.DarkActionBar">
+	<!-- Themes -->
+	<style name="Theme.Aestheticodes" parent="Theme.AppCompat.Light.DarkActionBar">
+		<item name="android:colorPrimary" tools:ignore="NewApi">@color/apptheme_primary</item>
+		<item name="android:colorPrimaryDark" tools:ignore="NewApi">@color/apptheme_primary_dark</item>
+		<item name="android:colorAccent" tools:ignore="NewApi">@color/apptheme_primary</item>
+		<item name="android:windowBackground">@android:color/white</item>
+
+		<item name="colorPrimary">@color/apptheme_primary</item>
+		<item name="colorPrimaryDark">@color/apptheme_primary_dark</item>
+		<item name="colorAccent">@color/apptheme_primary</item>
+	</style>
+
+	<style name="Theme.Aestheticodes.Transparent" parent="Theme.AppCompat.Light.DarkActionBar">
 		<item name="android:windowContentOverlay">@null</item>
-		<item name="android:actionBarStyle" tools:ignore="NewApi">@style/ActionBar.Transparent.Compat</item>
+		<item name="android:background">@null</item>
+		<item name="background">@null</item>
+
+		<item name="android:actionBarStyle" tools:ignore="NewApi">@style/Aestheticodes.ActionBar.Transparent</item>
+		<item name="actionBarStyle">@style/Aestheticodes.ActionBar.Transparent</item>
 
 		<item name="android:windowActionBarOverlay" tools:ignore="NewApi">true</item>
 		<item name="android:windowActionModeOverlay" tools:ignore="NewApi">true</item>
 		<item name="windowActionBarOverlay">true</item>
-		<!-- <item name="windowActionModeOverlay">true</item>-->
-		<item name="actionBarStyle">@style/ActionBar.Transparent.Compat</item>
 
+		<item name="android:colorPrimary" tools:ignore="NewApi">@color/apptheme_primary</item>
+		<item name="android:colorPrimaryDark" tools:ignore="NewApi">@color/apptheme_primary_dark</item>
+		<item name="android:colorAccent" tools:ignore="NewApi">@color/apptheme_primary</item>
+		<item name="android:windowBackground">@android:color/white</item>
+
+		<item name="colorPrimary">@color/apptheme_primary</item>
+		<item name="colorPrimaryDark">@color/apptheme_primary_dark</item>
+		<item name="colorAccent">@color/apptheme_primary</item>
+	</style>
+
+	<style name="Theme.Aestheticodes.Camera" parent="@style/Theme.AppCompat">
+		<item name="android:windowContentOverlay">@null</item>
+		<item name="android:actionBarStyle" tools:ignore="NewApi">@style/Aestheticodes.ActionBar.Transparent.Camera</item>
+		<item name="actionBarStyle">@style/Aestheticodes.ActionBar.Transparent.Camera</item>
+
+		<item name="android:windowActionBarOverlay" tools:ignore="NewApi">true</item>
+		<item name="android:windowActionModeOverlay" tools:ignore="NewApi">true</item>
+		<item name="windowActionBarOverlay">true</item>
 		<item name="android:windowTranslucentStatus" tools:ignore="NewApi">true</item>
 		<item name="android:windowTranslucentNavigation" tools:ignore="NewApi">true</item>
+		<item name="actionDropDownStyle">@style/Theme.Aestheticodes.Spinner</item>
+		<item name="popupMenuStyle">@style/Aestheticodes.PopupMenu</item>
 	</style>
 
-	<style name="ActionBarStyle.Transparent" parent="@style/Widget.AppCompat.ActionBar">
-		<item name="android:background">@null</item>
-		<item name="android:textAppearance">@style/TextAppearance.AppCompat.Widget.ActionBar.Title.Inverse</item>
+	<!-- Action Bar Styles -->
+	<style name="Aestheticodes.ActionBar" parent="ThemeOverlay.AppCompat.Dark.ActionBar">
+		<item name="android:displayOptions" tools:ignore="NewApi">homeAsUp</item>
+		<item name="displayOptions">homeAsUp</item>
 	</style>
 
-	<style name="MarkerTheme" parent="@style/Theme.AppCompat.Light.DarkActionBar">
-		<item name="android:background">@android:color/white</item>
-		<item name="android:windowContentOverlay">@null</item>
-		<item name="android:windowActionBarOverlay" tools:ignore="NewApi">true</item>
-		<item name="android:windowActionModeOverlay" tools:ignore="NewApi">true</item>
-		<item name="android:actionBarStyle" tools:ignore="NewApi">@style/ActionBarStyle.Transparent</item>
-
-		<item name="windowActionBarOverlay">true</item>
-		<!-- <item name="windowActionModeOverlay">true</item> -->
-		<item name="actionBarStyle">@style/ActionBarStyle.Transparent</item>
+	<style name="Aestheticodes.ActionBar.Transparent" parent="ThemeOverlay.AppCompat.Dark.ActionBar">
+		<item name="android:displayOptions" tools:ignore="NewApi">homeAsUp</item>
+		<item name="displayOptions">homeAsUp</item>
+		<item name="android:background">@android:color/transparent</item>
+		<item name="background">@android:color/transparent</item>
 	</style>
 
-	<style name="ActionBar.Transparent.Compat" parent="@style/Widget.AppCompat.ActionBar">
-		<item name="background">@null</item>
-		<item name="titleTextStyle">@style/TextAppearance.AppCompat.Widget.ActionBar.Title.Inverse</item>
+	<style name="Aestheticodes.ActionBar.Transparent.Camera" parent="Aestheticodes.ActionBar.Transparent">
+		<item name="android:displayOptions" tools:ignore="NewApi">showCustom</item>
+		<item name="displayOptions">showCustom</item>
 	</style>
 
+	<style name="Theme.Aestheticodes.Spinner" parent="Widget.AppCompat.Spinner.DropDown.ActionBar">
+		<item name="android:dropDownVerticalOffset">-4dip</item>
+		<item name="android:dropDownHorizontalOffset">-16dip</item>
+	</style>
+
+	<!-- Button style -->
+	<style name="Theme.Aestheticodes.Button">
+		<item name="android:background">@drawable/button</item>
+		<item name="android:textColor">#FFF</item>
+		<item name="android:textSize">12sp</item>
+		<item name="android:textAllCaps" tools:ignore="NewApi">true</item>
+		<item name="textAllCaps">true</item>
+	</style>
+
+	<style name="Aestheticodes.PopupMenu" parent="@style/Widget.AppCompat.PopupMenu">
+		<item name="android:popupBackground">@color/viewfinder_mask</item>
+	</style>
 </resources>

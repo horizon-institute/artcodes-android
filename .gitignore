@@ -5,3 +5,6 @@ gradle.properties
 local.properties
 settings.gradle
 *.keystore
+EndpointConstants.java
+
+src/main/res/values/keys.xml

@@ -20,7 +20,7 @@
 package uk.ac.horizon.aestheticodes.detect;
 
 import uk.ac.horizon.aestheticodes.model.Experience;
-import uk.ac.horizon.aestheticodes.model.Marker;
+import uk.ac.horizon.aestheticodes.model.MarkerCode;
 
 import java.util.List;
 
@@ -28,5 +28,5 @@ public interface ExperienceEventListener
 {
 	void experienceSelected(Experience experience);
 	void experiencesChanged();
-	void markersFound(List<Marker> markers);
+	void markersFound(List<MarkerCode> markers);
 }

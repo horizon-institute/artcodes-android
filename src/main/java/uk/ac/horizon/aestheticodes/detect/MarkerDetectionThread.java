@@ -31,17 +31,21 @@ import org.opencv.core.Rect;
 import org.opencv.core.Scalar;
 import org.opencv.core.Size;
 import org.opencv.imgproc.Imgproc;
-import uk.ac.horizon.aestheticodes.model.ExperienceManager;
-import uk.ac.horizon.aestheticodes.model.Marker;
+import uk.ac.horizon.aestheticodes.model.Experience;
+import uk.ac.horizon.aestheticodes.controller.ExperienceManager;
+import uk.ac.horizon.aestheticodes.model.MarkerCode;
 import uk.ac.horizon.aestheticodes.model.MarkerDetector;
-import uk.ac.horizon.aestheticodes.model.Mode;
-import uk.ac.horizon.aestheticodes.settings.ThresholdBehaviour;
 
 import java.util.ArrayList;
 import java.util.List;
 
 public class MarkerDetectionThread extends Thread
 {
+	public static enum Mode
+	{
+		detect, outline, threshold
+	}
+
 	private static final String TAG = MarkerDetectionThread.class.getName();
 	private static final Scalar detectedColour = new Scalar(255, 255, 0, 255);
 	private static final Scalar outlineColour = new Scalar(0, 0, 0, 255);
@@ -106,14 +110,14 @@ public class MarkerDetectionThread extends Thread
 
 	private void thresholdImage(Mat image)
 	{
-		ThresholdBehaviour thresholdBehaviour = experienceManager.getSelected().getThresholdBehaviour();
+		Experience.Threshold threshold = experienceManager.getSelected().getThreshold();
 
 		if (framesSinceLastMarker > 2)
 		{
 			++cumulativeFramesWithoutMarker;
 		}
 
-		if (thresholdBehaviour == ThresholdBehaviour.temporalTile)
+		if (threshold == Experience.Threshold.temporalTile)
 		{
 			Imgproc.GaussianBlur(image, image, new Size(5, 5), 0);
 
@@ -156,7 +160,7 @@ public class MarkerDetectionThread extends Thread
 
 			Imgproc.threshold(image, image, 127, 255, Imgproc.THRESH_OTSU);
 		}
-		else if (thresholdBehaviour == ThresholdBehaviour.resize)
+		else if (threshold == Experience.Threshold.resize)
 		{
 			Imgproc.resize(image, image, new Size(540, 540));
 
@@ -168,14 +172,14 @@ public class MarkerDetectionThread extends Thread
 		}
 	}
 
-	private List<Marker> findMarkers(Mat inputImage, Mat drawImage)
+	private List<MarkerCode> findMarkers(Mat inputImage, Mat drawImage)
 	{
 		final ArrayList<MatOfPoint> contours = new ArrayList<MatOfPoint>();
 		final Mat hierarchy = new Mat();
 		try
 		{
 			// holds all the markers identified in the camera.
-			List<Marker> markersDetected = new ArrayList<Marker>();
+			List<MarkerCode> markersDetected = new ArrayList<MarkerCode>();
 			// Find blobs using connect component.
 			Imgproc.findContours(inputImage, contours, hierarchy, Imgproc.RETR_TREE, Imgproc.CHAIN_APPROX_NONE);
 
@@ -185,7 +189,7 @@ public class MarkerDetectionThread extends Thread
 				if (code != null)
 				{
 					// if marker found then add in the list.
-					Marker marker = new Marker();
+					MarkerCode marker = new MarkerCode();
 					marker.setCode(code);
 					marker.setComponentIndex(i);
 					markersDetected.add(marker);
@@ -200,7 +204,7 @@ public class MarkerDetectionThread extends Thread
 
 			if ((mode != Mode.detect || mode == Mode.threshold) && drawImage != null)
 			{
-				for (Marker marker : markersDetected)
+				for (MarkerCode marker : markersDetected)
 				{
 					Rect bounds = Imgproc.boundingRect(contours.get(marker.getComponentIndex()));
 					String markerCode = marker.getCodeKey();
@@ -259,7 +263,7 @@ public class MarkerDetectionThread extends Thread
 						}
 
 						// find markers.
-						List<Marker> markers = findMarkers(croppedImage, drawImage);
+						List<MarkerCode> markers = findMarkers(croppedImage, drawImage);
 						if (markers.size() == 0)
 						{
 							++framesSinceLastMarker;

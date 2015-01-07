@@ -19,140 +19,100 @@
 
 package uk.ac.horizon.aestheticodes.activities;
 
+import android.app.AlertDialog;
+import android.content.DialogInterface;
 import android.content.Intent;
 import android.os.Bundle;
+import android.support.v4.app.NavUtils;
+import android.support.v7.app.ActionBarActivity;
 import android.util.Log;
-import com.squareup.picasso.Picasso;
+import android.view.Menu;
+import android.view.MenuItem;
+import android.view.View;
 import uk.ac.horizon.aestheticodes.R;
-import uk.ac.horizon.aestheticodes.detect.ExperienceEventListener;
+import uk.ac.horizon.aestheticodes.properties.bindings.ColorImageBinding;
+import uk.ac.horizon.aestheticodes.properties.bindings.VisibilityBinding;
+import uk.ac.horizon.aestheticodes.controller.ExperienceManager;
 import uk.ac.horizon.aestheticodes.model.Experience;
-import uk.ac.horizon.aestheticodes.model.ExperienceManager;
-import uk.ac.horizon.aestheticodes.model.Marker;
-import uk.ac.horizon.aestheticodes.model.MarkerAction;
-import uk.ac.horizon.aestheticodes.settings.ActivitySettingsItem;
-import uk.ac.horizon.aestheticodes.settings.AddMarkerSettingsItem;
-import uk.ac.horizon.aestheticodes.settings.MarkerSettingsItem;
-import uk.ac.horizon.aestheticodes.settings.SettingsActivity;
+import uk.ac.horizon.aestheticodes.properties.Properties;
 
-import java.util.ArrayList;
-import java.util.Collections;
-import java.util.Comparator;
-import java.util.List;
-
-public class ExperienceActivity extends SettingsActivity implements ExperienceEventListener
+public class ExperienceActivity extends ActionBarActivity
 {
 	private ExperienceManager experienceManager;
 	private Experience experience;
+	private Properties properties;
 
 	@Override
 	protected void onCreate(Bundle savedInstanceState)
 	{
 		super.onCreate(savedInstanceState);
 
-		Log.i("", getIntent().toString());
-		String experienceID = getIntent().getData().getHost();
+		Bundle extras = getIntent().getExtras();
+		String experienceID = extras.getString("experience");
 
 		experienceManager = ExperienceManager.get(this);
 		experience = experienceManager.get(experienceID);
 
-		getSupportActionBar().setTitle(getString(R.string.marker_title, experience.getName()));
-		if (experience.getIcon() != null)
+		setContentView(R.layout.experience);
+
+		properties = new Properties(this, experience);
+		properties.get("name").bindTo(R.id.experienceTitle);
+		properties.get("description").bindTo(R.id.experienceDescription);
+		properties.get("icon").bindTo(R.id.experienceIcon);
+		properties.get("image").bindTo(new ColorImageBinding(R.id.experienceImage, R.id.experienceFloatingAction));
+		//properties.get("editable").bindTo(new VisibilityBinding(R.id.experienceFloatingAction));
+		properties.load();
+	}
+
+	@Override
+	public boolean onCreateOptionsMenu(Menu menu)
+	{
+		getMenuInflater().inflate(R.menu.experience_actions, menu);
+
+		return super.onCreateOptionsMenu(menu);
+	}
+
+	@Override
+	public boolean onOptionsItemSelected(MenuItem item)
+	{
+		switch (item.getItemId())
 		{
-			Picasso.with(this).load(experience.getIcon()).into(new ActionBarTarget(this));
+			case R.id.action_delete:
+				Log.i("", "Delete experience");
+				AlertDialog.Builder confirmBuilder = new AlertDialog.Builder(this);
+				confirmBuilder.setTitle(getResources().getString(R.string.experienceDeleteConfirmTitle, experience.getName()));
+				confirmBuilder.setMessage(getResources().getString(R.string.experienceDeleteConfirmMessage, experience.getName()));
+				confirmBuilder.setPositiveButton(R.string.deleteConfirm, new DialogInterface.OnClickListener()
+				{
+					@Override
+					public void onClick(DialogInterface dialogInterface, int i)
+					{
+						experience.setOp(Experience.Operation.remove);
+						experienceManager.save();
+						NavUtils.navigateUpTo(ExperienceActivity.this, new Intent(ExperienceActivity.this, ExperienceListActivity.class));
+					}
+				});
+				confirmBuilder.setNegativeButton(R.string.deleteCancel, new DialogInterface.OnClickListener()
+				{
+					@Override
+					public void onClick(DialogInterface dialogInterface, int i)
+					{
+						// nothing
+					}
+				});
+
+				confirmBuilder.create().show();
+				return true;
 		}
-
-		String code = getIntent().getData().getLastPathSegment();
-		Log.i("", "Code: " +  code);
-		if (code != null && !code.isEmpty())
-		{
-			final AddMarkerSettingsItem.AddMarkerDialogFragment dialogFragment = new AddMarkerSettingsItem.AddMarkerDialogFragment();
-			final Bundle bundle = new Bundle();
-			bundle.putString("experience", experience.getId());
-			bundle.putString("code", code);
-			dialogFragment.setArguments(bundle);
-			dialogFragment.show(getSupportFragmentManager(), "missiles");
-		}
-
-		refresh();
+		return super.onOptionsItemSelected(item);
 	}
 
-	@Override
-	public void refresh()
+
+	public void editExperience(View view)
 	{
-		adapter.clear();
-		final List<MarkerAction> actions = new ArrayList<MarkerAction>(experience.getMarkers().values());
-		Collections.sort(actions, new Comparator<MarkerAction>()
-		{
-			@Override
-			public int compare(MarkerAction markerAction, MarkerAction markerAction2)
-			{
-				return markerAction.getCode().compareTo(markerAction2.getCode());
-			}
-		});
-		for (MarkerAction action : actions)
-		{
-			if (action.isVisible())
-			{
-				adapter.add(new MarkerSettingsItem(this, experience, action));
-			}
-		}
+		Intent intent = new Intent(ExperienceActivity.this, ExperienceEditActivity.class);
+		intent.putExtra("experience", experience.getId());
 
-		if (experience.canAddMarker())
-		{
-			adapter.add(new AddMarkerSettingsItem(this, experience, getString(R.string.marker_add)));
-		}
-
-		if(experience.isEditable())
-		{
-			Intent intent = new Intent(this, MarkerSettingsActivity.class);
-			intent.putExtra("experience", experience.getId());
-
-			adapter.add(new ActivitySettingsItem(this, getString(R.string.settings), intent));
-		}
-
-		Intent intent = new Intent(this, AboutActivity.class);
-
-		adapter.add(new ActivitySettingsItem(this, getString(R.string.about), intent));
-
-		adapter.notifyDataSetChanged();
-	}
-
-	@Override
-	public void saveChanges()
-	{
-		experienceManager.add(experience);
-	}
-
-	@Override
-	public void experienceSelected(Experience experience)
-	{
-
-	}
-
-	@Override
-	public void experiencesChanged()
-	{
-		refresh();
-	}
-
-	@Override
-	protected void onPause()
-	{
-		super.onPause();
-		experienceManager.removeListener(this);
-	}
-
-	@Override
-	protected void onResume()
-	{
-		super.onResume();
-		experienceManager.addListener(this);
-		refresh();
-	}
-
-	@Override
-	public void markersFound(List<Marker> markers)
-	{
-
+		startActivity(intent);
 	}
 }

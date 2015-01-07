@@ -17,71 +17,90 @@
   ~     You should have received a copy of the GNU Affero General Public License
   ~     along with this program.  If not, see <http://www.gnu.org/licenses/>.
   -->
-
 <resources xmlns:tools="http://schemas.android.com/tools">
-    <string name="app_name">Aestheticodes</string>
-	<string name="marker_settings_title">%s Settings</string>
-	<string name="marker_title">%s Markers</string>
+	<string name="app_name">Aestheticodes</string>
+	<string name="property_set">Set %s</string>
+	<string name="code_text">Marker %s</string>
 	<string name="action_experiences">Experiences</string>
 	<string name="action_switch_camera">Switch Camera</string>
-    <string name="about">About</string>
 	<string name="marker_add">Add Marker</string>
 	<string name="dialog_action_set">Set</string>
-    <string name="dialog_action_cancel">Cancel</string>
-    <string name="dialog_action_delete">Delete</string>
-    <string name="dialog_marker_title_prefix">Marker</string>
+	<string name="dialog_action_cancel">Cancel</string>
+	<string name="dialog_action_delete">Delete</string>
 	<string name="mode_detect" tools:ignore="UnusedResources">Detect</string>
 	<string name="mode_outline" tools:ignore="UnusedResources">Outline</string>
 	<string name="mode_threshold" tools:ignore="UnusedResources">Threshold</string>
-	<string name="pager_mark">■</string>
+	<string name="mode_active_detect" tools:ignore="UnusedResources">Detecting…</string>
+	<string name="mode_active_outline" tools:ignore="UnusedResources">Outlining…</string>
+	<string name="mode_active_threshold" tools:ignore="UnusedResources">Thresholding…</string>
 	<string name="markerCode">Marker Code</string>
-	<string name="settings_markers">Markers</string>
-	<string name="settings">Settings</string>
 	<!-- Default WebSites -->
-	<string name="about_aestheticodes">http://aestheticodes.com/info/</string>
-    <string name="default_status">Place an Aestheticode inside the viewfinder to scan it</string>
 	<string name="URL">URL</string>
-	<string name="minRegions" tools:ignore="UnusedResources">Min Regions</string>
-	<string name="minRegions_desc" tools:ignore="UnusedResources">The minimum number of regions in a valid Aestheticode.</string>
-	<plurals name="minRegions_value" tools:ignore="UnusedResources">
+	<string name="minRegions">Regions</string>
+	<string name="minRegions_desc" tools:ignore="UnusedResources">The number of regions in a valid Aestheticode.</string>
+	<plurals name="minRegions_text" tools:ignore="UnusedResources">
 		<item quantity="one">1 Region</item>
-		<item quantity="other">%d Regions</item>
-	</plurals>
-	<string name="maxRegions" tools:ignore="UnusedResources">Max Regions</string>
-	<string name="maxRegions_desc" tools:ignore="UnusedResources">The maximum number of regions in a valid Aestheticode.</string>
-	<plurals name="maxRegions_value" tools:ignore="UnusedResources">
-		<item quantity="one">1 Region</item>
-		<item quantity="other">%d Regions</item>
+		<item quantity="other">%s Regions</item>
 	</plurals>
 	<string name="maxRegionValue" tools:ignore="UnusedResources">Max Region Value</string>
-	<string name="maxRegionValue_desc" tools:ignore="UnusedResources">The maximum value a region can have in a valid Aestheticode.</string>
+	<string name="maxRegionValue_desc" tools:ignore="UnusedResources">The maximum value a region can have in a valid
+		Aestheticode.
+	</string>
 	<string name="maxEmptyRegions" tools:ignore="UnusedResources">Empty Regions</string>
-	<string name="maxEmptyRegions_desc" tools:ignore="UnusedResources">The maximum number of empty regions in a valid Aestheticode.</string>
+	<string name="maxEmptyRegions_desc" tools:ignore="UnusedResources">The maximum number of empty regions in a valid
+		Aestheticode.
+	</string>
 	<string name="maxEmptyRegions_off" tools:ignore="UnusedResources">None</string>
-	<plurals name="maxEmptyRegions_value" tools:ignore="UnusedResources">
+	<plurals name="maxEmptyRegions_text" tools:ignore="UnusedResources">
 		<item quantity="one">Maximum 1 Empty Region</item>
 		<item quantity="other">Maximum %d Empty Regions</item>
 	</plurals>
 	<string name="validationRegions" tools:ignore="UnusedResources">Validation</string>
-	<string name="validationRegions_desc" tools:ignore="UnusedResources">The number of regions that must have a specified value in a valid Aestheticode.</string>
+	<string name="validationRegions_desc" tools:ignore="UnusedResources">The number of regions that must have a
+		specified value in a valid Aestheticode.
+	</string>
 	<string name="validationRegions_off" tools:ignore="UnusedResources">Off</string>
-	<plurals name="validationRegions_value" tools:ignore="UnusedResources">
+	<plurals name="validationRegions_text" tools:ignore="UnusedResources">
 		<item quantity="one">1 Validation Region</item>
 		<item quantity="other">%d Validation Regions</item>
 	</plurals>
 	<string name="validationRegionValue" tools:ignore="UnusedResources">Validation Region Value</string>
-	<string name="validationRegionValue_desc" tools:ignore="UnusedResources">The value that validation regions must have in a valid Aestheticode.</string>
+	<string name="validationRegionValue_desc" tools:ignore="UnusedResources">The value that validation regions must have
+		in a valid Aestheticode.
+	</string>
 	<string name="checksumModulo" tools:ignore="UnusedResources">Checksum Value</string>
 	<string name="checksumModulo_off" tools:ignore="UnusedResources">Disabled</string>
-	<string name="checksumModulo_desc" tools:ignore="UnusedResources">The Aestheticode checksum: the sum of all regions must be divisible by this value to be valid.</string>
+	<string name="checksumModulo_desc" tools:ignore="UnusedResources">The Aestheticode checksum: the sum of all regions
+		must be divisible by this value to be valid.
+	</string>
 
-    <string name="noCameraTitle">Camera Unavailable</string>
-    <string name="noCameraMessage">Please try restarting your device.</string>
-    <string name="noCameraButton">OK</string>
+	<string name="noCameraTitle">Camera Unavailable</string>
+	<string name="noCameraMessage">Please try restarting your device.</string>
+	<string name="noCameraButton">OK</string>
 
-    <string name="confirmDeleteDialogTitlePrefix">Delete</string>
-    <string name="confirmDeleteDialogMessage">Are you sure you want to delete this marker?</string>
-    <string name="confirmDeleteDialogPositive">Delete</string>
-    <string name="confirmDeleteDialogNegative">Cancel</string>
+	<string name="markerDeleteConfirmTitle">Delete Marker %s?</string>
+	<string name="markerDeleteConfirmMessage">Marker %s will be permanently deleted</string>
+
+	<string name="experienceDeleteConfirmTitle">Delete %s?</string>
+	<string name="experienceDeleteConfirmMessage">%s will be permanently deleted</string>
+	<string name="deleteConfirm">Delete</string>
+	<string name="deleteCancel">Cancel</string>
+
 	<string name="open">Open</string>
+	<string name="experience_add">Add Experience</string>
+	<string name="experiences">Experiences</string>
+	<string name="experience_edit">Edit Experience</string>
+	<string name="markerTitle">Title</string>
+	<string name="markerDescription">Description</string>
+	<string name="markerSettings">Marker Settings</string>
+	<string name="markerImage">Image</string>
+	<string name="experienceTitle">Title</string>
+	<string name="experienceDescription">Description</string>
+	<string name="experienceIcon">Icon</string>
+	<string name="experienceImage">Image</string>
+	<string name="markers">Markers</string>
+	<string name="markerShowDetail">Show Detail Screen</string>
+	<string name="delete">Delete</string>
+	<string name="minimum">Minimum</string>
+	<string name="maximum">Maximum</string>
 </resources>

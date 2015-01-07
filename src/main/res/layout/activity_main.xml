@@ -18,74 +18,43 @@
   ~     You should have received a copy of the GNU Affero General Public License
   ~     along with this program.  If not, see <http://www.gnu.org/licenses/>.
   -->
-<android.support.v4.widget.DrawerLayout
-		xmlns:android="http://schemas.android.com/apk/res/android"
-		android:id="@+id/drawer_layout"
-		android:layout_width="match_parent"
-		android:layout_height="match_parent">
-	<!-- The main content view -->
-	<FrameLayout
-			android:id="@+id/content_frame"
-			android:layout_width="match_parent"
-			android:layout_height="match_parent">
-		<SurfaceView android:id="@+id/preview"
-		             android:layout_width="fill_parent"
-		             android:layout_height="fill_parent" />
+<merge xmlns:android="http://schemas.android.com/apk/res/android"
+       xmlns:tools="http://schemas.android.com/tools" android:id="@+id/content_frame"
+       android:layout_width="match_parent"
+       android:layout_height="match_parent" tools:context=".activities.CameraActivity">
+	<SurfaceView android:id="@+id/preview"
+	             android:layout_width="fill_parent"
+	             android:layout_height="fill_parent" />
 
-		<uk.ac.horizon.aestheticodes.detect.ViewfinderView
-				android:id="@+id/viewfinder"
-				android:layout_width="fill_parent"
-				android:layout_height="fill_parent" />
+	<uk.ac.horizon.aestheticodes.detect.ViewfinderView
+			android:id="@+id/viewfinder"
+			android:layout_width="fill_parent"
+			android:layout_height="fill_parent" />
 
-		<RelativeLayout android:id="@+id/bottomView"
-		                android:layout_width="fill_parent"
-		                android:layout_height="100dp"
-		                android:layout_gravity="bottom">
+	<RelativeLayout android:id="@+id/bottomView"
+	                android:layout_width="fill_parent"
+	                android:layout_height="100dp"
+	                android:layout_gravity="bottom">
 
-			<TextView android:layout_width="fill_parent"
-			          android:layout_height="wrap_content"
-			          android:background="@android:color/transparent"
-			          android:text="@string/pager_mark"
-			          android:textColor="@android:color/white" android:id="@+id/pager_mark"
-			          android:gravity="center_horizontal" />
-
-			<ProgressBar
-					android:layout_width="fill_parent"
-					android:layout_height="wrap_content"
-					style="@style/Widget.AppCompat.ProgressBar.Horizontal"
-					android:layout_marginRight="48dp"
-					android:layout_marginLeft="48dp"
-					android:layout_marginBottom="60dp" android:id="@+id/progress" />
-
-			<TextView android:id="@+id/status_view"
-			          android:layout_width="fill_parent"
-			          android:layout_height="fill_parent"
-			          android:background="@android:color/transparent"
-			          android:text="@string/default_status"
-			          android:textColor="#DEDEDE"
-			          android:gravity="center_horizontal|bottom"
-			          android:padding="16dp"
-			          android:textSize="12sp" />
-
-			<android.support.v4.view.ViewPager
-					android:id="@+id/pager"
-					android:layout_width="fill_parent"
-					android:layout_height="fill_parent"
-					android:overScrollMode="never"
-					android:paddingTop="16dp"
-					android:clickable="true" />
-		</RelativeLayout>
-	</FrameLayout>
-	<!-- The navigation drawer -->
-	<ListView android:id="@+id/drawer_list"
-	          android:layout_width="280dp"
-	          android:layout_height="match_parent"
-	          android:layout_gravity="end"
-	          android:choiceMode="singleChoice"
-	          android:divider="@android:color/transparent"
-	          android:listSelector="@android:color/transparent"
-	          android:cacheColorHint="@android:color/transparent"
-	          android:paddingTop="100dp"
-	          android:dividerHeight="0dp"
-	          android:background="@android:color/transparent" />
-</android.support.v4.widget.DrawerLayout>
+		<TextView android:layout_width="fill_parent"
+		          android:layout_height="fill_parent"
+		          android:id="@+id/modeText"
+		          android:text="@string/mode_active_detect"
+		          style="@style/Base.TextAppearance.AppCompat"
+		          android:gravity="center" />
+		<ImageView android:layout_width="wrap_content"
+		           android:layout_height="wrap_content"
+		           android:id="@+id/modeMenuButton"
+		           android:layout_alignParentEnd="true"
+		           android:layout_alignParentRight="true"
+		           android:layout_alignParentTop="true"
+		           android:paddingRight="8dp"
+		           android:paddingEnd="8dp"
+		           android:paddingTop="8dp"
+		           android:paddingBottom="8dp"
+		           android:src="@drawable/ic_more_vert_white_24dp"
+		           android:tint="#BBB"
+		           android:background="?attr/selectableItemBackground"
+		           android:onClick="showMenu" />
+	</RelativeLayout>
+</merge>
