@@ -1,7 +1,7 @@
 /*
- * Aestheticodes recognises a different marker scheme that allows the
+ * uk.ac.horizon.aestheticodes.Aestheticodes recognises a different marker scheme that allows the
  * creation of aesthetically pleasing, even beautiful, codes.
- * Copyright (C) 2014  Aestheticodes
+ * Copyright (C) 2014  uk.ac.horizon.aestheticodes.Aestheticodes
  *
  *     This program is free software: you can redistribute it and/or modify
  *     it under the terms of the GNU Affero General Public License as published
@@ -30,7 +30,10 @@ import android.view.MenuItem;
 import android.view.View;
 import android.widget.ImageView;
 import android.widget.LinearLayout;
+import uk.ac.horizon.aestheticodes.Aestheticodes;
 import uk.ac.horizon.aestheticodes.R;
+import uk.ac.horizon.aestheticodes.controllers.ExperienceListController;
+import uk.ac.horizon.aestheticodes.controllers.ExperienceListUpdater;
 import uk.ac.horizon.aestheticodes.dialogs.IntDialogFragment;
 import uk.ac.horizon.aestheticodes.dialogs.IntRangeDialogFragment;
 import uk.ac.horizon.aestheticodes.model.Marker;
@@ -38,7 +41,6 @@ import uk.ac.horizon.aestheticodes.properties.Format;
 import uk.ac.horizon.aestheticodes.properties.Properties;
 import uk.ac.horizon.aestheticodes.properties.IntFormat;
 import uk.ac.horizon.aestheticodes.properties.IntRangeFormat;
-import uk.ac.horizon.aestheticodes.controller.ExperienceManager;
 import uk.ac.horizon.aestheticodes.dialogs.MarkerEditDialog;
 import uk.ac.horizon.aestheticodes.model.Experience;
 import uk.ac.horizon.aestheticodes.properties.URLFormat;
@@ -56,7 +58,7 @@ public class ExperienceEditActivity extends ActionBarActivity
 	private LinearLayout markerSettings;
 	private ImageView markerSettingsIcon;
 	private Properties properties;
-	private ExperienceManager experienceManager;
+	private ExperienceListController experiences;
 
 	@Override
 	protected void onCreate(Bundle savedInstanceState)
@@ -66,13 +68,13 @@ public class ExperienceEditActivity extends ActionBarActivity
 		setContentView(R.layout.experience_edit);
 
 		final Bundle extras = getIntent().getExtras();
-		experienceManager = ExperienceManager.get(this);
+		experiences = Aestheticodes.getExperiences();
 		if(extras != null)
 		{
 			final String experienceID = extras.getString("experience");
 			if (experienceID != null)
 			{
-				experience = experienceManager.get(experienceID);
+				experience = experiences.get(experienceID);
 			}
 		}
 
@@ -157,7 +159,7 @@ public class ExperienceEditActivity extends ActionBarActivity
 		updateMarkers();
 
 		getSupportActionBar().setDisplayHomeAsUpEnabled(true);
-		getSupportActionBar().setHomeAsUpIndicator(R.drawable.ic_done);
+		getSupportActionBar().setHomeAsUpIndicator(R.drawable.ic_done_white_24dp);
 	}
 
 	public void updateMarkers()
@@ -205,12 +207,12 @@ public class ExperienceEditActivity extends ActionBarActivity
 			// Respond to the action bar's Up/Home open_button
 			case android.R.id.home:
 				properties.save();
-				experienceManager.add(experience);
+				experiences.add(experience);
 				if(experience.getOp() == null)
 				{
 					experience.setOp(Experience.Operation.update);
 				}
-				experienceManager.save();
+				ExperienceListUpdater.save(this, experiences);
 				Intent intent = new Intent(this, ExperienceActivity.class);
 				intent.putExtra("experience", experience.getId());
 

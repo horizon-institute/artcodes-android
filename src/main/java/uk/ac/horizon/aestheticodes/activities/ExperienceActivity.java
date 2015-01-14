@@ -1,7 +1,7 @@
 /*
- * Aestheticodes recognises a different marker scheme that allows the
+ * uk.ac.horizon.aestheticodes.Aestheticodes recognises a different marker scheme that allows the
  * creation of aesthetically pleasing, even beautiful, codes.
- * Copyright (C) 2014  Aestheticodes
+ * Copyright (C) 2014  uk.ac.horizon.aestheticodes.Aestheticodes
  *
  *     This program is free software: you can redistribute it and/or modify
  *     it under the terms of the GNU Affero General Public License as published
@@ -29,39 +29,26 @@ import android.util.Log;
 import android.view.Menu;
 import android.view.MenuItem;
 import android.view.View;
+import uk.ac.horizon.aestheticodes.Aestheticodes;
 import uk.ac.horizon.aestheticodes.R;
-import uk.ac.horizon.aestheticodes.properties.bindings.ColorImageBinding;
-import uk.ac.horizon.aestheticodes.properties.bindings.VisibilityBinding;
-import uk.ac.horizon.aestheticodes.controller.ExperienceManager;
+import uk.ac.horizon.aestheticodes.controllers.ExperienceListController;
+import uk.ac.horizon.aestheticodes.controllers.ExperienceListUpdater;
 import uk.ac.horizon.aestheticodes.model.Experience;
 import uk.ac.horizon.aestheticodes.properties.Properties;
+import uk.ac.horizon.aestheticodes.properties.bindings.ColorImageBinding;
 
 public class ExperienceActivity extends ActionBarActivity
 {
-	private ExperienceManager experienceManager;
+	private ExperienceListController experiences;
 	private Experience experience;
 	private Properties properties;
 
-	@Override
-	protected void onCreate(Bundle savedInstanceState)
+	public void editExperience(View view)
 	{
-		super.onCreate(savedInstanceState);
+		Intent intent = new Intent(ExperienceActivity.this, ExperienceEditActivity.class);
+		intent.putExtra("experience", experience.getId());
 
-		Bundle extras = getIntent().getExtras();
-		String experienceID = extras.getString("experience");
-
-		experienceManager = ExperienceManager.get(this);
-		experience = experienceManager.get(experienceID);
-
-		setContentView(R.layout.experience);
-
-		properties = new Properties(this, experience);
-		properties.get("name").bindTo(R.id.experienceTitle);
-		properties.get("description").bindTo(R.id.experienceDescription);
-		properties.get("icon").bindTo(R.id.experienceIcon);
-		properties.get("image").bindTo(new ColorImageBinding(R.id.experienceImage, R.id.experienceFloatingAction));
-		//properties.get("editable").bindTo(new VisibilityBinding(R.id.experienceFloatingAction));
-		properties.load();
+		startActivity(intent);
 	}
 
 	@Override
@@ -88,7 +75,7 @@ public class ExperienceActivity extends ActionBarActivity
 					public void onClick(DialogInterface dialogInterface, int i)
 					{
 						experience.setOp(Experience.Operation.remove);
-						experienceManager.save();
+						ExperienceListUpdater.save(ExperienceActivity.this, experiences);
 						NavUtils.navigateUpTo(ExperienceActivity.this, new Intent(ExperienceActivity.this, ExperienceListActivity.class));
 					}
 				});
@@ -107,12 +94,25 @@ public class ExperienceActivity extends ActionBarActivity
 		return super.onOptionsItemSelected(item);
 	}
 
-
-	public void editExperience(View view)
+	@Override
+	protected void onCreate(Bundle savedInstanceState)
 	{
-		Intent intent = new Intent(ExperienceActivity.this, ExperienceEditActivity.class);
-		intent.putExtra("experience", experience.getId());
+		super.onCreate(savedInstanceState);
 
-		startActivity(intent);
+		Bundle extras = getIntent().getExtras();
+		String experienceID = extras.getString("experience");
+
+		experiences = Aestheticodes.getExperiences();
+		experience = experiences.get(experienceID);
+
+		setContentView(R.layout.experience);
+
+		properties = new Properties(this, experience);
+		properties.get("name").bindTo(R.id.experienceTitle);
+		properties.get("description").bindTo(R.id.experienceDescription);
+		properties.get("icon").bindTo(R.id.experienceIcon);
+		properties.get("image").bindTo(new ColorImageBinding(R.id.experienceImage, R.id.experienceFloatingAction));
+		//properties.get("editable").bindTo(new VisibilityBinding(R.id.experienceFloatingAction));
+		properties.load();
 	}
 }

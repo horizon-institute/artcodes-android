@@ -2,6 +2,4 @@
 <resources>
     <color name="apptheme_primary">#295a9e</color>
     <color name="apptheme_primary_dark">#194a8e</color>
-
-	<color name="viewfinder_mask">#B000</color>
 </resources>

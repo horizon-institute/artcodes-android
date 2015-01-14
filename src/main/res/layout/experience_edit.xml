@@ -1,9 +1,9 @@
 <?xml version="1.0" encoding="utf-8"?>
 
 <!--
-  ~ Aestheticodes recognises a different marker scheme that allows the
+  ~ uk.ac.horizon.aestheticodes.Aestheticodes recognises a different marker scheme that allows the
   ~ creation of aesthetically pleasing, even beautiful, codes.
-  ~ Copyright (C) 2014  Aestheticodes
+  ~ Copyright (C) 2014  uk.ac.horizon.aestheticodes.Aestheticodes
   ~
   ~     This program is free software: you can redistribute it and/or modify
   ~     it under the terms of the GNU Affero General Public License as published
@@ -136,7 +136,7 @@
 			           android:layout_marginRight="16dp"
 			           android:scaleType="fitCenter"
 			           tools:ignore="ContentDescription"
-			           android:src="@drawable/ic_add_24dp"
+			           android:src="@drawable/ic_add_white_24dp"
 			           android:paddingTop="8dp"
 			           android:paddingRight="16dp"
 			           android:paddingBottom="8dp" android:tint="#999" />
@@ -161,7 +161,7 @@
 			           android:layout_marginRight="16dp"
 			           android:scaleType="fitCenter"
 			           tools:ignore="ContentDescription"
-			           android:src="@drawable/ic_settings_24dp"
+			           android:src="@drawable/ic_settings_white_24dp"
 			           android:paddingTop="8dp"
 			           android:paddingRight="16dp"
 			           android:paddingBottom="8dp"

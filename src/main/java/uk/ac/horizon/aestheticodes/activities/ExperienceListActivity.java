@@ -1,7 +1,7 @@
 /*
- * Aestheticodes recognises a different marker scheme that allows the
+ * uk.ac.horizon.aestheticodes.Aestheticodes recognises a different marker scheme that allows the
  * creation of aesthetically pleasing, even beautiful, codes.
- * Copyright (C) 2014  Aestheticodes
+ * Copyright (C) 2014  uk.ac.horizon.aestheticodes.Aestheticodes
  *
  *     This program is free software: you can redistribute it and/or modify
  *     it under the terms of the GNU Affero General Public License as published
@@ -25,34 +25,39 @@ import android.support.v7.app.ActionBarActivity;
 import android.view.View;
 import android.widget.AdapterView;
 import android.widget.ListView;
+import uk.ac.horizon.aestheticodes.Aestheticodes;
 import uk.ac.horizon.aestheticodes.R;
+import uk.ac.horizon.aestheticodes.controllers.ExperienceListAdapter;
+import uk.ac.horizon.aestheticodes.controllers.ExperienceListController;
 import uk.ac.horizon.aestheticodes.model.Experience;
-import uk.ac.horizon.aestheticodes.controller.ExperienceManager;
 
 public class ExperienceListActivity extends ActionBarActivity
 {
-	private ExperienceManager experienceManager;
+	private ExperienceListAdapter experiences;
+
+	public void addExperience(View view)
+	{
+		startActivity(new Intent(this, ExperienceEditActivity.class));
+	}
 
 	@Override
 	protected void onCreate(Bundle savedInstanceState)
 	{
 		super.onCreate(savedInstanceState);
 
-		experienceManager = ExperienceManager.get(this);
-
 		setContentView(R.layout.experience_list);
 
 		final ListView listView = (ListView) findViewById(R.id.experienceList);
 
-		final ExperienceAdapter experienceAdapter = new ExperienceAdapter(this, experienceManager);
-		listView.setAdapter(experienceAdapter);
+		experiences = new ExperienceListAdapter(this, Aestheticodes.getExperiences());
+		listView.setAdapter(experiences);
 		listView.setOnItemClickListener(new AdapterView.OnItemClickListener()
 		{
 			@Override
 			public void onItemClick(AdapterView<?> parent, View view, int position, long id)
 			{
-				Experience experience = (Experience) experienceAdapter.getItem(position);
-				if(experience != null)
+				Experience experience = (Experience) experiences.getItem(position);
+				if (experience != null)
 				{
 					Intent intent = new Intent(ExperienceListActivity.this, ExperienceActivity.class);
 					intent.putExtra("experience", experience.getId());
@@ -65,15 +70,10 @@ public class ExperienceListActivity extends ActionBarActivity
 		getSupportActionBar().setDisplayHomeAsUpEnabled(true);
 	}
 
-	public void addExperience(View view)
-	{
-		startActivity(new Intent(this, ExperienceEditActivity.class));
-	}
-
 	@Override
 	protected void onResume()
 	{
 		super.onResume();
-		experienceManager.load();
+		experiences.update();
 	}
 }

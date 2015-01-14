@@ -1,7 +1,7 @@
 /*
- * Aestheticodes recognises a different marker scheme that allows the
+ * uk.ac.horizon.aestheticodes.Aestheticodes recognises a different marker scheme that allows the
  * creation of aesthetically pleasing, even beautiful, codes.
- * Copyright (C) 2014  Aestheticodes
+ * Copyright (C) 2014  uk.ac.horizon.aestheticodes.Aestheticodes
  *
  *     This program is free software: you can redistribute it and/or modify
  *     it under the terms of the GNU Affero General Public License as published
@@ -21,7 +21,7 @@ buildscript {
 		mavenCentral()
 	}
 	dependencies {
-		classpath 'com.android.tools.build:gradle:1.0.0'
+		classpath 'com.android.tools.build:gradle:1.0.1'
 	}
 }
 
@@ -37,10 +37,9 @@ repositories {
 }
 
 dependencies {
-	compile 'com.android.support:appcompat-v7:21.0.3'
+	compile project(":aestheticodes-core")
 	compile 'com.android.support:palette-v7:21.0.3'
 	compile 'com.google.android.gms:play-services-base:6.5.87'
-	compile 'com.google.code.gson:gson:2.3.1'
 	compile 'com.squareup.picasso:picasso:2.4.0'
 	compile 'org.opencv:opencv-android:2.4.8'
 }
@@ -52,7 +51,7 @@ android {
 	defaultConfig {
 		minSdkVersion 10
 		targetSdkVersion 21
-		versionCode 400028
+		versionCode 400030
 		versionName '2.3'
 	}
 

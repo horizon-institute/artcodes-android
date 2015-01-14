@@ -1,8 +1,8 @@
 <?xml version="1.0" encoding="utf-8"?>
 <!--
-~ Aestheticodes recognises a different marker scheme that allows the
+~ uk.ac.horizon.aestheticodes.Aestheticodes recognises a different marker scheme that allows the
 ~ creation of aesthetically pleasing, even beautiful, codes.
-~ Copyright (C) 2014  Aestheticodes
+~ Copyright (C) 2014  uk.ac.horizon.aestheticodes.Aestheticodes
 ~
 ~     This program is free software: you can redistribute it and/or modify
 ~     it under the terms of the GNU Affero General Public License as published
@@ -18,82 +18,79 @@
 ~     along with this program.  If not, see <http://www.gnu.org/licenses/>.
 -->
 <manifest xmlns:android="http://schemas.android.com/apk/res/android"
-    xmlns:tools="http://schemas.android.com/tools"
-    package="uk.ac.horizon.aestheticodes" >
+          xmlns:tools="http://schemas.android.com/tools"
+          package="uk.ac.horizon.aestheticodes">
 
-    <uses-permission android:name="android.permission.CAMERA" />
-    <uses-permission android:name="android.permission.INTERNET" />
-    <uses-permission android:name="android.permission.ACCESS_NETWORK_STATE" />
-    <uses-permission android:name="android.permission.GET_ACCOUNTS" />
-    <uses-permission android:name="android.permission.USE_CREDENTIALS" />
+	<uses-permission android:name="android.permission.CAMERA" />
+	<uses-permission android:name="android.permission.INTERNET" />
+	<uses-permission android:name="android.permission.ACCESS_NETWORK_STATE" />
+	<uses-permission android:name="android.permission.GET_ACCOUNTS" />
+	<uses-permission android:name="android.permission.USE_CREDENTIALS" />
 
-    <uses-feature android:name="android.hardware.camera" android:required="false" />
-    <uses-feature android:name="android.hardware.camera.any" android:required="false" />
-    <uses-feature android:name="android.hardware.camera.front" android:required="false" />
-    <uses-feature android:name="android.hardware.camera.autofocus" android:required="false" />
-    <uses-feature android:name="android.hardware.camera.flash" android:required="false" />
-    <uses-feature android:name="android.hardware.touchscreen" />
+	<uses-feature android:name="android.hardware.camera" android:required="false" />
+	<uses-feature android:name="android.hardware.camera.any" android:required="false" />
+	<uses-feature android:name="android.hardware.camera.front" android:required="false" />
+	<uses-feature android:name="android.hardware.camera.autofocus" android:required="false" />
+	<uses-feature android:name="android.hardware.camera.flash" android:required="false" />
+	<uses-feature android:name="android.hardware.touchscreen" />
 
-    <application
-        android:allowBackup="false"
-        android:icon="@drawable/ic_launcher"
-        android:label="@string/app_name"
-        android:supportsRtl="true"
-        android:theme="@style/Theme.Aestheticodes"
-        tools:ignore="UnusedAttribute" >
-	    <meta-data android:name="com.google.android.gms.version" android:value="@integer/google_play_services_version" />
-        <activity
-            android:name="uk.ac.horizon.aestheticodes.activities.CameraActivity"
-            android:screenOrientation="portrait"
-            android:theme="@style/Theme.Aestheticodes.Camera" >
-            <intent-filter>
-                <action android:name="android.intent.action.MAIN" />
+	<application
+			android:allowBackup="false"
+			android:icon="@drawable/ic_launcher"
+			android:label="@string/app_name"
+			android:supportsRtl="true"
+			android:theme="@style/Theme.Aestheticodes"
+			tools:ignore="UnusedAttribute">
+		<meta-data android:name="com.google.android.gms.version"
+		           android:value="@integer/google_play_services_version" />
+		<activity
+				android:name=".activities.AestheticodesActivity"
+				android:screenOrientation="portrait"
+				android:theme="@style/Theme.Aestheticodes.Camera">
+			<intent-filter>
+				<action android:name="android.intent.action.MAIN" />
 
-                <category android:name="android.intent.category.LAUNCHER" />
-            </intent-filter>
-	        <intent-filter>
-		        <action android:name="uk.ac.horizon.aestheticodes.SCAN" />
-		        <category android:name="android.intent.category.DEFAULT" />
-	        </intent-filter>
-        </activity>
-        <activity
-            android:name="uk.ac.horizon.aestheticodes.activities.MarkerActivity"
-            android:parentActivityName="uk.ac.horizon.aestheticodes.activities.CameraActivity"
-            android:theme="@style/Theme.Aestheticodes.Transparent" >
-            <intent-filter>
-                <action android:name="android.intent.action.VIEW" />
+				<category android:name="android.intent.category.LAUNCHER" />
+			</intent-filter>
+		</activity>
+		<activity
+				android:name=".core.activities.ScanActivity"
+				android:screenOrientation="portrait"
+				android:theme="@style/Theme.Aestheticodes.Camera">
+			<intent-filter>
+				<action android:name="uk.ac.horizon.aestheticodes.SCAN" />
+				<category android:name="android.intent.category.DEFAULT" />
+			</intent-filter>
+		</activity>
+		<activity
+				android:name="uk.ac.horizon.aestheticodes.activities.MarkerActivity"
+				android:parentActivityName=".activities.AestheticodesActivity"
+				android:theme="@style/Theme.Aestheticodes.Transparent">
+			<meta-data
+					android:name="android.support.PARENT_ACTIVITY"
+					android:value=".activities.AestheticodesActivity" />
+		</activity>
+		<activity
+				android:name="uk.ac.horizon.aestheticodes.activities.ExperienceActivity"
+				android:parentActivityName="uk.ac.horizon.aestheticodes.activities.ExperienceListActivity"
+				android:theme="@style/Theme.Aestheticodes.Transparent">
+			<meta-data
+					android:name="android.support.PARENT_ACTIVITY"
+					android:value="uk.ac.horizon.aestheticodes.activities.ExperienceListActivity" />
+		</activity>
+		<activity
+				android:name="uk.ac.horizon.aestheticodes.activities.ExperienceListActivity"
+				android:label="@string/experiences"
+				android:parentActivityName=".activities.AestheticodesActivity">
+			<meta-data
+					android:name="android.support.PARENT_ACTIVITY"
+					android:value=".activities.AestheticodesActivity" />
+		</activity>
+		<activity
+				android:name="uk.ac.horizon.aestheticodes.activities.ExperienceEditActivity"
+				android:label="Edit Experience">
+		</activity>
+	</application>
 
-                <category android:name="android.intent.category.DEFAULT" />
-                <category android:name="android.intent.category.BROWSABLE" />
-
-                <data android:scheme="aestheticodes" />
-            </intent-filter>
-
-            <meta-data
-                android:name="android.support.PARENT_ACTIVITY"
-                android:value="uk.ac.horizon.aestheticodes.activities.CameraActivity" />
-            </activity>
-            <activity
-                android:name="uk.ac.horizon.aestheticodes.activities.ExperienceActivity"
-                android:parentActivityName="uk.ac.horizon.aestheticodes.activities.ExperienceListActivity"
-                android:theme="@style/Theme.Aestheticodes.Transparent" >
-                <meta-data
-                    android:name="android.support.PARENT_ACTIVITY"
-                    android:value="uk.ac.horizon.aestheticodes.activities.ExperienceListActivity" />
-                </activity>
-                <activity
-                    android:name="uk.ac.horizon.aestheticodes.activities.ExperienceListActivity"
-                    android:label="@string/experiences"
-                    android:parentActivityName="uk.ac.horizon.aestheticodes.activities.CameraActivity" >
-                    <meta-data
-                        android:name="android.support.PARENT_ACTIVITY"
-                        android:value="uk.ac.horizon.aestheticodes.activities.CameraActivity" />
-                    </activity>
-                    <activity
-                        android:name="uk.ac.horizon.aestheticodes.activities.ExperienceEditActivity"
-                        android:label="Edit Experience" >
-                    </activity>
-                </application>
-
-            </manifest>
+</manifest>
             

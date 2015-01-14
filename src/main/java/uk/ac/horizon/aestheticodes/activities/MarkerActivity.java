@@ -1,7 +1,7 @@
 /*
- * Aestheticodes recognises a different marker scheme that allows the
+ * uk.ac.horizon.aestheticodes.Aestheticodes recognises a different marker scheme that allows the
  * creation of aesthetically pleasing, even beautiful, codes.
- * Copyright (C) 2014  Aestheticodes
+ * Copyright (C) 2014  uk.ac.horizon.aestheticodes.Aestheticodes
  *
  *     This program is free software: you can redistribute it and/or modify
  *     it under the terms of the GNU Affero General Public License as published
@@ -24,12 +24,14 @@ import android.net.Uri;
 import android.os.Bundle;
 import android.support.v7.app.ActionBarActivity;
 import android.view.View;
+import uk.ac.horizon.aestheticodes.Aestheticodes;
 import uk.ac.horizon.aestheticodes.R;
+import uk.ac.horizon.aestheticodes.controllers.ExperienceListController;
 import uk.ac.horizon.aestheticodes.model.Marker;
 import uk.ac.horizon.aestheticodes.properties.bindings.ColorImageBinding;
-import uk.ac.horizon.aestheticodes.controller.ExperienceManager;
 import uk.ac.horizon.aestheticodes.model.Experience;
 import uk.ac.horizon.aestheticodes.properties.Properties;
+import uk.ac.horizon.aestheticodes.properties.bindings.VisibilityBinding;
 
 public class MarkerActivity extends ActionBarActivity
 {
@@ -43,11 +45,13 @@ public class MarkerActivity extends ActionBarActivity
 
 		setContentView(R.layout.marker);
 
-		String markerCode = getIntent().getData().getLastPathSegment();
-		String experienceID = getIntent().getData().getHost();
+		final Bundle extras = getIntent().getExtras();
 
-		ExperienceManager experienceManager = ExperienceManager.get(this);
-		Experience experience = experienceManager.get(experienceID);
+		String markerCode = extras.getString("marker");
+		String experienceID = extras.getString("experience");
+
+		ExperienceListController experiences = Aestheticodes.getExperiences();
+		Experience experience = experiences.get(experienceID);
 		marker = experience.getMarkers().get(markerCode);
 
 		properties = new Properties(this, marker);
@@ -57,6 +61,8 @@ public class MarkerActivity extends ActionBarActivity
 		properties.get("description")
 				.defaultTo(marker.getAction())
 				.bindTo(R.id.markerDescription);
+		properties.get("action")
+				.bindTo(new VisibilityBinding(R.id.markerAction));
 		properties.get("image")
 				.bindTo(new ColorImageBinding(R.id.markerImage, R.id.markerAction));
 		properties.load();
@@ -64,6 +70,9 @@ public class MarkerActivity extends ActionBarActivity
 
 	public void open(View view)
 	{
-		startActivity(new Intent(Intent.ACTION_VIEW, Uri.parse(marker.getAction())));
+		if(marker != null && marker.getAction() != null && !marker.getAction().isEmpty())
+		{
+			startActivity(new Intent(Intent.ACTION_VIEW, Uri.parse(marker.getAction())));
+		}
 	}
 }
