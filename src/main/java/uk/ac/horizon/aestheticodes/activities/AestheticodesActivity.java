@@ -1,7 +1,7 @@
 /*
- * uk.ac.horizon.aestheticodes.Aestheticodes recognises a different marker scheme that allows the
+ * Aestheticodes recognises a different marker scheme that allows the
  * creation of aesthetically pleasing, even beautiful, codes.
- * Copyright (C) 2014  uk.ac.horizon.aestheticodes.Aestheticodes
+ * Copyright (C) 2015  Aestheticodes
  *
  *     This program is free software: you can redistribute it and/or modify
  *     it under the terms of the GNU Affero General Public License as published
