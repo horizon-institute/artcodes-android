@@ -104,129 +104,126 @@ class MarkerCode
 		return m.getClass() == this.getClass() && isCodeEqual((MarkerCode) m);
 	}
 
-	/**
-	 * This function determines whether the input node is a valid branch. It is a valid branch if it contains zero or more dark regions.
-	 *
-	 * @param branchIndex Node index from the hierarchy.
-	 * @param hierarchy   This contains the contours or components hierarchy.
-	 * @return Returns branch status.
-	 */
-	static int getRegionValue(int branchIndex, Mat hierarchy, int regionMaxValue)
-	{
-		double[] nodes = hierarchy.get(0, branchIndex);
-		int currentLeafIndex = (int) nodes[FIRST_NODE];
-		if (currentLeafIndex < 0)
-		{
-			return 0;
-		}
+    /**
+     * This function determines whether the input node is a valid region. It is a valid region if it contains zero or more dots.
+     *
+     * @param regionIndex Region index in the hierarchy.
+     * @param hierarchy   This contains the contours or components hierarchy.
+     * @param regionMaxValue The maximum number of dots allowed in a region.
+     * @return Returns region status.
+     */
+    static int getRegionValue(int regionIndex, Mat hierarchy, int regionMaxValue)
+    {
+        // Find the first dot index:
+        double[] nodes = hierarchy.get(0, regionIndex);
+        int currentDotIndex = (int) nodes[FIRST_NODE];
+        if (currentDotIndex < 0)
+        {
+            return REGION_EMPTY; // There are no dots in this region.
+        }
 
-		int leafCount = 0;
-		//loop until there is a leaf node.
-		while (currentLeafIndex >= 0)
-		{
-			if (verifyLeaf(currentLeafIndex, hierarchy))
-			{
-				leafCount++;
-				//get next leaf node.
-				nodes = hierarchy.get(0, currentLeafIndex);
-				currentLeafIndex = (int) nodes[NEXT_NODE];
+        // Count all the dots and check if they are leaf nodes in the hierarchy:
+        int dotCount = 0;
+        while (currentDotIndex >= 0)
+        {
+            if (verifyAsLeaf(currentDotIndex, hierarchy))
+            {
+                dotCount++;
+                // Get next dot node:
+                nodes = hierarchy.get(0, currentDotIndex);
+                currentDotIndex = (int) nodes[NEXT_NODE];
 
-				if (leafCount > regionMaxValue)
-				{
-					return REGION_INVALID;
-				}
-			}
-			else
-			{
-				return REGION_INVALID;
-			}
-		}
+                if (dotCount > regionMaxValue)
+                {
+                    return REGION_INVALID; // Too many dots.
+                }
+            }
+            else
+            {
+                return REGION_INVALID; // Dot is not a leaf in the hierarchy.
+            }
+        }
 
-		return leafCount;
-	}
+        return dotCount;
+    }
 
-	/**
-	 * This function detects whether a particular node is a d-touch marker. A d-touch contains one dark (black) region which is called the root. A root can have
-	 * one or more light (white) regions. These light regions are called branches. Each branch can contain zero or more dark (black) regions and these dark regions
-	 * are called leaves. If a branch has no leaf then it is called an empty branch. In conclusion Root==> 1 or more branches ==> 0 or more leaves.
-	 *
-	 * @param rootIndex The index of the node which needs to be identified as the root. It is used to access the hierarchy of this node from the hierarchy parameter.	 *
-	 * @param hierarchy This contains the contours or components hierarchy using opencv findContours function.
-	 * @return returns true if the root node is a valid d-touch marker otherwise returns false.
-	 */
-	static MarkerCode findMarker(Mat hierarchy, int rootIndex, Experience experience)
-	{
-		double[] nodes = hierarchy.get(0, rootIndex);
-		int currentRegionIndex = (int) nodes[MarkerCode.FIRST_NODE];
-		if (currentRegionIndex < 0)
-		{
-			return null;
-		}
+    /**
+     * This function detects whether a particular node is an Aestheticode marker. An Aestheticode contains one dark (black) area which is called the root. A root can contain
+     * one or more light (white) areas, these are called regions. Each region can contain zero or more dark (black) areas, these
+     * are called dots. If a region has no dot then it is called an empty region. Colours can be inverted (e.g. a light root has dark regions and light dots).
+     *
+     * @param rootIndex The index of the node which needs to be identified as the root. It is used to access the hierarchy of this node from the hierarchy parameter.	 *
+     * @param hierarchy This contains the contours or components hierarchy using opencv findContours function.
+     * @return returns A MarkerCode if the root node is a valid Aestheticode marker otherwise returns null.
+     */
+    static MarkerCode findMarker(Mat hierarchy, int rootIndex, Experience experience)
+    {
+        double[] nodes = hierarchy.get(0, rootIndex);
+        int currentRegionIndex = (int) nodes[MarkerCode.FIRST_NODE];
+        if (currentRegionIndex < 0)
+        {
+            return null; // There are no regions.
+        }
 
-		int regions = 0;
-		int emptyRegions = 0;
-		List<Integer> codes = null;
+        int regions = 0;
+        int emptyRegions = 0;
+        List<Integer> code = null;
 
-		//loop until there is a branch node.
-		while (currentRegionIndex >= 0)
-		{
-			//verify current branch.
-			final int regionValue = MarkerCode.getRegionValue(currentRegionIndex, hierarchy, experience.getMaxRegionValue());
-			//if branch is valid or empty.
-			if (regionValue == MarkerCode.REGION_INVALID)
-			{
-				return null;
-			}
+        // Loop through the regions, verifing the value of each:
+        while (currentRegionIndex >= 0)
+        {
+            final int regionValue = MarkerCode.getRegionValue(currentRegionIndex, hierarchy, experience.getMaxRegionValue());
+            if (regionValue == MarkerCode.REGION_EMPTY)
+            {
+                if (++emptyRegions > experience.getMaxEmptyRegions())
+                {
+                    return null; // Too many empty regions.
+                }
+            }
 
-			regions++;
-			if (regions > experience.getMaxRegions())
-			{
-				return null;
-			}
-			if (regionValue == MarkerCode.REGION_EMPTY)
-			{
-				emptyRegions++;
-				if (emptyRegions > experience.getMaxEmptyRegions())
-				{
-					return null;
-				}
-			}
-			else
-			{
-				if (codes == null)
-				{
-					codes = new ArrayList<>();
-				}
-				codes.add(regionValue);
-			}
-			//get next node.
-			nodes = hierarchy.get(0, currentRegionIndex);
-			currentRegionIndex = (int) nodes[MarkerCode.NEXT_NODE];
-		}
+            if (regionValue == MarkerCode.REGION_INVALID)
+            {
+                return null; // Too many levels or dots.
+            }
 
-		//Marker should have at least one non-empty branch. If all branches are empty then return false.
-		if ((emptyRegions - regions) == 0)
-		{
-			return null;
-		}
+            if (++regions > experience.getMaxRegions())
+            {
+                return null; // Too many regions.
+            }
 
-		if (experience.isValidMarker(codes))
-		{
-			Collections.sort(codes);
-			return new MarkerCode(codes, rootIndex);
-		}
+            // Add region value to code:
+            if (code == null)
+            {
+                code = new ArrayList<>();
+            }
+            code.add(regionValue);
 
-		return null;
-	}
+            // Get next region:
+            nodes = hierarchy.get(0, currentRegionIndex);
+            currentRegionIndex = (int) nodes[MarkerCode.NEXT_NODE];
+        }
 
-	/**
-	 * This functions determines if the node is a valid leaf. It is a valid leaf if it does not have any child nodes.
-	 */
-	private static Boolean verifyLeaf(int leafIndex, Mat hierarchy)
-	{
-		//Get nodes of branch index.
-		double[] nodes = hierarchy.get(0, leafIndex);
-		//check if there is no child node.
-		return nodes[FIRST_NODE] < 0;
-	}
+        // Marker should have at least one non-empty branch. If all branches are empty then return false.
+        if ((regions - emptyRegions) < 1)
+        {
+            return null;
+        }
+
+        if (experience.isValidMarker(code))
+        {
+            Collections.sort(code);
+            return new MarkerCode(code, rootIndex);
+        }
+
+        return null;
+    }
+
+    /**
+     * This functions determines if the node is a valid leaf. It is a valid leaf if it does not have any child nodes.
+     */
+    private static Boolean verifyAsLeaf(int nodeIndex, Mat hierarchy)
+    {
+        double[] nodes = hierarchy.get(0, nodeIndex);
+        return nodes[FIRST_NODE] < 0;
+    }
 }

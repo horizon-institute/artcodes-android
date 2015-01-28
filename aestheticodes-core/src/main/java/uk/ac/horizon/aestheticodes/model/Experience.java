@@ -504,7 +504,7 @@ public class Experience
 				empty++;
 			}
 		}
-		return maxEmptyRegions == empty;
+		return maxEmptyRegions >= empty;
 	}
 
 	/**
