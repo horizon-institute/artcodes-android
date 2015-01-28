@@ -3,7 +3,6 @@
 build/
 gradle.properties
 local.properties
-settings.gradle
 *.keystore
 EndpointConstants.java
 
