@@ -26,8 +26,8 @@
 		<item name="android:windowActionBarOverlay" tools:ignore="NewApi">true</item>
 		<item name="android:windowActionModeOverlay" tools:ignore="NewApi">true</item>
 		<item name="windowActionBarOverlay">true</item>
-		<item name="android:windowTranslucentStatus" tools:ignore="NewApi">true</item>
-		<item name="android:windowTranslucentNavigation" tools:ignore="NewApi">true</item>
+		<!--<item name="android:windowTranslucentStatus" tools:ignore="NewApi">true</item>
+		<item name="android:windowTranslucentNavigation" tools:ignore="NewApi">true</item>-->
 		<item name="actionDropDownStyle">@style/Theme.Aestheticodes.Spinner</item>
 		<item name="popupMenuStyle">@style/Aestheticodes.PopupMenu</item>
 	</style>
