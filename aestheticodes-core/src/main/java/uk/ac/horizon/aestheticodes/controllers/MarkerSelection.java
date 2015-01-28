@@ -19,75 +19,77 @@
 
 package uk.ac.horizon.aestheticodes.controllers;
 
-import android.util.Log;
-
+import java.util.Collection;
 import java.util.HashMap;
+import java.util.HashSet;
 import java.util.List;
 import java.util.Map;
 
 public class MarkerSelection
 {
-	private static final int TIMEOUT = 2000;
 	private static final int REQUIRED = 5;
 	private final Map<String, MarkerCode> occurrences = new HashMap<>();
-	private long lastUpdate = 0;
+	private String current = null;
 
-	public void addMarkers(List<MarkerCode> markers)
+	public void reset(MarkerDetector.Listener callback)
 	{
-		//check if this is the first marker detected in particular duration.
-		final long now = System.currentTimeMillis();
-		if (markers.size() > 0)
+		occurrences.clear();
+		if(current != null)
 		{
-			lastUpdate = now;
+			current = null;
+			callback.markerChanged(null);
 		}
+	}
 
-		if (hasTimedOut(lastUpdate, now))
+	public void addMarkers(List<MarkerCode> markers, MarkerDetector.Listener callback)
+	{
+		final Collection<String> updated = new HashSet<>();
+
+		for (MarkerCode markerCode : markers)
 		{
-			reset();
-		}
-		else
-		{
-			for (MarkerCode markerCode : markers)
+			//increase occurrence if this marker is already in the list.
+			MarkerCode existing = occurrences.get(markerCode.getCodeKey());
+			if (existing != null)
 			{
-				//increase occurrence if this marker is already in the list.
-				MarkerCode existing = occurrences.get(markerCode.getCodeKey());
-				if (existing != null)
-				{
-					existing.setOccurrences(markerCode.getOccurrences() + existing.getOccurrences());
-				}
-				else
-				{
-					occurrences.put(markerCode.getCodeKey(), markerCode);
-				}
+				existing.setOccurrences(Math.min(REQUIRED * 2, markerCode.getOccurrences() + existing.getOccurrences()));
 			}
+			else
+			{
+				occurrences.put(markerCode.getCodeKey(), markerCode);
+			}
+			updated.add(markerCode.getCodeKey());
 		}
-	}
 
-	private boolean hasTimedOut(long lastUpdate, long now)
-	{
-		return now - lastUpdate > TIMEOUT;
-	}
-
-	public String getFoundMarker()
-	{
 		MarkerCode likely = null;
-		for (MarkerCode marker : occurrences.values())
+		for(MarkerCode marker: occurrences.values())
 		{
-			if (likely == null || marker.getOccurrences() > likely.getOccurrences())
+			if(!updated.contains(marker.getCodeKey()))
+			{
+				marker.setOccurrences(Math.max(marker.getOccurrences() - 1, 0));
+			}
+
+			if (marker.getOccurrences() > REQUIRED && (likely == null || marker.getOccurrences() > likely.getOccurrences()))
 			{
 				likely = marker;
 			}
 		}
-		if (likely != null && likely.getOccurrences() > REQUIRED)
-		{
-			Log.i(MarkerSelection.class.getName(), "Detected " + likely.getOccurrences());
-			return likely.getCodeKey();
-		}
-		return null;
-	}
 
-	public void reset()
-	{
-		occurrences.clear();
+		if (likely == null)
+		{
+			if(current != null)
+			{
+				current = null;
+				callback.markerChanged(null);
+			}
+		}
+		else
+		{
+			String code = likely.getCodeKey();
+			if(current == null || !current.equals(code))
+			{
+				current = code;
+				callback.markerChanged(code);
+			}
+		}
 	}
 }

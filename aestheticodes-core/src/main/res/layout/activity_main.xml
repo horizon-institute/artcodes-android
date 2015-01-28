@@ -19,9 +19,12 @@
   ~     along with this program.  If not, see <http://www.gnu.org/licenses/>.
   -->
 <merge xmlns:android="http://schemas.android.com/apk/res/android"
-       xmlns:tools="http://schemas.android.com/tools" android:id="@+id/content_frame"
+       xmlns:tools="http://schemas.android.com/tools"
+       android:id="@+id/content_frame"
        android:layout_width="match_parent"
-       android:layout_height="match_parent" tools:context=".activities.CameraActivity">
+       android:layout_height="match_parent"
+       tools:context=".activities.CameraActivity">
+
 	<SurfaceView android:id="@+id/preview"
 	             android:layout_width="fill_parent"
 	             android:layout_height="fill_parent" />
@@ -29,32 +32,113 @@
 	<uk.ac.horizon.aestheticodes.views.ViewfinderView
 			android:id="@+id/viewfinder"
 			android:layout_width="fill_parent"
-			android:layout_height="fill_parent" />
+			android:layout_height="fill_parent"
+			android:onClick="hideMenu" />
 
-	<RelativeLayout android:id="@+id/bottomView"
-	                android:layout_width="fill_parent"
-	                android:layout_height="100dp"
-	                android:layout_gravity="bottom">
+	<LinearLayout android:orientation="vertical"
+	              android:layout_gravity="bottom"
+	              android:layout_width="fill_parent"
+	              android:layout_height="wrap_content">
 
-		<TextView android:layout_width="fill_parent"
-		          android:layout_height="fill_parent"
-		          android:id="@+id/modeText"
-		          android:text="@string/mode_active_detect"
-		          style="@style/Base.TextAppearance.AppCompat"
-		          android:gravity="center" />
-		<ImageView android:layout_width="wrap_content"
-		           android:layout_height="wrap_content"
-		           android:id="@+id/modeMenuButton"
-		           android:layout_alignParentEnd="true"
-		           android:layout_alignParentRight="true"
-		           android:layout_alignParentTop="true"
-		           android:paddingRight="8dp"
-		           android:paddingEnd="8dp"
-		           android:paddingTop="8dp"
-		           android:paddingBottom="8dp"
-		           android:src="@drawable/ic_more_vert_white_24dp"
-		           android:tint="#BBB"
-		           android:background="?attr/selectableItemBackground"
-		           android:onClick="showMenu" />
-	</RelativeLayout>
+		<LinearLayout
+				android:orientation="vertical"
+				android:layout_width="fill_parent"
+				android:id="@+id/settingsMenu"
+				android:visibility="invisible"
+				tools:visibility="visible"
+				android:background="#5000"
+				android:layout_height="wrap_content"
+				android:layout_marginBottom="-58dp">
+
+			<LinearLayout android:layout_width="fill_parent"
+			              android:layout_height="wrap_content"
+			              android:orientation="horizontal"
+			              android:padding="4dp"
+			              android:gravity="center_horizontal">
+
+				<Button android:layout_width="wrap_content"
+				        android:layout_height="wrap_content"
+				        style="@style/Widget.AppCompat.ActionButton"
+				        android:text="Open Automatically"
+				        android:id="@+id/autoOpenButton"
+				        android:drawablePadding="4dp"
+				        android:drawableLeft="@drawable/ic_open_in_new_white_24dp"
+				        android:drawableStart="@drawable/ic_open_in_new_white_24dp"
+				        android:visibility="invisible"
+				        tools:visibility="visible"
+				        android:gravity="start|center_vertical"
+				        android:layout_weight="1" />
+
+				<Button android:layout_width="wrap_content"
+				        android:layout_height="wrap_content"
+				        style="@style/Widget.AppCompat.ActionButton"
+				        android:text="@string/marker_off"
+				        android:drawablePadding="4dp"
+				        android:gravity="start|center_vertical"
+				        android:id="@+id/markerDisplayButton"
+				        android:onClick="toggleMarkerDisplay"
+				        android:drawableLeft="@drawable/ic_border_clear_white_24dp"
+				        android:drawableStart="@drawable/ic_border_clear_white_24dp"
+				        android:layout_weight="1" />
+
+			</LinearLayout>
+
+			<LinearLayout android:layout_width="fill_parent"
+			              android:layout_height="wrap_content"
+			              android:orientation="horizontal"
+			              android:padding="4dp"
+
+			              android:gravity="center_horizontal">
+
+				<Button android:layout_width="wrap_content"
+				        android:layout_height="wrap_content"
+				        style="@style/Widget.AppCompat.ActionButton"
+				        android:text="@string/threshold_off"
+				        android:id="@+id/thresholdDisplayButton"
+				        android:drawablePadding="4dp"
+				        android:gravity="start|center_vertical"
+				        android:drawableLeft="@drawable/ic_filter_b_and_w_white_24dp"
+				        android:drawableStart="@drawable/ic_filter_b_and_w_white_24dp"
+				        android:onClick="toggleThresholdDisplay"
+				        android:layout_weight="1" />
+
+				<Button android:layout_width="wrap_content"
+				        android:layout_height="wrap_content"
+				        android:text="@string/camera_rear"
+				        android:id="@+id/flipCameraButton"
+				        android:onClick="flipCamera"
+				        android:gravity="start|center_vertical"
+				        android:drawablePadding="4dp"
+				        android:drawableLeft="@drawable/ic_camera_rear_white_24dp"
+				        android:drawableStart="@drawable/ic_camera_rear_white_24dp"
+				        style="@style/Widget.AppCompat.ActionButton"
+				        android:layout_weight="1" />
+			</LinearLayout>
+		</LinearLayout>
+
+		<ImageButton
+				android:layout_width="48dp"
+				android:layout_height="48dp"
+				android:id="@+id/settingsMenuButton"
+				android:layout_gravity="right"
+				android:src="@drawable/ic_more_horiz_white_24dp"
+				android:background="@drawable/camera_floating_action_button"
+				android:layout_marginRight="8dp"
+				android:layout_marginBottom="8dp"
+				android:onClick="showMenu" />
+
+		<RelativeLayout android:id="@+id/bottomView"
+		                android:layout_width="fill_parent"
+		                android:layout_height="100dp"
+		                android:layout_gravity="bottom"
+		                android:background="@color/viewfinder_mask">
+
+			<TextView android:layout_width="fill_parent"
+			          android:layout_height="fill_parent"
+			          android:id="@+id/modeText"
+			          android:text="@string/mode_active_detect"
+			          style="@style/Base.TextAppearance.AppCompat.Medium"
+			          android:gravity="center" />
+		</RelativeLayout>
+	</LinearLayout>
 </merge>

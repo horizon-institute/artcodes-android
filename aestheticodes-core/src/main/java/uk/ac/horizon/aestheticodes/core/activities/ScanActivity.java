@@ -18,26 +18,29 @@
  */
 package uk.ac.horizon.aestheticodes.core.activities;
 
+import android.animation.Animator;
+import android.animation.AnimatorListenerAdapter;
 import android.annotation.TargetApi;
 import android.content.Context;
 import android.content.Intent;
 import android.content.res.Resources;
+import android.graphics.Bitmap;
 import android.graphics.Color;
 import android.graphics.Rect;
 import android.os.Build;
 import android.os.Bundle;
 import android.support.v7.app.ActionBarActivity;
-import android.support.v7.widget.PopupMenu;
 import android.util.Log;
 import android.view.KeyCharacterMap;
 import android.view.KeyEvent;
-import android.view.MenuItem;
 import android.view.SurfaceHolder;
 import android.view.SurfaceView;
 import android.view.View;
+import android.view.ViewAnimationUtils;
 import android.view.ViewConfiguration;
 import android.view.ViewGroup;
 import android.view.WindowManager;
+import android.widget.Button;
 import android.widget.TextView;
 import com.google.gson.Gson;
 import org.opencv.android.OpenCVLoader;
@@ -52,8 +55,6 @@ import uk.ac.horizon.aestheticodes.views.ViewfinderView;
 public class ScanActivity extends ActionBarActivity implements ExperienceController.Listener, MarkerDetector.Listener
 {
 	private static final String TAG = ScanActivity.class.getName();
-	private static final String MODE_PREFIX = "mode_";
-	private static final String MODE_ACTIVE_PREFIX = "mode_active_";
 
 	static
 	{
@@ -85,8 +86,8 @@ public class ScanActivity extends ActionBarActivity implements ExperienceControl
 	protected TextView modeText;
 	private SurfaceHolder holder;
 	private View bottomView;
-	private PopupMenu modeMenu;
-	private View modeMenuButton;
+	private View settingsMenuButton;
+	private View settingsMenu;
 
 	@Override
 	public void experienceSelected(Experience experience)
@@ -99,52 +100,52 @@ public class ScanActivity extends ActionBarActivity implements ExperienceControl
 
 			setTitle(experience.getName());
 		}
+	}
+
+	public void flipCamera(View view)
+	{
+		stopCamera();
+		camera.flip();
+		viewfinder.invalidate();
+		startCamera();
 		updateMenu();
 	}
 
-	public void markerFound(final String markerCode)
+	public void hideMenu(View view)
 	{
-		stopCamera();
+		if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.LOLLIPOP)
+		{
+			int cx = (settingsMenuButton.getLeft() + settingsMenuButton.getRight()) / 2;
+			int cy = (settingsMenuButton.getTop() + settingsMenuButton.getBottom()) / 2;
 
+			Animator anim = ViewAnimationUtils.createCircularReveal(settingsMenu, cx, cy, bottomView.getWidth(), 0);
+
+			anim.addListener(new AnimatorListenerAdapter()
+			{
+				@Override
+				public void onAnimationEnd(Animator animation)
+				{
+					super.onAnimationEnd(animation);
+					settingsMenu.setVisibility(View.INVISIBLE);
+					settingsMenuButton.setVisibility(View.VISIBLE);
+				}
+			});
+
+			anim.start();
+		}
+		else
+		{
+			settingsMenuButton.setVisibility(View.VISIBLE);
+			settingsMenu.setVisibility(View.INVISIBLE);
+		}
+	}
+
+	public void markerChanged(final String markerCode)
+	{
 		Intent intent = getIntent();
 		intent.putExtra("marker", markerCode);
 		setResult(RESULT_OK, intent);
 		finish();
-	}
-
-	@Override
-	public void markersDetected(final boolean detected)
-	{
-		if (detector.getMode() == MarkerDetector.Mode.detect)
-		{
-			runOnUiThread(new Runnable()
-			{
-				@Override
-				public void run()
-				{
-					if (detected)
-					{
-						modeText.setTextColor(Color.YELLOW);
-					}
-					else
-					{
-						modeText.setTextColor(Color.WHITE);
-					}
-				}
-			});
-
-		}
-		else
-		{
-			runOnUiThread(new Runnable()
-			{
-				@Override
-				public void run()
-				{
-					viewfinder.invalidate();
-				}
-			});
-		}
 	}
 
 	@Override
@@ -162,7 +163,6 @@ public class ScanActivity extends ActionBarActivity implements ExperienceControl
 
 		viewfinder = (ViewfinderView) findViewById(R.id.viewfinder);
 		viewfinder.setCamera(camera);
-		viewfinder.setDetector(detector);
 		viewfinder.addSizeChangedListener(new ViewfinderView.SizeChangedListener()
 		{
 			@Override
@@ -181,9 +181,9 @@ public class ScanActivity extends ActionBarActivity implements ExperienceControl
 
 		bottomView = findViewById(R.id.bottomView);
 
-		modeMenuButton = findViewById(R.id.modeMenuButton);
+		settingsMenuButton = findViewById(R.id.settingsMenuButton);
+		settingsMenu = findViewById(R.id.settingsMenu);
 		modeText = (TextView) findViewById(R.id.modeText);
-		modeMenu = new PopupMenu(this, modeMenuButton);
 	}
 
 	@Override
@@ -194,9 +194,76 @@ public class ScanActivity extends ActionBarActivity implements ExperienceControl
 		experience.addListener(this);
 	}
 
+	@Override
+	public void resultUpdated(final boolean detected, final Bitmap image)
+	{
+		runOnUiThread(new Runnable()
+		{
+			@Override
+			public void run()
+			{
+				if (detected)
+				{
+					modeText.setTextColor(Color.YELLOW);
+				}
+				else
+				{
+					modeText.setTextColor(Color.WHITE);
+				}
+				viewfinder.setResult(image);
+			}
+		});
+	}
+
+	protected ViewGroup getRootView()
+	{
+		return (ViewGroup)bottomView.getRootView();
+	}
+
 	public void showMenu(View view)
 	{
-		modeMenu.show();
+		updateMenu();
+		if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.LOLLIPOP)
+		{
+			int cx = (settingsMenuButton.getLeft() + settingsMenuButton.getRight()) / 2;
+			int cy = (settingsMenuButton.getTop() + settingsMenuButton.getBottom()) / 2;
+
+			Animator anim = ViewAnimationUtils.createCircularReveal(settingsMenu, cx, cy, 0, bottomView.getWidth());
+
+			settingsMenuButton.setVisibility(View.INVISIBLE);
+			settingsMenu.setVisibility(View.VISIBLE);
+			anim.start();
+
+		}
+		else
+		{
+			settingsMenuButton.setVisibility(View.INVISIBLE);
+			settingsMenu.setVisibility(View.VISIBLE);
+		}
+	}
+
+	public void toggleMarkerDisplay(View view)
+	{
+		if (detector.getMarkerDrawMode() == MarkerDetector.MarkerDrawMode.off)
+		{
+			detector.setMarkerDrawMode(MarkerDetector.MarkerDrawMode.outline);
+		}
+		else if (detector.getMarkerDrawMode() == MarkerDetector.MarkerDrawMode.outline)
+		{
+			detector.setMarkerDrawMode(MarkerDetector.MarkerDrawMode.regions);
+		}
+		else
+		{
+			detector.setMarkerDrawMode(MarkerDetector.MarkerDrawMode.off);
+		}
+
+		updateMenu();
+	}
+
+	public void toggleThresholdDisplay(View view)
+	{
+		detector.setDrawThreshold(!detector.shouldDrawThreshold());
+		updateMenu();
 	}
 
 	@Override
@@ -204,7 +271,7 @@ public class ScanActivity extends ActionBarActivity implements ExperienceControl
 	{
 		super.onNewIntent(intent);
 
-		if(intent.getStringExtra("experience") != null)
+		if (intent.getStringExtra("experience") != null)
 		{
 			try
 			{
@@ -212,14 +279,11 @@ public class ScanActivity extends ActionBarActivity implements ExperienceControl
 				Experience intentExperience = gson.fromJson(intent.getStringExtra("experience"), Experience.class);
 				experience.set(intentExperience);
 			}
-			catch(Exception e)
+			catch (Exception e)
 			{
 				Log.w(TAG, e.getMessage(), e);
 			}
 		}
-
-		// TODO
-		//experience.handleIntent(intent);
 	}
 
 	@Override
@@ -228,6 +292,59 @@ public class ScanActivity extends ActionBarActivity implements ExperienceControl
 		super.onPause();
 		stopCamera();
 		experience.removeListener(this);
+	}
+
+	protected void updateMenu()
+	{
+		Button flipCameraButton = (Button) findViewById(R.id.flipCameraButton);
+		if (camera.getCameraCount() > 1)
+		{
+			flipCameraButton.setVisibility(View.VISIBLE);
+			if (camera.isFront())
+			{
+				flipCameraButton.setCompoundDrawablesWithIntrinsicBounds(R.drawable.ic_camera_front_white_24dp, 0, 0, 0);
+				flipCameraButton.setText(getString(R.string.camera_front));
+			}
+			else
+			{
+				flipCameraButton.setCompoundDrawablesWithIntrinsicBounds(R.drawable.ic_camera_rear_white_24dp, 0, 0, 0);
+				flipCameraButton.setText(getString(R.string.camera_rear));
+			}
+		}
+		else
+		{
+			flipCameraButton.setVisibility(View.GONE);
+		}
+
+		Button thresholdDisplayButton = (Button) findViewById(R.id.thresholdDisplayButton);
+		if (detector.shouldDrawThreshold())
+		{
+			thresholdDisplayButton.setText(getString(R.string.threshold_on));
+		}
+		else
+		{
+			thresholdDisplayButton.setText(getString(R.string.threshold_off));
+		}
+
+		Button markerDisplayButton = (Button) findViewById(R.id.markerDisplayButton);
+		if (detector.getMarkerDrawMode() == MarkerDetector.MarkerDrawMode.off)
+		{
+			markerDisplayButton.setCompoundDrawablesWithIntrinsicBounds(R.drawable.ic_border_clear_white_24dp, 0, 0, 0);
+			markerDisplayButton.setText(getString(R.string.marker_off));
+		}
+		else if (detector.getMarkerDrawMode() == MarkerDetector.MarkerDrawMode.outline)
+		{
+			markerDisplayButton.setCompoundDrawablesWithIntrinsicBounds(R.drawable.ic_border_outer_white_24dp, 0, 0, 0);
+			markerDisplayButton.setText(getString(R.string.marker_outline));
+		}
+		else
+		{
+			markerDisplayButton.setCompoundDrawablesWithIntrinsicBounds(R.drawable.ic_border_all_white_24dp, 0, 0, 0);
+			markerDisplayButton.setText(getString(R.string.marker_on));
+		}
+
+		//private ImageView autoOpenIcon;
+		//private TextView autoOpenLabel;
 	}
 
 	/**
@@ -244,16 +361,6 @@ public class ScanActivity extends ActionBarActivity implements ExperienceControl
 			return resources.getDimensionPixelSize(resourceId);
 		}
 		return 0;
-	}
-
-	private String getTextString(String name, String defaultValue)
-	{
-		int resource = getResources().getIdentifier(name, "string", getPackageName());
-		if (resource != 0)
-		{
-			return getString(resource);
-		}
-		return defaultValue;
 	}
 
 	private void layout()
@@ -281,14 +388,13 @@ public class ScanActivity extends ActionBarActivity implements ExperienceControl
 		viewfinder.invalidate();
 	}
 
-	private void setMode(MarkerDetector.Mode mode)
-	{
-		Log.i("", "Set mode to " + mode);
-		detector.setMode(mode);
-		viewfinder.invalidate();
-		modeText.setText(getTextString(MODE_ACTIVE_PREFIX + mode.name(), mode.name()));
-		updateMenu();
-	}
+//	private void setMode(MarkerDetector.Mode mode)
+//	{
+//		Log.i("", "Set mode to " + mode);
+//		//detector.setMode(mode);
+//		viewfinder.invalidate();
+//		modeText.setText(getTextString(MODE_ACTIVE_PREFIX + mode.name(), mode.name()));
+//	}
 
 	private void startCamera()
 	{
@@ -313,65 +419,6 @@ public class ScanActivity extends ActionBarActivity implements ExperienceControl
 		{
 			detector.stop();
 			camera.release();
-		}
-	}
-
-	private void updateMenu()
-	{
-		if (modeMenu != null)
-		{
-			modeMenu.getMenu().clear();
-			for (final MarkerDetector.Mode amode : MarkerDetector.Mode.values())
-			{
-				MenuItem item = modeMenu.getMenu().add(getTextString(MODE_PREFIX + amode.name(), amode.name()));
-				item.setOnMenuItemClickListener(new MenuItem.OnMenuItemClickListener()
-				{
-					@Override
-					public boolean onMenuItemClick(MenuItem item)
-					{
-						setMode(amode);
-						return true;
-					}
-				});
-				if (amode == detector.getMode())
-				{
-					item.setEnabled(false);
-				}
-			}
-
-			if (camera.getCameraCount() > 1)
-			{
-				MenuItem switchItem = modeMenu.getMenu().add(getString(R.string.action_switch_camera));
-				switchItem.setIcon(R.drawable.ic_switch_camera_white_24dp);
-				switchItem.setOnMenuItemClickListener(new MenuItem.OnMenuItemClickListener()
-				{
-					@Override
-					public boolean onMenuItemClick(MenuItem item)
-					{
-						try
-						{
-							stopCamera();
-							camera.flip();
-							viewfinder.invalidate();
-							startCamera();
-						}
-						catch (Exception e)
-						{
-							Log.e(TAG, e.getMessage(), e);
-						}
-						return true;
-					}
-				});
-			}
-
-			if (modeMenu.getMenu().hasVisibleItems())
-			{
-				modeMenuButton.setVisibility(View.VISIBLE);
-			}
-			else
-			{
-				modeMenuButton.setVisibility(View.GONE);
-			}
 		}
 	}
 }

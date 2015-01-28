@@ -38,52 +38,13 @@ public class EditTextBinding extends ViewBinding
 	}
 
 	@Override
-	public void update(Object value, Format format)
-	{
-		this.format = format;
-		if(view instanceof EditText)
-		{
-			EditText editText = (EditText)view;
-			if(format instanceof InputFilter)
-			{
-				editText.setFilters(new InputFilter[] {(InputFilter)format});
-			}
-			editText.setError(null);
-			String editString = format.getEditString(value);
-			if(!editText.getText().toString().equals(editString))
-			{
-				editText.setText(editString);
-			}
-		}
-	}
-
-	@Override
-	public void setError(String error)
-	{
-		if(view instanceof EditText)
-		{
-			EditText editText = (EditText)view;
-			editText.setError(error);
-		}
-	}
-
-	@Override
-	public void save(Property property)
-	{
-		if(view instanceof EditText)
-		{
-			property.set(format.getSaveValue(((EditText)view).getText().toString()));
-		}
-	}
-
-	@Override
 	public boolean init(final Property property)
 	{
 		super.init(property);
 
-		if(view instanceof EditText)
+		if (view instanceof EditText)
 		{
-			final EditText editText = (EditText)view;
+			final EditText editText = (EditText) view;
 			editText.addTextChangedListener(new TextWatcher()
 			{
 				private final Handler handler = new Handler();
@@ -99,7 +60,7 @@ public class EditTextBinding extends ViewBinding
 					@Override
 					public void run()
 					{
-						save(property);
+						set(property);
 					}
 				};
 
@@ -107,7 +68,7 @@ public class EditTextBinding extends ViewBinding
 				public void onTextChanged(CharSequence charSequence, int i, int i2, int i3)
 				{
 					handler.removeCallbacksAndMessages(null);
-					handler.postDelayed(userStoppedTyping, 2000);
+					handler.postDelayed(userStoppedTyping, 1000);
 				}
 
 				@Override
@@ -115,18 +76,58 @@ public class EditTextBinding extends ViewBinding
 				{
 				}
 			});
-			editText.setOnFocusChangeListener(new View.OnFocusChangeListener() {
+			editText.setOnFocusChangeListener(new View.OnFocusChangeListener()
+			{
 				@Override
 				public void onFocusChange(View v, boolean hasFocus)
 				{
-					if(!hasFocus)
+					if (!hasFocus)
 					{
-						save(property);
+						set(property);
 					}
 				}
 			});
 			return true;
 		}
 		return false;
+	}
+
+	@Override
+	public void set(Property property)
+	{
+		if (view instanceof EditText)
+		{
+			property.set(format.getSaveValue(((EditText) view).getText().toString()));
+		}
+	}
+
+	@Override
+	public void setError(String error)
+	{
+		if (view instanceof EditText)
+		{
+			EditText editText = (EditText) view;
+			editText.setError(error);
+		}
+	}
+
+	@Override
+	public void update(Object value, Format format)
+	{
+		this.format = format;
+		if (view instanceof EditText)
+		{
+			EditText editText = (EditText) view;
+			if (format instanceof InputFilter)
+			{
+				editText.setFilters(new InputFilter[]{(InputFilter) format});
+			}
+			editText.setError(null);
+			String editString = format.getEditString(value);
+			if (!editText.getText().toString().equals(editString))
+			{
+				editText.setText(editString);
+			}
+		}
 	}
 }

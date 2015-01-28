@@ -42,7 +42,7 @@
 			           android:adjustViewBounds="true"
 			           tools:ignore="ContentDescription"
 			           android:layout_marginLeft="-1dp" android:layout_marginTop="-1dp"
-			           android:layout_marginRight="-1dp" />
+			           android:layout_marginRight="-1dp" android:scaleType="centerCrop" android:longClickable="false" />
 
 			<ImageButton
 					android:id="@+id/experienceFloatingAction"

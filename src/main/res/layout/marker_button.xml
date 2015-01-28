@@ -18,22 +18,21 @@
   ~     along with this program.  If not, see <http://www.gnu.org/licenses/>.
   -->
 
-<resources xmlns:tools="http://schemas.android.com/tools">
-	<string name="noCameraTitle">Camera Unavailable</string>
-	<string name="noCameraMessage">Please try restarting your device.</string>
-	<string name="noCameraButton">OK</string>
+<Button xmlns:android="http://schemas.android.com/apk/res/android"
+        xmlns:tools="http://schemas.android.com/tools"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_gravity="bottom|center_horizontal"
+        android:layout_marginBottom="56dp"
+        style="@style/Widget.AppCompat.ActionButton"
+        android:background="@drawable/rounded"
+        android:drawableRight="@drawable/ic_open_in_new_white_36dp"
+        android:drawableEnd="@drawable/ic_open_in_new_white_36dp"
+        android:drawablePadding="8dp"
+        tools:text="Tarantula Nebula"
+        android:textColor="#FFF"
+        android:textSize="21sp"
+        android:id="@+id/markerButton"
+        android:visibility="invisible">
 
-	<string name="action_switch_camera">Switch Camera</string>
-
-	<string name="mode_active_detect">Detecting…</string>
-
-	<string name="camera_front">Front Camera</string>
-	<string name="camera_rear">Rear Camera</string>
-
-	<string name="threshold_on">Threshold Visible</string>
-	<string name="threshold_off">Threshold Hidden</string>
-
-	<string name="marker_off">Markers Hidden</string>
-	<string name="marker_outline">Markers Outlined</string>
-	<string name="marker_on">Markers Visible</string>
-</resources>
+</Button>

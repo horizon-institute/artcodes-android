@@ -93,7 +93,7 @@ public class MarkerEditDialog extends DialogFragment
 		{
 			public void onClick(DialogInterface dialog, int id)
 			{
-				if (properties.valid())
+				if (properties.isValid())
 				{
 					Marker marker = (Marker) properties.save();
 					ExperienceEditActivity activity = (ExperienceEditActivity) getActivity();
@@ -146,9 +146,9 @@ public class MarkerEditDialog extends DialogFragment
 //		properties.set()
 //		{
 //			@Override
-//			protected void setValid(boolean valid)
+//			protected void setValid(boolean isValid)
 //			{
-//				dialog.getButton(AlertDialog.BUTTON_POSITIVE).setEnabled(valid);
+//				dialog.getButton(AlertDialog.BUTTON_POSITIVE).setEnabled(properties.isValid());
 //			}
 //		};
 

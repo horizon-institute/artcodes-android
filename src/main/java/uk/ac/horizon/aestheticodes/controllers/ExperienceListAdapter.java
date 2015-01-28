@@ -30,7 +30,6 @@ import android.widget.LinearLayout;
 import android.widget.TextView;
 import com.squareup.picasso.Picasso;
 import uk.ac.horizon.aestheticodes.R;
-import uk.ac.horizon.aestheticodes.activities.AestheticodesActivity;
 import uk.ac.horizon.aestheticodes.model.Experience;
 
 import java.util.ArrayList;
@@ -60,100 +59,13 @@ public class ExperienceListAdapter extends BaseAdapter implements ExperienceList
 		listeners.add(listener);
 	}
 
-	public void removeListener(ExperienceListController.Listener listener)
-	{
-		listeners.remove(listener);
-	}
-
-	public void update()
-	{
-		new ExperienceListUpdater(context, experienceController).execute();
-	}
-
-
-
-	public Experience getSelected(String preferred)
-	{
-		if(preferred != null)
-		{
-			for (Experience experience : experiences)
-			{
-				if (experience.getId().equals(preferred))
-				{
-					return experience;
-				}
-			}
-		}
-
-		if(!experiences.isEmpty())
-		{
-			Log.i("", "Not found " + preferred + ", returning " + experiences.get(0).getId());
-			return experiences.get(0);
-		}
-		return null;
-	}
-
-	@Override
-	public int getCount()
-	{
-		return experiences.size();
-	}
-
-	@Override
-	public Object getItem(int i)
-	{
-		return experiences.get(i);
-	}
-
-	@Override
-	public long getItemId(final int position)
-	{
-		return experiences.get(position).getId().hashCode();
-	}
-
-	@Override
-	public View getView(int i, View view, ViewGroup viewGroup)
-	{
-		final Experience experience = experiences.get(i);
-		if (view == null)
-		{
-			view = inflater.inflate(R.layout.experience_listitem, viewGroup, false);
-		}
-
-		final LinearLayout layout = (LinearLayout) view.findViewById(R.id.rootView);
-		if(viewGroup.getClass().getName().endsWith("SpinnerCompat"))
-		{
-
-			layout.setPadding(0,0,48,0);
-		}
-
-		final TextView eventTitle = (TextView) view.findViewById(R.id.markerCode);
-		final ImageView iconView = (ImageView) view.findViewById(R.id.experienceIcon);
-		eventTitle.setText(experience.getName());
-
-		iconView.setSelected(false);
-		iconView.setImageDrawable(null);
-		if (experience.getIcon() != null && !experience.getIcon().isEmpty())
-		{
-			Picasso.with(context).cancelRequest(iconView);
-			Picasso.with(context).load(experience.getIcon()).into(iconView);
-		}
-
-		return view;
-	}
-
-	public List<Experience> getExperiences()
-	{
-		return experiences;
-	}
-
 	@Override
 	public void experienceListChanged()
 	{
 		List<Experience> newExperiences = new ArrayList<Experience>();
-		for(Experience experience: experienceController.get())
+		for (Experience experience : experienceController.get())
 		{
-			if(experience.getOp() != Experience.Operation.remove)
+			if (experience.getOp() != Experience.Operation.remove)
 			{
 				newExperiences.add(experience);
 			}
@@ -177,9 +89,94 @@ public class ExperienceListAdapter extends BaseAdapter implements ExperienceList
 		experiences = newExperiences;
 		notifyDataSetChanged();
 
-		for(ExperienceListController.Listener listener: listeners)
+		for (ExperienceListController.Listener listener : listeners)
 		{
 			listener.experienceListChanged();
 		}
+	}
+
+	@Override
+	public int getCount()
+	{
+		return experiences.size();
+	}
+
+	public List<Experience> getExperiences()
+	{
+		return experiences;
+	}
+
+	@Override
+	public Object getItem(int i)
+	{
+		return experiences.get(i);
+	}
+
+	@Override
+	public long getItemId(final int position)
+	{
+		return experiences.get(position).getId().hashCode();
+	}
+
+	public Experience getSelected(String preferred)
+	{
+		if (preferred != null)
+		{
+			for (Experience experience : experiences)
+			{
+				if (experience.getId().equals(preferred))
+				{
+					return experience;
+				}
+			}
+		}
+
+		if (!experiences.isEmpty())
+		{
+			Log.i("", "Not found " + preferred + ", returning " + experiences.get(0).getId());
+			return experiences.get(0);
+		}
+		return null;
+	}
+
+	@Override
+	public View getView(int i, View view, ViewGroup viewGroup)
+	{
+		final Experience experience = experiences.get(i);
+		if (view == null)
+		{
+			view = inflater.inflate(R.layout.experience_listitem, viewGroup, false);
+		}
+
+		final TextView eventTitle = (TextView) view.findViewById(R.id.markerCode);
+		final ImageView iconView = (ImageView) view.findViewById(R.id.experienceIcon);
+		final LinearLayout layout = (LinearLayout) view.findViewById(R.id.rootView);
+
+		eventTitle.setText(experience.getName());
+
+		iconView.setSelected(false);
+		iconView.setImageDrawable(null);
+		if (experience.getIcon() != null && !experience.getIcon().isEmpty())
+		{
+			Picasso.with(context).cancelRequest(iconView);
+			Picasso.with(context).load(experience.getIcon()).into(iconView);
+		}
+
+		if (viewGroup.getClass().getName().endsWith("SpinnerCompat"))
+		{
+			layout.setPadding(0, 0, 48, 0);
+		}
+
+		return view;
+	}
+
+	public void removeListener(ExperienceListController.Listener listener)
+	{
+		listeners.remove(listener);
+	}
+
+	public void update()
+	{
+		new ExperienceListUpdater(context, experienceController).execute();
 	}
 }

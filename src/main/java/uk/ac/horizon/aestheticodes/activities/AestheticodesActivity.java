@@ -27,7 +27,11 @@ import android.util.Log;
 import android.view.Menu;
 import android.view.MenuInflater;
 import android.view.MenuItem;
+import android.view.View;
 import android.view.WindowManager;
+import android.view.animation.Animation;
+import android.view.animation.AnimationUtils;
+import android.widget.Button;
 import uk.ac.horizon.aestheticodes.Aestheticodes;
 import uk.ac.horizon.aestheticodes.R;
 import uk.ac.horizon.aestheticodes.controllers.ExperienceListAdapter;
@@ -40,9 +44,11 @@ import java.util.List;
 
 public class AestheticodesActivity extends ScanActivity implements ExperienceListController.Listener
 {
-	private static final String TAG = AestheticodesActivity.class.getName();
-
 	private ExperienceListAdapter experiences;
+	private Button markerButton;
+	private boolean autoOpen = true;
+	private String currentCode = null;
+
 
 	@Override
 	public void experienceListChanged()
@@ -66,33 +72,102 @@ public class AestheticodesActivity extends ScanActivity implements ExperienceLis
 	}
 
 	@Override
-	public void markerFound(String markerCode)
+	public void markerChanged(final String markerCode)
 	{
-		Marker marker = experience.get().getMarkers().get(markerCode);
-		if (marker != null)
-		{
-			camera.stop();
-			if (marker.getShowDetail())
-			{
-				Intent intent = new Intent(this, MarkerActivity.class);
-				intent.putExtra("experience", experience.get().getId());
-				intent.putExtra("marker", markerCode);
+		Log.i("", "Marker changing from " + currentCode + " to " + markerCode);
+		final String oldCode = currentCode;
+		currentCode = markerCode;
 
-				startActivity(intent);
+		if (markerCode != null)
+		{
+			final Marker marker = experience.get().getMarkers().get(markerCode);
+			if (autoOpen)
+			{
+				if (marker != null)
+				{
+					openMarker(marker);
+				}
 			}
 			else
 			{
-				startActivity(new Intent(Intent.ACTION_VIEW, Uri.parse(marker.getAction())));
+				runOnUiThread(new Runnable()
+				{
+					@Override
+					public void run()
+					{
+						if (marker != null)
+						{
+							if (marker.getTitle() != null && !marker.getTitle().isEmpty())
+							{
+								markerButton.setText(marker.getTitle());
+							}
+							else
+							{
+								markerButton.setText(getString(R.string.code_text, marker.getCode()));
+							}
+							markerButton.setOnClickListener(new View.OnClickListener()
+							{
+								@Override
+								public void onClick(View v)
+								{
+									openMarker(marker);
+								}
+							});
+						}
+						else
+						{
+							markerButton.setText("Unknown Marker " + markerCode);
+							markerButton.setCompoundDrawablesWithIntrinsicBounds(0,0,R.drawable.ic_add_white_36dp, 0);
+							markerButton.setOnClickListener(new View.OnClickListener()
+							{
+								@Override
+								public void onClick(View v)
+								{
+									// TODO Add marker
+								}
+							});
+						}
+
+						if(oldCode == null)
+						{
+							Log.i("", "Slide in");
+							markerButton.setVisibility(View.VISIBLE);
+							markerButton.startAnimation(AnimationUtils.loadAnimation(AestheticodesActivity.this, R.anim.slide_in));
+						}
+					}
+				});
 			}
 		}
 		else
 		{
-			Log.w(TAG, "No details for marker " + markerCode);
+			runOnUiThread(new Runnable()
+			{
+				@Override
+				public void run()
+				{
+					Animation animation = AnimationUtils.loadAnimation(AestheticodesActivity.this, R.anim.slide_out);
+					animation.setAnimationListener(new Animation.AnimationListener() {
+						@Override
+						public void onAnimationStart(Animation animation)
+						{
 
-			// TODO if (experienceManager.get().canAddMarkerByScanning())
-			//{
-			//	this.addMarkerDialog(marker.getCodeKey());
-			//}
+						}
+
+						@Override
+						public void onAnimationEnd(Animation animation)
+						{
+							markerButton.setVisibility(View.INVISIBLE);
+						}
+
+						@Override
+						public void onAnimationRepeat(Animation animation)
+						{
+
+						}
+					});
+					markerButton.startAnimation(animation);
+				}
+			});
 		}
 	}
 
@@ -102,6 +177,9 @@ public class AestheticodesActivity extends ScanActivity implements ExperienceLis
 		super.onCreate(savedInstanceState);
 		getWindow().addFlags(WindowManager.LayoutParams.FLAG_KEEP_SCREEN_ON);
 
+		View view = getLayoutInflater().inflate(R.layout.marker_button, getRootView());
+		markerButton = (Button) view.findViewById(R.id.markerButton);
+		
 		experiences = new ExperienceListAdapter(getSupportActionBar().getThemedContext(), Aestheticodes.getExperiences());
 		//noinspection deprecation
 		getSupportActionBar().setNavigationMode(ActionBar.NAVIGATION_MODE_LIST);
@@ -158,5 +236,54 @@ public class AestheticodesActivity extends ScanActivity implements ExperienceLis
 	{
 		super.onPause();
 		experiences.removeListener(this);
+	}
+
+	@Override
+	protected void updateMenu()
+	{
+		super.updateMenu();
+
+		Button autoOpenButton = (Button) findViewById(uk.ac.horizon.aestheticodes.core.R.id.autoOpenButton);
+		autoOpenButton.setVisibility(View.VISIBLE);
+		autoOpenButton.setOnClickListener(new View.OnClickListener()
+		{
+			@Override
+			public void onClick(View v)
+			{
+				autoOpen = !autoOpen;
+				updateMenu();
+				if(currentCode != null)
+				{
+					String code = currentCode;
+					currentCode = null;
+					markerChanged(code);
+				}
+			}
+		});
+		if (autoOpen)
+		{
+			autoOpenButton.setText("Open Automatically");
+		}
+		else
+		{
+			autoOpenButton.setText("Open Manually");
+		}
+	}
+
+	private void openMarker(Marker marker)
+	{
+		camera.stop();
+		if (marker.getShowDetail())
+		{
+			Intent intent = new Intent(this, MarkerActivity.class);
+			intent.putExtra("experience", experience.get().getId());
+			intent.putExtra("marker", marker.getCode());
+
+			startActivity(intent);
+		}
+		else
+		{
+			startActivity(new Intent(Intent.ACTION_VIEW, Uri.parse(marker.getAction())));
+		}
 	}
 }

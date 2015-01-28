@@ -38,15 +38,16 @@ import java.util.List;
 
 public class MarkerDetector
 {
-	public static enum Mode
+	public static enum MarkerDrawMode
 	{
-		detect, outline, threshold
+		off, outline, regions
 	}
 
 	public static interface Listener
 	{
-		void markersDetected(boolean detected);
-		void markerFound(String markerCode);
+		void markerChanged(String markerCode);
+
+		void resultUpdated(boolean detected, Bitmap image);
 	}
 
 	private static final String TAG = MarkerDetector.class.getName();
@@ -68,6 +69,7 @@ public class MarkerDetector
 				Camera.Size size = camera.getSize();
 				Mat image = new Mat(size.height, size.width, CvType.CV_8UC1);
 				Mat drawImage = null;
+				result = null;
 				while (running)
 				{
 					try
@@ -83,32 +85,35 @@ public class MarkerDetector
 							// apply threshold.
 							thresholdImage(croppedImage);
 
-							if (mode != Mode.detect)
+							if (markerDrawMode != MarkerDrawMode.off || drawThreshold)
 							{
 								MatTranform.rotate(croppedImage, croppedImage, 360 + 90 - camera.getRotation(), camera.isFront());
 
-								if(resetDrawImage && drawImage != null)
+								if (drawImage == null || resetDrawImage)
 								{
-									drawImage.release();
-									drawImage = null;
+									if(drawImage != null)
+									{
+										drawImage.release();
+									}
+									drawImage = new Mat(croppedImage.rows(), croppedImage.cols(), CvType.CV_8UC4);
+									resetDrawImage = false;
 								}
 
-								if (drawImage == null)
+								if(drawThreshold)
 								{
-									if (mode == Mode.threshold)
-									{
-										drawImage = new Mat(croppedImage.rows(), croppedImage.cols(), CvType.CV_8UC3);
-										Imgproc.cvtColor(croppedImage, drawImage, Imgproc.COLOR_GRAY2BGR);
-									}
-									else
-									{
-										drawImage = new Mat(croppedImage.rows(), croppedImage.cols(), CvType.CV_8UC4);
-									}
+									Imgproc.cvtColor(croppedImage, drawImage, Imgproc.COLOR_GRAY2BGRA);
 								}
 								else
 								{
 									drawImage.setTo(new Scalar(0, 0, 0));
 								}
+							}
+							else if(drawImage != null)
+							{
+								drawImage.release();
+								drawImage = null;
+								result = null;
+								resetDrawImage = false;
 							}
 
 							// find markers.
@@ -122,7 +127,7 @@ public class MarkerDetector
 								framesSinceLastMarker = 0;
 							}
 
-							if (mode == Mode.detect || drawImage == null)
+							if (drawImage == null)
 							{
 								result = null;
 							}
@@ -135,19 +140,8 @@ public class MarkerDetector
 								Utils.matToBitmap(drawImage, result);
 							}
 
-							if(listener != null)
-							{
-								markerSelection.addMarkers(markers);
-								String code = markerSelection.getFoundMarker();
-								if (code != null && mode == Mode.detect)
-								{
-									listener.markerFound(code);
-								}
-								else
-								{
-									listener.markersDetected(!markers.isEmpty());
-								}
-							}
+							listener.resultUpdated(!markers.isEmpty(), result);
+							markerSelection.addMarkers(markers, listener);
 						}
 						else
 						{
@@ -210,15 +204,30 @@ public class MarkerDetector
 						// if marker found then add in the list.
 						foundMarkers.add(code);
 
-						if ((mode == Mode.outline || mode == Mode.threshold) && drawImage != null)
+						if (markerDrawMode != MarkerDrawMode.off && drawImage != null)
 						{
+							if (markerDrawMode == MarkerDrawMode.regions)
+							{
+								double[] nodes = hierarchy.get(0, i);
+								int currentRegionIndex = (int) nodes[MarkerCode.FIRST_NODE];
+
+								while (currentRegionIndex >= 0)
+								{
+									Imgproc.drawContours(drawImage, contours, currentRegionIndex, outlineColour, 4);
+									Imgproc.drawContours(drawImage, contours, currentRegionIndex, detectedColour, 2);
+
+									nodes = hierarchy.get(0, currentRegionIndex);
+									currentRegionIndex = (int) nodes[MarkerCode.NEXT_NODE];
+								}
+							}
+
 							Imgproc.drawContours(drawImage, contours, i, outlineColour, 7);
 							Imgproc.drawContours(drawImage, contours, i, detectedColour, 5);
 						}
 					}
 				}
 
-				if ((mode != Mode.detect || mode == Mode.threshold) && drawImage != null)
+				if (markerDrawMode != MarkerDrawMode.off && drawImage != null)
 				{
 					for (MarkerCode marker : foundMarkers)
 					{
@@ -311,8 +320,10 @@ public class MarkerDetector
 	private DetectionThread thread = null;
 	private boolean running = true;
 	private boolean resetDrawImage = false;
-	private Mode mode = Mode.detect;
 	private Bitmap result;
+
+	private MarkerDrawMode markerDrawMode = MarkerDrawMode.regions;
+	private boolean drawThreshold = false;
 
 	public MarkerDetector(CameraController camera, Listener listener, ExperienceController experience)
 	{
@@ -321,17 +332,14 @@ public class MarkerDetector
 		this.experience = experience;
 	}
 
-	public Mode getMode()
+	public MarkerDrawMode getMarkerDrawMode()
 	{
-		return mode;
+		return markerDrawMode;
 	}
 
-	public void setMode(Mode mode)
+	public void setMarkerDrawMode(MarkerDrawMode mode)
 	{
-		Log.i(TAG, "Set mode " + mode);
-		this.mode = mode;
-		resetDrawImage = true;
-		markerSelection.reset();
+		this.markerDrawMode = mode;
 	}
 
 	public Bitmap getResult()
@@ -339,10 +347,22 @@ public class MarkerDetector
 		return result;
 	}
 
+	public void setDrawThreshold(boolean drawThreshold)
+	{
+		this.drawThreshold = drawThreshold;
+		resetDrawImage = true;
+	}
+
+	public boolean shouldDrawThreshold()
+	{
+		return drawThreshold;
+	}
+
 	public void start()
 	{
 		if (thread == null)
 		{
+			markerSelection.reset(listener);
 			thread = new DetectionThread();
 			running = true;
 			thread.start();

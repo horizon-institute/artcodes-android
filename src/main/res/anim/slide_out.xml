@@ -17,23 +17,11 @@
   ~     You should have received a copy of the GNU Affero General Public License
   ~     along with this program.  If not, see <http://www.gnu.org/licenses/>.
   -->
-
-<resources xmlns:tools="http://schemas.android.com/tools">
-	<string name="noCameraTitle">Camera Unavailable</string>
-	<string name="noCameraMessage">Please try restarting your device.</string>
-	<string name="noCameraButton">OK</string>
-
-	<string name="action_switch_camera">Switch Camera</string>
-
-	<string name="mode_active_detect">Detecting…</string>
-
-	<string name="camera_front">Front Camera</string>
-	<string name="camera_rear">Rear Camera</string>
-
-	<string name="threshold_on">Threshold Visible</string>
-	<string name="threshold_off">Threshold Hidden</string>
-
-	<string name="marker_off">Markers Hidden</string>
-	<string name="marker_outline">Markers Outlined</string>
-	<string name="marker_on">Markers Visible</string>
-</resources>
+<set xmlns:android="http://schemas.android.com/apk/res/android">
+	<translate android:fromYDelta="0%"
+	           android:toYDelta="100%"
+	           android:duration="500" />
+	<alpha android:fromAlpha="1"
+	       android:toAlpha="0"
+			android:duration="500"/>
+</set>

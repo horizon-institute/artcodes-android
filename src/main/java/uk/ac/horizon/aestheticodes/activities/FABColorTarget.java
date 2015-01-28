@@ -56,7 +56,6 @@ class FABColorTarget implements Target
 			// TODO Animate?
 			imageView.setImageBitmap(bitmap);
 		}
-		Log.i(FABColorTarget.class.getName(), "View = " + view);
 		Palette.generateAsync(bitmap, new Palette.PaletteAsyncListener()
 		{
 			public void onGenerated(Palette palette)

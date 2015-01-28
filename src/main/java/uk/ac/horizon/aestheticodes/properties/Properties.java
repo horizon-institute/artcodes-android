@@ -65,9 +65,21 @@ public class Properties
 		return property;
 	}
 
-	public boolean valid()
+	public boolean isValid()
 	{
+		for(Property property: properties.values())
+		{
+			if(!property.isValid())
+			{
+				return false;
+			}
+		}
 		return true;
+	}
+
+	public void valid(boolean valid)
+	{
+
 	}
 
 	public void load()

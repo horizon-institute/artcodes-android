@@ -43,7 +43,7 @@ public class ExperienceListController
 		{
 			return;
 		}
-		Log.i("", "Adding " + experience.getId());
+
 		synchronized (experiences)
 		{
 			experiences.put(experience.getId(), experience);

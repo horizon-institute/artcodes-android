@@ -23,6 +23,7 @@ import android.view.View;
 import uk.ac.horizon.aestheticodes.properties.bindings.ViewBinding;
 import uk.ac.horizon.aestheticodes.properties.bindings.ViewBindingFactory;
 
+import java.beans.PropertyChangeListener;
 import java.lang.reflect.Field;
 import java.util.ArrayList;
 import java.util.List;
@@ -90,6 +91,11 @@ public final class Property
 		return this;
 	}
 
+	public boolean isValid()
+	{
+		return format.getError(value) == null;
+	}
+
 	public void load()
 	{
 		try
@@ -112,7 +118,7 @@ public final class Property
 	{
 		for(ViewBinding binding: bindings)
 		{
-			binding.save(this);
+			binding.set(this);
 		}
 		try
 		{

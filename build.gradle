@@ -51,8 +51,10 @@ android {
 	defaultConfig {
 		minSdkVersion 10
 		targetSdkVersion 21
-		versionCode 400030
+		versionCode 400031
 		versionName '2.3'
+
+		resConfigs "nodpi", "hdpi", "xhdpi", "xxhdpi", "xxxhdpi"
 	}
 
 	signingConfigs {

@@ -19,60 +19,46 @@
 
 package uk.ac.horizon.aestheticodes.properties.bindings;
 
-import android.content.Context;
-import android.view.View;
+import android.util.Log;
 import uk.ac.horizon.aestheticodes.properties.Format;
 import uk.ac.horizon.aestheticodes.properties.Property;
 
-public abstract class ViewBinding
+public class PropertyBinding extends ViewBinding
 {
-	protected Context context;
-	protected Object view;
-
-	public ViewBinding(int view)
+	public PropertyBinding(String property)
 	{
-		this.view = view;
+		super(null);
+		this.view = property;
 	}
 
-	public ViewBinding(View view)
-	{
-		this.view = view;
-	}
-
+	@Override
 	public boolean init(Property property)
 	{
-		if(view instanceof Integer)
+		if (view instanceof String)
 		{
-			view = property.getProperties().findView((Integer)view);
+			view = property.getProperties().get((String) view);
 		}
-
-		context = property.getProperties().getContext();
-
-		return view != null;
+		return true;
 	}
 
+	@Override
 	public void set(Property property)
 	{
-
-	}
-
-	public void setError(String error)
-	{
-
-	}
-
-	public boolean hasViewID(int viewID)
-	{
-		if(view instanceof Integer)
+		if(view instanceof Property)
 		{
-			return ((Integer)view) == viewID;
+			Property aproperty = (Property)view;
+			aproperty.save();
 		}
-		else if(view instanceof View)
-		{
-			return ((View)view).getId() == viewID;
-		}
-		return false;
 	}
 
-	public abstract void update(Object value, Format format);
+	@Override
+	public void update(Object value, Format format)
+	{
+		if(view instanceof Property)
+		{
+			Property property = (Property)view;
+			property.formatAs(format);
+			property.set(value);
+		}
+	}
 }

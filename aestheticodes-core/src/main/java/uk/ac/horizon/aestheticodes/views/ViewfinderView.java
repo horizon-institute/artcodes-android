@@ -28,7 +28,6 @@ import android.util.AttributeSet;
 import android.view.View;
 import uk.ac.horizon.aestheticodes.core.R;
 import uk.ac.horizon.aestheticodes.controllers.CameraController;
-import uk.ac.horizon.aestheticodes.controllers.MarkerDetector;
 
 import java.util.HashSet;
 import java.util.Set;
@@ -44,7 +43,8 @@ public final class ViewfinderView extends View
 	private final int maskColor;
 	private final Set<SizeChangedListener> sizeChangeListeners = new HashSet<>();
 	private CameraController camera;
-	private MarkerDetector detector;
+	private Bitmap result;
+	private Rect frame;
 
 	public ViewfinderView(Context context, AttributeSet attrs)
 	{
@@ -66,7 +66,7 @@ public final class ViewfinderView extends View
 		final int width = this.getWidth();
 		final int height = this.getHeight();
 
-		Rect frame = null;
+		frame = null;
 		if (camera != null)
 		{
 			frame = camera.getFrame(width, height);
@@ -82,15 +82,29 @@ public final class ViewfinderView extends View
 		canvas.drawRect(0, 0, width, frame.top, paint);
 		canvas.drawRect(0, frame.top, frame.left, frame.bottom + 1, paint);
 		canvas.drawRect(frame.right + 1, frame.top, width, frame.bottom + 1, paint);
-		canvas.drawRect(0, frame.bottom + 1, width, height, paint);
+		// Bottom handled by view
+		// canvas.drawRect(0, frame.bottom + 1, width, height, paint);
 
-		if (detector != null)
+		if (result != null)
 		{
-			Bitmap result = detector.getResult();
-			if (result != null)
-			{
-				canvas.drawBitmap(result, null, frame, null);
-			}
+			canvas.drawBitmap(result, null, frame, null);
+		}
+	}
+
+	public void setResult(Bitmap result)
+	{
+		if(result == null && this.result == null)
+		{
+			return;
+		}
+		this.result = result;
+		if(frame == null)
+		{
+			invalidate();
+		}
+		else
+		{
+			invalidate(frame);
 		}
 	}
 
@@ -102,11 +116,6 @@ public final class ViewfinderView extends View
 	public void setCamera(CameraController camera)
 	{
 		this.camera = camera;
-	}
-
-	public void setDetector(MarkerDetector detector)
-	{
-		this.detector = detector;
 	}
 
 	@Override

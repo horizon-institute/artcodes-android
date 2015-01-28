@@ -40,6 +40,13 @@
 		          android:textStyle="bold" />
 		<EditText android:layout_width="match_parent"
 		          android:layout_height="wrap_content"
+		          android:id="@+id/markerTitle"
+		          android:hint="@string/markerTitle"
+		          android:inputType="text"
+		          android:singleLine="true"
+		          android:textStyle="bold" />
+		<EditText android:layout_width="match_parent"
+		          android:layout_height="wrap_content"
 		          android:id="@+id/markerAction"
 		          android:hint="@string/URL"
 		          android:inputType="textUri"
@@ -58,13 +65,6 @@
 				android:layout_height="fill_parent"
 				android:id="@+id/markerDetails"
 				android:paddingTop="8dp">
-			<EditText android:layout_width="match_parent"
-			          android:layout_height="wrap_content"
-			          android:id="@+id/markerTitle"
-			          android:hint="@string/markerTitle"
-			          android:inputType="text"
-			          android:singleLine="true"
-			          android:textStyle="bold" />
 			<LinearLayout android:orientation="horizontal"
 			              android:layout_width="fill_parent"
 			              android:layout_height="fill_parent">

@@ -1,0 +1,61 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!--
+  ~ Aestheticodes recognises a different marker scheme that allows the
+  ~ creation of aesthetically pleasing, even beautiful, codes.
+  ~ Copyright (C) 2015  Aestheticodes
+  ~
+  ~     This program is free software: you can redistribute it and/or modify
+  ~     it under the terms of the GNU Affero General Public License as published
+  ~     by the Free Software Foundation, either version 3 of the License, or
+  ~     (at your option) any later version.
+  ~
+  ~     This program is distributed in the hope that it will be useful,
+  ~     but WITHOUT ANY WARRANTY; without even the implied warranty of
+  ~     MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+  ~     GNU Affero General Public License for more details.
+  ~
+  ~     You should have received a copy of the GNU Affero General Public License
+  ~     along with this program.  If not, see <http://www.gnu.org/licenses/>.
+  -->
+<resources xmlns:tools="http://schemas.android.com/tools">
+	<style name="Theme.Aestheticodes.Camera" parent="@style/Theme.AppCompat">
+		<item name="android:windowContentOverlay">@null</item>
+		<item name="android:actionBarStyle" tools:ignore="NewApi">@style/Aestheticodes.ActionBar.Transparent.Camera</item>
+		<item name="actionBarStyle">@style/Aestheticodes.ActionBar.Transparent.Camera</item>
+
+		<item name="android:windowActionBarOverlay" tools:ignore="NewApi">true</item>
+		<item name="android:windowActionModeOverlay" tools:ignore="NewApi">true</item>
+		<item name="windowActionBarOverlay">true</item>
+		<item name="android:windowTranslucentStatus" tools:ignore="NewApi">true</item>
+		<item name="android:windowTranslucentNavigation" tools:ignore="NewApi">true</item>
+		<item name="actionDropDownStyle">@style/Theme.Aestheticodes.Spinner</item>
+		<item name="popupMenuStyle">@style/Aestheticodes.PopupMenu</item>
+	</style>
+
+	<!-- Action Bar Styles -->
+	<style name="Aestheticodes.ActionBar" parent="ThemeOverlay.AppCompat.Dark.ActionBar">
+		<item name="android:displayOptions" tools:ignore="NewApi">homeAsUp</item>
+		<item name="displayOptions">homeAsUp</item>
+	</style>
+
+	<style name="Aestheticodes.ActionBar.Transparent" parent="ThemeOverlay.AppCompat.Dark.ActionBar">
+		<item name="android:displayOptions" tools:ignore="NewApi">homeAsUp</item>
+		<item name="displayOptions">homeAsUp</item>
+		<item name="android:background">@android:color/transparent</item>
+		<item name="background">@android:color/transparent</item>
+	</style>
+
+	<style name="Aestheticodes.ActionBar.Transparent.Camera" parent="Aestheticodes.ActionBar.Transparent">
+		<item name="android:displayOptions" tools:ignore="NewApi">showCustom</item>
+		<item name="displayOptions">showCustom</item>
+	</style>
+
+	<style name="Theme.Aestheticodes.Spinner" parent="Widget.AppCompat.Spinner.DropDown.ActionBar">
+		<item name="android:dropDownVerticalOffset">-4dip</item>
+		<item name="android:dropDownHorizontalOffset">-16dip</item>
+	</style>
+
+	<style name="Aestheticodes.PopupMenu" parent="@style/Widget.AppCompat.PopupMenu">
+		<item name="android:popupBackground">@color/viewfinder_mask</item>
+	</style>
+</resources>

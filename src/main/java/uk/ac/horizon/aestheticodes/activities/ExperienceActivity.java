@@ -65,7 +65,6 @@ public class ExperienceActivity extends ActionBarActivity
 		switch (item.getItemId())
 		{
 			case R.id.action_delete:
-				Log.i("", "Delete experience");
 				AlertDialog.Builder confirmBuilder = new AlertDialog.Builder(this);
 				confirmBuilder.setTitle(getResources().getString(R.string.experienceDeleteConfirmTitle, experience.getName()));
 				confirmBuilder.setMessage(getResources().getString(R.string.experienceDeleteConfirmMessage, experience.getName()));

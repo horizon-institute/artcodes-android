@@ -36,7 +36,7 @@ public class Experience
 		temporalTile, resize
 	}
 
-	private final Map<String, Marker> markers = new HashMap<String, Marker>();
+	private final Map<String, Marker> markers = new HashMap<>();
 
 	private String id;
 	private String name;
@@ -55,7 +55,7 @@ public class Experience
 	private int maxRegions = 5;
 	private int maxEmptyRegions = 0;
 	private int maxRegionValue = 6;
-	private int validationRegions = 2;
+	private int validationRegions = 0;
 	private int validationRegionValue = 1;
 	private int checksumModulo = 3;
 	private Threshold threshold = Threshold.temporalTile;
@@ -64,24 +64,180 @@ public class Experience
 	{
 	}
 
-	public int getMinRegions()
+	public void add(Marker marker)
 	{
-		return minRegions;
+		markers.put(marker.getCode(), marker);
 	}
 
-	public void setMinRegions(int minRegions)
+	/**
+	 * Delete a marker from the list of markers.
+	 *
+	 * @param code The code of the marker to delete.
+	 * @return True if a marker was deleted, false if the given code was not found.
+	 */
+	public boolean deleteMarker(String code)
 	{
-		this.minRegions = minRegions;
+		if (this.markers.containsKey(code))
+		{
+			this.markers.remove(code);
+			return true;
+		}
+		else
+		{
+			return false;
+		}
 	}
 
-	public int getMaxRegions()
+	public int getChecksumModulo()
 	{
-		return maxRegions;
+		return checksumModulo;
 	}
 
-	public void setMaxRegions(int maxRegions)
+	public void setChecksumModulo(int checksumModulo)
 	{
-		this.maxRegions = maxRegions;
+		this.checksumModulo = checksumModulo;
+	}
+
+	public String getDescription()
+	{
+		return description;
+	}
+
+	public void setDescription(String description)
+	{
+		this.description = description;
+	}
+
+	public String getIcon()
+	{
+		return icon;
+	}
+
+	public void setIcon(String icon)
+	{
+		this.icon = icon;
+	}
+
+	public String getId()
+	{
+		return id;
+	}
+
+	public void setId(String id)
+	{
+		this.id = id;
+	}
+
+	public String getImage()
+	{
+		return image;
+	}
+
+	public void setImage(String image)
+	{
+		this.image = image;
+	}
+
+	public String getMarkerError(List<Integer> markerCodes)
+	{
+		if(markerCodes == null)
+		{
+			return "No Code";
+		}
+		else if(markerCodes.size() < minRegions)
+		{
+			return "Marker too Short";
+		}
+		else if(markerCodes.size() > maxRegions)
+		{
+			return "Marker too Long";
+		}
+		else if(!hasValidNumberofEmptyRegions(markerCodes))
+		{
+			return "Incorrect Empty Regions";
+		}
+
+		for (Integer value : markerCodes)
+		{
+			//check if leaves are with in accepted range.
+			if (value > maxRegionValue)
+			{
+				return value + " is too Big";
+			}
+		}
+
+		if(!hasValidChecksum(markerCodes))
+		{
+			return "Region Total not Divisable §by " + checksumModulo;
+		}
+
+		if(!hasValidationRegions(markerCodes))
+		{
+			return validationRegions + " Regions of " + validationRegionValue + " Required";
+		}
+
+		return null;
+	}
+
+	public String getMarkerError(String marker, boolean partial)
+	{
+		String[] values = marker.split(":");
+		if (!partial)
+		{
+			if (values.length < minRegions)
+			{
+				return "Marker too Short";
+			}
+		}
+		else if (marker.endsWith(":"))
+		{
+			if (values.length == maxRegions || marker.endsWith("::"))
+			{
+				return "Missing Region Value";
+			}
+		}
+
+		if (values.length > maxRegions)
+		{
+			return "Marker too Long";
+		}
+
+		int prevValue = 0;
+		List<Integer> codes = new ArrayList<>();
+		for (int index = 0; index < values.length; index++)
+		{
+			String value = values[index];
+			try
+			{
+				int codeValue = Integer.parseInt(value);
+				if (codeValue > maxRegionValue)
+				{
+					return value + " too Large";
+				}
+				else if(codeValue < prevValue)
+				{
+					if(!marker.endsWith(":") && index < values.length - 1)
+					{
+						return value + " is larger than " + prevValue;
+					}
+				}
+
+				codes.add(codeValue);
+
+				prevValue = codeValue;
+			}
+			catch (Exception e)
+			{
+				return value + " is Not a Number";
+			}
+		}
+
+		return getMarkerError(codes);
+	}
+
+	public Map<String, Marker> getMarkers()
+	{
+		return markers;
 	}
 
 	public int getMaxEmptyRegions()
@@ -104,6 +260,31 @@ public class Experience
 		this.maxRegionValue = maxRegionValue;
 	}
 
+	public int getMaxRegions()
+	{
+		return maxRegions;
+	}
+
+	public void setMaxRegions(int maxRegions)
+	{
+		this.maxRegions = maxRegions;
+	}
+
+	public int getMinRegions()
+	{
+		return minRegions;
+	}
+
+	public void setMinRegions(int minRegions)
+	{
+		this.minRegions = minRegions;
+	}
+
+	public String getName()
+	{
+		return name;
+	}
+
 	public void setName(String name)
 	{
 		this.name = name;
@@ -113,7 +294,7 @@ public class Experience
 	{
 		for (int size = minRegions; size <= maxRegions; size++)
 		{
-			final List<Integer> marker = new ArrayList<Integer>();
+			final List<Integer> marker = new ArrayList<>();
 			for (int index = 0; index < size; index++)
 			{
 				marker.add(1);
@@ -121,7 +302,7 @@ public class Experience
 
 			while (true)
 			{
-				if (isValidMarker(marker, false))
+				if (isValidMarker(marker))
 				{
 					StringBuilder result = new StringBuilder();
 					for (int index = 0; index < size; index++)
@@ -143,7 +324,10 @@ public class Experience
 				for (int i = (size - 1); i >= 0; i--)
 				{
 					int value = marker.get(i) + 1;
-					marker.set(i, value);
+					for(int x = i; x < size; x++)
+					{
+						marker.set(x, value);
+					}
 					if (value <= maxRegionValue)
 					{
 						break;
@@ -152,10 +336,6 @@ public class Experience
 					{
 						return null;
 					}
-					else
-					{
-						marker.set(i, marker.get(i - 1));
-					}
 				}
 			}
 		}
@@ -163,19 +343,39 @@ public class Experience
 		return null;
 	}
 
-	public void add(Marker marker)
+	public Operation getOp()
 	{
-		markers.put(marker.getCode(), marker);
+		return op;
 	}
 
-	public int getValidationRegions()
+	public void setOp(Operation op)
 	{
-		return validationRegions;
+		this.op = op;
 	}
 
-	public void setValidationRegions(int validationRegions)
+	public String getOriginalID()
 	{
-		this.validationRegions = validationRegions;
+		return originalID;
+	}
+
+	public void setOriginalID(String originalID)
+	{
+		this.originalID = originalID;
+	}
+
+	public String getOwnerID()
+	{
+		return ownerID;
+	}
+
+	public void setOwnerID(String ownerID)
+	{
+		this.ownerID = ownerID;
+	}
+
+	public Threshold getThreshold()
+	{
+		return threshold;
 	}
 
 	public int getValidationRegionValue()
@@ -188,63 +388,29 @@ public class Experience
 		this.validationRegionValue = validationRegionValue;
 	}
 
-	public int getChecksumModulo()
+	public int getValidationRegions()
 	{
-		return checksumModulo;
+		return validationRegions;
 	}
 
-	public void setChecksumModulo(int checksumModulo)
+	public void setValidationRegions(int validationRegions)
 	{
-		this.checksumModulo = checksumModulo;
+		this.validationRegions = validationRegions;
 	}
 
-	public Threshold getThreshold()
+	public int getVersion()
 	{
-		return threshold;
+		return version;
 	}
 
-	public String getIcon()
+	public void setVersion(int version)
 	{
-		return icon;
+		this.version = version;
 	}
 
 	public boolean isValidMarker(List<Integer> markerCodes)
 	{
-		return isValidMarker(markerCodes, false);
-	}
-
-	public Map<String, Marker> getMarkers()
-	{
-		return markers;
-	}
-
-	/**
-	 * Delete a marker from the list of markers.
-	 *
-	 * @param code The code of the marker to delete.
-	 * @return True if a marker was deleted, false if the given code was not found.
-	 */
-	public boolean deleteMarker(String code)
-	{
-		if (this.markers.containsKey(code))
-		{
-			this.markers.remove(code);
-			return true;
-		}
-		else
-		{
-			return false;
-		}
-	}
-
-	boolean isValidMarker(List<Integer> markerCodes, boolean partial)
-	{
-		return markerCodes != null
-				&& hasValidNumberofRegions(markerCodes)
-				&& hasValidNumberofEmptyRegions(markerCodes)
-				&& hasValidNumberOfLeaves(markerCodes)
-				&& hasValidationRegions(markerCodes)
-				&& hasValidChecksum(markerCodes);
+		return getMarkerError(markerCodes) == null;
 	}
 
 	public boolean isValidMarker(String marker, boolean partial)
@@ -257,6 +423,17 @@ public class Experience
 				return false;
 			}
 		}
+		else if (marker.endsWith(":"))
+		{
+			if (values.length == maxRegions)
+			{
+				return false;
+			}
+			else if (marker.endsWith("::"))
+			{
+				return false;
+			}
+		}
 
 		if (values.length > maxRegions)
 		{
@@ -264,15 +441,23 @@ public class Experience
 		}
 
 		int prevValue = 0;
-		List<Integer> codes = new ArrayList<Integer>();
-		for (String value : values)
+		List<Integer> codes = new ArrayList<>();
+		for (int index = 0; index < values.length; index++)
 		{
+			String value = values[index];
 			try
 			{
 				int codeValue = Integer.parseInt(value);
-				if (codeValue > maxRegionValue || codeValue < prevValue)
+				if (codeValue > maxRegionValue)
 				{
 					return false;
+				}
+				else if(codeValue < prevValue)
+				{
+					if(marker.endsWith(":") || index < values.length - 1)
+					{
+						return false;
+					}
 				}
 
 				codes.add(codeValue);
@@ -286,7 +471,40 @@ public class Experience
 		}
 
 		return partial || isValidMarker(codes);
+	}
 
+	/**
+	 * This function divides the total number of leaves in the marker by the
+	 * value given in the checksumModulo preference. Code is valid if the modulo is 0.
+	 *
+	 * @return true if the number of leaves are divisible by the checksumModulo value
+	 * otherwise false.
+	 */
+	private boolean hasValidChecksum(List<Integer> markerCodes)
+	{
+		if (checksumModulo <= 1)
+		{
+			return true;
+		}
+		int numberOfLeaves = 0;
+		for (int code : markerCodes)
+		{
+			numberOfLeaves += code;
+		}
+		return (numberOfLeaves % checksumModulo) == 0;
+	}
+
+	private boolean hasValidNumberofEmptyRegions(List<Integer> marker)
+	{
+		int empty = 0;
+		for (Integer value : marker)
+		{
+			if (value == 0)
+			{
+				empty++;
+			}
+		}
+		return maxEmptyRegions == empty;
 	}
 
 	/**
@@ -313,137 +531,5 @@ public class Experience
 			}
 		}
 		return validationRegionCount >= validationRegions;
-	}
-
-	/**
-	 * This function divides the total number of leaves in the marker by the
-	 * value given in the checksumModulo preference. Code is valid if the modulo is 0.
-	 *
-	 * @return true if the number of leaves are divisible by the checksumModulo value
-	 * otherwise false.
-	 */
-	private boolean hasValidChecksum(List<Integer> markerCodes)
-	{
-		if (checksumModulo <= 1)
-		{
-			return true;
-		}
-		int numberOfLeaves = 0;
-		for (int code : markerCodes)
-		{
-			numberOfLeaves += code;
-		}
-		return (numberOfLeaves % checksumModulo) == 0;
-	}
-
-	private boolean hasValidNumberofRegions(List<Integer> marker)
-	{
-		return ((marker.size() >= minRegions) && (marker.size() <= maxRegions));
-	}
-
-	private boolean hasValidNumberofEmptyRegions(List<Integer> marker)
-	{
-		int empty = 0;
-		for (Integer value : marker)
-		{
-			if (value == 0)
-			{
-				empty++;
-			}
-		}
-		return maxEmptyRegions == empty;
-	}
-
-	private boolean hasValidNumberOfLeaves(List<Integer> marker)
-	{
-		for (Integer value : marker)
-		{
-			//check if leaves are with in accepted range.
-			if (value > maxRegionValue)
-			{
-				return false;
-			}
-		}
-		return true;
-	}
-
-	public String getId()
-	{
-		return id;
-	}
-
-	public void setId(String id)
-	{
-		this.id = id;
-	}
-
-	public String getName()
-	{
-		return name;
-	}
-
-	public String getDescription()
-	{
-		return description;
-	}
-
-	public String getImage()
-	{
-		return image;
-	}
-
-	public int getVersion()
-	{
-		return version;
-	}
-
-	public void setVersion(int version)
-	{
-		this.version = version;
-	}
-
-	public void setIcon(String icon)
-	{
-		this.icon = icon;
-	}
-
-	public void setImage(String image)
-	{
-		this.image = image;
-	}
-
-	public void setDescription(String description)
-	{
-		this.description = description;
-	}
-
-	public Operation getOp()
-	{
-		return op;
-	}
-
-	public String getOwnerID()
-	{
-		return ownerID;
-	}
-
-	public void setOwnerID(String ownerID)
-	{
-		this.ownerID = ownerID;
-	}
-
-	public void setOriginalID(String originalID)
-	{
-		this.originalID = originalID;
-	}
-
-	public void setOp(Operation op)
-	{
-		this.op = op;
-	}
-
-	public String getOriginalID()
-	{
-		return originalID;
 	}
 }

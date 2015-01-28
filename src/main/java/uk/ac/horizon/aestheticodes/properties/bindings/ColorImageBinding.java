@@ -65,15 +65,12 @@ public class ColorImageBinding extends ViewBinding implements Target
 	@Override
 	public void onBitmapLoaded(Bitmap bitmap, Picasso.LoadedFrom from)
 	{
-		Log.i("", "Image received");
 		if (view instanceof ImageView)
 		{
-			Log.i("", "Setting view");
 			final ImageView imageView = (ImageView) view;
 			// TODO Animate?
 			imageView.setImageBitmap(bitmap);
 		}
-		Log.i("", "View = " + view);
 		Palette.generateAsync(bitmap, new Palette.PaletteAsyncListener()
 		{
 			public void onGenerated(Palette palette)

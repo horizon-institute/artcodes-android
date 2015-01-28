@@ -47,13 +47,22 @@ public class MarkerFormat extends Format implements InputFilter
 		{
 			return sourceValue;
 		}
-		boolean resultValid = experience.isValidMarker(result, true);
 
+		boolean resultValid = experience.isValidMarker(result, true);
 		if (!resultValid && !sourceValue.startsWith(":"))
 		{
 			sourceValue = ":" + sourceValue;
 			resultValid = experience.isValidMarker(destination.subSequence(0, destinationStart).toString() + sourceValue +
 					destination.subSequence(destinationEnd, destination.length()).toString(), true);
+		}
+		else if (!sourceValue.isEmpty())
+		{
+			if (experience.isValidMarker(destination.subSequence(0, destinationStart).toString() + sourceValue + ":" +
+					destination.subSequence(destinationEnd, destination.length()).toString(), true))
+			{
+				sourceValue = sourceValue + ":";
+				resultValid = true;
+			}
 		}
 
 		if (resultValid && !source.subSequence(sourceStart, sourceEnd).toString().equals(sourceValue))
@@ -69,27 +78,32 @@ public class MarkerFormat extends Format implements InputFilter
 	}
 
 	@Override
-	public String getTextString(String postfix, Object value)
-	{
-		return value.toString();
-	}
-
-	@Override
 	public String getError(Object value)
 	{
-		if (value instanceof String)
+		if (value == null)
+		{
+			return "No Code";
+		}
+		else if (value instanceof String)
 		{
 			String text = (String) value;
-			if (!experience.isValidMarker(text, false))
+			String error = experience.getMarkerError(text, false);
+			if(error != null)
 			{
-				return "Invalid code";
+				return error;
 			}
 
 			if (experience.getMarkers().containsKey(text))
 			{
-				return "The code already exists";
+				return "Code Already Exists";
 			}
 		}
 		return null;
+	}
+
+	@Override
+	public String getTextString(String postfix, Object value)
+	{
+		return value.toString();
 	}
 }

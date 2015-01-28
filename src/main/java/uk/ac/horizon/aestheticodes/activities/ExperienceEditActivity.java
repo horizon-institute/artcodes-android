@@ -24,7 +24,6 @@ import android.os.Bundle;
 import android.support.v4.app.DialogFragment;
 import android.support.v4.app.NavUtils;
 import android.support.v7.app.ActionBarActivity;
-import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.MenuItem;
 import android.view.View;
@@ -36,13 +35,13 @@ import uk.ac.horizon.aestheticodes.controllers.ExperienceListController;
 import uk.ac.horizon.aestheticodes.controllers.ExperienceListUpdater;
 import uk.ac.horizon.aestheticodes.dialogs.IntDialogFragment;
 import uk.ac.horizon.aestheticodes.dialogs.IntRangeDialogFragment;
-import uk.ac.horizon.aestheticodes.model.Marker;
-import uk.ac.horizon.aestheticodes.properties.Format;
-import uk.ac.horizon.aestheticodes.properties.Properties;
-import uk.ac.horizon.aestheticodes.properties.IntFormat;
-import uk.ac.horizon.aestheticodes.properties.IntRangeFormat;
 import uk.ac.horizon.aestheticodes.dialogs.MarkerEditDialog;
 import uk.ac.horizon.aestheticodes.model.Experience;
+import uk.ac.horizon.aestheticodes.model.Marker;
+import uk.ac.horizon.aestheticodes.properties.Format;
+import uk.ac.horizon.aestheticodes.properties.IntFormat;
+import uk.ac.horizon.aestheticodes.properties.IntRangeFormat;
+import uk.ac.horizon.aestheticodes.properties.Properties;
 import uk.ac.horizon.aestheticodes.properties.URLFormat;
 import uk.ac.horizon.aestheticodes.properties.bindings.ClickBinding;
 
@@ -60,106 +59,57 @@ public class ExperienceEditActivity extends ActionBarActivity
 	private Properties properties;
 	private ExperienceListController experiences;
 
-	@Override
-	protected void onCreate(Bundle savedInstanceState)
+	public void addMarker(View view)
 	{
-		super.onCreate(savedInstanceState);
+		DialogFragment newFragment = new MarkerEditDialog();
+		newFragment.show(getSupportFragmentManager(), "marker.edit");
+	}
 
-		setContentView(R.layout.experience_edit);
+	public Experience getExperience()
+	{
+		return experience;
+	}
 
-		final Bundle extras = getIntent().getExtras();
-		experiences = Aestheticodes.getExperiences();
-		if(extras != null)
+	public Properties getProperties()
+	{
+		return properties;
+	}
+
+	@Override
+	public boolean onOptionsItemSelected(MenuItem item)
+	{
+		switch (item.getItemId())
 		{
-			final String experienceID = extras.getString("experience");
-			if (experienceID != null)
-			{
-				experience = experiences.get(experienceID);
-			}
-		}
+			// Respond to the action bar's Up/Home open_button
+			case android.R.id.home:
+				properties.save();
+				experiences.add(experience);
+				if (experience.getOp() == null)
+				{
+					experience.setOp(Experience.Operation.update);
+				}
+				ExperienceListUpdater.save(this, experiences);
+				Intent intent = new Intent(this, ExperienceActivity.class);
+				intent.putExtra("experience", experience.getId());
 
-		if(experience == null)
+				NavUtils.navigateUpTo(this, intent);
+				return true;
+		}
+		return super.onOptionsItemSelected(item);
+	}
+
+	public void toggleMarkerSettings(View view)
+	{
+		if (markerSettings.getVisibility() == View.VISIBLE)
 		{
-			experience = new Experience();
-			experience.setId(UUID.randomUUID().toString());
-			experience.setOp(Experience.Operation.create);
+			markerSettings.setVisibility(View.GONE);
+			markerSettingsIcon.setImageResource(R.drawable.ic_expand_more_24dp);
 		}
-
-		properties = new Properties(this, experience);
-
-		properties.get("name").bindTo(R.id.experienceTitle);
-		properties.get("description").bindTo(R.id.experienceDescription);
-
-		properties.get("icon").formatAs(new URLFormat())
-				.bindTo(R.id.experienceIcon);
-		properties.get("image").formatAs(new URLFormat())
-				.bindTo(R.id.experienceImage);
-
-		properties.get("maxRegionValue").formatAs(new IntFormat(1, 9))
-				.bindTo(R.id.markerRegionValue)
-				.bindTo(new ClickBinding(R.id.markerRegionValue, true) {
-					@Override
-					public void onClick(View v)
-					{
-						IntDialogFragment.create(getSupportFragmentManager(), "maxRegionValue");
-					}
-				});
-
-		properties.get("validationRegions").formatAs(new IntFormat(0, properties.get("maxRegions"), 0))
-				.bindTo(R.id.markerValidationRegions)
-				.bindTo(new ClickBinding(R.id.markerValidationRegions, true)
-				{
-					@Override
-					public void onClick(View v)
-					{
-						IntDialogFragment.create(getSupportFragmentManager(), "validationRegions");
-					}
-				});
-
-		properties.get("validationRegionValue").formatAs(new IntFormat(1, properties.get("maxRegionValue")))
-				.bindTo(R.id.markerValidationRegionValue)
-				.bindTo(new ClickBinding(R.id.markerValidationRegionValue, true)
-				{
-					@Override
-					public void onClick(View v)
-					{
-						IntDialogFragment.create(getSupportFragmentManager(), "validationRegionValue");
-					}
-				});
-
-		properties.get("checksumModulo").formatAs(new IntFormat(1, 12, 1))
-				.bindTo(R.id.markerChecksum)
-				.bindTo(new ClickBinding(R.id.markerChecksum, true)
-				{
-					@Override
-					public void onClick(View v)
-					{
-						IntDialogFragment.create(getSupportFragmentManager(), "checksumModulo");
-					}
-				});
-
-		Format format = new IntRangeFormat(properties.get("minRegions"), properties.get("maxRegions"), 1, 9);
-		properties.get("maxRegions").formatAs(format)
-				.bindTo(R.id.markerRegions);
-		properties.get("minRegions").formatAs(format)
-				.bindTo(R.id.markerRegions)
-				.bindTo(new ClickBinding(R.id.markerRegions, true)
-				{
-					@Override
-					public void onClick(View v)
-					{
-						IntRangeDialogFragment.create(getSupportFragmentManager(), "minRegions", "maxRegions");
-					}
-				});
-		properties.load();
-
-		markerSettings = (LinearLayout) findViewById(R.id.markerSettings);
-		markerSettingsIcon = (ImageView) findViewById(R.id.markerSettingsIcon);
-
-		updateMarkers();
-
-		getSupportActionBar().setDisplayHomeAsUpEnabled(true);
-		getSupportActionBar().setHomeAsUpIndicator(R.drawable.ic_done_white_24dp);
+		else
+		{
+			markerSettings.setVisibility(View.VISIBLE);
+			markerSettingsIcon.setImageResource(R.drawable.ic_expand_less_24dp);
+		}
 	}
 
 	public void updateMarkers()
@@ -200,56 +150,83 @@ public class ExperienceEditActivity extends ActionBarActivity
 	}
 
 	@Override
-	public boolean onOptionsItemSelected(MenuItem item)
+	protected void onCreate(Bundle savedInstanceState)
 	{
-		switch (item.getItemId())
+		super.onCreate(savedInstanceState);
+
+		setContentView(R.layout.experience_edit);
+
+		final Bundle extras = getIntent().getExtras();
+		experiences = Aestheticodes.getExperiences();
+		if (extras != null)
 		{
-			// Respond to the action bar's Up/Home open_button
-			case android.R.id.home:
-				properties.save();
-				experiences.add(experience);
-				if(experience.getOp() == null)
+			final String experienceID = extras.getString("experience");
+			if (experienceID != null)
+			{
+				experience = experiences.get(experienceID);
+			}
+		}
+
+		if (experience == null)
+		{
+			experience = new Experience();
+			experience.setId(UUID.randomUUID().toString());
+			experience.setOp(Experience.Operation.create);
+		}
+
+		properties = new Properties(this, experience);
+
+		properties.get("name").bindTo(R.id.experienceTitle);
+		properties.get("description").bindTo(R.id.experienceDescription);
+
+		properties.get("icon").formatAs(new URLFormat())
+				.bindTo(R.id.experienceIcon);
+		properties.get("image").formatAs(new URLFormat())
+				.bindTo(R.id.experienceImage);
+
+		properties.get("maxRegionValue").formatAs(new IntFormat(1, 20))
+				.bindTo(R.id.markerRegionValue)
+				.bindTo(new ClickBinding(R.id.markerRegionValue, true)
 				{
-					experience.setOp(Experience.Operation.update);
-				}
-				ExperienceListUpdater.save(this, experiences);
-				Intent intent = new Intent(this, ExperienceActivity.class);
-				intent.putExtra("experience", experience.getId());
+					@Override
+					public void onClick(View v)
+					{
+						IntDialogFragment.create(getSupportFragmentManager(), "maxRegionValue");
+					}
+				});
 
-				NavUtils.navigateUpTo(this, intent);
-				return true;
-		}
-		return super.onOptionsItemSelected(item);
-	}
+		properties.get("checksumModulo").formatAs(new IntFormat(1, 12, 1))
+				.bindTo(R.id.markerChecksum)
+				.bindTo(new ClickBinding(R.id.markerChecksum, true)
+				{
+					@Override
+					public void onClick(View v)
+					{
+						IntDialogFragment.create(getSupportFragmentManager(), "checksumModulo");
+					}
+				});
 
-	public void toggleMarkerSettings(View view)
-	{
-		if(markerSettings.getVisibility() == View.VISIBLE)
-		{
-			markerSettings.setVisibility(View.GONE);
-			markerSettingsIcon.setImageResource(R.drawable.ic_expand_more_24dp);
-		}
-		else
-		{
-			markerSettings.setVisibility(View.VISIBLE);
-			markerSettingsIcon.setImageResource(R.drawable.ic_expand_less_24dp);
-		}
-	}
+		Format format = new IntRangeFormat(properties.get("minRegions"), properties.get("maxRegions"), 1, 20);
+		properties.get("maxRegions").formatAs(format)
+				.bindTo(R.id.markerRegions);
+		properties.get("minRegions").formatAs(format)
+				.bindTo(R.id.markerRegions)
+				.bindTo(new ClickBinding(R.id.markerRegions, true)
+				{
+					@Override
+					public void onClick(View v)
+					{
+						IntRangeDialogFragment.create(getSupportFragmentManager(), "minRegions", "maxRegions");
+					}
+				});
+		properties.load();
 
-	public void addMarker(View view)
-	{
-		Log.i(ExperienceActivity.class.getName(), "Add Marker");
-		DialogFragment newFragment = new MarkerEditDialog();
-		newFragment.show(getSupportFragmentManager(), "marker.edit");
-	}
+		markerSettings = (LinearLayout) findViewById(R.id.markerSettings);
+		markerSettingsIcon = (ImageView) findViewById(R.id.markerSettingsIcon);
 
-	public Properties getProperties()
-	{
-		return properties;
-	}
+		updateMarkers();
 
-	public Experience getExperience()
-	{
-		return experience;
+		getSupportActionBar().setDisplayHomeAsUpEnabled(true);
+		getSupportActionBar().setHomeAsUpIndicator(R.drawable.ic_done_white_24dp);
 	}
 }

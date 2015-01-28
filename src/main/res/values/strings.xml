@@ -30,18 +30,18 @@
 	<!-- Default WebSites -->
 	<string name="URL">URL</string>
 	<string name="minRegions">Regions</string>
-	<string name="minRegions_desc" tools:ignore="UnusedResources">The number of regions in a valid Aestheticode.</string>
+	<string name="minRegions_desc" tools:ignore="UnusedResources">The number of regions in a valid Artcode.</string>
 	<plurals name="minRegions_text" tools:ignore="UnusedResources">
 		<item quantity="one">1 Region</item>
 		<item quantity="other">%s Regions</item>
 	</plurals>
 	<string name="maxRegionValue" tools:ignore="UnusedResources">Max Region Value</string>
 	<string name="maxRegionValue_desc" tools:ignore="UnusedResources">The maximum value a region can have in a valid
-		Aestheticode.
+		Artcode.
 	</string>
 	<string name="maxEmptyRegions" tools:ignore="UnusedResources">Empty Regions</string>
 	<string name="maxEmptyRegions_desc" tools:ignore="UnusedResources">The maximum number of empty regions in a valid
-		Aestheticode.
+		Artcode.
 	</string>
 	<string name="maxEmptyRegions_off" tools:ignore="UnusedResources">None</string>
 	<plurals name="maxEmptyRegions_text" tools:ignore="UnusedResources">
@@ -50,7 +50,7 @@
 	</plurals>
 	<string name="validationRegions" tools:ignore="UnusedResources">Validation</string>
 	<string name="validationRegions_desc" tools:ignore="UnusedResources">The number of regions that must have a
-		specified value in a valid Aestheticode.
+		specified value in a valid Artcode.
 	</string>
 	<string name="validationRegions_off" tools:ignore="UnusedResources">Off</string>
 	<plurals name="validationRegions_text" tools:ignore="UnusedResources">
@@ -59,11 +59,11 @@
 	</plurals>
 	<string name="validationRegionValue" tools:ignore="UnusedResources">Validation Region Value</string>
 	<string name="validationRegionValue_desc" tools:ignore="UnusedResources">The value that validation regions must have
-		in a valid Aestheticode.
+		in a valid Artcode.
 	</string>
 	<string name="checksumModulo" tools:ignore="UnusedResources">Checksum Value</string>
 	<string name="checksumModulo_off" tools:ignore="UnusedResources">Disabled</string>
-	<string name="checksumModulo_desc" tools:ignore="UnusedResources">The Aestheticode checksum: the sum of all regions
+	<string name="checksumModulo_desc" tools:ignore="UnusedResources">The Artcode checksum: the sum of all regions
 		must be divisible by this value to be valid.
 	</string>
 
@@ -75,7 +75,7 @@
 	<string name="deleteConfirm">Delete</string>
 	<string name="deleteCancel">Cancel</string>
 
-	<string name="open">Open</string>
+	<string name="open_in_browser">Open in Browser</string>
 	<string name="experience_add">Add Experience</string>
 	<string name="experiences">Experiences</string>
 	<string name="experience_edit">Edit Experience</string>
