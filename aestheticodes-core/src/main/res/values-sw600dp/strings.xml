@@ -19,5 +19,13 @@
   -->
 
 <resources>
-	<dimen name="padding">24dp</dimen>
+	<string name="camera_front">Front Camera</string>
+	<string name="camera_rear">Rear Camera</string>
+
+	<string name="threshold_on">Threshold Visible</string>
+	<string name="threshold_off">Threshold Hidden</string>
+
+	<string name="marker_off">Markers Hidden</string>
+	<string name="marker_outline">Markers Outlined</string>
+	<string name="marker_on">Markers Visible</string>
 </resources>

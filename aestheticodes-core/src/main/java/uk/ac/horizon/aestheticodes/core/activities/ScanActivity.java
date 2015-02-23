@@ -41,6 +41,7 @@ import android.view.ViewConfiguration;
 import android.view.ViewGroup;
 import android.view.WindowManager;
 import android.widget.Button;
+import android.widget.RelativeLayout;
 import android.widget.TextView;
 import com.google.gson.Gson;
 import org.opencv.android.OpenCVLoader;
@@ -85,7 +86,7 @@ public class ScanActivity extends ActionBarActivity implements ExperienceControl
 	protected ViewfinderView viewfinder;
 	protected TextView modeText;
 	private SurfaceHolder holder;
-	private View bottomView;
+	protected RelativeLayout bottomView;
 	private View settingsMenuButton;
 	private View settingsMenu;
 
@@ -115,10 +116,12 @@ public class ScanActivity extends ActionBarActivity implements ExperienceControl
 	{
 		if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.LOLLIPOP)
 		{
-			int cx = (settingsMenuButton.getLeft() + settingsMenuButton.getRight()) / 2;
-			int cy = (settingsMenuButton.getTop() + settingsMenuButton.getBottom()) / 2;
+			final int cx = (settingsMenuButton.getLeft() + settingsMenuButton.getRight()) / 2;
+			final int cy = ((settingsMenuButton.getTop() + settingsMenuButton.getBottom()) / 2) - settingsMenu.getTop();
 
-			Animator anim = ViewAnimationUtils.createCircularReveal(settingsMenu, cx, cy, bottomView.getWidth(), 0);
+			Log.i("", "Circle center " + cx + ", " + cy + " width " + bottomView.getWidth());
+
+			final Animator anim = ViewAnimationUtils.createCircularReveal(settingsMenu, cx, cy, bottomView.getWidth(), 0);
 
 			anim.addListener(new AnimatorListenerAdapter()
 			{
@@ -179,7 +182,7 @@ public class ScanActivity extends ActionBarActivity implements ExperienceControl
 		//noinspection deprecation
 		holder.setType(SurfaceHolder.SURFACE_TYPE_PUSH_BUFFERS);
 
-		bottomView = findViewById(R.id.bottomView);
+		bottomView = (RelativeLayout)findViewById(R.id.bottomView);
 
 		settingsMenuButton = findViewById(R.id.settingsMenuButton);
 		settingsMenu = findViewById(R.id.settingsMenu);
@@ -225,15 +228,16 @@ public class ScanActivity extends ActionBarActivity implements ExperienceControl
 		updateMenu();
 		if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.LOLLIPOP)
 		{
-			int cx = (settingsMenuButton.getLeft() + settingsMenuButton.getRight()) / 2;
-			int cy = (settingsMenuButton.getTop() + settingsMenuButton.getBottom()) / 2;
+			final int cx = (settingsMenuButton.getLeft() + settingsMenuButton.getRight()) / 2;
+			final int cy = ((settingsMenuButton.getTop() + settingsMenuButton.getBottom()) / 2) - settingsMenu.getTop();
 
-			Animator anim = ViewAnimationUtils.createCircularReveal(settingsMenu, cx, cy, 0, bottomView.getWidth());
+			Log.i("", "Circle center " + cx + ", " + cy + " width " + bottomView.getWidth());
+
+			final Animator anim = ViewAnimationUtils.createCircularReveal(settingsMenu, cx, cy, 0, bottomView.getWidth());
 
 			settingsMenuButton.setVisibility(View.INVISIBLE);
 			settingsMenu.setVisibility(View.VISIBLE);
 			anim.start();
-
 		}
 		else
 		{
@@ -320,10 +324,12 @@ public class ScanActivity extends ActionBarActivity implements ExperienceControl
 		if (detector.shouldDrawThreshold())
 		{
 			thresholdDisplayButton.setText(getString(R.string.threshold_on));
+			thresholdDisplayButton.setCompoundDrawablesWithIntrinsicBounds(R.drawable.ic_filter_b_and_w_white_24dp, 0, 0, 0);
 		}
 		else
 		{
 			thresholdDisplayButton.setText(getString(R.string.threshold_off));
+			thresholdDisplayButton.setCompoundDrawablesWithIntrinsicBounds(R.drawable.ic_filter_b_and_w_off_white_24dp, 0, 0, 0);
 		}
 
 		Button markerDisplayButton = (Button) findViewById(R.id.markerDisplayButton);

@@ -52,6 +52,7 @@ public class MarkerDetector
 
 	private static final String TAG = MarkerDetector.class.getName();
 	private static final Scalar detectedColour = new Scalar(255, 255, 0, 255);
+	private static final Scalar regionColour = new Scalar(255, 128, 0, 255);
 	private static final Scalar outlineColour = new Scalar(0, 0, 0, 255);
 
 	private class DetectionThread extends Thread
@@ -214,7 +215,7 @@ public class MarkerDetector
 								while (currentRegionIndex >= 0)
 								{
 									Imgproc.drawContours(drawImage, contours, currentRegionIndex, outlineColour, 4);
-									Imgproc.drawContours(drawImage, contours, currentRegionIndex, detectedColour, 2);
+									Imgproc.drawContours(drawImage, contours, currentRegionIndex, regionColour, 2);
 
 									nodes = hierarchy.get(0, currentRegionIndex);
 									currentRegionIndex = (int) nodes[MarkerCode.NEXT_NODE];
@@ -322,7 +323,7 @@ public class MarkerDetector
 	private boolean resetDrawImage = false;
 	private Bitmap result;
 
-	private MarkerDrawMode markerDrawMode = MarkerDrawMode.regions;
+	private MarkerDrawMode markerDrawMode = MarkerDrawMode.off;
 	private boolean drawThreshold = false;
 
 	public MarkerDetector(CameraController camera, Listener listener, ExperienceController experience)

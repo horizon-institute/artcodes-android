@@ -19,6 +19,7 @@
   ~     along with this program.  If not, see <http://www.gnu.org/licenses/>.
   -->
 <merge xmlns:android="http://schemas.android.com/apk/res/android"
+       xmlns:app="http://schemas.android.com/apk/res-auto"
        xmlns:tools="http://schemas.android.com/tools"
        android:id="@+id/content_frame"
        android:layout_width="match_parent"
@@ -35,72 +36,32 @@
 			android:layout_height="fill_parent"
 			android:onClick="hideMenu" />
 
-	<LinearLayout android:orientation="vertical"
-	              android:layout_gravity="bottom"
-	              android:layout_width="fill_parent"
-	              android:layout_height="wrap_content">
+	<RelativeLayout android:orientation="vertical"
+	                android:layout_gravity="bottom"
+	                android:layout_width="fill_parent"
+	                android:layout_height="fill_parent">
 
 		<LinearLayout
-				android:orientation="vertical"
-				android:layout_width="fill_parent"
+				android:orientation="horizontal"
+				android:layout_width="wrap_content"
 				android:id="@+id/settingsMenu"
 				android:visibility="invisible"
 				tools:visibility="visible"
 				android:background="#5000"
 				android:layout_height="wrap_content"
-				android:layout_marginBottom="-58dp">
+				android:layout_above="@+id/bottomView"
+				android:layout_alignParentRight="true"
+				android:layout_alignParentLeft="true"
+				android:layout_alignParentStart="true"
+				android:layout_alignParentEnd="true"
+				android:gravity="center">
 
-			<LinearLayout android:layout_width="fill_parent"
-			              android:layout_height="wrap_content"
-			              android:orientation="horizontal"
-			              android:padding="4dp"
-			              android:gravity="center_horizontal">
-
-				<Button android:layout_width="wrap_content"
-				        android:layout_height="wrap_content"
-				        style="@style/Widget.AppCompat.ActionButton"
-				        android:text="Open Automatically"
-				        android:id="@+id/autoOpenButton"
-				        android:drawablePadding="4dp"
-				        android:drawableLeft="@drawable/ic_open_in_new_white_24dp"
-				        android:drawableStart="@drawable/ic_open_in_new_white_24dp"
-				        android:visibility="invisible"
-				        tools:visibility="visible"
-				        android:gravity="start|center_vertical"
-				        android:layout_weight="1" />
-
-				<Button android:layout_width="wrap_content"
-				        android:layout_height="wrap_content"
-				        style="@style/Widget.AppCompat.ActionButton"
-				        android:text="@string/marker_off"
-				        android:drawablePadding="4dp"
-				        android:gravity="start|center_vertical"
-				        android:id="@+id/markerDisplayButton"
-				        android:onClick="toggleMarkerDisplay"
-				        android:drawableLeft="@drawable/ic_border_clear_white_24dp"
-				        android:drawableStart="@drawable/ic_border_clear_white_24dp"
-				        android:layout_weight="1" />
-
-			</LinearLayout>
-
-			<LinearLayout android:layout_width="fill_parent"
-			              android:layout_height="wrap_content"
-			              android:orientation="horizontal"
-			              android:padding="4dp"
-
-			              android:gravity="center_horizontal">
-
-				<Button android:layout_width="wrap_content"
-				        android:layout_height="wrap_content"
-				        style="@style/Widget.AppCompat.ActionButton"
-				        android:text="@string/threshold_off"
-				        android:id="@+id/thresholdDisplayButton"
-				        android:drawablePadding="4dp"
-				        android:gravity="start|center_vertical"
-				        android:drawableLeft="@drawable/ic_filter_b_and_w_white_24dp"
-				        android:drawableStart="@drawable/ic_filter_b_and_w_white_24dp"
-				        android:onClick="toggleThresholdDisplay"
-				        android:layout_weight="1" />
+			<android.support.v7.widget.GridLayout xmlns:grid="http://schemas.android.com/apk/res-auto"
+			                                      android:layout_width="wrap_content"
+			                                      android:layout_height="fill_parent"
+			                                      android:layout_marginTop="0dp"
+			                                      grid:columnCount="2"
+			                                      grid:orientation="horizontal">
 
 				<Button android:layout_width="wrap_content"
 				        android:layout_height="wrap_content"
@@ -112,33 +73,93 @@
 				        android:drawableLeft="@drawable/ic_camera_rear_white_24dp"
 				        android:drawableStart="@drawable/ic_camera_rear_white_24dp"
 				        style="@style/Widget.AppCompat.ActionButton"
-				        android:layout_weight="1" />
-			</LinearLayout>
+				        grid:layout_gravity="center_horizontal"
+				        android:shadowColor="#4000"
+				        android:shadowDy="2"
+				        android:shadowRadius="2"
+						/>
+
+				<Button android:layout_width="wrap_content"
+				        android:layout_height="wrap_content"
+				        style="@style/Widget.AppCompat.ActionButton"
+				        android:text="@string/auto_open_off"
+				        android:id="@+id/autoOpenButton"
+				        android:drawablePadding="4dp"
+				        android:drawableLeft="@drawable/ic_open_in_new_white_24dp"
+				        android:drawableStart="@drawable/ic_open_in_new_white_24dp"
+				        android:visibility="invisible"
+				        tools:visibility="visible"
+				        android:gravity="center_vertical|start"
+				        grid:layout_gravity="center_horizontal"
+				        android:shadowColor="#4000"
+				        android:shadowDy="2"
+				        android:shadowRadius="2" />
+
+				<Button android:layout_width="wrap_content"
+				        android:layout_height="wrap_content"
+				        style="@style/Widget.AppCompat.ActionButton"
+				        android:text="@string/threshold_off"
+				        android:id="@+id/thresholdDisplayButton"
+				        android:drawablePadding="4dp"
+				        android:gravity="start|center_vertical"
+				        android:drawableLeft="@drawable/ic_filter_b_and_w_white_24dp"
+				        android:drawableStart="@drawable/ic_filter_b_and_w_white_24dp"
+				        android:onClick="toggleThresholdDisplay"
+				        grid:layout_gravity="center_horizontal"
+				        android:shadowColor="#4000"
+				        android:shadowDy="2"
+				        android:shadowRadius="2" />
+
+				<Button android:layout_width="wrap_content"
+				        android:layout_height="wrap_content"
+				        style="@style/Widget.AppCompat.ActionButton"
+				        android:text="@string/marker_off"
+				        android:drawablePadding="4dp"
+				        android:gravity="start|center_vertical"
+				        android:id="@+id/markerDisplayButton"
+				        android:onClick="toggleMarkerDisplay"
+				        android:drawableLeft="@drawable/ic_border_clear_white_24dp"
+				        android:drawableStart="@drawable/ic_border_clear_white_24dp"
+				        grid:layout_gravity="center_horizontal"
+				        android:shadowColor="#4000"
+				        android:shadowDy="2"
+				        android:shadowRadius="2" />
+
+			</android.support.v7.widget.GridLayout>
 		</LinearLayout>
 
-		<ImageButton
-				android:layout_width="48dp"
-				android:layout_height="48dp"
-				android:id="@+id/settingsMenuButton"
-				android:layout_gravity="right"
-				android:src="@drawable/ic_more_horiz_white_24dp"
-				android:background="@drawable/camera_floating_action_button"
-				android:layout_marginRight="8dp"
-				android:layout_marginBottom="8dp"
-				android:onClick="showMenu" />
+		<ImageButton android:layout_width="48dp"
+		             android:layout_height="48dp"
+		             android:id="@+id/settingsMenuButton"
+		             android:layout_gravity="end"
+		             android:src="@drawable/ic_more_horiz_white_24dp"
+		             android:background="@drawable/camera_floating_action_button"
+		             android:onClick="showMenu"
+		             android:layout_alignParentEnd="true"
+		             android:layout_alignParentRight="true"
+		             android:layout_above="@+id/bottomView"
+		             android:layout_marginEnd="16dp"
+		             android:layout_marginBottom="16dp"
+		             android:contentDescription="@string/display_menu" />
 
 		<RelativeLayout android:id="@+id/bottomView"
 		                android:layout_width="fill_parent"
 		                android:layout_height="100dp"
 		                android:layout_gravity="bottom"
-		                android:background="@color/viewfinder_mask">
+		                android:background="@color/viewfinder_mask"
+		                android:layout_alignParentLeft="true"
+		                android:layout_alignParentBottom="true"
+		                android:layout_alignParentRight="true"
+		                android:layout_alignParentEnd="true"
+		                android:layout_alignParentStart="true">
 
 			<TextView android:layout_width="fill_parent"
 			          android:layout_height="fill_parent"
 			          android:id="@+id/modeText"
 			          android:text="@string/mode_active_detect"
 			          style="@style/Base.TextAppearance.AppCompat.Medium"
-			          android:gravity="center" />
+			          android:gravity="center"
+					/>
 		</RelativeLayout>
-	</LinearLayout>
+	</RelativeLayout>
 </merge>

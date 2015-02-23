@@ -206,7 +206,7 @@ public class ExperienceEditActivity extends ActionBarActivity
 					}
 				});
 
-		Format format = new IntRangeFormat(properties.get("minRegions"), properties.get("maxRegions"), 1, 20);
+		Format format = new IntRangeFormat(properties.get("minRegions"), properties.get("maxRegions"), 2, 20);
 		properties.get("maxRegions").formatAs(format)
 				.bindTo(R.id.markerRegions);
 		properties.get("minRegions").formatAs(format)

@@ -26,7 +26,7 @@ public class Marker
 	private String title;
 	private String description;
 	private String image;
-	private boolean showDetail = true;
+	private boolean showDetail = false;
 
 	public String getCode()
 	{

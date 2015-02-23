@@ -19,5 +19,4 @@
   -->
 <resources>
 	<dimen name="padding">16dp</dimen>
-	<dimen name="imageHeight">150dp</dimen>
 </resources>

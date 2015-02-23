@@ -46,7 +46,7 @@ public class AestheticodesActivity extends ScanActivity implements ExperienceLis
 {
 	private ExperienceListAdapter experiences;
 	private Button markerButton;
-	private boolean autoOpen = true;
+	private boolean autoOpen = false;
 	private String currentCode = null;
 
 
@@ -99,11 +99,11 @@ public class AestheticodesActivity extends ScanActivity implements ExperienceLis
 						{
 							if (marker.getTitle() != null && !marker.getTitle().isEmpty())
 							{
-								markerButton.setText(marker.getTitle());
+								markerButton.setText(getString(R.string.marker_open, marker.getTitle()));
 							}
 							else
 							{
-								markerButton.setText(getString(R.string.code_text, marker.getCode()));
+								markerButton.setText(getString(R.string.marker_open_code, marker.getCode()));
 							}
 							markerButton.setOnClickListener(new View.OnClickListener()
 							{
@@ -113,27 +113,26 @@ public class AestheticodesActivity extends ScanActivity implements ExperienceLis
 									openMarker(marker);
 								}
 							});
-						}
-						else
-						{
-							markerButton.setText("Unknown Marker " + markerCode);
-							markerButton.setCompoundDrawablesWithIntrinsicBounds(0,0,R.drawable.ic_add_white_36dp, 0);
-							markerButton.setOnClickListener(new View.OnClickListener()
-							{
-								@Override
-								public void onClick(View v)
-								{
-									// TODO Add marker
-								}
-							});
-						}
 
-						if(oldCode == null)
-						{
-							Log.i("", "Slide in");
-							markerButton.setVisibility(View.VISIBLE);
-							markerButton.startAnimation(AnimationUtils.loadAnimation(AestheticodesActivity.this, R.anim.slide_in));
+							if(oldCode == null)
+							{
+								Log.i("", "Slide in");
+								markerButton.setVisibility(View.VISIBLE);
+								markerButton.startAnimation(AnimationUtils.loadAnimation(AestheticodesActivity.this, R.anim.slide_in));
+							}
 						}
+						//else
+						//{
+							//markerButton.setText("Unknown Marker " + markerCode);
+							//markerButton.setCompoundDrawablesWithIntrinsicBounds(0,0,R.drawable.ic_add_white_36dp, 0);
+							//markerButton.setOnClickListener(new View.OnClickListener()
+							//{
+							//	@Override
+							//	public void onClick(View v)
+							//	{
+							//	}
+							//});
+						//}
 					}
 				});
 			}
@@ -177,7 +176,7 @@ public class AestheticodesActivity extends ScanActivity implements ExperienceLis
 		super.onCreate(savedInstanceState);
 		getWindow().addFlags(WindowManager.LayoutParams.FLAG_KEEP_SCREEN_ON);
 
-		View view = getLayoutInflater().inflate(R.layout.marker_button, getRootView());
+		View view = getLayoutInflater().inflate(R.layout.marker_button, bottomView);
 		markerButton = (Button) view.findViewById(R.id.markerButton);
 		
 		experiences = new ExperienceListAdapter(getSupportActionBar().getThemedContext(), Aestheticodes.getExperiences());
@@ -262,11 +261,13 @@ public class AestheticodesActivity extends ScanActivity implements ExperienceLis
 		});
 		if (autoOpen)
 		{
-			autoOpenButton.setText("Open Automatically");
+			autoOpenButton.setText(getString(R.string.auto_open));
+			autoOpenButton.setCompoundDrawablesWithIntrinsicBounds(uk.ac.horizon.aestheticodes.core.R.drawable.ic_open_in_new_white_24dp, 0, 0, 0);
 		}
 		else
 		{
-			autoOpenButton.setText("Open Manually");
+			autoOpenButton.setText(getString(R.string.auto_open_off));
+			autoOpenButton.setCompoundDrawablesWithIntrinsicBounds(R.drawable.ic_popup_white_24dp, 0, 0, 0);
 		}
 	}
 

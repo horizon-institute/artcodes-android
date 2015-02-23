@@ -21,6 +21,8 @@
 	<string name="app_name">Artcodes</string>
 	<string name="property_set">Set %s</string>
 	<string name="code_text">Marker %s</string>
+	<string name="marker_open">Open %s</string>
+	<string name="marker_open_code">Open Marker %s</string>
 	<string name="action_experiences">Experiences</string>
 	<string name="marker_add">Add Marker</string>
 	<string name="dialog_action_set">Set</string>

@@ -168,7 +168,7 @@ public class Experience
 
 		if(!hasValidChecksum(markerCodes))
 		{
-			return "Region Total not Divisable §by " + checksumModulo;
+			return "Region Total not Divisable by " + checksumModulo;
 		}
 
 		if(!hasValidationRegions(markerCodes))
