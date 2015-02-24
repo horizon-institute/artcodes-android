@@ -158,8 +158,7 @@ class MarkerCode
      */
     static MarkerCode findMarker(Mat hierarchy, int rootIndex, Experience experience)
     {
-        double[] nodes = hierarchy.get(0, rootIndex);
-        int currentRegionIndex = (int) nodes[MarkerCode.FIRST_NODE];
+        int currentRegionIndex = (int) hierarchy.get(0, rootIndex)[MarkerCode.FIRST_NODE];
         if (currentRegionIndex < 0)
         {
             return null; // There are no regions.
@@ -168,9 +167,10 @@ class MarkerCode
         int regions = 0;
         int emptyRegions = 0;
         List<Integer> code = null;
+        Integer embeddedChecksumValue = null;
 
         // Loop through the regions, verifing the value of each:
-        while (currentRegionIndex >= 0)
+        for (;currentRegionIndex >= 0; currentRegionIndex = (int) hierarchy.get(0, currentRegionIndex)[MarkerCode.NEXT_NODE])
         {
             final int regionValue = MarkerCode.getRegionValue(currentRegionIndex, hierarchy, experience.getMaxRegionValue());
             if (regionValue == MarkerCode.REGION_EMPTY)
@@ -183,6 +183,16 @@ class MarkerCode
 
             if (regionValue == MarkerCode.REGION_INVALID)
             {
+                // Not a normal region so look for embedded checksum:
+                if (experience.getEmbeddedChecksum() && embeddedChecksumValue == null) // if we've not found it yet:
+                {
+                    embeddedChecksumValue = MarkerCode.getEmbeddedChecksumValueForRegion(currentRegionIndex, hierarchy);
+                    if (embeddedChecksumValue != null)
+                    {
+                        continue; // this is a checksum region, so continue looking for regions
+                    }
+                }
+
                 return null; // Too many levels or dots.
             }
 
@@ -197,10 +207,6 @@ class MarkerCode
                 code = new ArrayList<>();
             }
             code.add(regionValue);
-
-            // Get next region:
-            nodes = hierarchy.get(0, currentRegionIndex);
-            currentRegionIndex = (int) nodes[MarkerCode.NEXT_NODE];
         }
 
         // Marker should have at least one non-empty branch. If all branches are empty then return false.
@@ -209,9 +215,9 @@ class MarkerCode
             return null;
         }
 
-        if (experience.isValidMarker(code))
+        Collections.sort(code); // Sort before checking if valid because this could effect the embedded checksum
+        if (experience.isValidMarker(code, embeddedChecksumValue))
         {
-            Collections.sort(code);
             return new MarkerCode(code, rootIndex);
         }
 
@@ -226,4 +232,43 @@ class MarkerCode
         double[] nodes = hierarchy.get(0, nodeIndex);
         return nodes[FIRST_NODE] < 0;
     }
+
+    private static Integer getEmbeddedChecksumValueForRegion(int regionIndex, Mat hierarchy)
+    {
+        // Find the first dot index:
+        double[] nodes = hierarchy.get(0, regionIndex);
+        int currentDotIndex = (int) nodes[FIRST_NODE];
+        if (currentDotIndex < 0)
+        {
+            return null; // There are no dots in this region.
+        }
+
+        // Count all the dots and check if they are leaf nodes in the hierarchy:
+        int dotCount = 0;
+        while (currentDotIndex >= 0)
+        {
+            if (verifyAsDoubleLeaf(currentDotIndex, hierarchy))
+            {
+                dotCount++;
+                // Get next dot node:
+                nodes = hierarchy.get(0, currentDotIndex);
+                currentDotIndex = (int) nodes[NEXT_NODE];
+            }
+            else
+            {
+                return null; // Dot is not a leaf in the hierarchy.
+            }
+        }
+
+        return dotCount;
+    }
+
+    private static Boolean verifyAsDoubleLeaf(int nodeIndex, Mat hierarchy)
+    {
+        double[] nodes = hierarchy.get(0, nodeIndex);
+        return nodes[FIRST_NODE] >= 0 && // has a child node, and
+                hierarchy.get(0,(int)nodes[FIRST_NODE])[NEXT_NODE] < 0 && //the child has no siblings, and
+                verifyAsLeaf((int)nodes[FIRST_NODE], hierarchy);// the child is a leaf
+    }
+
 }

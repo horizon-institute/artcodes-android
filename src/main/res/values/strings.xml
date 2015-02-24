@@ -68,6 +68,7 @@
 	<string name="checksumModulo_desc" tools:ignore="UnusedResources">The Artcode checksum: the sum of all regions
 		must be divisible by this value to be valid.
 	</string>
+    <string name="embeddedChecksum">Embedded Checksum</string>
 
 	<string name="markerDeleteConfirmTitle">Delete Marker %s?</string>
 	<string name="markerDeleteConfirmMessage">Marker %s will be permanently deleted</string>

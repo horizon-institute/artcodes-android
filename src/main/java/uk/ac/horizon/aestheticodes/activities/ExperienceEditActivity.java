@@ -206,6 +206,8 @@ public class ExperienceEditActivity extends ActionBarActivity
 					}
 				});
 
+        properties.get("embeddedChecksum").bindTo(R.id.embeddedChecksum);
+
 		Format format = new IntRangeFormat(properties.get("minRegions"), properties.get("maxRegions"), 2, 20);
 		properties.get("maxRegions").formatAs(format)
 				.bindTo(R.id.markerRegions);

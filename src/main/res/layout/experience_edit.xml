@@ -245,6 +245,22 @@
 				          android:textSize="14sp"
 				          android:textColor="#999" />
 			</LinearLayout>
+            <!-- Embedded checksum (switch) -->
+            <LinearLayout android:layout_width="fill_parent"
+                android:layout_height="72dp"
+                android:paddingTop="16dp"
+                android:paddingBottom="16dp"
+                android:orientation="vertical"
+                android:paddingLeft="56dp"
+                android:paddingStart="56dp">
+
+                <android.support.v7.widget.SwitchCompat
+                    android:id="@+id/embeddedChecksum"
+                    android:layout_width="fill_parent"
+                    android:layout_height="wrap_content"
+                    android:text="@string/embeddedChecksum" />
+
+            </LinearLayout>
 		</LinearLayout>
 	</LinearLayout>
 </ScrollView>

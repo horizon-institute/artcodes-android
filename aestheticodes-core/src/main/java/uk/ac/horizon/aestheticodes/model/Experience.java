@@ -58,6 +58,7 @@ public class Experience
 	private int validationRegions = 0;
 	private int validationRegionValue = 1;
 	private int checksumModulo = 3;
+	private boolean embeddedChecksum = false;
 	private Threshold threshold = Threshold.temporalTile;
 
 	public Experience()
@@ -138,7 +139,7 @@ public class Experience
 		this.image = image;
 	}
 
-	public String getMarkerError(List<Integer> markerCodes)
+	public String getMarkerError(List<Integer> markerCodes, Integer embeddedChecksum)
 	{
 		if(markerCodes == null)
 		{
@@ -166,10 +167,20 @@ public class Experience
 			}
 		}
 
-		if(!hasValidChecksum(markerCodes))
-		{
-			return "Region Total not Divisable by " + checksumModulo;
-		}
+        if(embeddedChecksum==null && !hasValidChecksum(markerCodes))
+        {
+            return "Region Total not Divisable by " + checksumModulo;
+        }
+        else if(this.embeddedChecksum && embeddedChecksum!=null && !hasValidEmbeddedChecksum(markerCodes, embeddedChecksum))
+        {
+            return "Region Total not Divisable by " + embeddedChecksum.toString();
+        }
+        else if (!this.embeddedChecksum && embeddedChecksum!=null)
+        {
+            // Embedded checksum is turned off yet one was provided to this function (this should never happen unless the settings are changed in the middle of detection)
+            return "Embedded checksum markers are not valid.";
+        }
+
 
 		if(!hasValidationRegions(markerCodes))
 		{
@@ -232,7 +243,7 @@ public class Experience
 			}
 		}
 
-		return getMarkerError(codes);
+		return getMarkerError(codes, null);
 	}
 
 	public Map<String, Marker> getMarkers()
@@ -280,6 +291,16 @@ public class Experience
 		this.minRegions = minRegions;
 	}
 
+	public boolean getEmbeddedChecksum()
+	{
+		return embeddedChecksum;
+	}
+
+	public void setEmbeddedChecksum(boolean embeddedChecksum)
+	{
+		this.embeddedChecksum = embeddedChecksum;
+	}
+
 	public String getName()
 	{
 		return name;
@@ -302,7 +323,7 @@ public class Experience
 
 			while (true)
 			{
-				if (isValidMarker(marker))
+				if (isValidMarker(marker, null))
 				{
 					StringBuilder result = new StringBuilder();
 					for (int index = 0; index < size; index++)
@@ -408,9 +429,9 @@ public class Experience
 		this.version = version;
 	}
 
-	public boolean isValidMarker(List<Integer> markerCodes)
+	public boolean isValidMarker(List<Integer> markerCodes, Integer embeddedChecksum)
 	{
-		return getMarkerError(markerCodes) == null;
+		return getMarkerError(markerCodes, embeddedChecksum) == null;
 	}
 
 	public boolean isValidMarker(String marker, boolean partial)
@@ -470,7 +491,7 @@ public class Experience
 			}
 		}
 
-		return partial || isValidMarker(codes);
+		return partial || isValidMarker(codes, null);
 	}
 
 	/**
@@ -493,6 +514,17 @@ public class Experience
 		}
 		return (numberOfLeaves % checksumModulo) == 0;
 	}
+
+    private boolean hasValidEmbeddedChecksum(List<Integer> code, Integer embeddedChecksum)
+    {
+        // Find weighted sum of code, e.g. 1:1:2:4:4 -> 1*1 + 1*2 + 2*3 + 4*4 + 4*5 = 45
+        int weightedSum = 0;
+        for (int i=0; i<code.size(); ++i)
+        {
+            weightedSum += code.get(i).intValue() * (i+1);
+        }
+        return embeddedChecksum.intValue() == (weightedSum%7 == 0 ? 7 : weightedSum%7);
+    }
 
 	private boolean hasValidNumberofEmptyRegions(List<Integer> marker)
 	{
