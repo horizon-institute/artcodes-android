@@ -27,11 +27,16 @@
 	<uses-permission android:name="android.permission.GET_ACCOUNTS" />
 	<uses-permission android:name="android.permission.USE_CREDENTIALS" />
 
-	<uses-feature android:name="android.hardware.camera" android:required="false" />
-	<uses-feature android:name="android.hardware.camera.any" android:required="false" />
-	<uses-feature android:name="android.hardware.camera.front" android:required="false" />
-	<uses-feature android:name="android.hardware.camera.autofocus" android:required="false" />
-	<uses-feature android:name="android.hardware.camera.flash" android:required="false" />
+	<uses-feature android:name="android.hardware.camera"
+	              android:required="false" />
+	<uses-feature android:name="android.hardware.camera.any"
+	              android:required="false" />
+	<uses-feature android:name="android.hardware.camera.front"
+	              android:required="false" />
+	<uses-feature android:name="android.hardware.camera.autofocus"
+	              android:required="false" />
+	<uses-feature android:name="android.hardware.camera.flash"
+	              android:required="false" />
 	<uses-feature android:name="android.hardware.touchscreen" />
 
 	<application
@@ -43,14 +48,40 @@
 			tools:ignore="UnusedAttribute">
 		<meta-data android:name="com.google.android.gms.version"
 		           android:value="@integer/google_play_services_version" />
-		<activity
-				android:name=".activities.AestheticodesActivity"
-				android:screenOrientation="portrait"
-				android:theme="@style/Theme.Aestheticodes.Camera">
+
+		<!--<activity android:name=".activities.TestScanActivity">
 			<intent-filter>
 				<action android:name="android.intent.action.MAIN" />
 
 				<category android:name="android.intent.category.LAUNCHER" />
+			</intent-filter>
+		</activity>-->
+
+		<activity android:name=".activities.AestheticodesActivity"
+		          android:screenOrientation="portrait"
+		          android:theme="@style/Theme.Aestheticodes.Camera">
+			<intent-filter>
+				<action android:name="android.intent.action.MAIN" />
+
+				<category android:name="android.intent.category.LAUNCHER" />
+			</intent-filter>
+			<intent-filter>
+				<action android:name="android.intent.action.VIEW" />
+
+				<category android:name="android.intent.category.DEFAULT" />
+				<category android:name="android.intent.category.BROWSABLE" />
+
+				<data android:mimeType="application/x-artcode" />
+				<data android:scheme="http" android:mimeType="application/x-artcode" />
+				<data android:scheme="https" android:mimeType="application/x-artcode" />
+
+				<data android:scheme="http"
+				      android:host="*"
+				      android:pathPattern=".*\\.artcode" />
+
+				<data android:scheme="https"
+				      android:host="*"
+				      android:pathPattern=".*\\.artcode" />
 			</intent-filter>
 		</activity>
 		<activity
@@ -60,6 +91,14 @@
 			<intent-filter>
 				<action android:name="uk.ac.horizon.aestheticodes.SCAN" />
 				<category android:name="android.intent.category.DEFAULT" />
+			</intent-filter>
+			<intent-filter>
+				<action android:name="android.intent.action.VIEW" />
+
+				<category android:name="android.intent.category.DEFAULT" />
+				<category android:name="android.intent.category.BROWSABLE" />
+
+				<data android:scheme="@string/artcode_scan_scheme" />
 			</intent-filter>
 		</activity>
 		<activity

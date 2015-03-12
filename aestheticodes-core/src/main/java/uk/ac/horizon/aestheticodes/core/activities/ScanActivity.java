@@ -27,6 +27,7 @@ import android.content.res.Resources;
 import android.graphics.Bitmap;
 import android.graphics.Color;
 import android.graphics.Rect;
+import android.net.Uri;
 import android.os.Build;
 import android.os.Bundle;
 import android.support.v7.app.ActionBarActivity;
@@ -52,6 +53,8 @@ import uk.ac.horizon.aestheticodes.controllers.MarkerDetector;
 import uk.ac.horizon.aestheticodes.core.R;
 import uk.ac.horizon.aestheticodes.model.Experience;
 import uk.ac.horizon.aestheticodes.views.ViewfinderView;
+
+import java.net.URLDecoder;
 
 public class ScanActivity extends ActionBarActivity implements ExperienceController.Listener, MarkerDetector.Listener
 {
@@ -85,8 +88,8 @@ public class ScanActivity extends ActionBarActivity implements ExperienceControl
 	protected MarkerDetector detector;
 	protected ViewfinderView viewfinder;
 	protected TextView modeText;
-	private SurfaceHolder holder;
 	protected RelativeLayout bottomView;
+	private SurfaceHolder holder;
 	private View settingsMenuButton;
 	private View settingsMenu;
 
@@ -145,10 +148,17 @@ public class ScanActivity extends ActionBarActivity implements ExperienceControl
 
 	public void markerChanged(final String markerCode)
 	{
-		Intent intent = getIntent();
-		intent.putExtra("marker", markerCode);
-		setResult(RESULT_OK, intent);
-		finish();
+		if (experience.get().getCallback() == null)
+		{
+			Intent intent = getIntent();
+			intent.putExtra("marker", markerCode);
+			setResult(RESULT_OK, intent);
+			finish();
+		}
+		else
+		{
+			startActivity(new Intent(Intent.ACTION_VIEW, Uri.parse(experience.get().getCallback().replace("{code}", markerCode))));
+		}
 	}
 
 	@Override
@@ -182,11 +192,14 @@ public class ScanActivity extends ActionBarActivity implements ExperienceControl
 		//noinspection deprecation
 		holder.setType(SurfaceHolder.SURFACE_TYPE_PUSH_BUFFERS);
 
-		bottomView = (RelativeLayout)findViewById(R.id.bottomView);
+		bottomView = (RelativeLayout) findViewById(R.id.bottomView);
 
 		settingsMenuButton = findViewById(R.id.settingsMenuButton);
 		settingsMenu = findViewById(R.id.settingsMenu);
 		modeText = (TextView) findViewById(R.id.modeText);
+
+		Log.i(TAG, "Intent onCreate: " + getIntent());
+		onNewIntent(getIntent());
 	}
 
 	@Override
@@ -218,11 +231,6 @@ public class ScanActivity extends ActionBarActivity implements ExperienceControl
 		});
 	}
 
-	protected ViewGroup getRootView()
-	{
-		return (ViewGroup)bottomView.getRootView();
-	}
-
 	public void showMenu(View view)
 	{
 		updateMenu();
@@ -231,7 +239,7 @@ public class ScanActivity extends ActionBarActivity implements ExperienceControl
 			final int cx = (settingsMenuButton.getLeft() + settingsMenuButton.getRight()) / 2;
 			final int cy = ((settingsMenuButton.getTop() + settingsMenuButton.getBottom()) / 2) - settingsMenu.getTop();
 
-			Log.i("", "Circle center " + cx + ", " + cy + " width " + bottomView.getWidth());
+			Log.i(TAG, "Circle center " + cx + ", " + cy + " width " + bottomView.getWidth());
 
 			final Animator anim = ViewAnimationUtils.createCircularReveal(settingsMenu, cx, cy, 0, bottomView.getWidth());
 
@@ -275,6 +283,8 @@ public class ScanActivity extends ActionBarActivity implements ExperienceControl
 	{
 		super.onNewIntent(intent);
 
+		String artcode_scheme = getString(R.string.artcode_scan_scheme);
+		Log.i(TAG, "New Intent: " + intent);
 		if (intent.getStringExtra("experience") != null)
 		{
 			try
@@ -286,6 +296,34 @@ public class ScanActivity extends ActionBarActivity implements ExperienceControl
 			catch (Exception e)
 			{
 				Log.w(TAG, e.getMessage(), e);
+			}
+		}
+		else if (artcode_scheme.equals(intent.getScheme()))
+		{
+			String data = intent.getData().toString();
+			Log.i(TAG, "Data: " + data);
+
+			if (data.startsWith(artcode_scheme + ":"))
+			// should!
+			{
+				data = data.substring(artcode_scheme.length() + 1);
+				if(data.startsWith("//"))
+				{
+					data = data.substring(2);
+				}
+			}
+			try
+			{
+				Log.i(TAG, "Data: " + data);
+				data = URLDecoder.decode(data, "UTF-8");
+				Gson gson = ExperienceParser.createParser();
+				Experience intentExperience = gson.fromJson(data, Experience.class);
+				experience.set(intentExperience);
+			}
+			catch (Exception e)
+			{
+				Log.e(TAG, "Error decoding experience " + data + ": " + e);
+				finish();
 			}
 		}
 	}
@@ -396,7 +434,7 @@ public class ScanActivity extends ActionBarActivity implements ExperienceControl
 
 //	private void setMode(MarkerDetector.Mode mode)
 //	{
-//		Log.i("", "Set mode to " + mode);
+//		Log.i(TAG, "Set mode to " + mode);
 //		//detector.setMode(mode);
 //		viewfinder.invalidate();
 //		modeText.setText(getTextString(MODE_ACTIVE_PREFIX + mode.name(), mode.name()));

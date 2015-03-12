@@ -21,13 +21,62 @@ package uk.ac.horizon.aestheticodes.controllers;
 
 import com.google.gson.Gson;
 import com.google.gson.GsonBuilder;
+import com.google.gson.JsonArray;
+import com.google.gson.JsonDeserializationContext;
+import com.google.gson.JsonDeserializer;
+import com.google.gson.JsonElement;
+import com.google.gson.JsonParseException;
+import com.google.gson.JsonSerializationContext;
+import com.google.gson.JsonSerializer;
 import com.google.gson.reflect.TypeToken;
 import uk.ac.horizon.aestheticodes.model.Marker;
 
+import java.lang.reflect.Type;
+import java.util.HashMap;
 import java.util.Map;
 
 public class ExperienceParser
 {
+	public static class MarkerMapAdapter implements JsonDeserializer<Map<String, Marker>>, JsonSerializer<Map<String, Marker>>
+	{
+		@Override
+		public Map<String, Marker> deserialize(JsonElement json, Type unused, JsonDeserializationContext context)
+				throws JsonParseException
+		{
+			if (!json.isJsonArray())
+			{
+				throw new JsonParseException("Unexpected type: " + json.getClass().getSimpleName());
+			}
+
+			Map<String, Marker> result = new HashMap<String, Marker>();
+			JsonArray array = json.getAsJsonArray();
+			for (JsonElement element : array)
+			{
+				if (element.isJsonObject())
+				{
+					Marker marker = context.deserialize(element, Marker.class);
+					result.put(marker.getCode(), marker);
+				}
+				else
+				{
+					throw new JsonParseException("some meaningful message");
+				}
+			}
+			return result;
+		}
+
+		@Override
+		public JsonElement serialize(Map<String, Marker> src, Type typeOfSrc, JsonSerializationContext context)
+		{
+			final JsonArray array = new JsonArray();
+			for (Marker marker : src.values())
+			{
+				array.add(context.serialize(marker));
+			}
+			return array;
+		}
+	}
+
 	public static Gson createParser()
 	{
 		GsonBuilder build = new GsonBuilder();

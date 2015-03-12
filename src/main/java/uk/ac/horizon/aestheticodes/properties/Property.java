@@ -19,12 +19,15 @@
 
 package uk.ac.horizon.aestheticodes.properties;
 
+import android.util.Log;
 import android.view.View;
 import uk.ac.horizon.aestheticodes.properties.bindings.ViewBinding;
 import uk.ac.horizon.aestheticodes.properties.bindings.ViewBindingFactory;
 
 import java.beans.PropertyChangeListener;
 import java.lang.reflect.Field;
+import java.lang.reflect.InvocationTargetException;
+import java.lang.reflect.Method;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -34,6 +37,7 @@ public final class Property
 	private final List<ViewBinding> bindings = new ArrayList<>();
 	private final Properties properties;
 	private Field field;
+	private Method get;
 	private Object value;
 	private Format format;
 
@@ -96,21 +100,42 @@ public final class Property
 		return format.getError(value) == null;
 	}
 
+	private String getMethodName()
+	{
+		return "get" + name.substring(0,1).toUpperCase() + name.substring(1);
+	}
+
 	public void load()
 	{
 		try
 		{
-			if (field == null)
+			if (field == null && get == null)
 			{
-				field = properties.getObject().getClass().getDeclaredField(name);
-				field.setAccessible(true);
+				try
+				{
+					field = properties.getObject().getClass().getDeclaredField(name);
+					field.setAccessible(true);
+				}
+				catch(NoSuchFieldException e)
+				{
+					get = properties.getObject().getClass().getDeclaredMethod(getMethodName());
+					get.setAccessible(true);
+				}
 			}
-			set(field.get(properties.getObject()));
+
+			if(field != null)
+			{
+				set(field.get(properties.getObject()));
+			}
+			else if(get != null)
+			{
+				set(get.invoke(properties.getObject()));
+			}
 			refresh();
 		}
-		catch (NoSuchFieldException | IllegalAccessException e)
+		catch (NoSuchMethodException | IllegalAccessException | InvocationTargetException e)
 		{
-			e.printStackTrace();
+			Log.e("", e.getMessage(), e);
 		}
 	}
 
@@ -132,7 +157,7 @@ public final class Property
 
 	public Object get()
 	{
-		if (field == null)
+		if (field == null && get == null)
 		{
 			load();
 		}

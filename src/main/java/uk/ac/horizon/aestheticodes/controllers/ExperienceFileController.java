@@ -19,52 +19,38 @@
 
 package uk.ac.horizon.aestheticodes.controllers;
 
+import android.content.Context;
 import android.util.Log;
 import com.google.gson.Gson;
 import uk.ac.horizon.aestheticodes.model.Experience;
 
+import java.io.File;
+import java.io.FileWriter;
+import java.util.ArrayList;
 import java.util.Collection;
-import java.util.HashSet;
 
-public class ExperienceController
+public class ExperienceFileController
 {
-	public static interface Listener
+	public static void save(Context context, ExperienceListController experiences)
 	{
-		void experienceSelected(Experience experience);
-	}
-
-	private final Collection<Listener> listeners = new HashSet<>();
-	private Experience experience = new Experience();
-
-	public ExperienceController()
-	{
-	}
-
-	public void addListener(Listener listener)
-	{
-		listeners.add(listener);
-	}
-
-	public Experience get()
-	{
-		return experience;
-	}
-
-	public void removeListener(Listener listener)
-	{
-		listeners.remove(listener);
-	}
-
-	public void set(final Experience experience)
-	{
-		this.experience = experience;
-		Gson gson = ExperienceParser.createParser();
-		Log.i("", "Set experience to " + gson.toJson(experience));
-
-		for (final Listener listener : listeners)
+		try
 		{
-			listener.experienceSelected(experience);
+			final File experienceFile = new File(context.getFilesDir(), "experiences.json");
+			final FileWriter writer = new FileWriter(experienceFile);
+			final Collection<Experience> saveExperiences = new ArrayList<>();
+			for (Experience experience : experiences.get())
+			{
+				saveExperiences.add(experience);
+			}
+			Gson gson = ExperienceParser.createParser();
+			gson.toJson(saveExperiences, writer);
+
+			writer.flush();
+			writer.close();
+		}
+		catch (Exception e)
+		{
+			Log.e("", e.getMessage(), e);
 		}
 	}
 }
-

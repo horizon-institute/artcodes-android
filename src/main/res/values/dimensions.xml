@@ -19,4 +19,7 @@
   -->
 <resources>
 	<dimen name="padding">16dp</dimen>
+
+	<dimen name="action_button_min_width">56dp</dimen>
+	<dimen name="indeterminate_progress_size">32dp</dimen>
 </resources>

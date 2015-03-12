@@ -19,6 +19,7 @@
 
 package uk.ac.horizon.aestheticodes.activities;
 
+import android.app.DatePickerDialog;
 import android.content.Intent;
 import android.os.Bundle;
 import android.support.v4.app.DialogFragment;
@@ -27,17 +28,19 @@ import android.support.v7.app.ActionBarActivity;
 import android.view.LayoutInflater;
 import android.view.MenuItem;
 import android.view.View;
+import android.widget.DatePicker;
 import android.widget.ImageView;
 import android.widget.LinearLayout;
 import uk.ac.horizon.aestheticodes.Aestheticodes;
 import uk.ac.horizon.aestheticodes.R;
+import uk.ac.horizon.aestheticodes.controllers.ExperienceFileController;
 import uk.ac.horizon.aestheticodes.controllers.ExperienceListController;
-import uk.ac.horizon.aestheticodes.controllers.ExperienceListUpdater;
 import uk.ac.horizon.aestheticodes.dialogs.IntDialogFragment;
 import uk.ac.horizon.aestheticodes.dialogs.IntRangeDialogFragment;
 import uk.ac.horizon.aestheticodes.dialogs.MarkerEditDialog;
 import uk.ac.horizon.aestheticodes.model.Experience;
 import uk.ac.horizon.aestheticodes.model.Marker;
+import uk.ac.horizon.aestheticodes.properties.DateFormat;
 import uk.ac.horizon.aestheticodes.properties.Format;
 import uk.ac.horizon.aestheticodes.properties.IntFormat;
 import uk.ac.horizon.aestheticodes.properties.IntRangeFormat;
@@ -46,6 +49,7 @@ import uk.ac.horizon.aestheticodes.properties.URLFormat;
 import uk.ac.horizon.aestheticodes.properties.bindings.ClickBinding;
 
 import java.util.ArrayList;
+import java.util.Calendar;
 import java.util.Collections;
 import java.util.Comparator;
 import java.util.List;
@@ -88,7 +92,7 @@ public class ExperienceEditActivity extends ActionBarActivity
 				{
 					experience.setOp(Experience.Operation.update);
 				}
-				ExperienceListUpdater.save(this, experiences);
+				ExperienceFileController.save(this, experiences);
 				Intent intent = new Intent(this, ExperienceActivity.class);
 				intent.putExtra("experience", experience.getId());
 
@@ -122,6 +126,10 @@ public class ExperienceEditActivity extends ActionBarActivity
 			@Override
 			public int compare(Marker markerAction, Marker markerAction2)
 			{
+				if(markerAction.getCode().length() != markerAction2.getCode().length())
+				{
+					return markerAction.getCode().length() - markerAction2.getCode().length();
+				}
 				return markerAction.getCode().compareTo(markerAction2.getCode());
 			}
 		});
@@ -130,6 +138,7 @@ public class ExperienceEditActivity extends ActionBarActivity
 		{
 			View view = inflater.inflate(R.layout.marker_listitem, markerList, false);
 			Properties markerProperties = new Properties(this, marker, view);
+			markerProperties.get("title").bindTo(R.id.markerTitle);
 			markerProperties.get("code").bindTo(R.id.markerCode);
 			markerProperties.get("action").formatAs(new URLFormat()).bindTo(R.id.markerAction);
 			markerProperties.load();
@@ -179,10 +188,36 @@ public class ExperienceEditActivity extends ActionBarActivity
 		properties.get("name").bindTo(R.id.experienceTitle);
 		properties.get("description").bindTo(R.id.experienceDescription);
 
-		properties.get("icon").formatAs(new URLFormat())
-				.bindTo(R.id.experienceIcon);
+		properties.get("icon").formatAs(new URLFormat()).bindTo(R.id.experienceIcon);
 		properties.get("image").formatAs(new URLFormat())
-				.bindTo(R.id.experienceImage);
+				.bindTo(R.id.experienceImage)
+				.bindTo(R.id.experienceImagePreview);
+
+		properties.get("location").bindTo(R.id.experienceLocation);
+
+		properties.get("start").formatAs(new DateFormat())
+				.bindTo(R.id.experienceStart)
+				.bindTo(new ClickBinding(R.id.experienceStart) {
+					@Override
+					public void onClick(View v)
+					{
+						final Calendar c = Calendar.getInstance();
+						final DatePickerDialog dpd = new DatePickerDialog(ExperienceEditActivity.this,
+								new DatePickerDialog.OnDateSetListener() {
+
+									@Override
+									public void onDateSet(DatePicker view, int year, int month, int day)
+									{
+										Calendar calendar = Calendar.getInstance();
+										calendar.set(year, month, day);
+
+										properties.get("start").set(calendar.getTime());
+									}
+								}, c.get(Calendar.YEAR), c.get(Calendar.MONTH), c.get(Calendar.DAY_OF_MONTH));
+						dpd.show();
+					}
+				});
+		properties.get("end").formatAs(new DateFormat()).bindTo(R.id.experienceStart);
 
 		properties.get("maxRegionValue").formatAs(new IntFormat(1, 20))
 				.bindTo(R.id.markerRegionValue)

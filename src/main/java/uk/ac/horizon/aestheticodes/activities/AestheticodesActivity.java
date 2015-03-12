@@ -48,11 +48,22 @@ public class AestheticodesActivity extends ScanActivity implements ExperienceLis
 	private Button markerButton;
 	private boolean autoOpen = false;
 	private String currentCode = null;
-
+	private String experienceURL = null;
 
 	@Override
 	public void experienceListChanged()
 	{
+		if(experienceURL != null)
+		{
+			for(Experience experience: experiences.getExperiences())
+			{
+				if(experienceURL.equals(experience.getOrigin()))
+				{
+					this.experience.set(experience);
+					return;
+				}
+			}
+		}
 		String selectedID = getPreferences(Context.MODE_PRIVATE).getString("experience", experience.get().getId());
 		Experience newSelected = experiences.getSelected(selectedID);
 		if (newSelected != null && newSelected != experience.get())
@@ -69,6 +80,24 @@ public class AestheticodesActivity extends ScanActivity implements ExperienceLis
 		List<Experience> experienceList = experiences.getExperiences();
 		int index = experienceList.indexOf(experience);
 		getSupportActionBar().setSelectedNavigationItem(index);
+	}
+
+
+	@Override
+	protected void onNewIntent(Intent intent)
+	{
+		if(intent.getAction().equals(Intent.ACTION_VIEW))
+		{
+			Uri data = intent.getData();
+			if(data != null)
+			{
+				this.experienceURL = data.toString();
+			}
+		}
+		else
+		{
+			super.onNewIntent(intent);
+		}
 	}
 
 	@Override
@@ -227,7 +256,7 @@ public class AestheticodesActivity extends ScanActivity implements ExperienceLis
 		super.onResume();
 		experiences.addListener(this);
 		experienceListChanged();
-		experiences.update();
+		experiences.update(experienceURL);
 	}
 
 	@Override

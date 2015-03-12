@@ -24,12 +24,14 @@ import android.accounts.AccountManager;
 import android.content.Context;
 import android.net.ConnectivityManager;
 import android.net.NetworkInfo;
+import android.net.Uri;
 import android.os.AsyncTask;
 import android.util.Log;
 import com.google.android.gms.auth.GoogleAuthUtil;
 import com.google.gson.Gson;
 import org.apache.http.HttpResponse;
 import org.apache.http.client.HttpClient;
+import org.apache.http.client.methods.HttpGet;
 import org.apache.http.client.methods.HttpPut;
 import org.apache.http.entity.StringEntity;
 import org.apache.http.impl.client.DefaultHttpClient;
@@ -38,7 +40,7 @@ import uk.ac.horizon.aestheticodes.model.Experience;
 
 import java.io.File;
 import java.io.FileReader;
-import java.io.FileWriter;
+import java.io.InputStream;
 import java.io.InputStreamReader;
 import java.net.URL;
 import java.util.ArrayList;
@@ -50,7 +52,7 @@ import java.util.List;
 import java.util.Map;
 import java.util.Set;
 
-public class ExperienceListUpdater extends AsyncTask<Void, Experience, Collection<String>>
+class ExperienceListUpdater extends AsyncTask<String, Experience, Collection<String>>
 {
 	private static final class ExperienceResults
 	{
@@ -87,32 +89,6 @@ public class ExperienceListUpdater extends AsyncTask<Void, Experience, Collectio
 
 	private static final String TAG = ExperienceListController.class.getName();
 
-	public static void save(Context context, ExperienceListController experiences)
-	{
-		try
-		{
-			final File experienceFile = new File(context.getFilesDir(), "experiences.json");
-			final FileWriter writer = new FileWriter(experienceFile);
-			final Collection<Experience> saveExperiences = new ArrayList<>();
-			for (Experience experience : experiences.get())
-			{
-				if (experience.getOp() != Experience.Operation.temp)
-				{
-					saveExperiences.add(experience);
-				}
-			}
-			Gson gson = ExperienceParser.createParser();
-			gson.toJson(saveExperiences, writer);
-
-			writer.flush();
-			writer.close();
-		}
-		catch (Exception e)
-		{
-			Log.e("", e.getMessage(), e);
-		}
-	}
-
 	private final Context context;
 	private final ExperienceListController experiences;
 
@@ -123,7 +99,7 @@ public class ExperienceListUpdater extends AsyncTask<Void, Experience, Collectio
 	}
 
 	@Override
-	protected Collection<String> doInBackground(Void... params)
+	protected Collection<String> doInBackground(String... experienceURLs)
 	{
 		final Gson gson = ExperienceParser.createParser();
 		Set<String> removals = new HashSet<>();
@@ -172,6 +148,45 @@ public class ExperienceListUpdater extends AsyncTask<Void, Experience, Collectio
 				}
 			}
 
+			for(String experienceURL: experienceURLs)
+			{
+				try
+				{
+					if (experienceURL.startsWith("http:") || experienceURL.startsWith("https:"))
+					{
+						ConnectivityManager cm = (ConnectivityManager) context.getSystemService(Context.CONNECTIVITY_SERVICE);
+						NetworkInfo netInfo = cm.getActiveNetworkInfo();
+						if (netInfo != null && netInfo.isConnectedOrConnecting())
+						{
+							HttpClient client = new DefaultHttpClient();
+							HttpGet get = new HttpGet(experienceURL);
+							HttpResponse response = client.execute(get);
+							if (response.getStatusLine().getStatusCode() == 200)
+							{
+								Experience experience = gson.fromJson(new InputStreamReader(response.getEntity().getContent()), Experience.class);
+								experience.setOp(Experience.Operation.add);
+								experience.setOrigin(experienceURL);
+
+								publishProgress(experience);
+							}
+						}
+					}
+					else if (experienceURL.startsWith("content:"))
+					{
+						final InputStream inputStream = context.getContentResolver().openInputStream(Uri.parse(experienceURL));
+						final Experience intentExperience = gson.fromJson(new InputStreamReader(inputStream, "UTF-8"), Experience.class);
+						intentExperience.setOp(Experience.Operation.add);
+						intentExperience.setOrigin(experienceURL);
+
+						publishProgress(intentExperience);
+					}
+				}
+				catch(Exception e)
+				{
+					Log.e("", e.getMessage(), e);
+				}
+			}
+
 			Log.i(TAG, "Updating...");
 			ConnectivityManager cm = (ConnectivityManager) context.getSystemService(Context.CONNECTIVITY_SERVICE);
 			NetworkInfo netInfo = cm.getActiveNetworkInfo();
@@ -191,12 +206,11 @@ public class ExperienceListUpdater extends AsyncTask<Void, Experience, Collectio
 						updates.experiences.add(new ExperienceOp(experience.getId(), Experience.Operation.remove));
 						changes = true;
 					}
-					else if (experience.getOp() != Experience.Operation.temp)
+					else
 					{
 						updates.experiences.add(experience);
 						changes = true;
 					}
-
 				}
 
 				if (changes || loaded)
@@ -247,7 +261,7 @@ public class ExperienceListUpdater extends AsyncTask<Void, Experience, Collectio
 			Log.i("", "Removing " + experienceID);
 			experiences.remove(experienceID);
 		}
-		save(context, experiences);
+		ExperienceFileController.save(context, experiences);
 	}
 
 	@Override

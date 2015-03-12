@@ -20,6 +20,7 @@
 package uk.ac.horizon.aestheticodes.model;
 
 import java.util.ArrayList;
+import java.util.Date;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
@@ -28,7 +29,7 @@ public class Experience
 {
 	public static enum Operation
 	{
-		create, retrieve, update, deleted, remove, temp
+		create, retrieve, update, deleted, add, remove
 	}
 
 	public static enum Threshold
@@ -45,7 +46,16 @@ public class Experience
 	private String description;
 	private int version = 1;
 	private String ownerID;
+	private String callback;
 
+	private String location;
+	private double lat;
+	private double lon;
+
+	private Date start;
+	private Date end;
+
+	private String origin;
 	private String originalID;
 	private int originalVersion;
 
@@ -94,6 +104,16 @@ public class Experience
 		return checksumModulo;
 	}
 
+	public String getOrigin()
+	{
+		return origin;
+	}
+
+	public void setCallback(String callback)
+	{
+		this.callback = callback;
+	}
+
 	public void setChecksumModulo(int checksumModulo)
 	{
 		this.checksumModulo = checksumModulo;
@@ -122,6 +142,11 @@ public class Experience
 	public String getId()
 	{
 		return id;
+	}
+
+	public String getCallback()
+	{
+		return callback;
 	}
 
 	public void setId(String id)
@@ -377,6 +402,11 @@ public class Experience
 	public String getOriginalID()
 	{
 		return originalID;
+	}
+
+	public void setOrigin(String origin)
+	{
+		this.origin = origin;
 	}
 
 	public void setOriginalID(String originalID)

@@ -20,6 +20,9 @@
 package uk.ac.horizon.aestheticodes.controllers;
 
 import android.content.Context;
+import android.net.Uri;
+import android.os.AsyncTask;
+import android.os.Handler;
 import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
@@ -44,6 +47,7 @@ public class ExperienceListAdapter extends BaseAdapter implements ExperienceList
 	private final ExperienceListController experienceController;
 	private List<Experience> experiences = new ArrayList<>();
 	private List<ExperienceListController.Listener> listeners = new ArrayList<>();
+	private static ExperienceListUpdater updater = null;
 
 	public ExperienceListAdapter(final Context context, final ExperienceListController experienceController)
 	{
@@ -175,8 +179,24 @@ public class ExperienceListAdapter extends BaseAdapter implements ExperienceList
 		listeners.remove(listener);
 	}
 
-	public void update()
+	public AsyncTask.Status getStatus()
 	{
-		new ExperienceListUpdater(context, experienceController).execute();
+		if(updater == null)
+		{
+			return AsyncTask.Status.FINISHED;
+		}
+		else
+		{
+			return updater.getStatus();
+		}
+	}
+
+	public void update(String... uris)
+	{
+		if(getStatus() == AsyncTask.Status.FINISHED)
+		{
+			updater = new ExperienceListUpdater(context, experienceController);
+			updater.execute(uris);
+		}
 	}
 }

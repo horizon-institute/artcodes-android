@@ -28,6 +28,7 @@ import java.util.Map;
 public class MarkerSelection
 {
 	private static final int REQUIRED = 5;
+	private static final int MAX = REQUIRED * 4;
 	private final Map<String, MarkerCode> occurrences = new HashMap<>();
 	private String current = null;
 
@@ -51,7 +52,7 @@ public class MarkerSelection
 			MarkerCode existing = occurrences.get(markerCode.getCodeKey());
 			if (existing != null)
 			{
-				existing.setOccurrences(Math.min(REQUIRED * 2, markerCode.getOccurrences() + existing.getOccurrences()));
+				existing.setOccurrences(Math.min(MAX, markerCode.getOccurrences() + existing.getOccurrences()));
 			}
 			else
 			{

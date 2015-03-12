@@ -21,15 +21,18 @@ package uk.ac.horizon.aestheticodes.properties;
 
 import android.text.InputFilter;
 import android.text.Spanned;
+import android.util.Log;
 import uk.ac.horizon.aestheticodes.model.Experience;
 
 public class MarkerFormat extends Format implements InputFilter
 {
 	private final Experience experience;
+	private final String original;
 
-	public MarkerFormat(Experience experience)
+	public MarkerFormat(Experience experience, String original)
 	{
 		this.experience = experience;
+		this.original = original;
 	}
 
 	@Override
@@ -55,13 +58,17 @@ public class MarkerFormat extends Format implements InputFilter
 			resultValid = experience.isValidMarker(destination.subSequence(0, destinationStart).toString() + sourceValue +
 					destination.subSequence(destinationEnd, destination.length()).toString(), true);
 		}
-		else if (!sourceValue.isEmpty())
+		else if (!sourceValue.isEmpty() && !sourceValue.equals(result))
 		{
-			if (experience.isValidMarker(destination.subSequence(0, destinationStart).toString() + sourceValue + ":" +
-					destination.subSequence(destinationEnd, destination.length()).toString(), true))
+			String[] segments = result.split(":");
+			if(segments.length < experience.getMinRegions())
 			{
-				sourceValue = sourceValue + ":";
-				resultValid = true;
+				if (experience.isValidMarker(destination.subSequence(0, destinationStart).toString() + sourceValue + ":" +
+						destination.subSequence(destinationEnd, destination.length()).toString(), true))
+				{
+					sourceValue = sourceValue + ":";
+					resultValid = true;
+				}
 			}
 		}
 
@@ -93,7 +100,7 @@ public class MarkerFormat extends Format implements InputFilter
 				return error;
 			}
 
-			if (experience.getMarkers().containsKey(text))
+			if (experience.getMarkers().containsKey(text) && !text.equals(original))
 			{
 				return "Code Already Exists";
 			}

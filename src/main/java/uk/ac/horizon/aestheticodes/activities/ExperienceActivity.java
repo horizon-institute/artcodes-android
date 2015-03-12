@@ -24,15 +24,16 @@ import android.content.DialogInterface;
 import android.content.Intent;
 import android.os.Bundle;
 import android.support.v4.app.NavUtils;
+import android.support.v4.view.MenuItemCompat;
 import android.support.v7.app.ActionBarActivity;
-import android.util.Log;
+import android.support.v7.widget.ShareActionProvider;
 import android.view.Menu;
 import android.view.MenuItem;
 import android.view.View;
 import uk.ac.horizon.aestheticodes.Aestheticodes;
 import uk.ac.horizon.aestheticodes.R;
+import uk.ac.horizon.aestheticodes.controllers.ExperienceFileController;
 import uk.ac.horizon.aestheticodes.controllers.ExperienceListController;
-import uk.ac.horizon.aestheticodes.controllers.ExperienceListUpdater;
 import uk.ac.horizon.aestheticodes.model.Experience;
 import uk.ac.horizon.aestheticodes.properties.Properties;
 import uk.ac.horizon.aestheticodes.properties.bindings.ColorImageBinding;
@@ -56,6 +57,11 @@ public class ExperienceActivity extends ActionBarActivity
 	{
 		getMenuInflater().inflate(R.menu.experience_actions, menu);
 
+		// Set up ShareActionProvider's default share intent
+		//MenuItem shareItem = menu.findItem(R.id.action_share);
+		//ShareActionProvider shareActionProvider = (ShareActionProvider) MenuItemCompat.getActionProvider(shareItem);
+		//shareActionProvider.setShareIntent(getShareIntent());
+
 		return super.onCreateOptionsMenu(menu);
 	}
 
@@ -74,7 +80,7 @@ public class ExperienceActivity extends ActionBarActivity
 					public void onClick(DialogInterface dialogInterface, int i)
 					{
 						experience.setOp(Experience.Operation.remove);
-						ExperienceListUpdater.save(ExperienceActivity.this, experiences);
+						ExperienceFileController.save(ExperienceActivity.this, experiences);
 						NavUtils.navigateUpTo(ExperienceActivity.this, new Intent(ExperienceActivity.this, ExperienceListActivity.class));
 					}
 				});
@@ -88,6 +94,16 @@ public class ExperienceActivity extends ActionBarActivity
 				});
 
 				confirmBuilder.create().show();
+				return true;
+
+			case R.id.action_share:
+				Intent intent = new Intent(Intent.ACTION_SEND);
+				intent.setType("text/plain");
+				intent.addFlags(Intent.FLAG_ACTIVITY_CLEAR_WHEN_TASK_RESET);
+
+				intent.putExtra(Intent.EXTRA_SUBJECT, experience.getName());
+				intent.putExtra(Intent.EXTRA_TEXT, "http://aestheticodes.appspot.com/experience/info/" + experience.getId());
+				startActivity(intent);
 				return true;
 		}
 		return super.onOptionsItemSelected(item);
@@ -113,5 +129,16 @@ public class ExperienceActivity extends ActionBarActivity
 		properties.get("image").bindTo(new ColorImageBinding(R.id.experienceImage, R.id.experienceFloatingAction));
 		//properties.get("editable").bindTo(new VisibilityBinding(R.id.experienceFloatingAction));
 		properties.load();
+	}
+
+	private Intent getShareIntent()
+	{
+		Intent intent = new Intent(Intent.ACTION_SEND);
+		intent.setType("text/plain");
+		intent.addFlags(Intent.FLAG_ACTIVITY_CLEAR_WHEN_TASK_RESET);
+
+		intent.putExtra(Intent.EXTRA_SUBJECT, experience.getName());
+		intent.putExtra(Intent.EXTRA_TEXT, "http://aestheticodes.appspot.com/experience/info/" + experience.getId());
+		return intent;
 	}
 }

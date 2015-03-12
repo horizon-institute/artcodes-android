@@ -19,25 +19,87 @@
 
 package uk.ac.horizon.aestheticodes.activities;
 
+import android.annotation.TargetApi;
 import android.content.Intent;
+import android.os.AsyncTask;
+import android.os.Build;
 import android.os.Bundle;
+import android.os.Handler;
 import android.support.v7.app.ActionBarActivity;
+import android.view.Menu;
+import android.view.MenuItem;
 import android.view.View;
 import android.widget.AdapterView;
 import android.widget.ListView;
 import uk.ac.horizon.aestheticodes.Aestheticodes;
 import uk.ac.horizon.aestheticodes.R;
 import uk.ac.horizon.aestheticodes.controllers.ExperienceListAdapter;
-import uk.ac.horizon.aestheticodes.controllers.ExperienceListController;
 import uk.ac.horizon.aestheticodes.model.Experience;
 
 public class ExperienceListActivity extends ActionBarActivity
 {
+	private final Handler handler = new Handler();
+	private final Runnable downloadClear = new Runnable()
+	{
+		@Override
+		public void run()
+		{
+			downloadItem.setIcon(R.drawable.ic_cloud_download_white_24dp);
+		}
+	};
+	private final Runnable downloadOver = new Runnable()
+	{
+		@Override
+		public void run()
+		{
+			if (experiences.getStatus() == AsyncTask.Status.FINISHED)
+			{
+				if (android.os.Build.VERSION.SDK_INT >= Build.VERSION_CODES.HONEYCOMB)
+				{
+					downloadItem.setActionView(null);
+				}
+				downloadItem.setIcon(R.drawable.ic_cloud_done_white_24dp);
+				handler.removeCallbacksAndMessages(null);
+				handler.postDelayed(downloadClear, 2000);
+
+			}
+			else
+			{
+				handler.removeCallbacksAndMessages(null);
+				handler.postDelayed(downloadClear, 1000);
+			}
+		}
+	};
 	private ExperienceListAdapter experiences;
+	private MenuItem downloadItem = null;
 
 	public void addExperience(View view)
 	{
 		startActivity(new Intent(this, ExperienceEditActivity.class));
+	}
+
+	@Override
+	public boolean onCreateOptionsMenu(Menu menu)
+	{
+		getMenuInflater().inflate(R.menu.experience_list_actions, menu);
+
+		downloadItem = menu.findItem(R.id.action_download);
+
+		updateDownloadStatus();
+
+		return super.onCreateOptionsMenu(menu);
+	}
+
+	@Override
+	public boolean onOptionsItemSelected(MenuItem item)
+	{
+		switch (item.getItemId())
+		{
+			case R.id.action_download:
+				experiences.update();
+				updateDownloadStatus();
+		}
+		return super.onOptionsItemSelected(item);
 	}
 
 	@Override
@@ -75,5 +137,27 @@ public class ExperienceListActivity extends ActionBarActivity
 	{
 		super.onResume();
 		experiences.update();
+		updateDownloadStatus();
+	}
+
+	@TargetApi(Build.VERSION_CODES.HONEYCOMB)
+	private void updateDownloadStatus()
+	{
+		if (downloadItem != null)
+		{
+			if (android.os.Build.VERSION.SDK_INT >= Build.VERSION_CODES.HONEYCOMB)
+			{
+				if (experiences.getStatus() == AsyncTask.Status.RUNNING)
+				{
+					downloadItem.setActionView(R.layout.actionbar_indeterminate_progress);
+					handler.removeCallbacksAndMessages(null);
+					handler.postDelayed(downloadOver, 1000);
+				}
+				else
+				{
+					downloadItem.setActionView(null);
+				}
+			}
+		}
 	}
 }

@@ -26,6 +26,7 @@ import android.content.DialogInterface;
 import android.os.Bundle;
 import android.support.annotation.NonNull;
 import android.support.v4.app.DialogFragment;
+import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.WindowManager;
@@ -66,19 +67,16 @@ public class MarkerEditDialog extends DialogFragment
 		@SuppressLint("InflateParams")
 		View view = inflater.inflate(R.layout.marker_edit, null);
 
+		final String originalCode = marker.getCode();
 		final Properties properties = new Properties(getActivity(), marker, view);
-		if (marker.getCode() != null)
-		{
-			View markerCode = view.findViewById(R.id.markerCode);
-			markerCode.setVisibility(View.GONE);
-			builder.setTitle(getResources().getString(R.string.code_text, marker.getCode()));
-		}
-		else
+		if (originalCode == null)
 		{
 			marker.setCode(activity.getExperience().getNextUnusedMarker());
-			properties.get("code").formatAs(new MarkerFormat(activity.getExperience())).bindTo(R.id.markerCode);
 		}
 
+		Log.i("", marker.getCode());
+
+		properties.get("code").formatAs(new MarkerFormat(activity.getExperience(), originalCode)).bindTo(R.id.markerCode);
 		properties.get("showDetail").bindTo(R.id.markerShowDetail)
 				.bindTo(new VisibilityBinding(R.id.markerDetails));
 
@@ -97,6 +95,10 @@ public class MarkerEditDialog extends DialogFragment
 				{
 					Marker marker = (Marker) properties.save();
 					ExperienceEditActivity activity = (ExperienceEditActivity) getActivity();
+					if(originalCode != null)
+					{
+						activity.getExperience().getMarkers().remove(originalCode);
+					}
 					activity.getExperience().getMarkers().put(marker.getCode(), marker);
 					activity.updateMarkers();
 				}
