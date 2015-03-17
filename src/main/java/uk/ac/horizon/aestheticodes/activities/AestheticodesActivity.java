@@ -77,6 +77,8 @@ public class AestheticodesActivity extends ScanActivity implements ExperienceLis
 	{
 		super.experienceSelected(experience);
 
+		Log.i("", "Selected Experience changed to " + experience.getId());
+
 		List<Experience> experienceList = experiences.getExperiences();
 		int index = experienceList.indexOf(experience);
 		getSupportActionBar().setSelectedNavigationItem(index);
@@ -91,6 +93,7 @@ public class AestheticodesActivity extends ScanActivity implements ExperienceLis
 			Uri data = intent.getData();
 			if(data != null)
 			{
+				Log.i("", "Intent URL = " + data);
 				this.experienceURL = data.toString();
 			}
 		}
@@ -174,7 +177,8 @@ public class AestheticodesActivity extends ScanActivity implements ExperienceLis
 				public void run()
 				{
 					Animation animation = AnimationUtils.loadAnimation(AestheticodesActivity.this, R.anim.slide_out);
-					animation.setAnimationListener(new Animation.AnimationListener() {
+					animation.setAnimationListener(new Animation.AnimationListener()
+					{
 						@Override
 						public void onAnimationStart(Animation animation)
 						{
@@ -218,10 +222,10 @@ public class AestheticodesActivity extends ScanActivity implements ExperienceLis
 			public boolean onNavigationItemSelected(int position, long l)
 			{
 				final Experience selected = (Experience) experiences.getItem(position);
+				Log.i("", "User selected " + selected.getId() + ": " + l);
 				if (selected != experience.get())
 				{
 					experience.set(selected);
-					getPreferences(Context.MODE_PRIVATE).edit().putString("experience", selected.getId()).commit();
 				}
 				return true;
 			}
@@ -255,7 +259,6 @@ public class AestheticodesActivity extends ScanActivity implements ExperienceLis
 	{
 		super.onResume();
 		experiences.addListener(this);
-		experienceListChanged();
 		experiences.update(experienceURL);
 	}
 
@@ -264,6 +267,10 @@ public class AestheticodesActivity extends ScanActivity implements ExperienceLis
 	{
 		super.onPause();
 		experiences.removeListener(this);
+		if(experience.get() != null)
+		{
+			getPreferences(Context.MODE_PRIVATE).edit().putString("experience", experience.get().getId()).commit();
+		}
 	}
 
 	@Override

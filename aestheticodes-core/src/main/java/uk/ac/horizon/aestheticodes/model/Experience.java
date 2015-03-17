@@ -20,19 +20,18 @@
 package uk.ac.horizon.aestheticodes.model;
 
 import java.util.ArrayList;
-import java.util.Date;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
 public class Experience
 {
-	public static enum Operation
+	public enum Operation
 	{
 		create, retrieve, update, deleted, add, remove
 	}
 
-	public static enum Threshold
+	public enum Threshold
 	{
 		temporalTile, resize
 	}
@@ -49,18 +48,15 @@ public class Experience
 	private String callback;
 
 	private String location;
-	private double lat;
-	private double lon;
-
-	private Date start;
-	private Date end;
+	private Position position;
+	private Long startDate;
+	private Long endDate;
 
 	private String origin;
 	private String originalID;
 	private int originalVersion;
 
 	private Operation op = null;
-
 	private int minRegions = 5;
 	private int maxRegions = 5;
 	private int maxEmptyRegions = 0;
@@ -99,19 +95,19 @@ public class Experience
 		}
 	}
 
-	public int getChecksumModulo()
+	public String getCallback()
 	{
-		return checksumModulo;
-	}
-
-	public String getOrigin()
-	{
-		return origin;
+		return callback;
 	}
 
 	public void setCallback(String callback)
 	{
 		this.callback = callback;
+	}
+
+	public int getChecksumModulo()
+	{
+		return checksumModulo;
 	}
 
 	public void setChecksumModulo(int checksumModulo)
@@ -129,6 +125,26 @@ public class Experience
 		this.description = description;
 	}
 
+	public boolean getEmbeddedChecksum()
+	{
+		return embeddedChecksum;
+	}
+
+	public void setEmbeddedChecksum(boolean embeddedChecksum)
+	{
+		this.embeddedChecksum = embeddedChecksum;
+	}
+
+	public Long getEndDate()
+	{
+		return endDate;
+	}
+
+	public void setEndDate(Long endDate)
+	{
+		this.endDate = endDate;
+	}
+
 	public String getIcon()
 	{
 		return icon;
@@ -142,11 +158,6 @@ public class Experience
 	public String getId()
 	{
 		return id;
-	}
-
-	public String getCallback()
-	{
-		return callback;
 	}
 
 	public void setId(String id)
@@ -164,21 +175,31 @@ public class Experience
 		this.image = image;
 	}
 
+	public String getLocation()
+	{
+		return location;
+	}
+
+	public void setLocation(String location)
+	{
+		this.location = location;
+	}
+
 	public String getMarkerError(List<Integer> markerCodes, Integer embeddedChecksum)
 	{
-		if(markerCodes == null)
+		if (markerCodes == null)
 		{
 			return "No Code";
 		}
-		else if(markerCodes.size() < minRegions)
+		else if (markerCodes.size() < minRegions)
 		{
 			return "Marker too Short";
 		}
-		else if(markerCodes.size() > maxRegions)
+		else if (markerCodes.size() > maxRegions)
 		{
 			return "Marker too Long";
 		}
-		else if(!hasValidNumberofEmptyRegions(markerCodes))
+		else if (!hasValidNumberofEmptyRegions(markerCodes))
 		{
 			return "Incorrect Empty Regions";
 		}
@@ -192,22 +213,22 @@ public class Experience
 			}
 		}
 
-        if(embeddedChecksum==null && !hasValidChecksum(markerCodes))
-        {
-            return "Region Total not Divisable by " + checksumModulo;
-        }
-        else if(this.embeddedChecksum && embeddedChecksum!=null && !hasValidEmbeddedChecksum(markerCodes, embeddedChecksum))
-        {
-            return "Region Total not Divisable by " + embeddedChecksum.toString();
-        }
-        else if (!this.embeddedChecksum && embeddedChecksum!=null)
-        {
-            // Embedded checksum is turned off yet one was provided to this function (this should never happen unless the settings are changed in the middle of detection)
-            return "Embedded checksum markers are not valid.";
-        }
+		if (embeddedChecksum == null && !hasValidChecksum(markerCodes))
+		{
+			return "Region Total not Divisable by " + checksumModulo;
+		}
+		else if (this.embeddedChecksum && embeddedChecksum != null && !hasValidEmbeddedChecksum(markerCodes, embeddedChecksum))
+		{
+			return "Region Total not Divisable by " + embeddedChecksum.toString();
+		}
+		else if (!this.embeddedChecksum && embeddedChecksum != null)
+		{
+			// Embedded checksum is turned off yet one was provided to this function (this should never happen unless the settings are changed in the middle of detection)
+			return "Embedded checksum markers are not valid.";
+		}
 
 
-		if(!hasValidationRegions(markerCodes))
+		if (!hasValidationRegions(markerCodes))
 		{
 			return validationRegions + " Regions of " + validationRegionValue + " Required";
 		}
@@ -250,9 +271,9 @@ public class Experience
 				{
 					return value + " too Large";
 				}
-				else if(codeValue < prevValue)
+				else if (codeValue < prevValue)
 				{
-					if(!marker.endsWith(":") && index < values.length - 1)
+					if (!marker.endsWith(":") && index < values.length - 1)
 					{
 						return value + " is larger than " + prevValue;
 					}
@@ -316,16 +337,6 @@ public class Experience
 		this.minRegions = minRegions;
 	}
 
-	public boolean getEmbeddedChecksum()
-	{
-		return embeddedChecksum;
-	}
-
-	public void setEmbeddedChecksum(boolean embeddedChecksum)
-	{
-		this.embeddedChecksum = embeddedChecksum;
-	}
-
 	public String getName()
 	{
 		return name;
@@ -370,7 +381,7 @@ public class Experience
 				for (int i = (size - 1); i >= 0; i--)
 				{
 					int value = marker.get(i) + 1;
-					for(int x = i; x < size; x++)
+					for (int x = i; x < size; x++)
 					{
 						marker.set(x, value);
 					}
@@ -399,14 +410,19 @@ public class Experience
 		this.op = op;
 	}
 
-	public String getOriginalID()
+	public String getOrigin()
 	{
-		return originalID;
+		return origin;
 	}
 
 	public void setOrigin(String origin)
 	{
 		this.origin = origin;
+	}
+
+	public String getOriginalID()
+	{
+		return originalID;
 	}
 
 	public void setOriginalID(String originalID)
@@ -422,6 +438,26 @@ public class Experience
 	public void setOwnerID(String ownerID)
 	{
 		this.ownerID = ownerID;
+	}
+
+	public Position getPosition()
+	{
+		return position;
+	}
+
+	public void setPosition(Position position)
+	{
+		this.position = position;
+	}
+
+	public Long getStartDate()
+	{
+		return startDate;
+	}
+
+	public void setStartDate(Long startDate)
+	{
+		this.startDate = startDate;
 	}
 
 	public Threshold getThreshold()
@@ -503,9 +539,9 @@ public class Experience
 				{
 					return false;
 				}
-				else if(codeValue < prevValue)
+				else if (codeValue < prevValue)
 				{
-					if(marker.endsWith(":") || index < values.length - 1)
+					if (marker.endsWith(":") || index < values.length - 1)
 					{
 						return false;
 					}
@@ -545,16 +581,16 @@ public class Experience
 		return (numberOfLeaves % checksumModulo) == 0;
 	}
 
-    private boolean hasValidEmbeddedChecksum(List<Integer> code, Integer embeddedChecksum)
-    {
-        // Find weighted sum of code, e.g. 1:1:2:4:4 -> 1*1 + 1*2 + 2*3 + 4*4 + 4*5 = 45
-        int weightedSum = 0;
-        for (int i=0; i<code.size(); ++i)
-        {
-            weightedSum += code.get(i).intValue() * (i+1);
-        }
-        return embeddedChecksum.intValue() == (weightedSum%7 == 0 ? 7 : weightedSum%7);
-    }
+	private boolean hasValidEmbeddedChecksum(List<Integer> code, Integer embeddedChecksum)
+	{
+		// Find weighted sum of code, e.g. 1:1:2:4:4 -> 1*1 + 1*2 + 2*3 + 4*4 + 4*5 = 45
+		int weightedSum = 0;
+		for (int i = 0; i < code.size(); ++i)
+		{
+			weightedSum += code.get(i) * (i + 1);
+		}
+		return embeddedChecksum == (weightedSum % 7 == 0 ? 7 : weightedSum % 7);
+	}
 
 	private boolean hasValidNumberofEmptyRegions(List<Integer> marker)
 	{

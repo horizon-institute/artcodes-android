@@ -17,28 +17,30 @@
  *     along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-package uk.ac.horizon.aestheticodes.properties;
+package uk.ac.horizon.aestheticodes.model;
 
-import java.text.SimpleDateFormat;
-import java.util.Date;
-import java.util.Locale;
-
-public class DateFormat extends Format
+public class Position
 {
-	private final SimpleDateFormat format = new SimpleDateFormat("dd MMMM yyyy", Locale.getDefault());
+	private double lat;
+	private double lon;
 
-	@Override
-	public String getDisplayString(Object value)
+	public double getLat()
 	{
-		if(value instanceof Date)
-		{
-			return format.format((Date)value);
-		}
-		else if(value instanceof Long)
-		{
-			return format.format(new Date((Long)value));
-		}
+		return lat;
+	}
 
-		return super.getDisplayString(value);
+	public double getLon()
+	{
+		return lon;
+	}
+
+	public void setLat(double lat)
+	{
+		this.lat = lat;
+	}
+
+	public void setLon(double lon)
+	{
+		this.lon = lon;
 	}
 }

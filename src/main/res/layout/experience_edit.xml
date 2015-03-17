@@ -193,7 +193,8 @@
 				          android:layout_marginLeft="3dp"
 				          android:layout_marginRight="3dp"
 				          android:paddingTop="8dp"
-				          android:paddingBottom="8dp" />
+				          android:paddingBottom="8dp"
+				          android:focusable="false" />
 			</LinearLayout>
 
 		</LinearLayout>

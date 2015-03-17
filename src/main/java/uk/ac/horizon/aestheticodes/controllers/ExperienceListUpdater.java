@@ -29,12 +29,6 @@ import android.os.AsyncTask;
 import android.util.Log;
 import com.google.android.gms.auth.GoogleAuthUtil;
 import com.google.gson.Gson;
-import org.apache.http.HttpResponse;
-import org.apache.http.client.HttpClient;
-import org.apache.http.client.methods.HttpGet;
-import org.apache.http.client.methods.HttpPut;
-import org.apache.http.entity.StringEntity;
-import org.apache.http.impl.client.DefaultHttpClient;
 import uk.ac.horizon.aestheticodes.R;
 import uk.ac.horizon.aestheticodes.model.Experience;
 
@@ -42,6 +36,8 @@ import java.io.File;
 import java.io.FileReader;
 import java.io.InputStream;
 import java.io.InputStreamReader;
+import java.io.OutputStreamWriter;
+import java.net.HttpURLConnection;
 import java.net.URL;
 import java.util.ArrayList;
 import java.util.Arrays;
@@ -152,33 +148,34 @@ class ExperienceListUpdater extends AsyncTask<String, Experience, Collection<Str
 			{
 				try
 				{
-					if (experienceURL.startsWith("http:") || experienceURL.startsWith("https:"))
+					if(experienceURL != null)
 					{
-						ConnectivityManager cm = (ConnectivityManager) context.getSystemService(Context.CONNECTIVITY_SERVICE);
-						NetworkInfo netInfo = cm.getActiveNetworkInfo();
-						if (netInfo != null && netInfo.isConnectedOrConnecting())
+						if (experienceURL.startsWith("http:") || experienceURL.startsWith("https:"))
 						{
-							HttpClient client = new DefaultHttpClient();
-							HttpGet get = new HttpGet(experienceURL);
-							HttpResponse response = client.execute(get);
-							if (response.getStatusLine().getStatusCode() == 200)
+							ConnectivityManager cm = (ConnectivityManager) context.getSystemService(Context.CONNECTIVITY_SERVICE);
+							NetworkInfo netInfo = cm.getActiveNetworkInfo();
+							if (netInfo != null && netInfo.isConnectedOrConnecting())
 							{
-								Experience experience = gson.fromJson(new InputStreamReader(response.getEntity().getContent()), Experience.class);
-								experience.setOp(Experience.Operation.add);
-								experience.setOrigin(experienceURL);
+								HttpURLConnection connection = get(experienceURL);
+								if (connection.getResponseCode() == 200)
+								{
+									Experience experience = gson.fromJson(new InputStreamReader(connection.getInputStream()), Experience.class);
+									experience.setOp(Experience.Operation.add);
+									experience.setOrigin(experienceURL);
 
-								publishProgress(experience);
+									publishProgress(experience);
+								}
 							}
 						}
-					}
-					else if (experienceURL.startsWith("content:"))
-					{
-						final InputStream inputStream = context.getContentResolver().openInputStream(Uri.parse(experienceURL));
-						final Experience intentExperience = gson.fromJson(new InputStreamReader(inputStream, "UTF-8"), Experience.class);
-						intentExperience.setOp(Experience.Operation.add);
-						intentExperience.setOrigin(experienceURL);
+						else if (experienceURL.startsWith("content:"))
+						{
+							final InputStream inputStream = context.getContentResolver().openInputStream(Uri.parse(experienceURL));
+							final Experience intentExperience = gson.fromJson(new InputStreamReader(inputStream, "UTF-8"), Experience.class);
+							intentExperience.setOp(Experience.Operation.add);
+							intentExperience.setOrigin(experienceURL);
 
-						publishProgress(intentExperience);
+							publishProgress(intentExperience);
+						}
 					}
 				}
 				catch(Exception e)
@@ -215,10 +212,10 @@ class ExperienceListUpdater extends AsyncTask<String, Experience, Collection<Str
 
 				if (changes || loaded)
 				{
-					HttpResponse response = put("https://aestheticodes.appspot.com/_ah/api/experiences/v1/experiences", gson.toJson(updates));
-					if (response.getStatusLine().getStatusCode() == 200)
+					HttpURLConnection connection = put("https://aestheticodes.appspot.com/_ah/api/experiences/v1/experiences", gson.toJson(updates));
+					if (connection.getResponseCode() == 200)
 					{
-						ExperienceResults results = gson.fromJson(new InputStreamReader(response.getEntity().getContent()), ExperienceResults.class);
+						ExperienceResults results = gson.fromJson(new InputStreamReader(connection.getInputStream()), ExperienceResults.class);
 						for (String experienceID : results.experiences.keySet())
 						{
 							Experience experience = results.experiences.get(experienceID);
@@ -261,6 +258,11 @@ class ExperienceListUpdater extends AsyncTask<String, Experience, Collection<Str
 			Log.i("", "Removing " + experienceID);
 			experiences.remove(experienceID);
 		}
+
+		for(Experience experience: experiences.get())
+		{
+			experience.setOp(null);
+		}
 		ExperienceFileController.save(context, experiences);
 	}
 
@@ -272,22 +274,26 @@ class ExperienceListUpdater extends AsyncTask<String, Experience, Collection<Str
 			return;
 		}
 
-		for (Experience experience : newExperiences)
+		synchronized (experiences)
 		{
-			synchronized (experiences)
-			{
-				experiences.add(experience);
-			}
+			experiences.add(newExperiences);
 		}
 	}
 
-	private HttpResponse put(String url, String data) throws Exception
+	private HttpURLConnection get(String url) throws Exception
 	{
-		HttpClient client = new DefaultHttpClient();
-		HttpPut put = new HttpPut(new URL(url).toURI());
-		put.addHeader("content-type", "application/json");
-		put.setEntity(new StringEntity(data));
+		HttpURLConnection connection = (HttpURLConnection) (new URL(url).openConnection());
+		connection.connect();
+		return connection;
+	}
 
+	private HttpURLConnection put(String url, String data) throws Exception
+	{
+		HttpURLConnection connection = (HttpURLConnection) (new URL(url).openConnection());
+
+		connection.setDoOutput(true);
+		connection.setRequestMethod("PUT");
+		connection.setRequestProperty("Content-Type", "application/json");
 		String token = null;
 		try
 		{
@@ -297,7 +303,7 @@ class ExperienceListUpdater extends AsyncTask<String, Experience, Collection<Str
 			{
 				Log.i("", "Getting token for " + accounts[0].name);
 				token = GoogleAuthUtil.getToken(context, accounts[0].name, context.getString(R.string.app_scope));
-				put.addHeader("Authorization", "Bearer " + token);
+				connection.setRequestProperty("Authorization", "Bearer " + token);
 				Log.i("", token);
 			}
 		}
@@ -306,22 +312,26 @@ class ExperienceListUpdater extends AsyncTask<String, Experience, Collection<Str
 			Log.e("", e.getMessage(), e);
 		}
 
+		OutputStreamWriter out = new OutputStreamWriter(connection.getOutputStream());
+		out.write(data);
+		out.close();
+
 		Log.i("", "PUT " + url);
 		Log.i("", data);
-		HttpResponse response = client.execute(put);
-		if (response.getStatusLine().getStatusCode() == 401)
+		connection.connect();
+		if (connection.getResponseCode() == 401)
 		{
-			Log.w("", "Response " + response.getStatusLine().getStatusCode());
+			Log.w("", "Response " + connection.getResponseCode());
 			if (token != null)
 			{
 				GoogleAuthUtil.invalidateToken(context, token);
 			}
 		}
-		else if (response.getStatusLine().getStatusCode() != 200)
+		else if (connection.getResponseCode() != 200)
 		{
-			Log.w("", "Response " + response.getStatusLine().getStatusCode() + ": " + response.getStatusLine().getReasonPhrase());
+			Log.w("", "Response " + connection.getResponseCode() + ": " + connection.getResponseMessage());
 		}
 
-		return response;
+		return connection;
 	}
 }

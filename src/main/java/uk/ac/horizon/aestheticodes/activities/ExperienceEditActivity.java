@@ -126,7 +126,7 @@ public class ExperienceEditActivity extends ActionBarActivity
 			@Override
 			public int compare(Marker markerAction, Marker markerAction2)
 			{
-				if(markerAction.getCode().length() != markerAction2.getCode().length())
+				if (markerAction.getCode().length() != markerAction2.getCode().length())
 				{
 					return markerAction.getCode().length() - markerAction2.getCode().length();
 				}
@@ -195,15 +195,21 @@ public class ExperienceEditActivity extends ActionBarActivity
 
 		properties.get("location").bindTo(R.id.experienceLocation);
 
-		properties.get("start").formatAs(new DateFormat())
+		properties.get("startDate").formatAs(new DateFormat())
 				.bindTo(R.id.experienceStart)
-				.bindTo(new ClickBinding(R.id.experienceStart) {
+				.bindTo(new ClickBinding(R.id.experienceStart)
+				{
 					@Override
 					public void onClick(View v)
 					{
 						final Calendar c = Calendar.getInstance();
+						if(experience.getStartDate() != null)
+						{
+							c.setTimeInMillis(experience.getStartDate());
+						}
 						final DatePickerDialog dpd = new DatePickerDialog(ExperienceEditActivity.this,
-								new DatePickerDialog.OnDateSetListener() {
+								new DatePickerDialog.OnDateSetListener()
+								{
 
 									@Override
 									public void onDateSet(DatePicker view, int year, int month, int day)
@@ -211,13 +217,40 @@ public class ExperienceEditActivity extends ActionBarActivity
 										Calendar calendar = Calendar.getInstance();
 										calendar.set(year, month, day);
 
-										properties.get("start").set(calendar.getTime());
+										properties.get("startDate").set(calendar.getTimeInMillis());
 									}
 								}, c.get(Calendar.YEAR), c.get(Calendar.MONTH), c.get(Calendar.DAY_OF_MONTH));
 						dpd.show();
 					}
 				});
-		properties.get("end").formatAs(new DateFormat()).bindTo(R.id.experienceStart);
+		properties.get("endDate").formatAs(new DateFormat())
+				.bindTo(R.id.experienceEnd)
+				.bindTo(new ClickBinding(R.id.experienceEnd)
+				{
+					@Override
+					public void onClick(View v)
+					{
+						final Calendar c = Calendar.getInstance();
+						if(experience.getEndDate() != null)
+						{
+							c.setTimeInMillis(experience.getEndDate());
+						}
+
+						final DatePickerDialog dpd = new DatePickerDialog(ExperienceEditActivity.this,
+								new DatePickerDialog.OnDateSetListener()
+								{
+									@Override
+									public void onDateSet(DatePicker view, int year, int month, int day)
+									{
+										Calendar calendar = Calendar.getInstance();
+										calendar.set(year, month, day);
+
+										properties.get("endDate").set(calendar.getTimeInMillis());
+									}
+								}, c.get(Calendar.YEAR), c.get(Calendar.MONTH), c.get(Calendar.DAY_OF_MONTH));
+						dpd.show();
+					}
+				});
 
 		properties.get("maxRegionValue").formatAs(new IntFormat(1, 20))
 				.bindTo(R.id.markerRegionValue)
@@ -241,7 +274,7 @@ public class ExperienceEditActivity extends ActionBarActivity
 					}
 				});
 
-        properties.get("embeddedChecksum").bindTo(R.id.embeddedChecksum);
+		properties.get("embeddedChecksum").bindTo(R.id.embeddedChecksum);
 
 		Format format = new IntRangeFormat(properties.get("minRegions"), properties.get("maxRegions"), 2, 20);
 		properties.get("maxRegions").formatAs(format)

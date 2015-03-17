@@ -42,6 +42,8 @@ import java.util.List;
 
 public class ExperienceListAdapter extends BaseAdapter implements ExperienceListController.Listener
 {
+	private static final String DEFAULT_ID = "4c758e29-0759-4583-a0d4-71ee692b7f86";
+
 	private final Context context;
 	private final LayoutInflater inflater;
 	private final ExperienceListController experienceController;
@@ -124,14 +126,19 @@ public class ExperienceListAdapter extends BaseAdapter implements ExperienceList
 
 	public Experience getSelected(String preferred)
 	{
-		if (preferred != null)
+		Log.i("", "Looking for " + preferred);
+		String id = preferred;
+		if(id == null)
 		{
-			for (Experience experience : experiences)
+			id = DEFAULT_ID;
+		}
+
+		for (Experience experience : experiences)
+		{
+			if (experience.getId().equals(id))
 			{
-				if (experience.getId().equals(preferred))
-				{
-					return experience;
-				}
+				Log.i("", "Found " + experience.getId());
+				return experience;
 			}
 		}
 

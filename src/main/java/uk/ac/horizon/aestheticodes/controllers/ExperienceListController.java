@@ -19,7 +19,6 @@
 
 package uk.ac.horizon.aestheticodes.controllers;
 
-import android.util.Log;
 import uk.ac.horizon.aestheticodes.model.Experience;
 
 import java.util.Collection;
@@ -29,13 +28,34 @@ import java.util.Map;
 
 public class ExperienceListController
 {
-	public static interface Listener
+	public interface Listener
 	{
 		void experienceListChanged();
 	}
 
 	private final Map<String, Experience> experiences = new HashMap<>();
 	private final Collection<Listener> listeners = new HashSet<>();
+
+	public void add(Experience... experiences)
+	{
+		for(Experience experience: experiences)
+		{
+			if (experience == null || experience.getId() == null)
+			{
+				continue;
+			}
+
+			synchronized (this.experiences)
+			{
+				this.experiences.put(experience.getId(), experience);
+			}
+		}
+
+		for (final Listener listener : listeners)
+		{
+			listener.experienceListChanged();
+		}
+	}
 
 	public void add(Experience experience)
 	{

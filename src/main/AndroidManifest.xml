@@ -67,21 +67,26 @@
 			</intent-filter>
 			<intent-filter>
 				<action android:name="android.intent.action.VIEW" />
-
 				<category android:name="android.intent.category.DEFAULT" />
 				<category android:name="android.intent.category.BROWSABLE" />
 
 				<data android:mimeType="application/x-artcode" />
-				<data android:scheme="http" android:mimeType="application/x-artcode" />
-				<data android:scheme="https" android:mimeType="application/x-artcode" />
+			</intent-filter>
+			<intent-filter>
+				<action android:name="android.intent.action.VIEW" />
 
-				<data android:scheme="http"
-				      android:host="*"
-				      android:pathPattern=".*\\.artcode" />
+				<category android:name="android.intent.category.DEFAULT" />
+				<category android:name="android.intent.category.BROWSABLE" />
 
-				<data android:scheme="https"
-				      android:host="*"
-				      android:pathPattern=".*\\.artcode" />
+				<data android:scheme="file" />
+				<data android:scheme="smb" />
+				<data android:scheme="content" />
+				<data android:scheme="http" />
+				<data android:scheme="https" />
+				
+				<data android:mimeType="*/*" />
+				<data android:host="*"/>
+				<data android:pathPattern=".*\\.artcode" />
 			</intent-filter>
 		</activity>
 		<activity
