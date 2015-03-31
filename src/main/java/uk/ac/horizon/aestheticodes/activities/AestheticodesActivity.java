@@ -169,7 +169,7 @@ public class AestheticodesActivity extends ScanActivity implements ExperienceLis
 				});
 			}
 		}
-		else
+		else if (markerButton.getVisibility()==View.VISIBLE)
 		{
 			runOnUiThread(new Runnable()
 			{
