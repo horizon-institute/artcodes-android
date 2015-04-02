@@ -19,7 +19,9 @@
 
 package uk.ac.horizon.aestheticodes.activities;
 
+import android.app.AlertDialog;
 import android.app.DatePickerDialog;
+import android.content.DialogInterface;
 import android.content.Intent;
 import android.os.Bundle;
 import android.support.v4.app.DialogFragment;
@@ -27,6 +29,7 @@ import android.support.v4.app.NavUtils;
 import android.support.v7.app.ActionBarActivity;
 import android.util.Log;
 import android.view.LayoutInflater;
+import android.view.Menu;
 import android.view.MenuItem;
 import android.view.View;
 import android.widget.DatePicker;
@@ -69,6 +72,46 @@ public class ExperienceEditActivity extends ActionBarActivity
 	private Properties properties;
 	private ExperienceListController experiences;
 
+	public void deleteExperience(View view)
+	{
+		AlertDialog.Builder confirmBuilder = new AlertDialog.Builder(this);
+		confirmBuilder.setTitle(getResources().getString(R.string.experienceDeleteConfirmTitle, experience.getName()));
+		confirmBuilder.setMessage(getResources().getString(R.string.experienceDeleteConfirmMessage, experience.getName()));
+		confirmBuilder.setPositiveButton(R.string.deleteConfirm, new DialogInterface.OnClickListener()
+		{
+			@Override
+			public void onClick(DialogInterface dialogInterface, int i)
+			{
+				experience.setOp(Experience.Operation.remove);
+				ExperienceFileController.save(ExperienceEditActivity.this, experiences);
+				NavUtils.navigateUpTo(ExperienceEditActivity.this, new Intent(ExperienceEditActivity.this, ExperienceListActivity.class));
+			}
+		});
+		confirmBuilder.setNegativeButton(R.string.deleteCancel, new DialogInterface.OnClickListener()
+		{
+			@Override
+			public void onClick(DialogInterface dialogInterface, int i)
+			{
+				// nothing
+			}
+		});
+
+		confirmBuilder.create().show();
+	}
+
+	@Override
+	public boolean onCreateOptionsMenu(Menu menu)
+	{
+		getMenuInflater().inflate(R.menu.experience_actions, menu);
+
+		// Set up ShareActionProvider's default share intent
+		//MenuItem shareItem = menu.findItem(R.id.action_share);
+		//ShareActionProvider shareActionProvider = (ShareActionProvider) MenuItemCompat.getActionProvider(shareItem);
+		//shareActionProvider.setShareIntent(getShareIntent());
+
+		return super.onCreateOptionsMenu(menu);
+	}
+
 	public void addMarker(View view)
 	{
 		DialogFragment newFragment = new MarkerEditDialog();
@@ -104,6 +147,10 @@ public class ExperienceEditActivity extends ActionBarActivity
 
 				NavUtils.navigateUpTo(this, intent);
 				return true;
+			case R.id.action_delete:
+				deleteExperience(null);
+				return true;
+
 		}
 		return super.onOptionsItemSelected(item);
 	}

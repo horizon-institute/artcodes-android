@@ -40,33 +40,6 @@ public class ExperienceActivity extends ActionBarActivity
 	private Experience experience;
 	private Properties properties;
 
-	public void deleteExperience(View view)
-	{
-		AlertDialog.Builder confirmBuilder = new AlertDialog.Builder(this);
-		confirmBuilder.setTitle(getResources().getString(R.string.experienceDeleteConfirmTitle, experience.getName()));
-		confirmBuilder.setMessage(getResources().getString(R.string.experienceDeleteConfirmMessage, experience.getName()));
-		confirmBuilder.setPositiveButton(R.string.deleteConfirm, new DialogInterface.OnClickListener()
-		{
-			@Override
-			public void onClick(DialogInterface dialogInterface, int i)
-			{
-				experience.setOp(Experience.Operation.remove);
-				ExperienceFileController.save(ExperienceActivity.this, experiences);
-				NavUtils.navigateUpTo(ExperienceActivity.this, new Intent(ExperienceActivity.this, ExperienceListActivity.class));
-			}
-		});
-		confirmBuilder.setNegativeButton(R.string.deleteCancel, new DialogInterface.OnClickListener()
-		{
-			@Override
-			public void onClick(DialogInterface dialogInterface, int i)
-			{
-				// nothing
-			}
-		});
-
-		confirmBuilder.create().show();
-	}
-
 	public void editExperience(View view)
 	{
 		Intent intent = new Intent(ExperienceActivity.this, ExperienceEditActivity.class);
