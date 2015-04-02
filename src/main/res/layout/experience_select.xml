@@ -1,4 +1,5 @@
 <?xml version="1.0" encoding="utf-8"?>
+
 <!--
   ~ Aestheticodes recognises a different marker scheme that allows the
   ~ creation of aesthetically pleasing, even beautiful, codes.
@@ -17,11 +18,14 @@
   ~     You should have received a copy of the GNU Affero General Public License
   ~     along with this program.  If not, see <http://www.gnu.org/licenses/>.
   -->
-<resources>
-	<color name="apptheme_primary">#295a9e</color>
-	<color name="apptheme_primary_dark">#194a8e</color>
 
-	<color name="PRESSED_STATE_COLOR">#194a8e</color>
-	<color name="FOCUSED_STATE_COLOR">#194a8e</color>
-	<color name="NORMAL_STATE_COLOR">#194a8e</color>
-</resources>
+<merge xmlns:tools="http://schemas.android.com/tools" xmlns:android="http://schemas.android.com/apk/res/android"
+       tools:context=".activities.ExperienceListActivity">
+	<ListView
+			android:layout_width="fill_parent"
+			android:layout_height="wrap_content"
+			android:id="@+id/experienceList" android:divider="@null"
+			tools:listitem="@layout/experience_listitem"
+			android:paddingTop="8dp"
+			android:paddingBottom="8dp" />
+</merge>

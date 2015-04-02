@@ -61,10 +61,8 @@ public class MarkerActivity extends ActionBarActivity
 		properties.get("description")
 				.defaultTo(marker.getAction())
 				.bindTo(R.id.markerDescription);
-		properties.get("action")
-				.bindTo(new VisibilityBinding(R.id.markerAction));
-		properties.get("image")
-				.bindTo(new ColorImageBinding(R.id.markerImage, R.id.markerAction));
+		properties.get("action").bindTo(new VisibilityBinding(R.id.markerAction));
+		properties.get("image").bindTo(R.id.markerImage).bindTo(new ColorImageBinding(R.id.markerAction));
 		properties.load();
 	}
 

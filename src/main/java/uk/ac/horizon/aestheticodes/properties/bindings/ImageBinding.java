@@ -36,7 +36,9 @@ public class ImageBinding extends ViewBinding
 	{
 		if (view instanceof ImageView && value instanceof String)
 		{
-			Picasso.with(context).load((String)value).into((ImageView)view);
+			final ImageView imageView = (ImageView)view;
+			Picasso.with(context).cancelRequest(imageView);
+			Picasso.with(context).load((String)value).into(imageView);
 		}
 	}
 }

@@ -39,14 +39,15 @@ repositories {
 dependencies {
 	compile project(":aestheticodes-core")
 	compile 'com.android.support:palette-v7:22.0.0'
-	compile 'com.google.android.gms:play-services-base:6.5.87'
+	compile 'com.google.android.gms:play-services-base:7.0.0'
+	compile 'com.google.android.gms:play-services-location:7.0.0'
 	compile 'com.squareup.picasso:picasso:2.4.0'
 	compile 'org.opencv:opencv-android:2.4.8'
 }
 
 android {
 	compileSdkVersion 22
-	buildToolsVersion "22"
+	buildToolsVersion "22.0.1"
 
 	defaultConfig {
 		minSdkVersion 10

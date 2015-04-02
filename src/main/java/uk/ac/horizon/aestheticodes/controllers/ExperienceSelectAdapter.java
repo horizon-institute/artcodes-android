@@ -21,52 +21,48 @@ package uk.ac.horizon.aestheticodes.controllers;
 
 import android.content.Context;
 import android.os.AsyncTask;
-import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.BaseAdapter;
-import android.widget.ImageView;
-import android.widget.LinearLayout;
 import android.widget.TextView;
-import com.squareup.picasso.Picasso;
 import uk.ac.horizon.aestheticodes.R;
 import uk.ac.horizon.aestheticodes.model.Experience;
+import uk.ac.horizon.aestheticodes.properties.Properties;
 
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.Comparator;
 import java.util.List;
 
-public class ExperienceListAdapter extends BaseAdapter implements ExperienceListController.Listener
+public class ExperienceSelectAdapter extends BaseAdapter implements ExperienceListController.Listener
 {
 	private static final String DEFAULT_ID = "4c758e29-0759-4583-a0d4-71ee692b7f86";
+
+	private static final int RECENT_MAX = 3;
+	private static final int RECOMMENDED_MAX = 4;
+
+	private List<Experience> recent = new ArrayList<>();
+	private List<Experience> recommended = new ArrayList<>();
 
 	private final Context context;
 	private final LayoutInflater inflater;
 	private final ExperienceListController experienceController;
-	private List<Experience> experiences = new ArrayList<>();
-	private final List<ExperienceListController.Listener> listeners = new ArrayList<>();
 	private static ExperienceListUpdater updater = null;
 
-	public ExperienceListAdapter(final Context context, final ExperienceListController experienceController)
+	public ExperienceSelectAdapter(final Context context, final ExperienceListController experienceController)
 	{
 		this.context = context;
-		inflater = (LayoutInflater) context.getSystemService(Context.LAYOUT_INFLATER_SERVICE);
+		this.inflater = (LayoutInflater) context.getSystemService(Context.LAYOUT_INFLATER_SERVICE);
 		this.experienceController = experienceController;
 		this.experienceController.addListener(this);
 		experienceListChanged();
 	}
 
-	public void addListener(ExperienceListController.Listener listener)
-	{
-		listeners.add(listener);
-	}
-
 	@Override
 	public void experienceListChanged()
 	{
-		List<Experience> newExperiences = new ArrayList<Experience>();
+		List<Experience> newExperiences = new ArrayList<>();
 		for (Experience experience : experienceController.get())
 		{
 			if (experience.getOp() != Experience.Operation.remove)
@@ -81,7 +77,7 @@ public class ExperienceListAdapter extends BaseAdapter implements ExperienceList
 			{
 				if (experience.getName() != null && experience2.getName() != null)
 				{
-					return experience.getName().compareToIgnoreCase(experience2.getName());
+					return experience.getName().compareTo(experience2.getName());
 				}
 				else
 				{
@@ -90,103 +86,90 @@ public class ExperienceListAdapter extends BaseAdapter implements ExperienceList
 			}
 		});
 
-		experiences = newExperiences;
+		//experiences = newExperiences;
 		notifyDataSetChanged();
-
-		for (ExperienceListController.Listener listener : listeners)
-		{
-			listener.experienceListChanged();
-		}
 	}
 
 	@Override
 	public int getCount()
 	{
-		return experiences.size();
+		if(recent.size() > 0)
+		{
+			return 1+ recent.size() + 1 + recommended.size();
+		}
+		return 1 + recommended.size();
 	}
 
-	public List<Experience> getExperiences()
+	@Override
+	public int getViewTypeCount()
 	{
-		return experiences;
+		return 2;
+	}
+
+	@Override
+	public int getItemViewType(int position)
+	{
+		return super.getItemViewType(position);
 	}
 
 	@Override
 	public Object getItem(int i)
 	{
-		return experiences.get(i);
+		if(recent.size() > 0)
+		{
+			if(i == 0)
+			{
+				return "Recent";
+			}
+
+			if(i <= recent.size())
+			{
+				return recent.get(i - 1);
+			}
+		}
+		return null;
+		//return experiences.get(i);
 	}
 
 	@Override
 	public long getItemId(final int position)
 	{
-		return experiences.get(position).getId().hashCode();
-	}
-
-	public Experience getSelected(String preferred)
-	{
-		Log.i("", "Looking for " + preferred);
-		String id = preferred;
-		if(id == null)
-		{
-			id = DEFAULT_ID;
-		}
-
-		for (Experience experience : experiences)
-		{
-			if (experience.getId().equals(id))
-			{
-				Log.i("", "Found " + experience.getId());
-				return experience;
-			}
-		}
-
-		if (!experiences.isEmpty())
-		{
-			Log.i("", "Not found " + preferred + ", returning " + experiences.get(0).getId());
-			return experiences.get(0);
-		}
-		return null;
+		return getItem(position).hashCode();
 	}
 
 	@Override
 	public View getView(int i, View view, ViewGroup viewGroup)
 	{
-		final Experience experience = experiences.get(i);
-		if (view == null)
+		Object item = getItem(i);
+		if(item instanceof String)
 		{
-			view = inflater.inflate(R.layout.experience_listitem, viewGroup, false);
+			if (view == null)
+			{
+				view = inflater.inflate(R.layout.experience_header, viewGroup, false);
+			}
+
+			final TextView textView = (TextView)view.findViewById(R.id.headerText);
+
+			//.bindTo(R.id.headerText);
 		}
-
-		final TextView eventTitle = (TextView) view.findViewById(R.id.markerCode);
-		final ImageView iconView = (ImageView) view.findViewById(R.id.experienceIcon);
-		final LinearLayout layout = (LinearLayout) view.findViewById(R.id.rootView);
-
-		eventTitle.setText(experience.getName());
-
-		iconView.setSelected(false);
-		iconView.setImageDrawable(null);
-		if (experience.getIcon() != null && !experience.getIcon().isEmpty())
+		else if(item instanceof Experience)
 		{
-			Picasso.with(context).cancelRequest(iconView);
-			Picasso.with(context).load(experience.getIcon()).into(iconView);
-		}
+			if (view == null)
+			{
+				view = inflater.inflate(R.layout.experience_listitem, viewGroup, false);
+			}
 
-		if (viewGroup.getClass().getName().endsWith("SpinnerCompat"))
-		{
-			layout.setPadding(0, 0, 48, 0);
+			final Properties experienceProperties = new Properties(context, item, view);
+			experienceProperties.get("name").bindTo(R.id.markerCode);
+			experienceProperties.get("icon").bindTo(R.id.experienceIcon);
+			experienceProperties.load();
 		}
-
 		return view;
-	}
-
-	public void removeListener(ExperienceListController.Listener listener)
-	{
-		listeners.remove(listener);
 	}
 
 	public AsyncTask.Status getStatus()
 	{
-		if(updater == null)
+		if (updater == null)
 		{
 			return AsyncTask.Status.FINISHED;
 		}
@@ -198,7 +181,7 @@ public class ExperienceListAdapter extends BaseAdapter implements ExperienceList
 
 	public void update(String... uris)
 	{
-		if(getStatus() == AsyncTask.Status.FINISHED)
+		if (getStatus() == AsyncTask.Status.FINISHED)
 		{
 			updater = new ExperienceListUpdater(context, experienceController);
 			updater.execute(uris);

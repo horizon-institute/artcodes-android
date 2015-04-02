@@ -98,7 +98,7 @@ class ExperienceListUpdater extends AsyncTask<String, Experience, Collection<Str
 	protected Collection<String> doInBackground(String... experienceURLs)
 	{
 		final Gson gson = ExperienceParser.createParser();
-		Set<String> removals = new HashSet<>();
+		final Set<String> removals = new HashSet<>();
 		try
 		{
 			Collection<Experience> experienceList = experiences.get();

@@ -25,7 +25,7 @@ import java.util.Locale;
 
 public class DateFormat extends Format
 {
-	private final SimpleDateFormat format = new SimpleDateFormat("dd MMMM yyyy", Locale.getDefault());
+	private final SimpleDateFormat format = new SimpleDateFormat("d MMMM yyyy", Locale.getDefault());
 
 	@Override
 	public String getDisplayString(Object value)

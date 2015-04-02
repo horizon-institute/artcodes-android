@@ -28,49 +28,27 @@ import android.os.Build;
 import android.support.v7.graphics.Palette;
 import android.util.Log;
 import android.view.View;
-import android.widget.ImageView;
 import com.squareup.picasso.Picasso;
 import com.squareup.picasso.Target;
 import uk.ac.horizon.aestheticodes.R;
 import uk.ac.horizon.aestheticodes.properties.Format;
-import uk.ac.horizon.aestheticodes.properties.Property;
 
 public class ColorImageBinding extends ViewBinding implements Target
 {
-	private Object colorView;
-
-	public ColorImageBinding(int viewID, int colorViewID)
+	public ColorImageBinding(int viewID)
 	{
 		super(viewID);
-		this.colorView = colorViewID;
-	}
-
-	@Override
-	public boolean init(Property property)
-	{
-		super.init(property);
-		if (colorView instanceof Integer)
-		{
-			colorView = property.getProperties().findView((Integer) colorView);
-		}
-		return view != null && colorView != null;
 	}
 
 	@Override
 	public void onBitmapFailed(Drawable errorDrawable)
 	{
-
+		Log.i("", "Failed to load image: " + errorDrawable.toString());
 	}
 
 	@Override
 	public void onBitmapLoaded(Bitmap bitmap, Picasso.LoadedFrom from)
 	{
-		if (view instanceof ImageView)
-		{
-			final ImageView imageView = (ImageView) view;
-			// TODO Animate?
-			imageView.setImageBitmap(bitmap);
-		}
 		Palette.generateAsync(bitmap, new Palette.PaletteAsyncListener()
 		{
 			public void onGenerated(Palette palette)
@@ -80,9 +58,9 @@ public class ColorImageBinding extends ViewBinding implements Target
 					((Activity) context).getWindow().setStatusBarColor(palette.getDarkVibrantColor(context.getResources().getColor(R.color.apptheme_primary_dark)));
 				}
 
-				if (colorView instanceof View)
+				if (view instanceof View)
 				{
-					((View) colorView).getBackground().setColorFilter(new LightingColorFilter(Color.BLACK, palette.getVibrantColor(context.getResources().getColor(R.color.apptheme_primary))));
+					((View) view).getBackground().setColorFilter(new LightingColorFilter(Color.BLACK, palette.getVibrantColor(context.getResources().getColor(R.color.apptheme_primary))));
 				}
 			}
 		});
@@ -99,6 +77,7 @@ public class ColorImageBinding extends ViewBinding implements Target
 	{
 		if (value instanceof String && !((String) value).isEmpty())
 		{
+			Log.i("", "Loading image " + value);
 			Picasso.with(context).cancelRequest(this);
 			Picasso.with(context).load((String) value).into(this);
 		}

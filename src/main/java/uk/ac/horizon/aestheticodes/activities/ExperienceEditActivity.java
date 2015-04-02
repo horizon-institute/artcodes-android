@@ -25,12 +25,15 @@ import android.os.Bundle;
 import android.support.v4.app.DialogFragment;
 import android.support.v4.app.NavUtils;
 import android.support.v7.app.ActionBarActivity;
+import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.MenuItem;
 import android.view.View;
 import android.widget.DatePicker;
 import android.widget.ImageView;
 import android.widget.LinearLayout;
+import com.google.android.gms.location.places.Place;
+import com.google.android.gms.location.places.ui.PlacePicker;
 import uk.ac.horizon.aestheticodes.Aestheticodes;
 import uk.ac.horizon.aestheticodes.R;
 import uk.ac.horizon.aestheticodes.controllers.ExperienceFileController;
@@ -40,6 +43,7 @@ import uk.ac.horizon.aestheticodes.dialogs.IntRangeDialogFragment;
 import uk.ac.horizon.aestheticodes.dialogs.MarkerEditDialog;
 import uk.ac.horizon.aestheticodes.model.Experience;
 import uk.ac.horizon.aestheticodes.model.Marker;
+import uk.ac.horizon.aestheticodes.model.Position;
 import uk.ac.horizon.aestheticodes.properties.DateFormat;
 import uk.ac.horizon.aestheticodes.properties.Format;
 import uk.ac.horizon.aestheticodes.properties.IntFormat;
@@ -57,6 +61,8 @@ import java.util.UUID;
 
 public class ExperienceEditActivity extends ActionBarActivity
 {
+	private static final int PLACE_PICKER_REQUEST = 19;
+
 	private Experience experience;
 	private LinearLayout markerSettings;
 	private ImageView markerSettingsIcon;
@@ -193,7 +199,29 @@ public class ExperienceEditActivity extends ActionBarActivity
 				.bindTo(R.id.experienceImage)
 				.bindTo(R.id.experienceImagePreview);
 
-		properties.get("location").bindTo(R.id.experienceLocation);
+		properties.get("location")
+				.bindTo(R.id.experienceLocation)
+				.bindTo(new ClickBinding(R.id.experienceLocation)
+				{
+					@Override
+					public void onClick(View v)
+					{
+						try
+						{
+							PlacePicker.IntentBuilder builder = new PlacePicker.IntentBuilder();
+							if(properties.get("position").get() != null)
+							{
+								// TODO builder.setLatLngBounds();
+							}
+
+							startActivityForResult(builder.build(context), PLACE_PICKER_REQUEST);
+						}
+						catch (Exception e)
+						{
+							Log.e("", e.getMessage(), e);
+						}
+					}
+				});
 
 		properties.get("startDate").formatAs(new DateFormat())
 				.bindTo(R.id.experienceStart)
@@ -203,9 +231,9 @@ public class ExperienceEditActivity extends ActionBarActivity
 					public void onClick(View v)
 					{
 						final Calendar c = Calendar.getInstance();
-						if(experience.getStartDate() != null)
+						if (properties.get("startDate").get() != null)
 						{
-							c.setTimeInMillis(experience.getStartDate());
+							c.setTimeInMillis((Long)properties.get("startDate").get());
 						}
 						final DatePickerDialog dpd = new DatePickerDialog(ExperienceEditActivity.this,
 								new DatePickerDialog.OnDateSetListener()
@@ -231,9 +259,9 @@ public class ExperienceEditActivity extends ActionBarActivity
 					public void onClick(View v)
 					{
 						final Calendar c = Calendar.getInstance();
-						if(experience.getEndDate() != null)
+						if (properties.get("endDate").get() != null)
 						{
-							c.setTimeInMillis(experience.getEndDate());
+							c.setTimeInMillis((Long)properties.get("endDate").get());
 						}
 
 						final DatePickerDialog dpd = new DatePickerDialog(ExperienceEditActivity.this,
@@ -298,5 +326,18 @@ public class ExperienceEditActivity extends ActionBarActivity
 
 		getSupportActionBar().setDisplayHomeAsUpEnabled(true);
 		getSupportActionBar().setHomeAsUpIndicator(R.drawable.ic_done_white_24dp);
+	}
+
+	protected void onActivityResult(int requestCode, int resultCode, Intent data)
+	{
+		if (requestCode == PLACE_PICKER_REQUEST)
+		{
+			if (resultCode == RESULT_OK)
+			{
+				Place place = PlacePicker.getPlace(data, this);
+				properties.get("location").set(place.getName());
+				properties.get("position").set(new Position(place.getLatLng().latitude, place.getLatLng().longitude));
+ 			}
+		}
 	}
 }
