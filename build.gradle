@@ -21,7 +21,7 @@ buildscript {
 		mavenCentral()
 	}
 	dependencies {
-		classpath 'com.android.tools.build:gradle:1.1.0'
+		classpath 'com.android.tools.build:gradle:1.1.3'
 	}
 }
 
@@ -52,8 +52,8 @@ android {
 	defaultConfig {
 		minSdkVersion 10
 		targetSdkVersion 22
-		versionCode 400034
-		versionName '2.3.2'
+		versionCode 400035
+		versionName '2.3.3'
 
 		resConfigs "nodpi", "hdpi", "xhdpi", "xxhdpi", "xxxhdpi"
 	}
