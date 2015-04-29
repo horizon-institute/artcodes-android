@@ -88,7 +88,7 @@ public class AestheticodesActivity extends ScanActivity implements ExperienceLis
 	@Override
 	protected void onNewIntent(Intent intent)
 	{
-		if(intent.getAction().equals(Intent.ACTION_VIEW))
+		if(intent.getAction()!=null && intent.getAction().equals(Intent.ACTION_VIEW))
 		{
 			Uri data = intent.getData();
 			if(data != null)
@@ -110,96 +110,60 @@ public class AestheticodesActivity extends ScanActivity implements ExperienceLis
 		final String oldCode = currentCode;
 		currentCode = markerCode;
 
-		if (markerCode != null)
-		{
+		if (oldCode!=currentCode || (oldCode!=null && !oldCode.equals(currentCode))) {
 			final Marker marker = experience.get().getMarkers().get(markerCode);
-			if (autoOpen)
-			{
-				if (marker != null)
-				{
+			if (marker != null) {
+				if (autoOpen) {
 					openMarker(marker);
-				}
-			}
-			else
-			{
-				runOnUiThread(new Runnable()
-				{
-					@Override
-					public void run()
-					{
-						if (marker != null)
-						{
-							if (marker.getTitle() != null && !marker.getTitle().isEmpty())
-							{
+				} else {
+					runOnUiThread(new Runnable() {
+						@Override
+						public void run() {
+							if (marker.getTitle() != null && !marker.getTitle().isEmpty()) {
 								markerButton.setText(getString(R.string.marker_open, marker.getTitle()));
-							}
-							else
-							{
+							} else {
 								markerButton.setText(getString(R.string.marker_open_code, marker.getCode()));
 							}
-							markerButton.setOnClickListener(new View.OnClickListener()
-							{
+							markerButton.setOnClickListener(new View.OnClickListener() {
 								@Override
-								public void onClick(View v)
-								{
+								public void onClick(View v) {
 									openMarker(marker);
 								}
 							});
 
-							if(oldCode == null)
-							{
+							if (markerButton.getVisibility() == View.INVISIBLE || markerButton.getAnimation() != null) {
 								Log.i("", "Slide in");
 								markerButton.setVisibility(View.VISIBLE);
 								markerButton.startAnimation(AnimationUtils.loadAnimation(AestheticodesActivity.this, R.anim.slide_in));
 							}
 						}
-						//else
-						//{
-							//markerButton.setText("Unknown Marker " + markerCode);
-							//markerButton.setCompoundDrawablesWithIntrinsicBounds(0,0,R.drawable.ic_add_white_36dp, 0);
-							//markerButton.setOnClickListener(new View.OnClickListener()
-							//{
-							//	@Override
-							//	public void onClick(View v)
-							//	{
-							//	}
-							//});
-						//}
+					});
+				}
+			} else if (markerButton.getVisibility() == View.VISIBLE) {
+				runOnUiThread(new Runnable() {
+					@Override
+					public void run() {
+						Animation animation = AnimationUtils.loadAnimation(AestheticodesActivity.this, R.anim.slide_out);
+						animation.setAnimationListener(new Animation.AnimationListener() {
+							@Override
+							public void onAnimationStart(Animation animation) {
+
+							}
+
+							@Override
+							public void onAnimationEnd(Animation animation) {
+								markerButton.setVisibility(View.INVISIBLE);
+							}
+
+							@Override
+							public void onAnimationRepeat(Animation animation) {
+
+							}
+						});
+						markerButton.startAnimation(animation);
 					}
 				});
 			}
-		}
-		else if (markerButton.getVisibility()==View.VISIBLE)
-		{
-			runOnUiThread(new Runnable()
-			{
-				@Override
-				public void run()
-				{
-					Animation animation = AnimationUtils.loadAnimation(AestheticodesActivity.this, R.anim.slide_out);
-					animation.setAnimationListener(new Animation.AnimationListener()
-					{
-						@Override
-						public void onAnimationStart(Animation animation)
-						{
-
-						}
-
-						@Override
-						public void onAnimationEnd(Animation animation)
-						{
-							markerButton.setVisibility(View.INVISIBLE);
-						}
-
-						@Override
-						public void onAnimationRepeat(Animation animation)
-						{
-
-						}
-					});
-					markerButton.startAnimation(animation);
-				}
-			});
 		}
 	}
 
