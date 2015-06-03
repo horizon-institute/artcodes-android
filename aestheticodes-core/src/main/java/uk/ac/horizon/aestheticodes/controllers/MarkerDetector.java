@@ -212,33 +212,23 @@ public class MarkerDetector
 				// Find blobs using connect component.
 				Imgproc.findContours(inputImage, contours, hierarchy, Imgproc.RETR_TREE, Imgproc.CHAIN_APPROX_NONE);
 
-				for (int i = 0; i < contours.size(); i++)
+				if (markerCodeFactory != null)
 				{
-					final MarkerCode code = MarkerCode.findMarker(hierarchy, i, experience.get());
-					if (code != null)
+					for (int i = 0; i < contours.size(); i++)
 					{
-						// if marker found then add in the list.
-						foundMarkers.add(code);
-
-						if (markerDrawMode != MarkerDrawMode.off && drawImage != null)
+						//final MarkerCode code = MarkerCode.findMarker(hierarchy, i, experience.get());
+						MarkerCodeFactory.DetectionError[] error = new MarkerCodeFactory.DetectionError[1];
+						final MarkerCode code = markerCodeFactory.createMarkerForNode(i, contours, hierarchy, experience.get(), error, 0);
+						if (code != null)
 						{
-							if (markerDrawMode == MarkerDrawMode.regions)
+							// if marker found then add in the list.
+							foundMarkers.add(code);
+
+							if (markerDrawMode != MarkerDrawMode.off && drawImage != null)
 							{
-								double[] nodes = hierarchy.get(0, i);
-								int currentRegionIndex = (int) nodes[MarkerCode.FIRST_NODE];
+								code.draw(drawImage, contours, hierarchy, detectedColour, outlineColour, (markerDrawMode == MarkerDrawMode.regions ? regionColour : null));
 
-								while (currentRegionIndex >= 0)
-								{
-									Imgproc.drawContours(drawImage, contours, currentRegionIndex, outlineColour, 4);
-									Imgproc.drawContours(drawImage, contours, currentRegionIndex, regionColour, 2);
-
-									nodes = hierarchy.get(0, currentRegionIndex);
-									currentRegionIndex = (int) nodes[MarkerCode.NEXT_NODE];
-								}
 							}
-
-							Imgproc.drawContours(drawImage, contours, i, outlineColour, 7);
-							Imgproc.drawContours(drawImage, contours, i, detectedColour, 5);
 						}
 					}
 				}
@@ -247,7 +237,7 @@ public class MarkerDetector
 				{
 					for (MarkerCode marker : foundMarkers)
 					{
-						Rect bounds = Imgproc.boundingRect(contours.get(marker.getComponentIndex()));
+						Rect bounds = Imgproc.boundingRect(contours.get(marker.getComponentIndexs().get(0)));
 						String markerCode = marker.getCodeKey();
 
 						Core.putText(drawImage, markerCode, bounds.tl(), Core.FONT_HERSHEY_SIMPLEX, 1, outlineColour, 5);
@@ -342,6 +332,7 @@ public class MarkerDetector
 	private boolean drawThreshold = false;
 
 	private Greyscaler greyscaler = null;
+	private MarkerCodeFactory markerCodeFactory = null;
 
 	public MarkerDetector(CameraController camera, Listener listener, ExperienceController experience)
 	{
@@ -363,6 +354,11 @@ public class MarkerDetector
 	public void setGreyscaler(Greyscaler greyscaler)
 	{
 		this.greyscaler = greyscaler;
+	}
+
+	public void setMarkerCodeFactory(MarkerCodeFactory markerCodeFactory)
+	{
+		this.markerCodeFactory = markerCodeFactory;
 	}
 
 	public Bitmap getResult()

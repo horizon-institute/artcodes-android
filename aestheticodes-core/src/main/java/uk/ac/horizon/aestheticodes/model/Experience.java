@@ -25,6 +25,9 @@ import java.util.List;
 import java.util.Map;
 import java.util.Objects;
 
+import uk.ac.horizon.aestheticodes.controllers.MarkerCodeFactory;
+import uk.ac.horizon.aestheticodes.controllers.MarkerCodeFactoryAreaOrderExtension;
+
 public class Experience
 {
 	public enum Operation
@@ -677,5 +680,15 @@ public class Experience
 		}
 
 		return new Greyscaler.RgbGreyscaler(this.hueShift, 0.299, 0.587, 0.114, this.invertGreyscale);
+	}
+
+	public MarkerCodeFactory getMarkerCodeFactory()
+	{
+		if (this.description != null && this.description.contains("A4321"))
+		{
+			return new MarkerCodeFactoryAreaOrderExtension();
+		}
+
+		return new MarkerCodeFactory();
 	}
 }

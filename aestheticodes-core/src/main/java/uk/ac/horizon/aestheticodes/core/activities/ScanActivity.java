@@ -102,6 +102,7 @@ public class ScanActivity extends ActionBarActivity implements ExperienceControl
 		{
 			detector.start();
 			detector.setGreyscaler(experience.getGreyscaler());
+			detector.setMarkerCodeFactory(experience.getMarkerCodeFactory());
 
 			setTitle(experience.getName());
 		}
