@@ -32,6 +32,7 @@ import org.opencv.core.Scalar;
 import org.opencv.core.Size;
 import org.opencv.imgproc.Imgproc;
 import uk.ac.horizon.aestheticodes.model.Experience;
+import uk.ac.horizon.aestheticodes.model.Greyscaler;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -68,9 +69,10 @@ public class MarkerDetector
 			{
 				timeOfLastAutoFocus = System.currentTimeMillis();
 				Camera.Size size = camera.getSize();
-				Mat image = new Mat(size.height, size.width, CvType.CV_8UC1);
+				//Mat image = new Mat(size.height, size.width, CvType.CV_8UC1);
 				Mat drawImage = null;
 				result = null;
+
 				while (running)
 				{
 					try
@@ -78,10 +80,17 @@ public class MarkerDetector
 						byte[] data = camera.getData();
 						if (data != null)
 						{
-							image.put(0, 0, data);
+							// data is in NV21 (or YCrCb or YUV) format, with all the Y values first followed by interleaved U and V values e.g. data=YYYYUVUV
+							// 'image' is only big enough to fit the Y values which is a hack for an easy greyscale image.
+							//image.put(0, 0, data);
 
-							// Cut down region for detection
-							Mat croppedImage = MatTranform.crop(image);
+							Mat yuvImage = MatTranform.cropNV12Data(data, size.height, size.width);
+
+							Mat croppedImage = null;
+							if (greyscaler!=null)
+							{
+								croppedImage = greyscaler.greyscaleImage(yuvImage);
+							}
 
 							// apply threshold.
 							thresholdImage(croppedImage);
@@ -143,6 +152,12 @@ public class MarkerDetector
 
 							listener.resultUpdated(!markers.isEmpty(), result);
 							markerSelection.addMarkers(markers, listener);
+
+							yuvImage.release();
+							if (croppedImage!=null)
+							{
+								croppedImage.release();
+							}
 						}
 						else
 						{
@@ -172,7 +187,7 @@ public class MarkerDetector
 					}
 				}
 
-				image.release();
+				//image.release();
 				if (drawImage != null)
 				{
 					drawImage.release();
@@ -326,6 +341,8 @@ public class MarkerDetector
 	private MarkerDrawMode markerDrawMode = MarkerDrawMode.off;
 	private boolean drawThreshold = false;
 
+	private Greyscaler greyscaler = null;
+
 	public MarkerDetector(CameraController camera, Listener listener, ExperienceController experience)
 	{
 		this.camera = camera;
@@ -341,6 +358,11 @@ public class MarkerDetector
 	public void setMarkerDrawMode(MarkerDrawMode mode)
 	{
 		this.markerDrawMode = mode;
+	}
+
+	public void setGreyscaler(Greyscaler greyscaler)
+	{
+		this.greyscaler = greyscaler;
 	}
 
 	public Bitmap getResult()

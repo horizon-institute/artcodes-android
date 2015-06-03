@@ -68,7 +68,26 @@
 	<string name="checksumModulo_desc" tools:ignore="UnusedResources">The Artcode checksum: the sum of all regions
 		must be divisible by this value to be valid.
 	</string>
-    <string name="embeddedChecksum">Embedded Checksum</string>
+	<string name="embeddedChecksum">Embedded Checksum</string>
+	<string name="greyscale">Greyscale</string>
+
+	<!-- Greyscale settings screen strings -->
+	<string name="greyscaleInvertLabel">Invert Greyscale:</string>
+	<string name="greyscaleColourPresetLabel">Colour Filter:</string>
+	<string name="greyscaleHueSeekBarLabel">Hue Shift: (%d/180)</string>
+	<string-array name="colourPresetNames">
+		<item>Intensity</item>
+		<item>Red in RGB</item>
+		<item>Green in RGB</item>
+		<item>Blue in RGB</item>
+		<item>Cyan in CMYK</item>
+		<item>Magenta in CMYK</item>
+		<item>Yellow in CMYK</item>
+		<item>Black in CMYK</item>
+		<item>Cyan in CMY</item>
+		<item>Magenta in CMY</item>
+		<item>Yellow in CMY</item>
+	</string-array>
 
 	<string name="markerDeleteConfirmTitle">Delete Marker %s?</string>
 	<string name="markerDeleteConfirmMessage">Marker %s will be permanently deleted</string>
@@ -96,4 +115,8 @@
 	<string name="minimum">Minimum</string>
 	<string name="maximum">Maximum</string>
 	<string name="share">Share</string>
+    <string name="title_activity_greyscale_settings">GreyscaleSettingsActivity</string>
+
+    <string name="hello_world">Hello world!</string>
+    <string name="action_settings">Settings</string>
 </resources>

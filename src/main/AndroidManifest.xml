@@ -16,120 +16,141 @@
   ~
   ~     You should have received a copy of the GNU Affero General Public License
   ~     along with this program.  If not, see <http://www.gnu.org/licenses/>.
-  -->
+-->
 <manifest xmlns:android="http://schemas.android.com/apk/res/android"
-          xmlns:tools="http://schemas.android.com/tools"
-          package="uk.ac.horizon.aestheticodes">
+    xmlns:tools="http://schemas.android.com/tools"
+    package="uk.ac.horizon.aestheticodes" >
 
-	<uses-permission android:name="android.permission.CAMERA" />
-	<uses-permission android:name="android.permission.INTERNET" />
-	<uses-permission android:name="android.permission.ACCESS_NETWORK_STATE" />
-	<uses-permission android:name="android.permission.GET_ACCOUNTS" />
-	<uses-permission android:name="android.permission.USE_CREDENTIALS" />
-	<uses-permission android:name="android.permission.ACCESS_FINE_LOCATION" />
+    <uses-permission android:name="android.permission.CAMERA" />
+    <uses-permission android:name="android.permission.INTERNET" />
+    <uses-permission android:name="android.permission.ACCESS_NETWORK_STATE" />
+    <uses-permission android:name="android.permission.GET_ACCOUNTS" />
+    <uses-permission android:name="android.permission.USE_CREDENTIALS" />
+    <uses-permission android:name="android.permission.ACCESS_FINE_LOCATION" />
 
-	<uses-feature android:name="android.hardware.camera"
-	              android:required="false" />
-	<uses-feature android:name="android.hardware.camera.any"
-	              android:required="false" />
-	<uses-feature android:name="android.hardware.camera.front"
-	              android:required="false" />
-	<uses-feature android:name="android.hardware.camera.autofocus"
-	              android:required="false" />
-	<uses-feature android:name="android.hardware.camera.flash"
-	              android:required="false" />
-	<uses-feature android:name="android.hardware.touchscreen" />
+    <uses-feature
+        android:name="android.hardware.camera"
+        android:required="false" />
+    <uses-feature
+        android:name="android.hardware.camera.any"
+        android:required="false" />
+    <uses-feature
+        android:name="android.hardware.camera.front"
+        android:required="false" />
+    <uses-feature
+        android:name="android.hardware.camera.autofocus"
+        android:required="false" />
+    <uses-feature
+        android:name="android.hardware.camera.flash"
+        android:required="false" />
+    <uses-feature android:name="android.hardware.touchscreen" />
 
-	<application android:allowBackup="false"
-	             android:icon="@mipmap/ic_launcher"
-	             android:label="@string/app_name"
-	             android:supportsRtl="true"
-	             android:theme="@style/Theme.Aestheticodes"
-	             tools:ignore="UnusedAttribute">
-		<meta-data android:name="com.google.android.gms.version"
-		           android:value="@integer/google_play_services_version" />
-		<meta-data
-				android:name="com.google.android.geo.API_KEY"
-				android:value="@string/api_key"/>
+    <application
+        android:allowBackup="false"
+        android:icon="@mipmap/ic_launcher"
+        android:label="@string/app_name"
+        android:supportsRtl="true"
+        android:theme="@style/Theme.Aestheticodes"
+        tools:ignore="UnusedAttribute" >
+        <meta-data
+            android:name="com.google.android.gms.version"
+            android:value="@integer/google_play_services_version" />
+        <meta-data
+            android:name="com.google.android.geo.API_KEY"
+            android:value="@string/api_key" />
 
-		<!--<activity android:name=".activities.TestScanActivity">
+        <!--
+        <activity android:name=".activities.TestScanActivity">
 			<intent-filter>
 				<action android:name="android.intent.action.MAIN" />
 
 				<category android:name="android.intent.category.LAUNCHER" />
 			</intent-filter>
-		</activity>-->
-		<activity android:name=".activities.AestheticodesActivity"
-		          android:screenOrientation="portrait"
-		          android:theme="@style/Theme.Aestheticodes.Camera">
-			<intent-filter>
-				<action android:name="android.intent.action.MAIN" />
-
-				<category android:name="android.intent.category.LAUNCHER" />
-			</intent-filter>
-			<intent-filter>
-				<action android:name="android.intent.action.VIEW" />
-
-				<category android:name="android.intent.category.DEFAULT" />
-				<category android:name="android.intent.category.BROWSABLE" />
-
-				<data android:mimeType="application/x-artcode" />
-			</intent-filter>
-			<intent-filter>
-				<action android:name="android.intent.action.VIEW" />
-
-				<category android:name="android.intent.category.DEFAULT" />
-				<category android:name="android.intent.category.BROWSABLE" />
-
-				<data android:scheme="file" />
-				<data android:scheme="smb" />
-				<data android:scheme="content" />
-				<data android:scheme="http" />
-				<data android:scheme="https" />
-
-				<data android:mimeType="*/*" />
-				<data android:host="*" />
-				<data android:pathPattern=".*\\.artcode" />
-			</intent-filter>
 		</activity>
-		<activity android:name=".core.activities.ScanActivity"
-		          android:screenOrientation="portrait"
-		          android:theme="@style/Theme.Aestheticodes.Camera">
-			<intent-filter>
-				<action android:name="uk.ac.horizon.aestheticodes.SCAN" />
-				<category android:name="android.intent.category.DEFAULT" />
-			</intent-filter>
-			<intent-filter>
-				<action android:name="android.intent.action.VIEW" />
+        -->
+        <activity
+            android:name=".activities.AestheticodesActivity"
+            android:screenOrientation="portrait"
+            android:theme="@style/Theme.Aestheticodes.Camera" >
+            <intent-filter>
+                <action android:name="android.intent.action.MAIN" />
 
-				<category android:name="android.intent.category.DEFAULT" />
-				<category android:name="android.intent.category.BROWSABLE" />
+                <category android:name="android.intent.category.LAUNCHER" />
+            </intent-filter>
+            <intent-filter>
+                <action android:name="android.intent.action.VIEW" />
 
-				<data android:scheme="@string/artcode_scan_scheme" />
-			</intent-filter>
-		</activity>
-		<activity android:name="uk.ac.horizon.aestheticodes.activities.MarkerActivity"
-		          android:parentActivityName=".activities.AestheticodesActivity"
-		          android:theme="@style/Theme.Aestheticodes.Transparent">
-			<meta-data android:name="android.support.PARENT_ACTIVITY"
-			           android:value=".activities.AestheticodesActivity" />
-		</activity>
-		<activity android:name="uk.ac.horizon.aestheticodes.activities.ExperienceActivity"
-		          android:parentActivityName="uk.ac.horizon.aestheticodes.activities.ExperienceListActivity"
-		          android:theme="@style/Theme.Aestheticodes.Transparent">
-			<meta-data android:name="android.support.PARENT_ACTIVITY"
-			           android:value="uk.ac.horizon.aestheticodes.activities.ExperienceListActivity" />
-		</activity>
-		<activity android:name="uk.ac.horizon.aestheticodes.activities.ExperienceListActivity"
-		          android:label="@string/experiences"
-		          android:parentActivityName=".activities.AestheticodesActivity">
-			<meta-data android:name="android.support.PARENT_ACTIVITY"
-			           android:value=".activities.AestheticodesActivity" />
-		</activity>
-		<activity android:name="uk.ac.horizon.aestheticodes.activities.ExperienceEditActivity"
-		          android:label="Edit Experience">
-		</activity>
-	</application>
+                <category android:name="android.intent.category.DEFAULT" />
+                <category android:name="android.intent.category.BROWSABLE" />
+
+                <data android:mimeType="application/x-artcode" />
+            </intent-filter>
+            <intent-filter>
+                <action android:name="android.intent.action.VIEW" />
+
+                <category android:name="android.intent.category.DEFAULT" />
+                <category android:name="android.intent.category.BROWSABLE" />
+
+                <data android:scheme="file" />
+                <data android:scheme="smb" />
+                <data android:scheme="content" />
+                <data android:scheme="http" />
+                <data android:scheme="https" />
+                <data android:mimeType="*/*" />
+                <data android:host="*" />
+                <data android:pathPattern=".*\\.artcode" />
+            </intent-filter>
+        </activity>
+        <activity
+            android:name=".core.activities.ScanActivity"
+            android:screenOrientation="portrait"
+            android:theme="@style/Theme.Aestheticodes.Camera" >
+            <intent-filter>
+                <action android:name="uk.ac.horizon.aestheticodes.SCAN" />
+
+                <category android:name="android.intent.category.DEFAULT" />
+            </intent-filter>
+            <intent-filter>
+                <action android:name="android.intent.action.VIEW" />
+
+                <category android:name="android.intent.category.DEFAULT" />
+                <category android:name="android.intent.category.BROWSABLE" />
+
+                <data android:scheme="@string/artcode_scan_scheme" />
+            </intent-filter>
+        </activity>
+        <activity
+            android:name=".activities.MarkerActivity"
+            android:parentActivityName=".activities.AestheticodesActivity"
+            android:theme="@style/Theme.Aestheticodes.Transparent" >
+            <meta-data
+                android:name="android.support.PARENT_ACTIVITY"
+                android:value=".activities.AestheticodesActivity" />
+        </activity>
+        <activity
+            android:name=".activities.ExperienceActivity"
+            android:parentActivityName=".activities.ExperienceListActivity"
+            android:theme="@style/Theme.Aestheticodes.Transparent" >
+            <meta-data
+                android:name="android.support.PARENT_ACTIVITY"
+                android:value="uk.ac.horizon.aestheticodes.activities.ExperienceListActivity" />
+        </activity>
+        <activity
+            android:name=".activities.ExperienceListActivity"
+            android:label="@string/experiences"
+            android:parentActivityName=".activities.AestheticodesActivity" >
+            <meta-data
+                android:name="android.support.PARENT_ACTIVITY"
+                android:value=".activities.AestheticodesActivity" />
+        </activity>
+        <activity
+            android:name=".activities.ExperienceEditActivity"
+            android:label="Edit Experience" >
+        </activity>
+        <activity
+            android:name=".activities.GreyscaleSettingsActivity"
+            android:label="@string/title_activity_greyscale_settings" >
+        </activity>
+    </application>
 
 </manifest>
-            

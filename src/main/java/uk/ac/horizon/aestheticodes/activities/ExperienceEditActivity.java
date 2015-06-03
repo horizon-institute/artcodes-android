@@ -35,6 +35,8 @@ import android.view.View;
 import android.widget.DatePicker;
 import android.widget.ImageView;
 import android.widget.LinearLayout;
+import android.widget.TextView;
+
 import com.google.android.gms.location.places.Place;
 import com.google.android.gms.location.places.ui.PlacePicker;
 import uk.ac.horizon.aestheticodes.Aestheticodes;
@@ -373,6 +375,22 @@ public class ExperienceEditActivity extends ActionBarActivity
 
 		getSupportActionBar().setDisplayHomeAsUpEnabled(true);
 		getSupportActionBar().setHomeAsUpIndicator(R.drawable.ic_done_white_24dp);
+
+
+		View v = findViewById(R.id.greyscaleSettingMenuItem);
+		v.setOnClickListener(new View.OnClickListener() {
+			@Override
+			public void onClick(View view) {
+				if (experience != null)
+				{
+					Intent intent = new Intent(ExperienceEditActivity.this, GreyscaleSettingsActivity.class);
+					intent.putExtra("experience", experience.getId());
+					startActivity(intent);
+				}
+			}
+		});
+		TextView greyscaleSetting = (TextView) findViewById(R.id.greyscaleSettingText);
+		greyscaleSetting.setText(GreyscaleSettingsActivity.getPresetName(this, this.experience.getGreyscaleOptions()));
 	}
 
 	protected void onActivityResult(int requestCode, int resultCode, Intent data)

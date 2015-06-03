@@ -23,6 +23,7 @@ import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+import java.util.Objects;
 
 public class Experience
 {
@@ -629,5 +630,52 @@ public class Experience
 			}
 		}
 		return validationRegionCount >= validationRegions;
+	}
+
+	private double hueShift = 0;
+	private List<Object> greyscaleOptions = null;
+	private boolean invertGreyscale = false;
+
+	public double getHueShift()
+	{
+		return this.hueShift;
+	}
+	public void setHueShift(double hueShift)
+	{
+		this.hueShift = hueShift;
+	}
+
+	public boolean getInvertGreyscale()
+	{
+		return this.invertGreyscale;
+	}
+	public void setInvertGreyscale(boolean invertGreyscale)
+	{
+		this.invertGreyscale = invertGreyscale;
+	}
+
+	public List<Object> getGreyscaleOptions()
+	{
+		return this.greyscaleOptions;
+	}
+	public void setGreyscaleOptions(List<Object> greyscaleOptions)
+	{
+		this.greyscaleOptions = greyscaleOptions;
+	}
+
+	public Greyscaler getGreyscaler()
+	{
+		if (this.greyscaleOptions!=null)
+		{
+			if (greyscaleOptions.size() == 4 && greyscaleOptions.get(0).equals("RGB")) {
+				return new Greyscaler.RgbGreyscaler(this.hueShift, ((Number) greyscaleOptions.get(1)).doubleValue(), ((Number) greyscaleOptions.get(2)).doubleValue(), ((Number) greyscaleOptions.get(3)).doubleValue(), this.invertGreyscale);
+			} else if (greyscaleOptions.size() == 5 && greyscaleOptions.get(0).equals("CMYK")) {
+				return new Greyscaler.CmykGreyscaler(this.hueShift, ((Number) greyscaleOptions.get(1)).doubleValue(), ((Number) greyscaleOptions.get(2)).doubleValue(), ((Number) greyscaleOptions.get(3)).doubleValue(), ((Number) greyscaleOptions.get(4)).doubleValue(), this.invertGreyscale);
+			} else if (greyscaleOptions.size() == 4 && greyscaleOptions.get(0).equals("CMY")) {
+				return new Greyscaler.CmyGreyscaler(this.hueShift, ((Number) greyscaleOptions.get(1)).doubleValue(), ((Number) greyscaleOptions.get(2)).doubleValue(), ((Number) greyscaleOptions.get(3)).doubleValue(), this.invertGreyscale);
+			}
+		}
+
+		return new Greyscaler.RgbGreyscaler(this.hueShift, 0.299, 0.587, 0.114, this.invertGreyscale);
 	}
 }

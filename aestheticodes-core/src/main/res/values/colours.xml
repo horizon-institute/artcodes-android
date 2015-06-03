@@ -19,5 +19,6 @@
   -->
 
 <resources>
-	<color name="viewfinder_mask">#B000</color>
+  <color name="viewfinder_mask">#B000</color>
+  <color name="greyscale_settings_mask">#BFFF</color>
 </resources>
