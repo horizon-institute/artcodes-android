@@ -39,9 +39,13 @@ import java.util.List;
 
 public class MarkerDetector
 {
-	public static enum MarkerDrawMode
+	public enum MarkerDrawMode
 	{
 		off, outline, regions
+	}
+	public enum CameraDrawMode
+	{
+		normal, grey, threshold
 	}
 
 	public static interface Listener
@@ -92,13 +96,9 @@ public class MarkerDetector
 								croppedImage = greyscaler.greyscaleImage(yuvImage);
 							}
 
-							// apply threshold.
-							thresholdImage(croppedImage);
-
-							if (markerDrawMode != MarkerDrawMode.off || drawThreshold)
+							if (cameraDrawMode!=CameraDrawMode.normal || markerDrawMode != MarkerDrawMode.off)
 							{
 								MatTranform.rotate(croppedImage, croppedImage, 360 + 90 - camera.getRotation(), camera.isFront());
-
 								if (drawImage == null || resetDrawImage)
 								{
 									if(drawImage != null)
@@ -108,12 +108,22 @@ public class MarkerDetector
 									drawImage = new Mat(croppedImage.rows(), croppedImage.cols(), CvType.CV_8UC4);
 									resetDrawImage = false;
 								}
+							}
+							if (cameraDrawMode==CameraDrawMode.grey)
+							{
+								Imgproc.cvtColor(croppedImage, drawImage, Imgproc.COLOR_GRAY2BGRA);
+							}
 
-								if(drawThreshold)
+							// apply threshold.
+							thresholdImage(croppedImage);
+
+							if (markerDrawMode != MarkerDrawMode.off || cameraDrawMode!=CameraDrawMode.normal)
+							{
+								if(cameraDrawMode==CameraDrawMode.threshold)
 								{
 									Imgproc.cvtColor(croppedImage, drawImage, Imgproc.COLOR_GRAY2BGRA);
 								}
-								else
+								else if (cameraDrawMode==CameraDrawMode.normal)
 								{
 									drawImage.setTo(new Scalar(0, 0, 0));
 								}
@@ -329,7 +339,7 @@ public class MarkerDetector
 	private Bitmap result;
 
 	private MarkerDrawMode markerDrawMode = MarkerDrawMode.off;
-	private boolean drawThreshold = false;
+	private CameraDrawMode cameraDrawMode = CameraDrawMode.normal;
 
 	private Greyscaler greyscaler = null;
 	private MarkerCodeFactory markerCodeFactory = null;
@@ -366,15 +376,31 @@ public class MarkerDetector
 		return result;
 	}
 
-	public void setDrawThreshold(boolean drawThreshold)
+	public void toggleCameraDrawMode()
 	{
-		this.drawThreshold = drawThreshold;
-		resetDrawImage = true;
+		switch (this.cameraDrawMode)
+		{
+			case normal:
+				this.setCameraDrawMode(CameraDrawMode.grey);
+				break;
+			case grey:
+				this.setCameraDrawMode(CameraDrawMode.threshold);
+				break;
+			case threshold:
+				this.setCameraDrawMode(CameraDrawMode.normal);
+				break;
+		}
 	}
 
-	public boolean shouldDrawThreshold()
+	public void setCameraDrawMode(CameraDrawMode cameraDrawMode)
 	{
-		return drawThreshold;
+		resetDrawImage = this.cameraDrawMode==CameraDrawMode.normal || cameraDrawMode==CameraDrawMode.normal;
+		this.cameraDrawMode = cameraDrawMode;
+	}
+
+	public CameraDrawMode shouldDrawThreshold()
+	{
+		return this.cameraDrawMode;
 	}
 
 	public void start()

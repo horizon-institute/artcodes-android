@@ -276,7 +276,7 @@ public class ScanActivity extends ActionBarActivity implements ExperienceControl
 
 	public void toggleThresholdDisplay(View view)
 	{
-		detector.setDrawThreshold(!detector.shouldDrawThreshold());
+		detector.toggleCameraDrawMode();
 		updateMenu();
 	}
 
@@ -361,12 +361,17 @@ public class ScanActivity extends ActionBarActivity implements ExperienceControl
 		}
 
 		Button thresholdDisplayButton = (Button) findViewById(R.id.thresholdDisplayButton);
-		if (detector.shouldDrawThreshold())
+		if (detector.shouldDrawThreshold() == MarkerDetector.CameraDrawMode.threshold)
 		{
 			thresholdDisplayButton.setText(getString(R.string.threshold_on));
 			thresholdDisplayButton.setCompoundDrawablesWithIntrinsicBounds(R.drawable.ic_filter_b_and_w_white_24dp, 0, 0, 0);
 		}
-		else
+		else if (detector.shouldDrawThreshold() == MarkerDetector.CameraDrawMode.normal)
+		{
+			thresholdDisplayButton.setText(getString(R.string.threshold_off));
+			thresholdDisplayButton.setCompoundDrawablesWithIntrinsicBounds(R.drawable.ic_filter_b_and_w_off_white_24dp, 0, 0, 0);
+		}
+		else if (detector.shouldDrawThreshold() == MarkerDetector.CameraDrawMode.grey)
 		{
 			thresholdDisplayButton.setText(getString(R.string.threshold_off));
 			thresholdDisplayButton.setCompoundDrawablesWithIntrinsicBounds(R.drawable.ic_filter_b_and_w_off_white_24dp, 0, 0, 0);
