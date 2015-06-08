@@ -43,6 +43,13 @@ public class Aestheticodes extends Application
 {
 	private static final ExperienceListController experiences = new ExperienceListController();
 
+	@Override
+	public void onCreate()
+	{
+		super.onCreate();
+		AnalyticsTrackers.initialize(this);
+	}
+
 	public static ExperienceListController getExperiences()
 	{
 		return experiences;

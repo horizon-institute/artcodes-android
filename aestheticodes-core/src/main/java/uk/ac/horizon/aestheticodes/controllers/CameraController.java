@@ -95,6 +95,11 @@ public class CameraController implements Camera.PreviewCallback, SurfaceHolder.C
 		return framingRect;
 	}
 
+	public int getPreviewFormat()
+	{
+		return camera.getParameters().getPreviewFormat();
+	}
+
 	public int getRotation()
 	{
 		WindowManager manager = (WindowManager) context.getSystemService(Context.WINDOW_SERVICE);

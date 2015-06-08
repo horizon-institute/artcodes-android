@@ -24,7 +24,10 @@ import android.net.Uri;
 import android.os.Bundle;
 import android.support.v7.app.ActionBarActivity;
 import android.view.View;
+import com.google.android.gms.analytics.HitBuilders;
+import com.google.android.gms.analytics.Tracker;
 import uk.ac.horizon.aestheticodes.Aestheticodes;
+import uk.ac.horizon.aestheticodes.AnalyticsTrackers;
 import uk.ac.horizon.aestheticodes.R;
 import uk.ac.horizon.aestheticodes.controllers.ExperienceListController;
 import uk.ac.horizon.aestheticodes.model.Marker;
@@ -37,6 +40,8 @@ public class MarkerActivity extends ActionBarActivity
 {
 	private Marker marker;
 	private Properties properties;
+	private String experienceID;
+	private String markerCode;
 
 	@Override
 	public void onCreate(Bundle savedInstanceState)
@@ -47,8 +52,8 @@ public class MarkerActivity extends ActionBarActivity
 
 		final Bundle extras = getIntent().getExtras();
 
-		String markerCode = extras.getString("marker");
-		String experienceID = extras.getString("experience");
+		markerCode = extras.getString("marker");
+		experienceID = extras.getString("experience");
 
 		ExperienceListController experiences = Aestheticodes.getExperiences();
 		Experience experience = experiences.get(experienceID);
@@ -64,6 +69,15 @@ public class MarkerActivity extends ActionBarActivity
 		properties.get("action").bindTo(new VisibilityBinding(R.id.markerAction));
 		properties.get("image").bindTo(R.id.markerImage).bindTo(new ColorImageBinding(R.id.markerAction));
 		properties.load();
+	}
+
+	@Override
+	protected void onStart()
+	{
+		super.onStart();
+		Tracker tracker = AnalyticsTrackers.getInstance().get(AnalyticsTrackers.Target.APP);
+		tracker.setScreenName("Marker " + markerCode + " @ " + experienceID + " Screen");
+		tracker.send(new HitBuilders.ScreenViewBuilder().build());
 	}
 
 	public void open(View view)

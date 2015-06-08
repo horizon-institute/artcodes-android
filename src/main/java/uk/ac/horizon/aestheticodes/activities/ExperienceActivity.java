@@ -26,7 +26,10 @@ import android.os.Bundle;
 import android.support.v4.app.NavUtils;
 import android.support.v7.app.ActionBarActivity;
 import android.view.View;
+import com.google.android.gms.analytics.HitBuilders;
+import com.google.android.gms.analytics.Tracker;
 import uk.ac.horizon.aestheticodes.Aestheticodes;
+import uk.ac.horizon.aestheticodes.AnalyticsTrackers;
 import uk.ac.horizon.aestheticodes.R;
 import uk.ac.horizon.aestheticodes.controllers.ExperienceFileController;
 import uk.ac.horizon.aestheticodes.controllers.ExperienceListController;
@@ -39,11 +42,12 @@ public class ExperienceActivity extends ActionBarActivity
 	private ExperienceListController experiences;
 	private Experience experience;
 	private Properties properties;
+	private String experienceID;
 
 	public void editExperience(View view)
 	{
 		Intent intent = new Intent(ExperienceActivity.this, ExperienceEditActivity.class);
-		intent.putExtra("experience", experience.getId());
+		intent.putExtra("experience", experienceID);
 
 		startActivity(intent);
 	}
@@ -61,12 +65,21 @@ public class ExperienceActivity extends ActionBarActivity
 	}
 
 	@Override
+	protected void onStart()
+	{
+		super.onStart();
+		Tracker tracker = AnalyticsTrackers.getInstance().get(AnalyticsTrackers.Target.APP);
+		tracker.setScreenName("Experience " + experienceID + " Screen");
+		tracker.send(new HitBuilders.ScreenViewBuilder().build());
+	}
+
+	@Override
 	protected void onCreate(Bundle savedInstanceState)
 	{
 		super.onCreate(savedInstanceState);
 
 		Bundle extras = getIntent().getExtras();
-		String experienceID = extras.getString("experience");
+		experienceID = extras.getString("experience");
 
 		experiences = Aestheticodes.getExperiences();
 		experience = experiences.get(experienceID);

@@ -31,7 +31,10 @@ import android.view.MenuItem;
 import android.view.View;
 import android.widget.AdapterView;
 import android.widget.ListView;
+import com.google.android.gms.analytics.HitBuilders;
+import com.google.android.gms.analytics.Tracker;
 import uk.ac.horizon.aestheticodes.Aestheticodes;
+import uk.ac.horizon.aestheticodes.AnalyticsTrackers;
 import uk.ac.horizon.aestheticodes.R;
 import uk.ac.horizon.aestheticodes.controllers.ExperienceListAdapter;
 import uk.ac.horizon.aestheticodes.model.Experience;
@@ -88,6 +91,15 @@ public class ExperienceListActivity extends ActionBarActivity
 		updateDownloadStatus();
 
 		return super.onCreateOptionsMenu(menu);
+	}
+
+	@Override
+	protected void onStart()
+	{
+		super.onStart();
+		Tracker tracker = AnalyticsTrackers.getInstance().get(AnalyticsTrackers.Target.APP);
+		tracker.setScreenName("Experience List Screen");
+		tracker.send(new HitBuilders.ScreenViewBuilder().build());
 	}
 
 	@Override

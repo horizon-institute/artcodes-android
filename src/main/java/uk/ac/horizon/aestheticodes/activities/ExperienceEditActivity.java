@@ -35,9 +35,12 @@ import android.view.View;
 import android.widget.DatePicker;
 import android.widget.ImageView;
 import android.widget.LinearLayout;
+import com.google.android.gms.analytics.HitBuilders;
+import com.google.android.gms.analytics.Tracker;
 import com.google.android.gms.location.places.Place;
 import com.google.android.gms.location.places.ui.PlacePicker;
 import uk.ac.horizon.aestheticodes.Aestheticodes;
+import uk.ac.horizon.aestheticodes.AnalyticsTrackers;
 import uk.ac.horizon.aestheticodes.R;
 import uk.ac.horizon.aestheticodes.controllers.ExperienceFileController;
 import uk.ac.horizon.aestheticodes.controllers.ExperienceListController;
@@ -71,6 +74,7 @@ public class ExperienceEditActivity extends ActionBarActivity
 	private ImageView markerSettingsIcon;
 	private Properties properties;
 	private ExperienceListController experiences;
+	private String experienceID;
 
 	public void deleteExperience(View view)
 	{
@@ -222,7 +226,7 @@ public class ExperienceEditActivity extends ActionBarActivity
 		experiences = Aestheticodes.getExperiences();
 		if (extras != null)
 		{
-			final String experienceID = extras.getString("experience");
+			experienceID = extras.getString("experience");
 			if (experienceID != null)
 			{
 				experience = experiences.get(experienceID);
@@ -373,6 +377,22 @@ public class ExperienceEditActivity extends ActionBarActivity
 
 		getSupportActionBar().setDisplayHomeAsUpEnabled(true);
 		getSupportActionBar().setHomeAsUpIndicator(R.drawable.ic_done_white_24dp);
+	}
+
+	@Override
+	protected void onStart()
+	{
+		super.onStart();
+		Tracker tracker = AnalyticsTrackers.getInstance().get(AnalyticsTrackers.Target.APP);
+		if(experienceID == null)
+		{
+			tracker.setScreenName("New Experience Edit Screen");
+		}
+		else
+		{
+			tracker.setScreenName("Experience " + experienceID + " Edit Screen");
+		}
+		tracker.send(new HitBuilders.ScreenViewBuilder().build());
 	}
 
 	protected void onActivityResult(int requestCode, int resultCode, Intent data)
