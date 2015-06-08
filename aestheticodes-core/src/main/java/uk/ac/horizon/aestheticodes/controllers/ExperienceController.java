@@ -28,7 +28,7 @@ import java.util.HashSet;
 
 public class ExperienceController
 {
-	public static interface Listener
+	public interface Listener
 	{
 		void experienceSelected(Experience experience);
 	}

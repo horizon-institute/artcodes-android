@@ -34,7 +34,7 @@
 		          android:id="@+id/markerCode"
 		          android:hint="@string/markerCode"
 		          android:digits="0123456789:"
-		          android:inputType="number"
+		          android:inputType="time"
 		          android:singleLine="true"
 		          android:layout_marginBottom="8dp"
 		          android:textStyle="bold" />
@@ -60,33 +60,32 @@
 				android:text="@string/markerShowDetail"
 				android:id="@+id/markerShowDetail" android:layout_marginLeft="4dp"
 				android:layout_marginRight="4dp" />
+
 		<LinearLayout
 				android:orientation="vertical"
 				android:layout_width="fill_parent"
 				android:layout_height="fill_parent"
 				android:id="@+id/markerDetails"
 				android:paddingTop="8dp">
-			<LinearLayout android:orientation="horizontal"
-			              android:layout_width="fill_parent"
-			              android:layout_height="fill_parent">
+			<LinearLayout
+					android:orientation="horizontal"
+					android:layout_width="match_parent"
+					android:layout_height="match_parent">
+
 				<ImageView tools:ignore="ContentDescription"
 				           android:layout_width="wrap_content"
 				           android:layout_height="wrap_content"
-				           android:layout_marginEnd="16dp"
-				           android:layout_marginRight="16dp"
 				           android:scaleType="fitCenter"
 				           android:src="@drawable/ic_subject_white_24dp"
-				           android:paddingTop="8dp"
-				           android:paddingRight="16dp"
-				           android:paddingBottom="8dp"
-				           android:tint="#999"
-				           android:layout_marginTop="4dp" />
+				           android:paddingTop="10dp"
+				           android:paddingRight="28dp"
+				           android:tint="@color/ic_tint" />
+
 				<EditText android:layout_width="match_parent"
 				          android:layout_height="wrap_content"
 				          android:inputType="textMultiLine"
 				          android:id="@+id/markerDescription"
-				          android:hint="@string/markerDescription"
-				          android:layout_marginTop="8dp" />
+				          android:hint="@string/markerDescription"	/>
 			</LinearLayout>
 
 			<LinearLayout android:orientation="horizontal"
@@ -95,21 +94,15 @@
 				<ImageView tools:ignore="ContentDescription"
 				           android:layout_width="wrap_content"
 				           android:layout_height="wrap_content"
-				           android:layout_marginEnd="16dp"
-				           android:layout_marginRight="16dp"
 				           android:scaleType="fitCenter"
 				           android:src="@drawable/ic_photo_white_24dp"
-				           android:paddingTop="8dp"
-				           android:paddingRight="16dp"
-				           android:paddingBottom="8dp"
-				           android:tint="#999"
-				           android:clickable="false"
-				           android:layout_marginTop="4dp" />
+				           android:paddingTop="10dp"
+				           android:paddingRight="28dp"
+				           android:tint="@color/ic_tint" />
 				<EditText android:layout_width="match_parent"
 				          android:layout_height="wrap_content"
 				          android:id="@+id/markerImage"
 				          android:hint="@string/markerImage"
-				          android:layout_marginTop="8dp"
 				          android:inputType="textUri" />
 			</LinearLayout>
 		</LinearLayout>

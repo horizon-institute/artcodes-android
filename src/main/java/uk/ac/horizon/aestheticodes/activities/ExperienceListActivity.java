@@ -25,7 +25,7 @@ import android.os.AsyncTask;
 import android.os.Build;
 import android.os.Bundle;
 import android.os.Handler;
-import android.support.v7.app.ActionBarActivity;
+import android.support.v7.app.AppCompatActivity;
 import android.view.Menu;
 import android.view.MenuItem;
 import android.view.View;
@@ -36,7 +36,7 @@ import uk.ac.horizon.aestheticodes.R;
 import uk.ac.horizon.aestheticodes.controllers.ExperienceListAdapter;
 import uk.ac.horizon.aestheticodes.model.Experience;
 
-public class ExperienceListActivity extends ActionBarActivity
+public class ExperienceListActivity extends AppCompatActivity
 {
 	private final Handler handler = new Handler();
 	private final Runnable downloadClear = new Runnable()
@@ -129,7 +129,10 @@ public class ExperienceListActivity extends ActionBarActivity
 			}
 		});
 
-		getSupportActionBar().setDisplayHomeAsUpEnabled(true);
+		if(getSupportActionBar() != null)
+		{
+			getSupportActionBar().setDisplayHomeAsUpEnabled(true);
+		}
 	}
 
 	@Override

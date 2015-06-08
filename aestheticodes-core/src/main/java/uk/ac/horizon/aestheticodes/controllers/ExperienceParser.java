@@ -48,7 +48,7 @@ public class ExperienceParser
 				throw new JsonParseException("Unexpected type: " + json.getClass().getSimpleName());
 			}
 
-			Map<String, Marker> result = new HashMap<String, Marker>();
+			Map<String, Marker> result = new HashMap<>();
 			JsonArray array = json.getAsJsonArray();
 			for (JsonElement element : array)
 			{

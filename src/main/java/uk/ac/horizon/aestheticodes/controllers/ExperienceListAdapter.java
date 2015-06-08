@@ -29,7 +29,7 @@ import android.widget.BaseAdapter;
 import android.widget.ImageView;
 import android.widget.LinearLayout;
 import android.widget.TextView;
-import com.squareup.picasso.Picasso;
+import com.koushikdutta.ion.Ion;
 import uk.ac.horizon.aestheticodes.R;
 import uk.ac.horizon.aestheticodes.model.Experience;
 
@@ -66,7 +66,7 @@ public class ExperienceListAdapter extends BaseAdapter implements ExperienceList
 	@Override
 	public void experienceListChanged()
 	{
-		List<Experience> newExperiences = new ArrayList<Experience>();
+		List<Experience> newExperiences = new ArrayList<>();
 		for (Experience experience : experienceController.get())
 		{
 			if (experience.getOp() != Experience.Operation.remove)
@@ -167,8 +167,7 @@ public class ExperienceListAdapter extends BaseAdapter implements ExperienceList
 		iconView.setImageDrawable(null);
 		if (experience.getIcon() != null && !experience.getIcon().isEmpty())
 		{
-			Picasso.with(context).cancelRequest(iconView);
-			Picasso.with(context).load(experience.getIcon()).into(iconView);
+			Ion.with(context).load(experience.getIcon()).intoImageView(iconView);
 		}
 
 		if (viewGroup.getClass().getName().endsWith("SpinnerCompat"))

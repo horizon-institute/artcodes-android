@@ -17,7 +17,9 @@
  *     along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-package uk.ac.horizon.aestheticodes;/*
+package uk.ac.horizon.aestheticodes;
+
+/*
  * uk.ac.horizon.aestheticodes.Aestheticodes recognises a different marker scheme that allows the
  * creation of aesthetically pleasing, even beautiful, codes.
  * Copyright (C) 2015  uk.ac.horizon.aestheticodes.Aestheticodes
@@ -37,6 +39,8 @@ package uk.ac.horizon.aestheticodes;/*
  */
 
 import android.app.Application;
+import com.google.android.gms.analytics.GoogleAnalytics;
+import com.google.android.gms.analytics.Tracker;
 import uk.ac.horizon.aestheticodes.controllers.ExperienceListController;
 
 public class Aestheticodes extends Application
@@ -46,5 +50,11 @@ public class Aestheticodes extends Application
 	public static ExperienceListController getExperiences()
 	{
 		return experiences;
+	}
+
+	public Tracker getTracker()
+	{
+		// Initialize a tracker using a Google Analytics property ID.
+		return GoogleAnalytics.getInstance(this).newTracker("UA-XXXX-Y");
 	}
 }

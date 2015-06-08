@@ -50,7 +50,7 @@
 		           android:value="@integer/google_play_services_version" />
 		<meta-data
 				android:name="com.google.android.geo.API_KEY"
-				android:value="@string/api_key"/>
+				android:value="@string/api_key" />
 
 		<!--<activity android:name=".activities.TestScanActivity">
 			<intent-filter>
@@ -127,7 +127,8 @@
 			           android:value=".activities.AestheticodesActivity" />
 		</activity>
 		<activity android:name="uk.ac.horizon.aestheticodes.activities.ExperienceEditActivity"
-		          android:label="Edit Experience">
+		          android:label="Edit Experience"
+		          android:windowSoftInputMode="stateUnchanged">
 		</activity>
 	</application>
 

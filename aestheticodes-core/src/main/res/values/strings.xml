@@ -25,7 +25,7 @@
 
 	<string name="action_switch_camera">Switch Camera</string>
 
-	<string name="mode_active_detect">Detecting…</string>
+	<string name="mode_active_detect">Looking for Artcodes…</string>
 
 
 	<string name="auto_open">Open</string>

@@ -23,14 +23,14 @@ import android.animation.AnimatorListenerAdapter;
 import android.annotation.TargetApi;
 import android.content.Context;
 import android.content.Intent;
+import android.content.res.Configuration;
 import android.content.res.Resources;
 import android.graphics.Bitmap;
 import android.graphics.Color;
-import android.graphics.Rect;
 import android.net.Uri;
 import android.os.Build;
 import android.os.Bundle;
-import android.support.v7.app.ActionBarActivity;
+import android.support.v7.app.AppCompatActivity;
 import android.util.Log;
 import android.view.KeyCharacterMap;
 import android.view.KeyEvent;
@@ -39,10 +39,10 @@ import android.view.SurfaceView;
 import android.view.View;
 import android.view.ViewAnimationUtils;
 import android.view.ViewConfiguration;
-import android.view.ViewGroup;
+import android.view.ViewTreeObserver;
 import android.view.WindowManager;
 import android.widget.Button;
-import android.widget.RelativeLayout;
+import android.widget.ImageView;
 import android.widget.TextView;
 import com.google.gson.Gson;
 import org.opencv.android.OpenCVLoader;
@@ -52,11 +52,10 @@ import uk.ac.horizon.aestheticodes.controllers.ExperienceParser;
 import uk.ac.horizon.aestheticodes.controllers.MarkerDetector;
 import uk.ac.horizon.aestheticodes.core.R;
 import uk.ac.horizon.aestheticodes.model.Experience;
-import uk.ac.horizon.aestheticodes.views.ViewfinderView;
 
 import java.net.URLDecoder;
 
-public class ScanActivity extends ActionBarActivity implements ExperienceController.Listener, MarkerDetector.Listener
+public class ScanActivity extends AppCompatActivity implements ExperienceController.Listener, MarkerDetector.Listener
 {
 	private static final String TAG = ScanActivity.class.getName();
 
@@ -86,9 +85,9 @@ public class ScanActivity extends ActionBarActivity implements ExperienceControl
 	protected final ExperienceController experience = new ExperienceController();
 	protected CameraController camera;
 	protected MarkerDetector detector;
-	protected ViewfinderView viewfinder;
-	protected TextView modeText;
-	protected RelativeLayout bottomView;
+	protected ImageView debugView;
+	private View topView;
+	protected TextView bottomView;
 	private SurfaceHolder holder;
 	private View settingsMenuButton;
 	private View settingsMenu;
@@ -110,7 +109,7 @@ public class ScanActivity extends ActionBarActivity implements ExperienceControl
 	{
 		stopCamera();
 		camera.flip();
-		viewfinder.invalidate();
+		// TODO ?viewfinder.invalidate();
 		startCamera();
 		updateMenu();
 	}
@@ -167,6 +166,8 @@ public class ScanActivity extends ActionBarActivity implements ExperienceControl
 	{
 		super.onCreate(savedInstanceState);
 		getWindow().addFlags(WindowManager.LayoutParams.FLAG_KEEP_SCREEN_ON);
+		getWindow().getDecorView().setSystemUiVisibility(
+				View.SYSTEM_UI_FLAG_LAYOUT_HIDE_NAVIGATION);
 
 		setContentView(R.layout.activity_main);
 
@@ -174,29 +175,65 @@ public class ScanActivity extends ActionBarActivity implements ExperienceControl
 
 		detector = new MarkerDetector(camera, this, experience);
 
-		viewfinder = (ViewfinderView) findViewById(R.id.viewfinder);
-		viewfinder.setCamera(camera);
-		viewfinder.addSizeChangedListener(new ViewfinderView.SizeChangedListener()
-		{
-			@Override
-			public void sizeHasChanged()
-			{
-				layout();
-			}
-		});
+//		viewfinder = (ViewfinderView) findViewById(R.id.viewfinder);
+//		viewfinder.setCamera(camera);
+//		viewfinder.addSizeChangedListener(new ViewfinderView.SizeChangedListener()
+//		{
+//			@Override
+//			public void sizeHasChanged()
+//			{
+//				layout();
+//			}
+//		});
 
-		final SurfaceView surfaceView = (SurfaceView) findViewById(R.id.preview);
+		final SurfaceView surfaceView = (SurfaceView) findViewById(R.id.cameraView);
 		holder = surfaceView.getHolder();
 		holder.addCallback(camera);
 		// deprecated setting, but required on Android versions prior to 3.0
 		//noinspection deprecation
 		holder.setType(SurfaceHolder.SURFACE_TYPE_PUSH_BUFFERS);
 
-		bottomView = (RelativeLayout) findViewById(R.id.bottomView);
+		bottomView = (TextView) findViewById(R.id.bottomView);
+		topView = findViewById(R.id.topView);
+
+
+		surfaceView.getViewTreeObserver().addOnGlobalLayoutListener(new ViewTreeObserver.OnGlobalLayoutListener()
+		{
+			@Override
+			public void onGlobalLayout()
+			{
+				int height = getWindow().getDecorView().getHeight();
+				int width = getWindow().getDecorView().getWidth();
+
+				int dividerSize = Math.abs(height - width) / 2;
+
+				if(getResources().getConfiguration().orientation == Configuration.ORIENTATION_LANDSCAPE)
+				{
+					topView.getLayoutParams().width = dividerSize;
+					bottomView.getLayoutParams().width = dividerSize;
+				}
+				else
+				{
+					topView.getLayoutParams().height = dividerSize;
+					bottomView.getLayoutParams().height = dividerSize;
+
+					int resourceId = getResources().getIdentifier("navigation_bar_height", "dimen", "android");
+					if (resourceId > 0)
+					{
+						int navHeight = getResources().getDimensionPixelSize(resourceId);
+						if(navHeight != 0)
+						{
+							bottomView.setPadding(0,0,0, navHeight);
+						}
+					}
+				}
+			}
+		});
+
+		debugView = (ImageView) findViewById(R.id.debugView);
 
 		settingsMenuButton = findViewById(R.id.settingsMenuButton);
 		settingsMenu = findViewById(R.id.settingsMenu);
-		modeText = (TextView) findViewById(R.id.modeText);
 
 		Log.i(TAG, "Intent onCreate: " + getIntent());
 		onNewIntent(getIntent());
@@ -220,13 +257,13 @@ public class ScanActivity extends ActionBarActivity implements ExperienceControl
 			{
 				if (detected)
 				{
-					modeText.setTextColor(Color.YELLOW);
+					bottomView.setTextColor(Color.YELLOW);
 				}
 				else
 				{
-					modeText.setTextColor(Color.WHITE);
+					bottomView.setTextColor(Color.WHITE);
 				}
-				viewfinder.setResult(image);
+				debugView.setImageBitmap(image);
 			}
 		});
 	}
@@ -307,7 +344,7 @@ public class ScanActivity extends ActionBarActivity implements ExperienceControl
 			// should!
 			{
 				data = data.substring(artcode_scheme.length() + 1);
-				if(data.startsWith("//"))
+				if (data.startsWith("//"))
 				{
 					data = data.substring(2);
 				}
@@ -409,36 +446,30 @@ public class ScanActivity extends ActionBarActivity implements ExperienceControl
 
 	private void layout()
 	{
-		Rect frame = camera.getFrame(viewfinder.getWidth(), viewfinder.getHeight());
-		if (frame == null)
-		{
-			return;
-		}
 
-		Log.i(TAG, "Frame = " + frame + ", " + viewfinder.getWidth());
-		ViewGroup.LayoutParams p = bottomView.getLayoutParams();
-		SurfaceView surfaceView = (SurfaceView) findViewById(R.id.preview);
-		p.height = surfaceView.getHeight() - frame.bottom;
-		p.width = frame.width();
-		bottomView.setLayoutParams(p);
+		// TODO
+		//Rect frame = camera.getFrame(viewfinder.getWidth(), viewfinder.getHeight());
+		//if (frame == null)
+		//{
+		//	return;
+		//}
 
-		if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.KITKAT && hasNavBar(this))
-		{
-			// Don't draw over nav bar
-			bottomView.setPadding(0, 0, 0, getNavBarHeight());
-		}
+		//Log.i(TAG, "Frame = " + frame + ", " + viewfinder.getWidth());
+		//ViewGroup.LayoutParams p = bottomView.getLayoutParams();
+		//SurfaceView surfaceView = (SurfaceView) findViewById(R.id.preview);
+		//p.height = surfaceView.getHeight() - frame.bottom;
+		//p.width = frame.width();
+		//bottomView.setLayoutParams(p);
 
-		bottomView.requestLayout();
-		viewfinder.invalidate();
+		//if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.KITKAT && hasNavBar(this))
+		//{
+		//	// Don't draw over nav bar
+		//	bottomView.setPadding(0, 0, 0, getNavBarHeight());
+		//}
+
+		//bottomView.requestLayout();
+		// TODO ?viewfinder.invalidate();
 	}
-
-//	private void setMode(MarkerDetector.Mode mode)
-//	{
-//		Log.i(TAG, "Set mode to " + mode);
-//		//detector.setMode(mode);
-//		viewfinder.invalidate();
-//		modeText.setText(getTextString(MODE_ACTIVE_PREFIX + mode.name(), mode.name()));
-//	}
 
 	private void startCamera()
 	{

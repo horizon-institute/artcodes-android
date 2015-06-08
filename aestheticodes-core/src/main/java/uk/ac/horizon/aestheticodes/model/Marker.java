@@ -19,8 +19,23 @@
 
 package uk.ac.horizon.aestheticodes.model;
 
+import java.util.Comparator;
+
 public class Marker
 {
+	public static final Comparator<Marker> comparator = new Comparator<Marker>()
+	{
+		@Override
+		public int compare(Marker marker1, Marker marker2)
+		{
+			if (marker1.getCode().length() != marker2.getCode().length())
+			{
+				return marker1.getCode().length() - marker2.getCode().length();
+			}
+			return marker1.getCode().compareTo(marker2.getCode());
+		}
+	};
+
 	private String code;
 	private String action;
 	private String title;

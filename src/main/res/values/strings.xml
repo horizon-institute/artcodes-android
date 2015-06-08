@@ -31,41 +31,14 @@
 	<string name="markerCode">Marker Code</string>
 	<!-- Default WebSites -->
 	<string name="URL">URL</string>
-	<string name="minRegions">Regions</string>
-	<string name="minRegions_desc" tools:ignore="UnusedResources">The number of regions in a valid Artcode.</string>
-	<plurals name="minRegions_text" tools:ignore="UnusedResources">
-		<item quantity="one">1 Region</item>
-		<item quantity="other">%s Regions</item>
-	</plurals>
-	<string name="maxRegionValue" tools:ignore="UnusedResources">Max Region Value</string>
-	<string name="maxRegionValue_desc" tools:ignore="UnusedResources">The maximum value a region can have in a valid
-		Artcode.
-	</string>
-	<string name="maxEmptyRegions" tools:ignore="UnusedResources">Empty Regions</string>
-	<string name="maxEmptyRegions_desc" tools:ignore="UnusedResources">The maximum number of empty regions in a valid
-		Artcode.
-	</string>
-	<string name="maxEmptyRegions_off" tools:ignore="UnusedResources">None</string>
-	<plurals name="maxEmptyRegions_text" tools:ignore="UnusedResources">
-		<item quantity="one">Maximum 1 Empty Region</item>
-		<item quantity="other">Maximum %d Empty Regions</item>
-	</plurals>
-	<string name="validationRegions" tools:ignore="UnusedResources">Validation</string>
-	<string name="validationRegions_desc" tools:ignore="UnusedResources">The number of regions that must have a
-		specified value in a valid Artcode.
-	</string>
-	<string name="validationRegions_off" tools:ignore="UnusedResources">Off</string>
-	<plurals name="validationRegions_text" tools:ignore="UnusedResources">
-		<item quantity="one">1 Validation Region</item>
-		<item quantity="other">%d Validation Regions</item>
-	</plurals>
-	<string name="validationRegionValue" tools:ignore="UnusedResources">Validation Region Value</string>
-	<string name="validationRegionValue_desc" tools:ignore="UnusedResources">The value that validation regions must have
-		in a valid Artcode.
-	</string>
-	<string name="checksumModulo" tools:ignore="UnusedResources">Checksum Value</string>
-	<string name="checksumModulo_off" tools:ignore="UnusedResources">Disabled</string>
-	<string name="checksumModulo_desc" tools:ignore="UnusedResources">The Artcode checksum: the sum of all regions
+	<string name="regions">Regions</string>
+	<string name="regions_desc">The number of regions in a valid Artcode.</string>
+	<string name="regions_value">%s Regions</string>
+	<string name="maxRegionValue">Max Items per Region</string>
+	<string name="maxRegionValue_desc">The maximum number of items that can be in a region in a valid Artcode.</string>
+	<string name="checksumModulo">Checksum Value</string>
+	<string name="checksumModulo_off">Disabled</string>
+	<string name="checksumModulo_desc">The Artcode checksum: the sum of all regions
 		must be divisible by this value to be valid.
 	</string>
     <string name="embeddedChecksum">Embedded Checksum</string>
@@ -75,6 +48,7 @@
 
 	<string name="experienceDeleteConfirmTitle">Delete %s?</string>
 	<string name="experienceDeleteConfirmMessage">%s will be permanently deleted</string>
+	<string name="save">Save</string>
 	<string name="deleteConfirm">Delete</string>
 	<string name="deleteCancel">Cancel</string>
 
@@ -96,4 +70,14 @@
 	<string name="minimum">Minimum</string>
 	<string name="maximum">Maximum</string>
 	<string name="share">Share</string>
+	<string name="download">Download</string>
+	<string name="open">Open</string>
+	<string name="edit">Edit</string>
+	<string name="location">Location</string>
+	<string name="start_date">Start Date</string>
+	<string name="end_date">End Date</string>
+	<string name="scan">Scan</string>
+	<string name="events">Events</string>
+	<string name="availability">Availability</string>
+	<string name="availability_add">Add Availability</string>
 </resources>

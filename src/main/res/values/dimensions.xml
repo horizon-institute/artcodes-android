@@ -20,6 +20,11 @@
 <resources>
 	<dimen name="padding">16dp</dimen>
 
+	<integer name="custom_wrap_content">-2</integer>
+
+	<dimen name="detail_edge_margin">0dp</dimen>
+	<dimen name="detail_backdrop_height">@integer/custom_wrap_content</dimen>
+
 	<dimen name="action_button_min_width">56dp</dimen>
 	<dimen name="indeterminate_progress_size">32dp</dimen>
 

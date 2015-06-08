@@ -24,4 +24,6 @@
 	<color name="PRESSED_STATE_COLOR">#194a8e</color>
 	<color name="FOCUSED_STATE_COLOR">#194a8e</color>
 	<color name="NORMAL_STATE_COLOR">#194a8e</color>
+
+    <color name="ic_tint">#777</color>
 </resources>

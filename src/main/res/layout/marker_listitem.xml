@@ -22,27 +22,31 @@
               xmlns:tools="http://schemas.android.com/tools"
               android:layout_width="fill_parent"
               android:layout_height="72dp"
+              android:background="?attr/selectableItemBackground"
+              android:orientation="horizontal"
+              tools:context=".activities.ExperienceEditActivity"
+              android:paddingRight="8dp"
+              android:paddingLeft="16dp"
               android:paddingTop="16dp"
               android:paddingBottom="16dp"
-              android:background="?attr/selectableItemBackground"
-              android:orientation="horizontal">
+              android:id="@+id/markerEdit">
 
 	<ImageView android:layout_width="wrap_content"
 	           android:layout_height="wrap_content"
-	           android:layout_marginEnd="16dp"
-	           android:layout_marginRight="16dp"
 	           android:scaleType="fitCenter"
 	           android:src="@drawable/ic_label_white_24dp"
 	           android:paddingTop="8dp"
-	           android:paddingRight="16dp"
-	           android:paddingEnd="16dp"
+	           android:paddingRight="32dp"
+	           android:paddingEnd="32dp"
 	           android:paddingBottom="8dp"
-	           android:tint="#CCC"
+	           android:tint="@color/ic_tint"
 	           tools:ignore="ContentDescription" />
 
-	<LinearLayout android:layout_width="fill_parent"
+	<LinearLayout android:layout_width="wrap_content"
 	              android:layout_height="wrap_content"
-	              android:orientation="vertical">
+	              android:orientation="vertical"
+	              android:layout_weight="1"
+			>
 
 		<LinearLayout android:layout_width="fill_parent"
 		              android:layout_height="wrap_content"
@@ -53,22 +57,39 @@
 			          android:layout_height="wrap_content"
 			          android:textSize="16sp"
 			          android:layout_marginRight="16dp"
-			          android:textColor="#444" />
+			          android:layout_marginEnd="16dp"
+			          android:textColor="#444"
+			          android:singleLine="true"
+			          android:ellipsize="end" />
 
 			<TextView android:id="@+id/markerTitle"
 			          android:layout_width="wrap_content"
 			          android:layout_height="wrap_content"
 			          android:textSize="16sp"
-			          android:textColor="#000" />
+			          android:textColor="#000"
+			          android:singleLine="true"
+			          android:ellipsize="end" />
 
 		</LinearLayout>
 
 		<TextView android:id="@+id/markerAction"
-		          android:layout_width="wrap_content"
+		          android:layout_width="fill_parent"
 		          android:layout_height="wrap_content"
 		          android:textSize="14sp"
-		          android:textColor="#999" />
+		          android:textColor="#999"
+				/>
 	</LinearLayout>
+
+	<ImageView android:layout_width="wrap_content"
+	           android:layout_height="wrap_content"
+	           android:src="@drawable/ic_close_black_18dp"
+	           android:tint="@color/ic_tint"
+	           android:scaleType="fitCenter"
+	           android:layout_gravity="center_vertical"
+	           android:background="?attr/selectableItemBackground"
+	           android:onClick="deleteMarker"
+	           android:padding="8dp"
+	           android:id="@+id/markerDelete" />
 
 
 </LinearLayout>

@@ -18,36 +18,43 @@
  */
 buildscript {
 	repositories {
-		mavenCentral()
+		jcenter()
 	}
 	dependencies {
-		classpath 'com.android.tools.build:gradle:1.1.3'
+		classpath 'com.android.tools.build:gradle:1.2.3'
+		classpath "com.android.databinding:dataBinder:1.0-rc0"
 	}
 }
 
 apply plugin: 'idea'
 apply plugin: 'eclipse'
 apply plugin: 'com.android.application'
+apply plugin: 'com.android.databinding'
 
 repositories {
-	mavenCentral()
+	jcenter()
 	maven {
-		url 'https://raw.githubusercontent.com/vRallev/mvn-repo/master/'
+		url 'https://raw.github.com/vRallev/mvn-repo/master/'
 	}
 }
 
 dependencies {
-	compile project(":aestheticodes-core")
-	compile 'com.android.support:palette-v7:22.0.0'
-	compile 'com.google.android.gms:play-services-base:7.0.0'
-	compile 'com.google.android.gms:play-services-location:7.0.0'
-	compile 'com.squareup.picasso:picasso:2.4.0'
-	compile 'org.opencv:opencv-android:2.4.8'
+	compile project(':aestheticodes-core')
+	compile 'com.squareup.retrofit:retrofit:1.9.0'
+	compile 'com.android.support:palette-v7:22.2.0'
+	compile 'com.android.support:appcompat-v7:22.2.0'
+	compile 'com.android.support:gridlayout-v7:22.2.0'
+	compile 'com.android.support:recyclerview-v7:22.2.0'
+	compile 'com.android.support:design:22.2.0'
+	compile 'com.google.android.gms:play-services-base:7.5.0'
+	compile 'com.google.android.gms:play-services-location:7.5.0'
+	compile 'com.google.android.gms:play-services-analytics:7.5.0'
+	compile 'com.koushikdutta.ion:ion:2.+'
 }
 
 android {
 	compileSdkVersion 22
-	buildToolsVersion "22.0.1"
+	buildToolsVersion '22.0.1'
 
 	defaultConfig {
 		minSdkVersion 10
@@ -90,7 +97,7 @@ android {
 	}
 
 	// map for the version code
-	project.ext.versionCodes = [armeabi:1,'armeabi-v7a':2, mips:3, x86:4]
+	project.ext.versionCodes = [armeabi: 1, 'armeabi-v7a': 2, mips: 3, x86: 4]
 
 	android.applicationVariants.all { variant ->
 		// assign different version code for each output

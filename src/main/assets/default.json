@@ -57,7 +57,7 @@
 		}
 	],
 	"id": "uk.ac.horizon.aestheticodes.default",
-	"name": "Aestheticodes",
+	"name": "Artcodes",
 	"icon": "http://www.wornchaos.org/default_logo.png",
 	"minRegions": 5,
 	"maxRegions": 5,

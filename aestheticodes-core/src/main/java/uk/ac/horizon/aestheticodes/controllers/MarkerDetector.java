@@ -38,12 +38,12 @@ import java.util.List;
 
 public class MarkerDetector
 {
-	public static enum MarkerDrawMode
+	public enum MarkerDrawMode
 	{
 		off, outline, regions
 	}
 
-	public static interface Listener
+	public interface Listener
 	{
 		void markerChanged(String markerCode);
 

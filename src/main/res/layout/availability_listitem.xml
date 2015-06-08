@@ -1,0 +1,128 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!--
+  ~ Aestheticodes recognises a different marker scheme that allows the
+  ~ creation of aesthetically pleasing, even beautiful, codes.
+  ~ Copyright (C) 2015  Aestheticodes
+  ~
+  ~     This program is free software: you can redistribute it and/or modify
+  ~     it under the terms of the GNU Affero General Public License as published
+  ~     by the Free Software Foundation, either version 3 of the License, or
+  ~     (at your option) any later version.
+  ~
+  ~     This program is distributed in the hope that it will be useful,
+  ~     but WITHOUT ANY WARRANTY; without even the implied warranty of
+  ~     MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+  ~     GNU Affero General Public License for more details.
+  ~
+  ~     You should have received a copy of the GNU Affero General Public License
+  ~     along with this program.  If not, see <http://www.gnu.org/licenses/>.
+  -->
+
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+              xmlns:tools="http://schemas.android.com/tools"
+              android:orientation="vertical"
+              android:layout_width="fill_parent"
+              android:layout_height="wrap_content">
+
+	<LinearLayout android:layout_width="fill_parent"
+	              android:layout_height="wrap_content"
+	              android:orientation="horizontal"
+	              android:clickable="true"
+	              android:background="?attr/selectableItemBackground"
+	              android:padding="8dp">
+
+		<ImageView tools:ignore="ContentDescription"
+		           android:layout_width="wrap_content"
+		           android:layout_height="wrap_content"
+		           android:scaleType="fitCenter"
+		           android:src="@drawable/ic_schedule_black_24dp"
+		           android:paddingRight="32dp"
+		           android:tint="@color/ic_tint"
+		           android:paddingLeft="8dp"
+		           android:paddingTop="4dp"
+		           android:paddingBottom="4dp" />
+
+		<TextView android:layout_width="0dp"
+		          android:layout_height="fill_parent"
+		          android:textSize="16sp"
+		          android:gravity="center_vertical"
+		          android:textColor="#333"
+		          android:layout_weight="1"
+		          android:hint="@string/start_date"
+		          android:id="@+id/availabilityStart" />
+
+		<ImageView android:layout_width="wrap_content"
+		           android:layout_height="wrap_content"
+		           android:src="@drawable/ic_close_black_18dp"
+		           android:layout_gravity="center_vertical"
+		           android:tint="@color/ic_tint"
+		           tools:ignore="ContentDescription"
+		           android:background="?attr/selectableItemBackground"
+		           android:padding="8dp"
+		           android:id="@+id/availabilityDelete" />
+
+	</LinearLayout>
+
+	<LinearLayout android:layout_width="fill_parent"
+	              android:layout_height="wrap_content"
+	              android:orientation="horizontal"
+	              android:clickable="true"
+	              android:background="?attr/selectableItemBackground"
+	              android:padding="8dp">
+
+		<ImageView tools:ignore="ContentDescription"
+		           android:layout_width="wrap_content"
+		           android:layout_height="wrap_content"
+		           android:scaleType="fitCenter"
+		           android:src="@drawable/ic_event_black_24dp"
+		           android:paddingRight="32dp"
+		           android:tint="#fff"
+		           android:paddingLeft="8dp"
+		           android:paddingTop="4dp"
+		           android:paddingBottom="4dp" />
+
+		<TextView android:layout_width="0dp"
+		          android:layout_height="fill_parent"
+		          android:textSize="16sp"
+		          android:gravity="center_vertical"
+		          android:textColor="#333"
+		          android:layout_weight="1"
+		          android:hint="@string/end_date"
+		          android:id="@+id/availabilityEnd" />
+
+	</LinearLayout>
+
+	<LinearLayout android:layout_width="fill_parent"
+	              android:layout_height="wrap_content"
+	              android:orientation="horizontal"
+	              android:clickable="true"
+	              android:background="?attr/selectableItemBackground"
+	              android:padding="8dp">
+
+		<ImageView tools:ignore="ContentDescription"
+		           android:layout_width="wrap_content"
+		           android:layout_height="wrap_content"
+		           android:scaleType="fitCenter"
+		           android:src="@drawable/ic_place_black_24dp"
+		           android:paddingRight="32dp"
+		           android:tint="@color/ic_tint"
+		           android:paddingLeft="8dp"
+		           android:paddingTop="4dp"
+		           android:paddingBottom="4dp" />
+
+		<TextView android:layout_width="0dp"
+		          android:layout_height="fill_parent"
+		          android:textSize="16sp"
+		          android:gravity="center_vertical"
+		          android:textColor="#333"
+		          android:layout_weight="1"
+		          android:hint="@string/location"
+		          android:id="@+id/availabilityLocation" />
+
+	</LinearLayout>
+
+	<View android:layout_width="fill_parent"
+	      android:layout_height="1dp"
+	      android:background="#DDD"
+	      android:layout_marginLeft="72dp" />
+</LinearLayout>

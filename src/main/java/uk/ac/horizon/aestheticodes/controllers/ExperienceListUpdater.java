@@ -140,7 +140,7 @@ class ExperienceListUpdater extends AsyncTask<String, Experience, Collection<Str
 				}
 				catch (Exception e)
 				{
-					Log.w(TAG, "Failed to load settings", e);
+					Log.w(TAG, "Failed to updateView settings", e);
 				}
 			}
 
@@ -161,7 +161,6 @@ class ExperienceListUpdater extends AsyncTask<String, Experience, Collection<Str
 								{
 									Experience experience = gson.fromJson(new InputStreamReader(connection.getInputStream()), Experience.class);
 									experience.setOp(Experience.Operation.add);
-									experience.setOrigin(experienceURL);
 
 									publishProgress(experience);
 								}
@@ -172,7 +171,6 @@ class ExperienceListUpdater extends AsyncTask<String, Experience, Collection<Str
 							final InputStream inputStream = context.getContentResolver().openInputStream(Uri.parse(experienceURL));
 							final Experience intentExperience = gson.fromJson(new InputStreamReader(inputStream, "UTF-8"), Experience.class);
 							intentExperience.setOp(Experience.Operation.add);
-							intentExperience.setOrigin(experienceURL);
 
 							publishProgress(intentExperience);
 						}
@@ -263,7 +261,7 @@ class ExperienceListUpdater extends AsyncTask<String, Experience, Collection<Str
 		{
 			experience.setOp(null);
 		}
-		ExperienceFileController.save(context, experiences);
+		ExperienceSaver.save(context, experiences);
 	}
 
 	@Override

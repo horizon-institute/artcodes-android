@@ -19,31 +19,26 @@
 
 package uk.ac.horizon.aestheticodes.activities;
 
-import android.app.AlertDialog;
-import android.content.DialogInterface;
 import android.content.Intent;
+import android.databinding.DataBindingUtil;
 import android.os.Bundle;
-import android.support.v4.app.NavUtils;
-import android.support.v7.app.ActionBarActivity;
+import android.support.v7.app.AppCompatActivity;
 import android.view.View;
-import uk.ac.horizon.aestheticodes.Aestheticodes;
+import com.koushikdutta.ion.Ion;
 import uk.ac.horizon.aestheticodes.R;
-import uk.ac.horizon.aestheticodes.controllers.ExperienceFileController;
-import uk.ac.horizon.aestheticodes.controllers.ExperienceListController;
+import uk.ac.horizon.aestheticodes.controllers.ExperienceLoader;
+import uk.ac.horizon.aestheticodes.databinding.ExperienceBinding;
 import uk.ac.horizon.aestheticodes.model.Experience;
-import uk.ac.horizon.aestheticodes.properties.Properties;
-import uk.ac.horizon.aestheticodes.properties.bindings.ColorImageBinding;
 
-public class ExperienceActivity extends ActionBarActivity
+public class ExperienceActivity extends AppCompatActivity
 {
-	private ExperienceListController experiences;
-	private Experience experience;
-	private Properties properties;
+	private String experienceID;
+	private ExperienceBinding binding;
 
 	public void editExperience(View view)
 	{
 		Intent intent = new Intent(ExperienceActivity.this, ExperienceEditActivity.class);
-		intent.putExtra("experience", experience.getId());
+		intent.putExtra("experience", experienceID);
 
 		startActivity(intent);
 	}
@@ -54,10 +49,18 @@ public class ExperienceActivity extends ActionBarActivity
 		intent.setType("text/plain");
 		intent.addFlags(Intent.FLAG_ACTIVITY_CLEAR_WHEN_TASK_RESET);
 
-		intent.putExtra(Intent.EXTRA_SUBJECT, experience.getName());
-		intent.putExtra(Intent.EXTRA_TEXT, "http://aestheticodes.appspot.com/experience/info/" + experience.getId());
+		if(binding.getExperience() != null)
+		{
+			intent.putExtra(Intent.EXTRA_SUBJECT, binding.getExperience().getName());
+		}
+		intent.putExtra(Intent.EXTRA_TEXT, "http://aestheticodes.appspot.com/experience/info/" + experienceID);
 		Intent openInChooser = Intent.createChooser(intent, "Share with...");
 		startActivity(openInChooser);
+	}
+
+	public void openExperience(View view)
+	{
+
 	}
 
 	@Override
@@ -65,19 +68,31 @@ public class ExperienceActivity extends ActionBarActivity
 	{
 		super.onCreate(savedInstanceState);
 
-		Bundle extras = getIntent().getExtras();
-		String experienceID = extras.getString("experience");
+		getWindow().getDecorView().setSystemUiVisibility(View.SYSTEM_UI_FLAG_LAYOUT_STABLE | View.SYSTEM_UI_FLAG_LAYOUT_FULLSCREEN);
 
-		experiences = Aestheticodes.getExperiences();
-		experience = experiences.get(experienceID);
+		binding = DataBindingUtil.setContentView(this, R.layout.experience);
 
-		setContentView(R.layout.experience);
+		// TODO bindView(R.id.openExperience, new TintAdapter<Experience>("image"));
+		//bindView(R.id.openExperience, new TintAdapter<Experience>("image"));
 
-		properties = new Properties(this, experience);
-		properties.get("name").bindTo(R.id.experienceTitle);
-		properties.get("description").bindTo(R.id.experienceDescription);
-		properties.get("icon").bindTo(R.id.experienceIcon);
-		properties.get("image").bindTo(R.id.experienceImage).bindTo(new ColorImageBinding(R.id.openExperience));
-		properties.load();
+		final Bundle extras = getIntent().getExtras();
+		experienceID = extras.getString("experience");
+		new ExperienceLoader(this)
+		{
+			@Override
+			protected void onProgressUpdate(Experience... values)
+			{
+				if(values != null && values.length != 0)
+				{
+					Experience experience = values[0];
+					binding.setExperience(experience);
+					if(experience != null)
+					{
+						Ion.with(ExperienceActivity.this).load(experience.getIcon()).intoImageView(binding.experienceIcon);
+						Ion.with(ExperienceActivity.this).load(experience.getImage()).intoImageView(binding.experienceImage);
+					}
+				}
+			}
+		}.execute(experienceID);
 	}
 }

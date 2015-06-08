@@ -22,22 +22,17 @@ package uk.ac.horizon.aestheticodes.activities;
 import android.content.Intent;
 import android.net.Uri;
 import android.os.Bundle;
-import android.support.v7.app.ActionBarActivity;
 import android.view.View;
-import uk.ac.horizon.aestheticodes.Aestheticodes;
 import uk.ac.horizon.aestheticodes.R;
-import uk.ac.horizon.aestheticodes.controllers.ExperienceListController;
+import uk.ac.horizon.aestheticodes.controllers.ControllerActivity;
+import uk.ac.horizon.aestheticodes.controllers.ExperienceLoader;
+import uk.ac.horizon.aestheticodes.controllers.adapters.TintAdapter;
+import uk.ac.horizon.aestheticodes.controllers.adapters.VisibilityAdapter;
 import uk.ac.horizon.aestheticodes.model.Marker;
-import uk.ac.horizon.aestheticodes.properties.bindings.ColorImageBinding;
 import uk.ac.horizon.aestheticodes.model.Experience;
-import uk.ac.horizon.aestheticodes.properties.Properties;
-import uk.ac.horizon.aestheticodes.properties.bindings.VisibilityBinding;
 
-public class MarkerActivity extends ActionBarActivity
+public class MarkerActivity extends ControllerActivity<Marker>
 {
-	private Marker marker;
-	private Properties properties;
-
 	@Override
 	public void onCreate(Bundle savedInstanceState)
 	{
@@ -45,32 +40,35 @@ public class MarkerActivity extends ActionBarActivity
 
 		setContentView(R.layout.marker);
 
+		bindView(R.id.markerTitle, "title");// TODO, new DefaultValue(getString(R.string.code_text, marker.getCode())));
+		bindView(R.id.markerDescription, "description");
+		bindView(R.id.markerImage, "image");
+		bindView(R.id.markerAction, new VisibilityAdapter<Marker>("action"));
+		bindView(R.id.markerAction, new TintAdapter<Marker>("image"));
+
 		final Bundle extras = getIntent().getExtras();
 
-		String markerCode = extras.getString("marker");
+		final String markerCode = extras.getString("marker");
 		String experienceID = extras.getString("experience");
 
-		ExperienceListController experiences = Aestheticodes.getExperiences();
-		Experience experience = experiences.get(experienceID);
-		marker = experience.getMarkers().get(markerCode);
-
-		properties = new Properties(this, marker);
-		properties.get("title")
-				.defaultTo(getString(R.string.code_text, marker.getCode()))
-				.bindTo(R.id.markerTitle);
-		properties.get("description")
-				.defaultTo(marker.getAction())
-				.bindTo(R.id.markerDescription);
-		properties.get("action").bindTo(new VisibilityBinding(R.id.markerAction));
-		properties.get("image").bindTo(R.id.markerImage).bindTo(new ColorImageBinding(R.id.markerAction));
-		properties.load();
+		new ExperienceLoader(this)
+		{
+			@Override
+			protected void onProgressUpdate(Experience... values)
+			{
+				if(values != null && values.length != 0)
+				{
+					setModel(values[0].getMarker(markerCode));
+				}
+			}
+		}.execute(experienceID);
 	}
 
 	public void open(View view)
 	{
-		if(marker != null && marker.getAction() != null && !marker.getAction().isEmpty())
+		if(getModel() != null && getModel().getAction() != null && !getModel().getAction().isEmpty())
 		{
-			startActivity(new Intent(Intent.ACTION_VIEW, Uri.parse(marker.getAction())));
+			startActivity(new Intent(Intent.ACTION_VIEW, Uri.parse(getModel().getAction())));
 		}
 	}
 }

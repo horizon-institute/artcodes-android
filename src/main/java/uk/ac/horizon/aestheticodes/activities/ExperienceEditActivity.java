@@ -19,16 +19,15 @@
 
 package uk.ac.horizon.aestheticodes.activities;
 
-import android.app.AlertDialog;
 import android.app.DatePickerDialog;
-import android.content.DialogInterface;
+import android.content.Context;
 import android.content.Intent;
+import android.graphics.Bitmap;
+import android.net.Uri;
 import android.os.Bundle;
 import android.support.v4.app.DialogFragment;
 import android.support.v4.app.NavUtils;
-import android.support.v7.app.ActionBarActivity;
 import android.util.Log;
-import android.view.LayoutInflater;
 import android.view.Menu;
 import android.view.MenuItem;
 import android.view.View;
@@ -37,95 +36,96 @@ import android.widget.ImageView;
 import android.widget.LinearLayout;
 import com.google.android.gms.location.places.Place;
 import com.google.android.gms.location.places.ui.PlacePicker;
-import uk.ac.horizon.aestheticodes.Aestheticodes;
 import uk.ac.horizon.aestheticodes.R;
-import uk.ac.horizon.aestheticodes.controllers.ExperienceFileController;
-import uk.ac.horizon.aestheticodes.controllers.ExperienceListController;
-import uk.ac.horizon.aestheticodes.dialogs.IntDialogFragment;
-import uk.ac.horizon.aestheticodes.dialogs.IntRangeDialogFragment;
-import uk.ac.horizon.aestheticodes.dialogs.MarkerEditDialog;
+import uk.ac.horizon.aestheticodes.controllers.Controller;
+import uk.ac.horizon.aestheticodes.controllers.ControllerActivity;
+import uk.ac.horizon.aestheticodes.controllers.ExperienceLoader;
+import uk.ac.horizon.aestheticodes.controllers.ExperienceParser;
+import uk.ac.horizon.aestheticodes.controllers.adapters.DateAdapter;
+import uk.ac.horizon.aestheticodes.controllers.adapters.ListAdapter;
+import uk.ac.horizon.aestheticodes.controllers.adapters.MarkerChecksumAdapter;
+import uk.ac.horizon.aestheticodes.controllers.adapters.MarkerRegionAdapter;
+import uk.ac.horizon.aestheticodes.controllers.adapters.URLAdapter;
+import uk.ac.horizon.aestheticodes.controllers.bindings.Action;
+import uk.ac.horizon.aestheticodes.dialogs.EditMarkerChecksumDialog;
+import uk.ac.horizon.aestheticodes.dialogs.EditMarkerDialog;
+import uk.ac.horizon.aestheticodes.dialogs.EditMarkerRegionSizeDialog;
+import uk.ac.horizon.aestheticodes.dialogs.EditMarkerRegionValueDialog;
+import uk.ac.horizon.aestheticodes.model.Availability;
 import uk.ac.horizon.aestheticodes.model.Experience;
 import uk.ac.horizon.aestheticodes.model.Marker;
-import uk.ac.horizon.aestheticodes.model.Position;
-import uk.ac.horizon.aestheticodes.properties.DateFormat;
-import uk.ac.horizon.aestheticodes.properties.Format;
-import uk.ac.horizon.aestheticodes.properties.IntFormat;
-import uk.ac.horizon.aestheticodes.properties.IntRangeFormat;
-import uk.ac.horizon.aestheticodes.properties.Properties;
-import uk.ac.horizon.aestheticodes.properties.URLFormat;
-import uk.ac.horizon.aestheticodes.properties.bindings.ClickBinding;
 
-import java.util.ArrayList;
 import java.util.Calendar;
-import java.util.Collections;
-import java.util.Comparator;
-import java.util.List;
 import java.util.UUID;
 
-public class ExperienceEditActivity extends ActionBarActivity
+public class ExperienceEditActivity extends ControllerActivity<Experience>
 {
-	private static final int PLACE_PICKER_REQUEST = 19;
+	private static final int PLACE_PICKER_REQUEST = 119;
+	private static final int IMAGE_PICKER_REQUEST = 121;
+	private static final int ICON_PICKER_REQUEST = 123;
 
-	private Experience experience;
+	private ListAdapter<Experience, Marker> markerList;
+	private ListAdapter<Experience, Availability> availabilityList;
 	private LinearLayout markerSettings;
 	private ImageView markerSettingsIcon;
-	private Properties properties;
-	private ExperienceListController experiences;
 
-	public void deleteExperience(View view)
+	public void addAvailability(View view)
 	{
-		AlertDialog.Builder confirmBuilder = new AlertDialog.Builder(this);
-		confirmBuilder.setTitle(getResources().getString(R.string.experienceDeleteConfirmTitle, experience.getName()));
-		confirmBuilder.setMessage(getResources().getString(R.string.experienceDeleteConfirmMessage, experience.getName()));
-		confirmBuilder.setPositiveButton(R.string.deleteConfirm, new DialogInterface.OnClickListener()
-		{
-			@Override
-			public void onClick(DialogInterface dialogInterface, int i)
-			{
-				experience.setOp(Experience.Operation.remove);
-				ExperienceFileController.save(ExperienceEditActivity.this, experiences);
-				NavUtils.navigateUpTo(ExperienceEditActivity.this, new Intent(ExperienceEditActivity.this, ExperienceListActivity.class));
-			}
-		});
-		confirmBuilder.setNegativeButton(R.string.deleteCancel, new DialogInterface.OnClickListener()
-		{
-			@Override
-			public void onClick(DialogInterface dialogInterface, int i)
-			{
-				// nothing
-			}
-		});
+		getModel().getAvailabilities().add(new Availability());
+		notifyChanges("availabilities");
+	}
 
-		confirmBuilder.create().show();
+	public void addMarker(View view)
+	{
+		DialogFragment newFragment = new EditMarkerDialog();
+		newFragment.show(getSupportFragmentManager(), "marker.edit");
+	}
+
+	public void editChecksum(View view)
+	{
+		new EditMarkerChecksumDialog().show(getSupportFragmentManager(), "ChecksumModulo");
+	}
+
+//	public void editIcon(View view)
+//	{
+//		Intent intent = new Intent(Intent.ACTION_GET_CONTENT);
+//		intent.setType("image/*");
+//		if (intent.resolveActivity(getPackageManager()) != null)
+//		{
+//			startActivityForResult(intent, ICON_PICKER_REQUEST);
+//		}
+//	}
+//
+//	public void editImage(View view)
+//	{
+//		Intent intent = new Intent(Intent.ACTION_GET_CONTENT);
+//		intent.setType("image/*");
+//		if (intent.resolveActivity(getPackageManager()) != null)
+//		{
+//			startActivityForResult(intent, IMAGE_PICKER_REQUEST);
+//		}
+//	}
+
+	public void editMaxRegionValue(View view)
+	{
+		new EditMarkerRegionValueDialog().show(getSupportFragmentManager(), "MaxRegionValue");
+	}
+
+	public void editRegions(View view)
+	{
+		new EditMarkerRegionSizeDialog().show(getSupportFragmentManager(), "Regions");
+	}
+
+	public Controller<Marker> getMarker(Marker marker)
+	{
+		return markerList.getController(marker);
 	}
 
 	@Override
 	public boolean onCreateOptionsMenu(Menu menu)
 	{
-		getMenuInflater().inflate(R.menu.experience_actions, menu);
-
-		// Set up ShareActionProvider's default share intent
-		//MenuItem shareItem = menu.findItem(R.id.action_share);
-		//ShareActionProvider shareActionProvider = (ShareActionProvider) MenuItemCompat.getActionProvider(shareItem);
-		//shareActionProvider.setShareIntent(getShareIntent());
-
+		getMenuInflater().inflate(R.menu.save_menu, menu);
 		return super.onCreateOptionsMenu(menu);
-	}
-
-	public void addMarker(View view)
-	{
-		DialogFragment newFragment = new MarkerEditDialog();
-		newFragment.show(getSupportFragmentManager(), "marker.edit");
-	}
-
-	public Experience getExperience()
-	{
-		return experience;
-	}
-
-	public Properties getProperties()
-	{
-		return properties;
 	}
 
 	@Override
@@ -133,24 +133,18 @@ public class ExperienceEditActivity extends ActionBarActivity
 	{
 		switch (item.getItemId())
 		{
-			// Respond to the action bar's Up/Home open_button
 			case android.R.id.home:
-				properties.save();
-				experiences.add(experience);
-				if (experience.getOp() == null)
+				NavUtils.navigateUpTo(this, upIntent());
+				return true;
+			case R.id.save:
+				if (getModel().getOp() == null)
 				{
-					experience.setOp(Experience.Operation.update);
+					getModel().setOp(Experience.Operation.update);
 				}
-				ExperienceFileController.save(this, experiences);
-				Intent intent = new Intent(this, ExperienceActivity.class);
-				intent.putExtra("experience", experience.getId());
+				// TODO ExperienceFileController.save(this, experiences);
 
-				NavUtils.navigateUpTo(this, intent);
+				NavUtils.navigateUpTo(this, upIntent());
 				return true;
-			case R.id.action_delete:
-				deleteExperience(null);
-				return true;
-
 		}
 		return super.onOptionsItemSelected(item);
 	}
@@ -169,45 +163,63 @@ public class ExperienceEditActivity extends ActionBarActivity
 		}
 	}
 
-	public void updateMarkers()
+	protected void onActivityResult(int requestCode, int resultCode, Intent data)
 	{
-		final LinearLayout markerList = (LinearLayout) findViewById(R.id.markerList);
-		markerList.removeAllViews();
-		final List<Marker> markers = new ArrayList<>(experience.getMarkers().values());
-		Collections.sort(markers, new Comparator<Marker>()
+		if (requestCode == PLACE_PICKER_REQUEST)
 		{
-			@Override
-			public int compare(Marker markerAction, Marker markerAction2)
+			if (resultCode == RESULT_OK)
 			{
-				if (markerAction.getCode().length() != markerAction2.getCode().length())
+				final Place place = PlacePicker.getPlace(data, this);
+				final int index = data.getIntExtra("availIndex", 0);
+				if (index >= 0)
 				{
-					return markerAction.getCode().length() - markerAction2.getCode().length();
+					final Availability availability = getModel().getAvailabilities().get(index);
+					final Controller<Availability> controller = availabilityList.getController(availability);
+					availability.setName(place.getName().toString());
+					availability.setAddress(place.getAddress().toString());
+					availability.setLat(place.getLatLng().latitude);
+					availability.setLon(place.getLatLng().longitude);
+					controller.notifyChanges("name", "lat", "lon");
 				}
-				return markerAction.getCode().compareTo(markerAction2.getCode());
 			}
-		});
-		LayoutInflater inflater = getLayoutInflater();
-		for (final Marker marker : markers)
+		}
+		else if (requestCode == IMAGE_PICKER_REQUEST)
 		{
-			View view = inflater.inflate(R.layout.marker_listitem, markerList, false);
-			Properties markerProperties = new Properties(this, marker, view);
-			markerProperties.get("title").bindTo(R.id.markerTitle);
-			markerProperties.get("code").bindTo(R.id.markerCode);
-			markerProperties.get("action").formatAs(new URLFormat()).bindTo(R.id.markerAction);
-			markerProperties.load();
-			view.setOnClickListener(new View.OnClickListener()
+			if (resultCode == RESULT_OK)
 			{
-				@Override
-				public void onClick(View v)
-				{
-					DialogFragment newFragment = new MarkerEditDialog();
-					Bundle bundle = new Bundle();
-					bundle.putString("code", marker.getCode());
-					newFragment.setArguments(bundle);
-					newFragment.show(getSupportFragmentManager(), "marker.edit");
-				}
-			});
-			markerList.addView(view);
+				Bitmap thumbnail = data.getParcelableExtra("data");
+				Uri fullPhotoUri = data.getData();
+
+			}
+		}
+		else if(requestCode == ICON_PICKER_REQUEST)
+		{
+			if(resultCode == RESULT_OK)
+			{
+
+			}
+		}
+	}
+
+	private void showDatePickerDialog(long timestamp, DatePickerDialog.OnDateSetListener listener)
+	{
+		final Calendar calendar = Calendar.getInstance();
+		calendar.setTimeInMillis(timestamp);
+		int mYear = calendar.get(Calendar.YEAR);
+		int mMonth = calendar.get(Calendar.MONTH);
+		int mDay = calendar.get(Calendar.DAY_OF_MONTH);
+
+		DatePickerDialog dialog = new DatePickerDialog(this, listener, mYear, mMonth, mDay);
+		dialog.show();
+	}
+
+	private void selectImage(int request_id)
+	{
+		Intent intent = new Intent(Intent.ACTION_GET_CONTENT);
+		intent.setType("image/*");
+		if (intent.resolveActivity(getPackageManager()) != null)
+		{
+			startActivityForResult(intent, request_id);
 		}
 	}
 
@@ -218,173 +230,156 @@ public class ExperienceEditActivity extends ActionBarActivity
 
 		setContentView(R.layout.experience_edit);
 
-		final Bundle extras = getIntent().getExtras();
-		experiences = Aestheticodes.getExperiences();
-		if (extras != null)
-		{
-			final String experienceID = extras.getString("experience");
-			if (experienceID != null)
+		bindView(R.id.experienceTitle, "name");
+		bindView(R.id.experienceDescription, "description");
+
+		bindView(R.id.experienceIcon, "icon");
+		bindView(R.id.experienceImage, "image");
+		bindView(R.id.experienceImage, new Action<Experience>() {
+			@Override
+			public void execute(Context context, Controller<Experience> controller)
 			{
-				experience = experiences.get(experienceID);
+				selectImage(IMAGE_PICKER_REQUEST);
 			}
-		}
+		});
 
-		if (experience == null)
+		bindView(R.id.markerRegionValue, "maxRegionValue");
+		bindView(R.id.markerChecksum, new MarkerChecksumAdapter(this));
+		bindView(R.id.markerRegions, new MarkerRegionAdapter(this));
+
+		markerList = new ListAdapter<>("markers", Marker.comparator, R.layout.marker_listitem);
+		markerList.bindView(R.id.markerTitle, "title");
+		markerList.bindView(R.id.markerCode, "code");
+		markerList.bindView(R.id.markerAction, new URLAdapter<Marker>("action"));
+		markerList.bindView(R.id.markerEdit, new Action<Marker>()
 		{
-			experience = new Experience();
-			experience.setId(UUID.randomUUID().toString());
-			experience.setOp(Experience.Operation.create);
+			@Override
+			public void execute(Context context, Controller<Marker> controller)
+			{
+				EditMarkerDialog.create(controller.getModel()).show(getSupportFragmentManager(), "marker.edit");
+			}
+		});
+		markerList.bindView(R.id.markerDelete, new Action<Marker>()
+		{
+			@Override
+			public void execute(Context context, Controller<Marker> controller)
+			{
+				getModel().getMarkers().remove(controller.getModel().getCode());
+				notifyChanges("markers");
+			}
+		});
+		bindView(R.id.markerList, markerList);
+
+		availabilityList = new ListAdapter<>("availabilities", R.layout.availability_listitem);
+		availabilityList.bindView(R.id.availabilityStart, new DateAdapter<Availability>("start"));
+		availabilityList.bindView(R.id.availabilityStart, new Action<Availability>() {
+			@Override
+			public void execute(Context context, final Controller<Availability> controller)
+			{
+				showDatePickerDialog(controller.getModel().getStart(), new DatePickerDialog.OnDateSetListener() {
+					@Override
+					public void onDateSet(DatePicker view, int year, int monthOfYear, int dayOfMonth)
+					{
+						controller.notifyChanges("start");
+					}
+				});
+			}
+		});
+		availabilityList.bindView(R.id.availabilityEnd, new DateAdapter<Availability>("end"));
+		availabilityList.bindView(R.id.availabilityEnd, new Action<Availability>() {
+			@Override
+			public void execute(Context context, final Controller<Availability> controller)
+			{
+				showDatePickerDialog(controller.getModel().getEnd(), new DatePickerDialog.OnDateSetListener() {
+					@Override
+					public void onDateSet(DatePicker view, int year, int monthOfYear, int dayOfMonth)
+					{
+						controller.notifyChanges("end");
+					}
+				});
+			}
+		});
+		availabilityList.bindView(R.id.availabilityLocation, "name");
+		availabilityList.bindView(R.id.availabilityLocation, new Action<Availability>() {
+			@Override
+			public void execute(Context context, Controller<Availability> availability)
+			{
+				try
+				{
+					final int index = getModel().getAvailabilities().indexOf(availability.getModel());
+					final PlacePicker.IntentBuilder builder = new PlacePicker.IntentBuilder();
+					final Intent intent = builder.build(ExperienceEditActivity.this);
+					intent.putExtra("availIndex", index);
+
+					startActivityForResult(intent, PLACE_PICKER_REQUEST);
+				}
+				catch (Exception e)
+				{
+					Log.w("", e.getMessage(), e);
+				}
+			}
+		});
+		availabilityList.bindView(R.id.availabilityDelete, new Action<Availability>()
+		{
+			@Override
+			public void execute(Context context, Controller<Availability> object)
+			{
+				getModel().getAvailabilities().remove(object.getModel());
+				notifyChanges("availabilities");
+			}
+		});
+		bindView(R.id.availabilityList, availabilityList);
+
+		final String experienceID = getIntent().getStringExtra("experience");
+		if (savedInstanceState != null && savedInstanceState.getString("experience") != null)
+		{
+			setModel(ExperienceParser.createParser().fromJson(savedInstanceState.getString("experience"), Experience.class));
 		}
-
-		properties = new Properties(this, experience);
-
-		properties.get("name").bindTo(R.id.experienceTitle);
-		properties.get("description").bindTo(R.id.experienceDescription);
-
-		properties.get("icon").formatAs(new URLFormat()).bindTo(R.id.experienceIcon);
-		properties.get("image").formatAs(new URLFormat())
-				.bindTo(R.id.experienceImage)
-				.bindTo(R.id.experienceImagePreview);
-
-		properties.get("location")
-				.bindTo(R.id.experienceLocation)
-				.bindTo(new ClickBinding(R.id.experienceLocation)
+		else if (experienceID != null)
+		{
+			new ExperienceLoader(this)
+			{
+				@Override
+				protected void onProgressUpdate(Experience... values)
 				{
-					@Override
-					public void onClick(View v)
+					if (values != null && values.length != 0)
 					{
-						try
-						{
-							PlacePicker.IntentBuilder builder = new PlacePicker.IntentBuilder();
-							if(properties.get("position").get() != null)
-							{
-								// TODO builder.setLatLngBounds();
-							}
-
-							startActivityForResult(builder.build(context), PLACE_PICKER_REQUEST);
-						}
-						catch (Exception e)
-						{
-							Log.e("", e.getMessage(), e);
-						}
+						setModel(values[0]);
 					}
-				});
+				}
+			}.execute(experienceID);
+		}
+		else
+		{
+			Experience newExperience = new Experience();
+			newExperience.setId(UUID.randomUUID().toString());
+			newExperience.setOp(Experience.Operation.create);
 
-		properties.get("startDate").formatAs(new DateFormat())
-				.bindTo(R.id.experienceStart)
-				.bindTo(new ClickBinding(R.id.experienceStart)
-				{
-					@Override
-					public void onClick(View v)
-					{
-						final Calendar c = Calendar.getInstance();
-						if (properties.get("startDate").get() != null)
-						{
-							c.setTimeInMillis((Long)properties.get("startDate").get());
-						}
-						final DatePickerDialog dpd = new DatePickerDialog(ExperienceEditActivity.this,
-								new DatePickerDialog.OnDateSetListener()
-								{
-
-									@Override
-									public void onDateSet(DatePicker view, int year, int month, int day)
-									{
-										Calendar calendar = Calendar.getInstance();
-										calendar.set(year, month, day);
-
-										properties.get("startDate").set(calendar.getTimeInMillis());
-									}
-								}, c.get(Calendar.YEAR), c.get(Calendar.MONTH), c.get(Calendar.DAY_OF_MONTH));
-						dpd.show();
-					}
-				});
-		properties.get("endDate").formatAs(new DateFormat())
-				.bindTo(R.id.experienceEnd)
-				.bindTo(new ClickBinding(R.id.experienceEnd)
-				{
-					@Override
-					public void onClick(View v)
-					{
-						final Calendar c = Calendar.getInstance();
-						if (properties.get("endDate").get() != null)
-						{
-							c.setTimeInMillis((Long)properties.get("endDate").get());
-						}
-
-						final DatePickerDialog dpd = new DatePickerDialog(ExperienceEditActivity.this,
-								new DatePickerDialog.OnDateSetListener()
-								{
-									@Override
-									public void onDateSet(DatePicker view, int year, int month, int day)
-									{
-										Calendar calendar = Calendar.getInstance();
-										calendar.set(year, month, day);
-
-										properties.get("endDate").set(calendar.getTimeInMillis());
-									}
-								}, c.get(Calendar.YEAR), c.get(Calendar.MONTH), c.get(Calendar.DAY_OF_MONTH));
-						dpd.show();
-					}
-				});
-
-		properties.get("maxRegionValue").formatAs(new IntFormat(1, 20))
-				.bindTo(R.id.markerRegionValue)
-				.bindTo(new ClickBinding(R.id.markerRegionValue, true)
-				{
-					@Override
-					public void onClick(View v)
-					{
-						IntDialogFragment.create(getSupportFragmentManager(), "maxRegionValue");
-					}
-				});
-
-		properties.get("checksumModulo").formatAs(new IntFormat(1, 12, 1))
-				.bindTo(R.id.markerChecksum)
-				.bindTo(new ClickBinding(R.id.markerChecksum, true)
-				{
-					@Override
-					public void onClick(View v)
-					{
-						IntDialogFragment.create(getSupportFragmentManager(), "checksumModulo");
-					}
-				});
-
-		properties.get("embeddedChecksum").bindTo(R.id.embeddedChecksum);
-
-		Format format = new IntRangeFormat(properties.get("minRegions"), properties.get("maxRegions"), 2, 20);
-		properties.get("maxRegions").formatAs(format)
-				.bindTo(R.id.markerRegions);
-		properties.get("minRegions").formatAs(format)
-				.bindTo(R.id.markerRegions)
-				.bindTo(new ClickBinding(R.id.markerRegions, true)
-				{
-					@Override
-					public void onClick(View v)
-					{
-						IntRangeDialogFragment.create(getSupportFragmentManager(), "minRegions", "maxRegions");
-					}
-				});
-		properties.load();
+			setModel(newExperience);
+		}
 
 		markerSettings = (LinearLayout) findViewById(R.id.markerSettings);
 		markerSettingsIcon = (ImageView) findViewById(R.id.markerSettingsIcon);
 
-		updateMarkers();
-
-		getSupportActionBar().setDisplayHomeAsUpEnabled(true);
-		getSupportActionBar().setHomeAsUpIndicator(R.drawable.ic_done_white_24dp);
+		if (getSupportActionBar() != null)
+		{
+			getSupportActionBar().setDisplayHomeAsUpEnabled(true);
+			getSupportActionBar().setHomeAsUpIndicator(R.drawable.ic_close_white_24dp);
+		}
 	}
 
-	protected void onActivityResult(int requestCode, int resultCode, Intent data)
+	@Override
+	protected void onSaveInstanceState(Bundle outState)
 	{
-		if (requestCode == PLACE_PICKER_REQUEST)
-		{
-			if (resultCode == RESULT_OK)
-			{
-				Place place = PlacePicker.getPlace(data, this);
-				properties.get("location").set(place.getName());
-				properties.get("position").set(new Position(place.getLatLng().latitude, place.getLatLng().longitude));
- 			}
-		}
+		super.onSaveInstanceState(outState);
+		outState.putString("experience", ExperienceParser.createParser().toJson(getModel()));
+	}
+
+	private Intent upIntent()
+	{
+		final Intent intent = new Intent(this, ExperienceActivity.class);
+		intent.putExtra("experience", getModel().getId());
+
+		return intent;
 	}
 }

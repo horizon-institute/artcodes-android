@@ -20,12 +20,13 @@
 package uk.ac.horizon.aestheticodes.model;
 
 import java.util.ArrayList;
-import java.util.HashMap;
+import java.util.Collections;
 import java.util.List;
-import java.util.Map;
 
+@SuppressWarnings("unused")
 public class Experience
 {
+	@SuppressWarnings("unused")
 	public enum Operation
 	{
 		create, retrieve, update, deleted, add, remove
@@ -36,7 +37,8 @@ public class Experience
 		temporalTile, resize
 	}
 
-	private final Map<String, Marker> markers = new HashMap<>();
+	private final List<Marker> markers = new ArrayList<>();
+	private final List<Availability> availabilities = new ArrayList<>();
 
 	private String id;
 	private String name;
@@ -44,19 +46,17 @@ public class Experience
 	private String image;
 	private String description;
 	private int version = 1;
-	private String ownerID;
+	//private String ownerID;
+	private String author;
 	private String callback;
 
-	private String location;
-	private Position position;
-	private Long startDate;
-	private Long endDate;
+	private Long updated;
+	private Long created;
 
-	private String origin;
 	private String originalID;
-	private int originalVersion;
 
 	private Operation op = null;
+	private Range regions;
 	private int minRegions = 5;
 	private int maxRegions = 5;
 	private int maxEmptyRegions = 0;
@@ -71,28 +71,19 @@ public class Experience
 	{
 	}
 
-	public void add(Marker marker)
+	public List<Availability> getAvailabilities()
 	{
-		markers.put(marker.getCode(), marker);
+		return availabilities;
 	}
 
-	/**
-	 * Delete a marker from the list of markers.
-	 *
-	 * @param code The code of the marker to delete.
-	 * @return True if a marker was deleted, false if the given code was not found.
-	 */
-	public boolean deleteMarker(String code)
+	public Long getUpdated()
 	{
-		if (this.markers.containsKey(code))
-		{
-			this.markers.remove(code);
-			return true;
-		}
-		else
-		{
-			return false;
-		}
+		return updated;
+	}
+
+	public void setUpdated(Long updated)
+	{
+		this.updated = updated;
 	}
 
 	public String getCallback()
@@ -135,16 +126,6 @@ public class Experience
 		this.embeddedChecksum = embeddedChecksum;
 	}
 
-	public Long getEndDate()
-	{
-		return endDate;
-	}
-
-	public void setEndDate(Long endDate)
-	{
-		this.endDate = endDate;
-	}
-
 	public String getIcon()
 	{
 		return icon;
@@ -175,124 +156,7 @@ public class Experience
 		this.image = image;
 	}
 
-	public String getLocation()
-	{
-		return location;
-	}
-
-	public void setLocation(String location)
-	{
-		this.location = location;
-	}
-
-	public String getMarkerError(List<Integer> markerCodes, Integer embeddedChecksum)
-	{
-		if (markerCodes == null)
-		{
-			return "No Code";
-		}
-		else if (markerCodes.size() < minRegions)
-		{
-			return "Marker too Short";
-		}
-		else if (markerCodes.size() > maxRegions)
-		{
-			return "Marker too Long";
-		}
-		else if (!hasValidNumberofEmptyRegions(markerCodes))
-		{
-			return "Incorrect Empty Regions";
-		}
-
-		for (Integer value : markerCodes)
-		{
-			//check if leaves are with in accepted range.
-			if (value > maxRegionValue)
-			{
-				return value + " is too Big";
-			}
-		}
-
-		if (embeddedChecksum == null && !hasValidChecksum(markerCodes))
-		{
-			return "Region Total not Divisable by " + checksumModulo;
-		}
-		else if (this.embeddedChecksum && embeddedChecksum != null && !hasValidEmbeddedChecksum(markerCodes, embeddedChecksum))
-		{
-			return "Region Total not Divisable by " + embeddedChecksum.toString();
-		}
-		else if (!this.embeddedChecksum && embeddedChecksum != null)
-		{
-			// Embedded checksum is turned off yet one was provided to this function (this should never happen unless the settings are changed in the middle of detection)
-			return "Embedded checksum markers are not valid.";
-		}
-
-
-		if (!hasValidationRegions(markerCodes))
-		{
-			return validationRegions + " Regions of " + validationRegionValue + " Required";
-		}
-
-		return null;
-	}
-
-	public String getMarkerError(String marker, boolean partial)
-	{
-		String[] values = marker.split(":");
-		if (!partial)
-		{
-			if (values.length < minRegions)
-			{
-				return "Marker too Short";
-			}
-		}
-		else if (marker.endsWith(":"))
-		{
-			if (values.length == maxRegions || marker.endsWith("::"))
-			{
-				return "Missing Region Value";
-			}
-		}
-
-		if (values.length > maxRegions)
-		{
-			return "Marker too Long";
-		}
-
-		int prevValue = 0;
-		List<Integer> codes = new ArrayList<>();
-		for (int index = 0; index < values.length; index++)
-		{
-			String value = values[index];
-			try
-			{
-				int codeValue = Integer.parseInt(value);
-				if (codeValue > maxRegionValue)
-				{
-					return value + " too Large";
-				}
-				else if (codeValue < prevValue)
-				{
-					if (!marker.endsWith(":") && index < values.length - 1)
-					{
-						return value + " is larger than " + prevValue;
-					}
-				}
-
-				codes.add(codeValue);
-
-				prevValue = codeValue;
-			}
-			catch (Exception e)
-			{
-				return value + " is Not a Number";
-			}
-		}
-
-		return getMarkerError(codes, null);
-	}
-
-	public Map<String, Marker> getMarkers()
+	public List<Marker> getMarkers()
 	{
 		return markers;
 	}
@@ -347,57 +211,133 @@ public class Experience
 		this.name = name;
 	}
 
+	public Marker getMarker(String code)
+	{
+		for(Marker marker: markers)
+		{
+			if(code.equals(marker.getCode()))
+			{
+				return marker;
+			}
+		}
+		return null;
+	}
+
 	public String getNextUnusedMarker()
 	{
-		for (int size = minRegions; size <= maxRegions; size++)
+		if(markers.isEmpty())
 		{
-			final List<Integer> marker = new ArrayList<>();
-			for (int index = 0; index < size; index++)
+			return "1:1:1:1:1";
+		}
+		List<Integer> code = null;
+		while (true)
+		{
+			code = getNextCode(code);
+			if (code == null)
 			{
-				marker.add(1);
+				return null;
 			}
 
-			while (true)
+			if (isValidMarker(code, null))
 			{
-				if (isValidMarker(marker, null))
+				StringBuilder result = new StringBuilder();
+				for (int index = 0; index < code.size(); index++)
 				{
-					StringBuilder result = new StringBuilder();
-					for (int index = 0; index < size; index++)
+					if (index != 0)
 					{
-						if (index != 0)
-						{
-							result.append(":");
-						}
-						result.append(marker.get(index));
+						result.append(":");
 					}
-
-					String code = result.toString();
-					if (!markers.containsKey(code))
-					{
-						return code;
-					}
+					result.append(code.get(index));
 				}
 
-				for (int i = (size - 1); i >= 0; i--)
+				String markerCode = result.toString();
+				if (getMarker(markerCode) == null)
 				{
-					int value = marker.get(i) + 1;
-					for (int x = i; x < size; x++)
+					return markerCode;
+				}
+			}
+		}
+	}
+
+	List<Integer> getNextCode(List<Integer> code)
+	{
+		if (code == null)
+		{
+			int size = minRegions;
+			code = new ArrayList<>();
+			for (int index = 0; index < size; index++)
+			{
+				code.add(1);
+			}
+			return code;
+		}
+
+		int size = code.size();
+		for (int i = (size - 1); i >= 0; i--)
+		{
+			int number = code.get(i);
+			int value = number + 1;
+			code.set(i, value);
+			if (value <= maxRegionValue)
+			{
+				break;
+			}
+			else if (i == 0)
+			{
+				if (size == maxRegions)
+				{
+					return null;
+				}
+				else
+				{
+					size++;
+					code = new ArrayList<>();
+					for (int index = 0; index < size; index++)
 					{
-						marker.set(x, value);
+						code.add(1);
 					}
-					if (value <= maxRegionValue)
-					{
-						break;
-					}
-					else if (i == 0)
-					{
-						return null;
-					}
+					return code;
+				}
+			}
+			else
+			{
+				number = code.get(i - 1);
+				value = number + 1;
+				code.set(i, value);
+			}
+		}
+
+		return code;
+	}
+
+	public void update()
+	{
+		int maxValue = 3;
+		int minRegion = 100;
+		int maxRegion = 3;
+		for (Marker marker : markers)
+		{
+			String[] values = marker.getCode().split(":");
+			minRegion = Math.min(minRegion, values.length);
+			maxRegion = Math.max(maxRegion, values.length);
+			for (String value : values)
+			{
+				try
+				{
+					int codeValue = Integer.parseInt(value);
+					maxValue = Math.max(maxValue, codeValue);
+				}
+				catch (Exception e)
+				{
 				}
 			}
 		}
 
-		return null;
+		this.maxRegionValue = maxValue;
+		this.minRegions = minRegion;
+		this.minRegions = maxRegion;
+
+		Collections.sort(markers, Marker.comparator);
 	}
 
 	public Operation getOp()
@@ -410,16 +350,6 @@ public class Experience
 		this.op = op;
 	}
 
-	public String getOrigin()
-	{
-		return origin;
-	}
-
-	public void setOrigin(String origin)
-	{
-		this.origin = origin;
-	}
-
 	public String getOriginalID()
 	{
 		return originalID;
@@ -428,36 +358,6 @@ public class Experience
 	public void setOriginalID(String originalID)
 	{
 		this.originalID = originalID;
-	}
-
-	public String getOwnerID()
-	{
-		return ownerID;
-	}
-
-	public void setOwnerID(String ownerID)
-	{
-		this.ownerID = ownerID;
-	}
-
-	public Position getPosition()
-	{
-		return position;
-	}
-
-	public void setPosition(Position position)
-	{
-		this.position = position;
-	}
-
-	public Long getStartDate()
-	{
-		return startDate;
-	}
-
-	public void setStartDate(Long startDate)
-	{
-		this.startDate = startDate;
 	}
 
 	public Threshold getThreshold()
@@ -497,67 +397,47 @@ public class Experience
 
 	public boolean isValidMarker(List<Integer> markerCodes, Integer embeddedChecksum)
 	{
-		return getMarkerError(markerCodes, embeddedChecksum) == null;
-	}
-
-	public boolean isValidMarker(String marker, boolean partial)
-	{
-		String[] values = marker.split(":");
-		if (!partial)
+		if (markerCodes == null)
 		{
-			if (values.length < minRegions)
-			{
-				return false;
-			}
+			return false; // No Code
 		}
-		else if (marker.endsWith(":"))
+		else if (markerCodes.size() < minRegions)
 		{
-			if (values.length == maxRegions)
-			{
-				return false;
-			}
-			else if (marker.endsWith("::"))
-			{
-				return false;
-			}
+			return false; // Too Short
+		}
+		else if (markerCodes.size() > maxRegions)
+		{
+			return false; // Too long
+		}
+		else if (!hasValidNumberofEmptyRegions(markerCodes))
+		{
+			return false; // Incorrect Empty Regions
 		}
 
-		if (values.length > maxRegions)
+		for (Integer value : markerCodes)
 		{
-			return false;
-		}
-
-		int prevValue = 0;
-		List<Integer> codes = new ArrayList<>();
-		for (int index = 0; index < values.length; index++)
-		{
-			String value = values[index];
-			try
+			//check if leaves are with in accepted range.
+			if (value > maxRegionValue)
 			{
-				int codeValue = Integer.parseInt(value);
-				if (codeValue > maxRegionValue)
-				{
-					return false;
-				}
-				else if (codeValue < prevValue)
-				{
-					if (marker.endsWith(":") || index < values.length - 1)
-					{
-						return false;
-					}
-				}
-
-				codes.add(codeValue);
-
-				prevValue = codeValue;
-			}
-			catch (Exception e)
-			{
-				return false;
+				return false; // value is too Big
 			}
 		}
 
-		return partial || isValidMarker(codes, null);
+		if (embeddedChecksum == null && !hasValidChecksum(markerCodes))
+		{
+			return false; // Region Total not Divisable by checksumModulo
+		}
+		else if (this.embeddedChecksum && embeddedChecksum != null && !hasValidEmbeddedChecksum(markerCodes, embeddedChecksum))
+		{
+			return false; // Region Total not Divisable by embeddedChecksum
+		}
+		else if (!this.embeddedChecksum && embeddedChecksum != null)
+		{
+			// Embedded checksum is turned off yet one was provided to this function (this should never happen unless the settings are changed in the middle of detection)
+			return false; // Embedded checksum markers are not valid.
+		}
+
+		return hasValidationRegions(markerCodes);
 	}
 
 	/**

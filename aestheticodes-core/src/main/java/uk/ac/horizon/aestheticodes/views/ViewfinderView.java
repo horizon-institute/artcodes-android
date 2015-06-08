@@ -36,7 +36,7 @@ public final class ViewfinderView extends View
 {
 	public interface SizeChangedListener
 	{
-		public void sizeHasChanged();
+		void sizeHasChanged();
 	}
 
 	private final Paint paint;
@@ -108,10 +108,12 @@ public final class ViewfinderView extends View
 		}
 	}
 
-	public boolean removeSizeChangedListener(SizeChangedListener listener)
-	{
-		return sizeChangeListeners.remove(listener);
-	}
+// --Commented out by Inspection START (29/04/2015 2:31 PM):
+//	public boolean removeSizeChangedListener(SizeChangedListener listener)
+//	{
+//		return sizeChangeListeners.remove(listener);
+//	}
+// --Commented out by Inspection STOP (29/04/2015 2:31 PM)
 
 	public void setCamera(CameraController camera)
 	{
