@@ -252,17 +252,7 @@ public class GreyscaleSettingsActivity extends ActionBarActivity {
         {
             // Respond to the action bar's Up/Home open_button
             case android.R.id.home:
-                //properties.save();
-                experiences.add(experience);
-                if (experience.getOp() == null)
-                {
-                    experience.setOp(Experience.Operation.update);
-                }
-                ExperienceFileController.save(this, experiences);
-                Intent intent = new Intent(this, ExperienceActivity.class);
-                intent.putExtra("experience", experience.getId());
-
-                NavUtils.navigateUpTo(this, intent);
+                onBackPressed();
                 return true;
 
         }
@@ -281,6 +271,13 @@ public class GreyscaleSettingsActivity extends ActionBarActivity {
     {
         super.onPause();
         stopCamera();
+
+        experiences.add(experience);
+        if (experience.getOp() == null)
+        {
+            experience.setOp(Experience.Operation.update);
+        }
+        ExperienceFileController.save(this, experiences);
     }
 
     private void startCamera()

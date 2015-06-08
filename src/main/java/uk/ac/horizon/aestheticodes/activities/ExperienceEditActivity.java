@@ -68,11 +68,13 @@ public class ExperienceEditActivity extends ActionBarActivity
 {
 	private static final int PLACE_PICKER_REQUEST = 19;
 
+	private String experienceID = null;
 	private Experience experience;
 	private LinearLayout markerSettings;
 	private ImageView markerSettingsIcon;
 	private Properties properties;
 	private ExperienceListController experiences;
+	private boolean delete = false;
 
 	public void deleteExperience(View view)
 	{
@@ -84,7 +86,9 @@ public class ExperienceEditActivity extends ActionBarActivity
 			@Override
 			public void onClick(DialogInterface dialogInterface, int i)
 			{
+				delete = true;
 				experience.setOp(Experience.Operation.remove);
+				experiences.remove(experienceID);
 				ExperienceFileController.save(ExperienceEditActivity.this, experiences);
 				NavUtils.navigateUpTo(ExperienceEditActivity.this, new Intent(ExperienceEditActivity.this, ExperienceListActivity.class));
 			}
@@ -137,17 +141,7 @@ public class ExperienceEditActivity extends ActionBarActivity
 		{
 			// Respond to the action bar's Up/Home open_button
 			case android.R.id.home:
-				properties.save();
-				experiences.add(experience);
-				if (experience.getOp() == null)
-				{
-					experience.setOp(Experience.Operation.update);
-				}
-				ExperienceFileController.save(this, experiences);
-				Intent intent = new Intent(this, ExperienceActivity.class);
-				intent.putExtra("experience", experience.getId());
-
-				NavUtils.navigateUpTo(this, intent);
+				onBackPressed();
 				return true;
 			case R.id.action_delete:
 				deleteExperience(null);
@@ -224,17 +218,45 @@ public class ExperienceEditActivity extends ActionBarActivity
 		experiences = Aestheticodes.getExperiences();
 		if (extras != null)
 		{
-			final String experienceID = extras.getString("experience");
-			if (experienceID != null)
-			{
-				experience = experiences.get(experienceID);
-			}
+			experienceID = extras.getString("experience");
 		}
+		if (experienceID == null)
+		{
+			experienceID = UUID.randomUUID().toString();
+		}
+
+
+		getSupportActionBar().setDisplayHomeAsUpEnabled(true);
+		getSupportActionBar().setHomeAsUpIndicator(R.drawable.ic_done_white_24dp);
+
+
+		View v = findViewById(R.id.greyscaleSettingMenuItem);
+		v.setOnClickListener(new View.OnClickListener()
+		{
+			@Override
+			public void onClick(View view)
+			{
+				if (experience != null)
+				{
+					Intent intent = new Intent(ExperienceEditActivity.this, GreyscaleSettingsActivity.class);
+					intent.putExtra("experience", experienceID);
+					startActivity(intent);
+				}
+			}
+		});
+	}
+
+	@Override
+	protected void onResume()
+	{
+		super.onResume();
+
+		experience = experiences.get(experienceID);
 
 		if (experience == null)
 		{
 			experience = new Experience();
-			experience.setId(UUID.randomUUID().toString());
+			experience.setId(experienceID);
 			experience.setOp(Experience.Operation.create);
 		}
 
@@ -373,24 +395,27 @@ public class ExperienceEditActivity extends ActionBarActivity
 
 		updateMarkers();
 
-		getSupportActionBar().setDisplayHomeAsUpEnabled(true);
-		getSupportActionBar().setHomeAsUpIndicator(R.drawable.ic_done_white_24dp);
-
-
-		View v = findViewById(R.id.greyscaleSettingMenuItem);
-		v.setOnClickListener(new View.OnClickListener() {
-			@Override
-			public void onClick(View view) {
-				if (experience != null)
-				{
-					Intent intent = new Intent(ExperienceEditActivity.this, GreyscaleSettingsActivity.class);
-					intent.putExtra("experience", experience.getId());
-					startActivity(intent);
-				}
-			}
-		});
 		TextView greyscaleSetting = (TextView) findViewById(R.id.greyscaleSettingText);
 		greyscaleSetting.setText(GreyscaleSettingsActivity.getPresetName(this, this.experience.getGreyscaleOptions()));
+
+	}
+
+	@Override
+	protected void onPause()
+	{
+		super.onPause();
+
+		if (!delete)
+		{
+			properties.save();
+			properties = null;
+			experiences.add(experience);
+			if (experience.getOp() == null)
+			{
+				experience.setOp(Experience.Operation.update);
+			}
+			ExperienceFileController.save(this, experiences);
+		}
 	}
 
 	protected void onActivityResult(int requestCode, int resultCode, Intent data)

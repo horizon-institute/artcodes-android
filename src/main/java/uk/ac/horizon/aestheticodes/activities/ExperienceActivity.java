@@ -39,6 +39,7 @@ public class ExperienceActivity extends ActionBarActivity
 	private ExperienceListController experiences;
 	private Experience experience;
 	private Properties properties;
+	private String experienceID;
 
 	public void editExperience(View view)
 	{
@@ -66,13 +67,19 @@ public class ExperienceActivity extends ActionBarActivity
 		super.onCreate(savedInstanceState);
 
 		Bundle extras = getIntent().getExtras();
-		String experienceID = extras.getString("experience");
-
-		experiences = Aestheticodes.getExperiences();
-		experience = experiences.get(experienceID);
+		experienceID = extras.getString("experience");
 
 		setContentView(R.layout.experience);
 
+	}
+
+	@Override
+	protected void onResume()
+	{
+		super.onResume();
+
+		experiences = Aestheticodes.getExperiences();
+		experience = experiences.get(experienceID);
 		properties = new Properties(this, experience);
 		properties.get("name").bindTo(R.id.experienceTitle);
 		properties.get("description").bindTo(R.id.experienceDescription);
