@@ -9,6 +9,10 @@ Adding Artcodes to your project
 
 1. Download the aestheticodes respository [zip file](https://github.com/horizon-institute/aestheticodes-ios/archive/master.zip) or clone it
 2. Copy the aestheticodes-core sub-project your project
+3. Add project to your gradle.build: 
+```gradle
+compile project(":aestheticodes-core")
+```
 
 ------------------------------------
 Basic usage
