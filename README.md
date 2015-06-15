@@ -13,6 +13,10 @@ Adding Artcodes to your project
 ```gradle
 compile project(":aestheticodes-core")
 ```
+4. Create settings.gradle with the line:
+```gradle
+include 'aestheticodes-core'
+```
 
 ------------------------------------
 Basic usage
