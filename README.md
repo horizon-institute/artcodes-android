@@ -9,6 +9,17 @@ Adding Artcodes to your project
 
 1. Download the aestheticodes respository [zip file](https://github.com/horizon-institute/aestheticodes-ios/archive/master.zip) or clone it
 2. Copy the aestheticodes-core sub-project your project
+3. Add the project to your build.gradle dependencies: 
+
+    ```gradle
+    compile project(":artcodes-scanner")
+    ```
+
+4. Create settings.gradle with the line:
+
+    ```gradle
+    include 'artcodes-scanner'
+    ```
 
 ------------------------------------
 Basic usage
@@ -18,17 +29,17 @@ To create the Artcode reader
 
 ```java
 import com.google.gson.Gson;
-import uk.ac.horizon.aestheticodes.core.activities.ScanActivity;
-import uk.ac.horizon.aestheticodes.controllers.ExperienceParser;
+import com.google.gson.GsonBuilder;
+import uk.ac.horizon.artcodes.scanner.activity.ScannerActivity;
 
 // Create and configure artcode experience
 Experience experience = new Experience();
 
 // Create intent
-Intent intent = new Intent(ScanActivity.class);
+Intent intent = new Intent(ScannerActivity.class);
 
 // Put experience in intent
-Gson gson = ExperienceParser.createParser();
+Gson gson = new GsonBuilder().create();
 intent.putExtra("experience", gson.toJson(experience));
 
 // Start artcode reader activity

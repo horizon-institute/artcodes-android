@@ -1,31 +1,32 @@
 <?xml version="1.0" encoding="utf-8"?>
 <!--
-  ~ Aestheticodes recognises a different marker scheme that allows the
+  ~ Artcodes recognises a different marker scheme that allows the
   ~ creation of aesthetically pleasing, even beautiful, codes.
   ~ Copyright (C) 2013-2015  The University of Nottingham
   ~
-  ~     This program is free software: you can redistribute it and/or modify
-  ~     it under the terms of the GNU Affero General Public License as published
-  ~     by the Free Software Foundation, either version 3 of the License, or
-  ~     (at your option) any later version.
+  ~ This program is free software: you can redistribute it and/or modify
+  ~ it under the terms of the GNU Affero General Public License as published
+  ~ by the Free Software Foundation, either version 3 of the License, or
+  ~ (at your option) any later version.
   ~
-  ~     This program is distributed in the hope that it will be useful,
-  ~     but WITHOUT ANY WARRANTY; without even the implied warranty of
-  ~     MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
-  ~     GNU Affero General Public License for more details.
+  ~ This program is distributed in the hope that it will be useful,
+  ~ but WITHOUT ANY WARRANTY; without even the implied warranty of
+  ~ MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+  ~ GNU Affero General Public License for more details.
   ~
-  ~     You should have received a copy of the GNU Affero General Public License
-  ~     along with this program.  If not, see <http://www.gnu.org/licenses/>.
+  ~ You should have received a copy of the GNU Affero General Public License
+  ~ along with this program.  If not, see <http://www.gnu.org/licenses/>.
   -->
 
 <resources xmlns:tools="http://schemas.android.com/tools">
-	<style name="Theme.Aestheticodes.Transparent" parent="Theme.AppCompat.Light.DarkActionBar">
+
+	<style name="Theme.Artcodes.Transparent" parent="Theme.AppCompat.Light.DarkActionBar">
 		<item name="android:windowContentOverlay">@null</item>
 		<item name="android:background">@null</item>
 		<item name="background">@null</item>
 
-		<item name="android:actionBarStyle" tools:ignore="NewApi">@style/Aestheticodes.ActionBar.Transparent</item>
-		<item name="actionBarStyle">@style/Aestheticodes.ActionBar.Transparent</item>
+		<item name="android:actionBarStyle" tools:ignore="NewApi">@style/Artcodes.ActionBar.Transparent</item>
+		<item name="actionBarStyle">@style/Artcodes.ActionBar.Transparent</item>
 
 		<item name="android:windowActionBarOverlay" tools:ignore="NewApi">true</item>
 		<item name="android:windowActionModeOverlay" tools:ignore="NewApi">true</item>
@@ -42,7 +43,10 @@
 		<item name="android:statusBarColor">@android:color/transparent</item>
 	</style>
 
-	<style name="Theme.Aestheticodes" parent="Theme.AppCompat.Light.DarkActionBar">
+	<style name="Theme.Artcodes" parent="Theme.AppCompat.Light.DarkActionBar">
+		<item name="windowActionBar">false</item>
+		<item name="windowNoTitle">true</item>
+
 		<item name="android:colorPrimary" tools:ignore="NewApi">@color/apptheme_primary</item>
 		<item name="android:colorPrimaryDark" tools:ignore="NewApi">@color/apptheme_primary_dark</item>
 		<item name="android:colorAccent" tools:ignore="NewApi">@color/apptheme_primary</item>
@@ -54,7 +58,7 @@
 	</style>
 
 	<!-- Button style -->
-	<style name="Theme.Aestheticodes.Button">
+	<style name="Theme.Artcodes.Button">
 		<item name="android:background">@drawable/button</item>
 		<item name="android:textColor">#FFF</item>
 		<item name="android:textSize">12sp</item>

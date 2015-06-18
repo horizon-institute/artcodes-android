@@ -1,0 +1,141 @@
+<?xml version="1.0" encoding="utf-8"?>
+
+<!--
+  ~ Artcodes recognises a different marker scheme that allows the
+  ~ creation of aesthetically pleasing, even beautiful, codes.
+  ~ Copyright (C) 2013-2015  The University of Nottingham
+  ~
+  ~ This program is free software: you can redistribute it and/or modify
+  ~ it under the terms of the GNU Affero General Public License as published
+  ~ by the Free Software Foundation, either version 3 of the License, or
+  ~ (at your option) any later version.
+  ~
+  ~ This program is distributed in the hope that it will be useful,
+  ~ but WITHOUT ANY WARRANTY; without even the implied warranty of
+  ~ MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+  ~ GNU Affero General Public License for more details.
+  ~
+  ~ You should have received a copy of the GNU Affero General Public License
+  ~ along with this program.  If not, see <http://www.gnu.org/licenses/>.
+  -->
+<layout xmlns:android="http://schemas.android.com/apk/res/android"
+        xmlns:tools="http://schemas.android.com/tools"
+        xmlns:app="http://schemas.android.com/apk/res-auto"
+        tools:context=".activities.ScannerActivity">
+
+	<data>
+
+		<variable name="experience"
+		          type="uk.ac.horizon.artcodes.scanner.ExperienceScanner" />
+	</data>
+
+	<FrameLayout android:id="@+id/content_frame"
+	             android:layout_width="match_parent"
+	             android:layout_height="match_parent">
+
+		<uk.ac.horizon.artcodes.scanner.camera.CameraView
+				android:id="@+id/cameraView"
+				app:frameProcessor="@{experience.frameProcessor}"
+				android:layout_width="fill_parent"
+				android:layout_height="fill_parent" />
+
+		<LinearLayout android:orientation="vertical"
+		              android:layout_gravity="bottom"
+		              android:layout_width="fill_parent"
+		              android:layout_height="fill_parent"
+		              android:onClick="hideMenu">
+
+			<android.support.v7.widget.Toolbar
+					android:layout_width="fill_parent"
+					android:layout_height="100dp"
+					android:background="@color/viewfinder_mask"
+					app:title="@{experience.name}"
+					android:id="@+id/toolbar"
+					android:paddingTop="15dp" />
+
+			<RelativeLayout
+					android:layout_width="fill_parent"
+					android:layout_height="0dp"
+					android:layout_weight="1">
+
+				<ImageView
+						android:layout_width="wrap_content"
+						android:layout_height="wrap_content"
+						android:id="@+id/debugView"
+						tools:ignore="ContentDescription" />
+
+				<LinearLayout
+						android:orientation="horizontal"
+						android:layout_width="wrap_content"
+						android:id="@+id/settingsMenu"
+						android:visibility="invisible"
+						tools:visibility="visible"
+						android:background="#3000"
+						android:layout_height="wrap_content"
+						android:layout_alignParentRight="true"
+						android:layout_alignParentLeft="true"
+						android:layout_alignParentStart="true"
+						android:layout_alignParentEnd="true"
+						android:layout_alignParentBottom="true"
+						android:paddingLeft="32dp"
+						android:paddingRight="32dp"
+						android:gravity="center">
+
+					<ImageButton android:layout_width="wrap_content"
+					             android:layout_height="wrap_content"
+					             android:layout_weight="1"
+					             style="@style/Widget.AppCompat.ActionButton"
+					             android:src="@drawable/ic_open_in_new_white_24dp" />
+
+					<ImageButton android:layout_width="wrap_content"
+					             android:layout_height="wrap_content"
+					             android:layout_weight="1"
+					             style="@style/Widget.AppCompat.ActionButton"
+					             app:imageResource="@{experience.drawMarkerIcon}"
+					             android:contentDescription="Hide Marker"
+					             tools:src="@drawable/ic_border_clear_white_24dp" />
+
+					<ImageButton android:layout_width="wrap_content"
+					             android:layout_height="wrap_content"
+					             android:layout_weight="1"
+					             style="@style/Widget.AppCompat.ActionButton"
+					             app:imageResource="@{experience.drawThresholdIcon}"
+					             tools:src="@drawable/ic_filter_b_and_w_off_white_24dp" />
+
+					<ImageButton android:layout_width="wrap_content"
+					             android:layout_height="wrap_content"
+					             android:layout_weight="1"
+					             style="@style/Widget.AppCompat.ActionButton"
+					             tools:src="@drawable/ic_camera_rear_white_24dp" />
+
+				</LinearLayout>
+
+				<ImageButton
+						android:layout_width="48dp"
+						android:layout_height="48dp"
+						android:id="@+id/settingsMenuButton"
+						android:layout_gravity="end"
+						android:src="@drawable/ic_more_horiz_white_24dp"
+						android:background="@drawable/camera_floating_action_button"
+						android:onClick="showMenu"
+						android:layout_alignParentEnd="true"
+						android:layout_alignParentRight="true"
+						android:layout_alignParentBottom="true"
+						android:layout_marginEnd="8dp"
+						android:layout_marginRight="8dp"
+						android:layout_marginBottom="8dp"
+						android:contentDescription="@string/display_menu" />
+			</RelativeLayout>
+
+			<TextView android:layout_width="fill_parent"
+			          android:layout_height="100dp"
+			          android:background="@color/viewfinder_mask"
+			          android:id="@+id/bottomView"
+			          android:text="@{experience.statusText}"
+			          tools:text="Looking for Artcodes..."
+			          style="@style/Base.TextAppearance.AppCompat.Medium"
+			          android:gravity="center" />
+
+		</LinearLayout>
+	</FrameLayout>
+</layout>

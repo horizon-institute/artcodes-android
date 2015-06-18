@@ -1,110 +1,137 @@
 <?xml version="1.0" encoding="utf-8"?>
 
 <!--
-  ~ Aestheticodes recognises a different marker scheme that allows the
+  ~ Artcodes recognises a different marker scheme that allows the
   ~ creation of aesthetically pleasing, even beautiful, codes.
   ~ Copyright (C) 2013-2015  The University of Nottingham
   ~
-  ~     This program is free software: you can redistribute it and/or modify
-  ~     it under the terms of the GNU Affero General Public License as published
-  ~     by the Free Software Foundation, either version 3 of the License, or
-  ~     (at your option) any later version.
+  ~ This program is free software: you can redistribute it and/or modify
+  ~ it under the terms of the GNU Affero General Public License as published
+  ~ by the Free Software Foundation, either version 3 of the License, or
+  ~ (at your option) any later version.
   ~
-  ~     This program is distributed in the hope that it will be useful,
-  ~     but WITHOUT ANY WARRANTY; without even the implied warranty of
-  ~     MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
-  ~     GNU Affero General Public License for more details.
+  ~ This program is distributed in the hope that it will be useful,
+  ~ but WITHOUT ANY WARRANTY; without even the implied warranty of
+  ~ MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+  ~ GNU Affero General Public License for more details.
   ~
-  ~     You should have received a copy of the GNU Affero General Public License
-  ~     along with this program.  If not, see <http://www.gnu.org/licenses/>.
+  ~ You should have received a copy of the GNU Affero General Public License
+  ~ along with this program.  If not, see <http://www.gnu.org/licenses/>.
   -->
 
-<ScrollView xmlns:android="http://schemas.android.com/apk/res/android"
-            xmlns:tools="http://schemas.android.com/tools"
-            android:orientation="vertical"
-            android:layout_width="match_parent"
-            android:layout_height="match_parent">
+<layout xmlns:android="http://schemas.android.com/apk/res/android"
+        xmlns:tools="http://schemas.android.com/tools"
+        tools:context=".activities.ExperienceEditActivity">
 
-	<LinearLayout android:orientation="vertical"
-	              android:layout_width="fill_parent"
-	              android:layout_height="wrap_content"
-	              android:padding="16dp">
-		<EditText android:layout_width="match_parent"
-		          android:layout_height="wrap_content"
-		          android:id="@+id/markerCode"
-		          android:hint="@string/markerCode"
-		          android:digits="0123456789:"
-		          android:inputType="time"
-		          android:singleLine="true"
-		          android:layout_marginBottom="8dp"
-		          android:textStyle="bold" />
-		<EditText android:layout_width="match_parent"
-		          android:layout_height="wrap_content"
-		          android:id="@+id/markerTitle"
-		          android:hint="@string/markerTitle"
-		          android:inputType="text"
-		          android:singleLine="true"
-		          android:layout_marginBottom="8dp"
-		          android:textStyle="bold" />
-		<EditText android:layout_width="match_parent"
-		          android:layout_height="wrap_content"
-		          android:id="@+id/markerAction"
-		          android:hint="@string/URL"
-		          android:inputType="textUri"
-		          android:layout_marginBottom="8dp">
-			<requestFocus />
-		</EditText>
-		<android.support.v7.widget.SwitchCompat
-				android:layout_width="fill_parent"
-				android:layout_height="wrap_content"
-				android:text="@string/markerShowDetail"
-				android:id="@+id/markerShowDetail" android:layout_marginLeft="4dp"
-				android:layout_marginRight="4dp" />
+	<data>
 
-		<LinearLayout
-				android:orientation="vertical"
-				android:layout_width="fill_parent"
-				android:layout_height="fill_parent"
-				android:id="@+id/markerDetails"
-				android:paddingTop="8dp">
+		<import type="android.view.View" />
+
+		<variable name="marker"
+		          type="uk.ac.horizon.artcodes.model.Marker" />
+	</data>
+
+	<ScrollView android:orientation="vertical"
+	            android:layout_width="match_parent"
+	            android:layout_height="match_parent">
+
+		<LinearLayout android:orientation="vertical"
+		              android:layout_width="fill_parent"
+		              android:layout_height="wrap_content"
+		              android:padding="16dp">
+
+			<EditText android:layout_width="match_parent"
+			          android:layout_height="wrap_content"
+			          android:id="@+id/markerCode"
+			          android:hint="@string/markerCode"
+			          android:digits="0123456789:"
+			          android:inputType="time"
+			          android:singleLine="true"
+			          android:layout_marginBottom="8dp"
+			          android:text="@{marker.code}"
+			          android:textAppearance="@style/TextAppearance.AppCompat"
+			          android:textStyle="bold" />
+
+			<EditText android:layout_width="match_parent"
+			          android:layout_height="wrap_content"
+			          android:id="@+id/markerTitle"
+			          android:hint="@string/markerTitle"
+			          android:inputType="text"
+			          android:text="@{marker.title}"
+			          android:singleLine="true"
+			          android:layout_marginBottom="8dp"
+			          android:textAppearance="@style/TextAppearance.AppCompat"
+			          android:textStyle="bold" />
+
+			<EditText android:layout_width="match_parent"
+			          android:layout_height="wrap_content"
+			          android:id="@+id/markerAction"
+			          android:hint="@string/URL"
+			          android:inputType="textUri"
+			          android:layout_marginBottom="8dp"
+			          android:textAppearance="@style/TextAppearance.AppCompat" />
+
+			<android.support.v7.widget.SwitchCompat
+					android:layout_width="fill_parent"
+					android:layout_height="wrap_content"
+					android:text="@string/markerShowDetail"
+					android:id="@+id/markerShowDetail"
+					android:layout_marginLeft="4dp"
+					android:layout_marginRight="4dp"
+					android:textAppearance="@style/TextAppearance.AppCompat" />
+
 			<LinearLayout
-					android:orientation="horizontal"
-					android:layout_width="match_parent"
-					android:layout_height="match_parent">
+					android:orientation="vertical"
+					android:layout_width="fill_parent"
+					android:layout_height="fill_parent"
+					android:id="@+id/markerDetails"
+					android:paddingTop="8dp">
 
-				<ImageView tools:ignore="ContentDescription"
-				           android:layout_width="wrap_content"
-				           android:layout_height="wrap_content"
-				           android:scaleType="fitCenter"
-				           android:src="@drawable/ic_subject_white_24dp"
-				           android:paddingTop="10dp"
-				           android:paddingRight="28dp"
-				           android:tint="@color/ic_tint" />
+				<LinearLayout
+						android:orientation="horizontal"
+						android:layout_width="match_parent"
+						android:layout_height="match_parent">
 
-				<EditText android:layout_width="match_parent"
-				          android:layout_height="wrap_content"
-				          android:inputType="textMultiLine"
-				          android:id="@+id/markerDescription"
-				          android:hint="@string/markerDescription"	/>
-			</LinearLayout>
+					<ImageView tools:ignore="ContentDescription"
+					           android:layout_width="wrap_content"
+					           android:layout_height="wrap_content"
+					           android:scaleType="fitCenter"
+					           android:src="@drawable/ic_subject_white_24dp"
+					           android:paddingRight="28dp"
+					           android:layout_gravity="center_vertical"
+					           android:tint="@color/ic_tint" />
 
-			<LinearLayout android:orientation="horizontal"
-			              android:layout_width="fill_parent"
-			              android:layout_height="fill_parent">
-				<ImageView tools:ignore="ContentDescription"
-				           android:layout_width="wrap_content"
-				           android:layout_height="wrap_content"
-				           android:scaleType="fitCenter"
-				           android:src="@drawable/ic_photo_white_24dp"
-				           android:paddingTop="10dp"
-				           android:paddingRight="28dp"
-				           android:tint="@color/ic_tint" />
-				<EditText android:layout_width="match_parent"
-				          android:layout_height="wrap_content"
-				          android:id="@+id/markerImage"
-				          android:hint="@string/markerImage"
-				          android:inputType="textUri" />
+					<EditText android:layout_width="match_parent"
+					          android:layout_height="wrap_content"
+					          android:inputType="textMultiLine"
+					          android:id="@+id/markerDescription"
+					          android:text="@{marker.description}"
+					          android:hint="@string/markerDescription"
+					          android:textAppearance="@style/TextAppearance.AppCompat" />
+				</LinearLayout>
+
+				<LinearLayout android:orientation="horizontal"
+				              android:layout_width="fill_parent"
+				              android:layout_height="fill_parent">
+
+					<ImageView tools:ignore="ContentDescription"
+					           android:layout_width="wrap_content"
+					           android:layout_height="wrap_content"
+					           android:scaleType="fitCenter"
+					           android:layout_gravity="center_vertical"
+					           android:src="@drawable/ic_photo_white_24dp"
+					           android:paddingRight="28dp"
+					           android:tint="@color/ic_tint" />
+
+					<EditText android:layout_width="match_parent"
+					          android:layout_height="wrap_content"
+					          android:id="@+id/markerImage"
+					          android:hint="@string/markerImage"
+					          android:inputType="textUri"
+
+					          android:textAppearance="@style/TextAppearance.AppCompat" />
+				</LinearLayout>
 			</LinearLayout>
 		</LinearLayout>
-	</LinearLayout>
-</ScrollView>
+	</ScrollView>
+</layout>

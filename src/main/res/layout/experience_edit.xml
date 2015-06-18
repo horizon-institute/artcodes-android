@@ -1,312 +1,251 @@
 <?xml version="1.0" encoding="utf-8"?>
 
 <!--
-  ~ Aestheticodes recognises a different marker scheme that allows the
+  ~ Artcodes recognises a different marker scheme that allows the
   ~ creation of aesthetically pleasing, even beautiful, codes.
   ~ Copyright (C) 2013-2015  The University of Nottingham
   ~
-  ~     This program is free software: you can redistribute it and/or modify
-  ~     it under the terms of the GNU Affero General Public License as published
-  ~     by the Free Software Foundation, either version 3 of the License, or
-  ~     (at your option) any later version.
+  ~ This program is free software: you can redistribute it and/or modify
+  ~ it under the terms of the GNU Affero General Public License as published
+  ~ by the Free Software Foundation, either version 3 of the License, or
+  ~ (at your option) any later version.
   ~
-  ~     This program is distributed in the hope that it will be useful,
-  ~     but WITHOUT ANY WARRANTY; without even the implied warranty of
-  ~     MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
-  ~     GNU Affero General Public License for more details.
+  ~ This program is distributed in the hope that it will be useful,
+  ~ but WITHOUT ANY WARRANTY; without even the implied warranty of
+  ~ MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+  ~ GNU Affero General Public License for more details.
   ~
-  ~     You should have received a copy of the GNU Affero General Public License
-  ~     along with this program.  If not, see <http://www.gnu.org/licenses/>.
+  ~ You should have received a copy of the GNU Affero General Public License
+  ~ along with this program.  If not, see <http://www.gnu.org/licenses/>.
   -->
-<ScrollView xmlns:android="http://schemas.android.com/apk/res/android"
-            xmlns:tools="http://schemas.android.com/tools"
-            android:layout_width="match_parent"
-            android:layout_height="wrap_content"
-            android:layout_weight="1"
 
-            tools:context=".activities.ExperienceEditActivity">
+<layout xmlns:android="http://schemas.android.com/apk/res/android"
+        xmlns:tools="http://schemas.android.com/tools"
+        xmlns:app="http://schemas.android.com/apk/res-auto"
+        tools:context=".activities.ExperienceEditActivity">
 
-	<LinearLayout android:orientation="vertical"
-	              android:layout_width="match_parent"
-	              android:layout_height="wrap_content">
+	<data>
 
-		<ImageView android:layout_width="match_parent"
-		           android:layout_height="150dp"
-		           android:id="@+id/experienceImage"
-		           android:src="@drawable/ic_photo_white_24dp"
-		           android:adjustViewBounds="true"
-		           tools:ignore="ContentDescription"
-		           android:scaleType="fitCenter"
-		           android:background="#AAA" />
+		<import type="android.view.View" />
 
-		<LinearLayout android:orientation="vertical"
-		              android:layout_width="match_parent"
-		              android:layout_height="wrap_content"
-				>
+		<variable name="experience"
+		          type="uk.ac.horizon.artcodes.model.Experience" />
 
-			<LinearLayout
-					android:orientation="horizontal"
-					android:layout_width="match_parent"
-					android:layout_height="match_parent"
-					android:paddingLeft="16dp"
-					android:paddingRight="16dp">
+		<variable name="settingsVisible"
+		          type="boolean" />
+	</data>
 
-				<ImageView
-						android:layout_width="56dp"
-						android:layout_height="56dp"
-						android:id="@+id/experienceIcon"
-						android:layout_marginTop="12dp"
-						android:layout_marginLeft="4dp" />
+	<LinearLayout android:layout_width="match_parent"
+	              android:layout_height="match_parent"
+	              android:orientation="vertical">
 
-				<EditText android:layout_width="match_parent"
-				          android:layout_height="wrap_content"
-				          android:id="@+id/experienceTitle"
-				          android:hint="@string/experienceTitle"
-				          android:textStyle="bold"
-				          android:singleLine="true"
-				          android:layout_marginLeft="16dp"
-				          android:layout_gravity="center_vertical"
-						/>
+		<android.support.v7.widget.Toolbar
+				android:layout_width="match_parent"
+				android:layout_height="?attr/actionBarSize"
+				android:id="@+id/toolbar"
+				android:background="?attr/colorPrimary"
+				app:theme="@style/ThemeOverlay.AppCompat.Dark.ActionBar"
+				app:popupTheme="@style/ThemeOverlay.AppCompat.Light" />
 
-			</LinearLayout>
-
-			<LinearLayout
-					android:orientation="horizontal"
-					android:layout_width="match_parent"
-					android:layout_height="match_parent"
-					android:paddingLeft="16dp"
-					android:paddingRight="16dp">
-
-				<ImageView tools:ignore="ContentDescription"
-				           android:layout_width="wrap_content"
-				           android:layout_height="wrap_content"
-				           android:scaleType="fitCenter"
-				           android:src="@drawable/ic_subject_white_24dp"
-				           android:paddingTop="10dp"
-				           android:paddingRight="28dp"
-				           android:tint="@color/ic_tint"
-						/>
-
-				<EditText android:layout_width="match_parent"
-				          android:layout_height="wrap_content"
-				          android:inputType="textMultiLine"
-				          android:id="@+id/experienceDescription"
-				          android:hint="@string/experienceDescription"
-						/>
-			</LinearLayout>
-
-			<TextView style="@style/Base.TextAppearance.AppCompat.Small"
-			          android:layout_width="match_parent"
-			          android:layout_height="match_parent"
-			          android:gravity="center_vertical"
-			          android:height="48dp"
-			          android:text="@string/availability"
-			          android:paddingLeft="16dp"
-			          android:paddingRight="16dp" />
+		<ScrollView android:layout_width="match_parent"
+		            android:layout_height="wrap_content">
 
 			<LinearLayout android:orientation="vertical"
 			              android:layout_width="match_parent"
-			              android:layout_height="match_parent"
-			              android:id="@+id/availabilityList" />
-
-			<LinearLayout android:orientation="horizontal"
-			              android:layout_width="match_parent"
-			              android:layout_height="match_parent"
-			              android:clickable="true"
-			              android:onClick="addAvailability"
-			              android:background="?attr/selectableItemBackground"
-			              android:paddingLeft="16dp"
-			              android:paddingRight="16dp"
-			              android:paddingTop="8dp"
-			              android:paddingBottom="8dp">
-
-				<ImageView tools:ignore="ContentDescription"
-				           android:layout_width="wrap_content"
-				           android:layout_height="wrap_content"
-				           android:layout_marginEnd="16dp"
-				           android:layout_marginRight="16dp"
-				           android:scaleType="fitCenter"
-				           android:src="@drawable/ic_add_white_24dp"
-				           android:paddingTop="8dp"
-				           android:paddingRight="16dp"
-				           android:paddingBottom="8dp"
-				           android:tint="@color/ic_tint" />
-
-				<TextView android:layout_width="wrap_content"
-				          android:layout_height="match_parent"
-				          android:textSize="16sp"
-				          android:textColor="#333"
-				          android:gravity="center_vertical"
-				          android:text="@string/availability_add" />
-			</LinearLayout>
-
-			<TextView android:layout_width="match_parent"
-			          android:layout_height="match_parent"
-			          android:gravity="center_vertical"
-			          android:height="48dp"
-			          android:text="@string/markers"
-			          style="@style/Base.TextAppearance.AppCompat.Small"
-			          android:paddingLeft="16dp"
-			          android:paddingRight="16dp" />
-
-			<LinearLayout android:orientation="horizontal"
-			              android:layout_width="match_parent"
-			              android:layout_height="match_parent"
-			              android:clickable="true"
-			              android:onClick="toggleMarkerSettings"
-			              android:paddingTop="8dp"
-			              android:paddingBottom="8dp"
-			              android:background="?attr/selectableItemBackground"
-			              android:paddingLeft="16dp"
-			              android:paddingRight="16dp">
-
-				<ImageView android:layout_width="wrap_content"
-				           android:layout_height="wrap_content"
-				           android:layout_marginEnd="16dp"
-				           android:layout_marginRight="16dp"
-				           android:scaleType="fitCenter"
-				           tools:ignore="ContentDescription"
-				           android:src="@drawable/ic_settings_white_24dp"
-				           android:paddingTop="8dp"
-				           android:paddingRight="16dp"
-				           android:paddingBottom="8dp"
-				           android:tint="@color/ic_tint" />
-
-				<TextView
-						android:layout_width="0dp"
-						android:layout_height="match_parent"
-						android:textSize="16sp"
-						android:gravity="center_vertical"
-						android:text="@string/markerSettings"
-						android:textColor="#333"
-						android:layout_weight="1" />
+			              android:layout_height="wrap_content">
 
 				<ImageView
-						android:layout_width="wrap_content"
-						android:layout_height="wrap_content"
-						android:id="@+id/markerSettingsIcon"
-						android:src="@drawable/ic_expand_more_24dp"
-						android:layout_gravity="center_vertical"
-						android:tint="@color/ic_tint"
-						tools:ignore="ContentDescription" />
-			</LinearLayout>
-
-			<LinearLayout android:orientation="vertical"
-			              android:layout_width="match_parent"
-			              android:id="@+id/markerSettings"
-			              android:layout_height="match_parent"
-			              android:visibility="gone"
-			              tools:visibility="visible">
-
-				<LinearLayout android:layout_width="match_parent"
-				              android:layout_height="48dp"
-				              android:paddingTop="16dp"
-				              android:paddingBottom="16dp"
-				              android:orientation="vertical"
-				              android:paddingLeft="72dp"
-				              android:paddingRight="16dp">
-
-					<TextView android:id="@+id/markerRegions"
-					          android:layout_width="wrap_content"
-					          android:layout_height="wrap_content"
-					          android:textSize="14sp"
-					          android:textColor="#999" />
-				</LinearLayout>
-
-				<LinearLayout android:layout_width="match_parent"
-				              android:layout_height="72dp"
-				              android:paddingTop="16dp"
-				              android:paddingBottom="16dp"
-				              android:orientation="vertical"
-				              android:paddingLeft="72dp"
-				              android:background="?attr/selectableItemBackground"
-				              android:onClick="editMaxRegionValue"
-				              android:paddingRight="16dp"
-				              android:visibility="gone">
-
-					<TextView android:layout_width="wrap_content"
-					          android:layout_height="wrap_content"
-					          android:textSize="16sp"
-					          android:textColor="#333"
-					          android:text="@string/maxRegionValue" />
-
-					<TextView android:id="@+id/markerRegionValue"
-					          android:layout_width="wrap_content"
-					          android:layout_height="wrap_content"
-					          android:textSize="14sp"
-					          android:textColor="#999" />
-				</LinearLayout>
-
-				<LinearLayout android:layout_width="match_parent"
-				              android:layout_height="72dp"
-				              android:paddingTop="16dp"
-				              android:paddingBottom="16dp"
-				              android:orientation="vertical"
-				              android:paddingLeft="72dp"
-				              android:background="?attr/selectableItemBackground"
-				              android:onClick="editChecksum"
-				              android:paddingRight="16dp">
-
-					<TextView android:layout_width="wrap_content"
-					          android:layout_height="wrap_content"
-					          android:textSize="16sp"
-					          android:textColor="#333"
-					          android:text="@string/checksumModulo" />
-
-					<TextView android:id="@+id/markerChecksum"
-					          android:layout_width="wrap_content"
-					          android:layout_height="wrap_content"
-					          android:textSize="14sp"
-					          android:textColor="#999" />
-				</LinearLayout>
-
-				<View
 						android:layout_width="match_parent"
-						android:layout_height="1dp"
-						android:background="#DDD"
-						android:layout_marginLeft="72dp" />
+						android:layout_height="150dp"
+						app:imageUrl="@{experience.image}"
+						android:adjustViewBounds="true"
+						tools:ignore="ContentDescription"
+						android:scaleType="fitCenter"
+						android:onClick="editImage"
+						android:background="#AAA" />
+
+				<LinearLayout android:orientation="vertical"
+				              android:layout_width="match_parent"
+				              android:layout_height="wrap_content">
+
+					<LinearLayout
+							android:orientation="horizontal"
+							android:layout_width="match_parent"
+							android:layout_height="match_parent"
+							android:paddingLeft="16dp"
+							android:paddingRight="16dp">
+
+						<ImageView
+								android:layout_width="56dp"
+								android:layout_height="56dp"
+								app:imageUrl="@{experience.icon}"
+								android:onClick="editImage"
+								android:layout_marginTop="12dp"
+								android:layout_marginLeft="4dp" />
+
+						<EditText
+								android:layout_width="match_parent"
+								android:layout_height="wrap_content"
+								android:hint="@string/experienceTitle"
+								android:text="@{experience.name}"
+								android:singleLine="true"
+								android:layout_marginLeft="16dp"
+								android:textAppearance="@style/TextAppearance.AppCompat.Title"
+								android:layout_gravity="center_vertical" />
+					</LinearLayout>
+
+					<LinearLayout
+							android:orientation="horizontal"
+							android:layout_width="match_parent"
+							android:layout_height="match_parent"
+							android:paddingLeft="16dp"
+							android:paddingRight="16dp">
+
+						<ImageView
+								tools:ignore="ContentDescription"
+								android:layout_width="wrap_content"
+								android:layout_height="wrap_content"
+								android:scaleType="fitCenter"
+								android:src="@drawable/ic_subject_white_24dp"
+								android:paddingTop="10dp"
+								android:paddingRight="28dp"
+								android:tint="@color/ic_tint" />
+
+						<EditText
+								android:layout_width="match_parent"
+								android:layout_height="wrap_content"
+								android:inputType="textMultiLine"
+								android:text="@{experience.description}"
+								android:textAppearance="@style/TextAppearance.AppCompat"
+								android:hint="@string/experienceDescription" />
+					</LinearLayout>
+
+					<TextView
+							android:layout_width="match_parent"
+							android:layout_height="match_parent"
+							android:gravity="center_vertical"
+							android:textAppearance="@style/TextAppearance.AppCompat.Small"
+							android:text="@string/availability"
+							android:padding="16dp" />
+
+					<LinearLayout
+							android:orientation="vertical"
+							android:layout_width="match_parent"
+							android:layout_height="match_parent"
+							android:id="@+id/availabilityList" />
+
+					<LinearLayout
+							android:orientation="horizontal"
+							android:layout_width="match_parent"
+							android:layout_height="match_parent"
+							android:clickable="true"
+							android:onClick="addAvailability"
+							android:background="?attr/selectableItemBackground"
+							android:paddingLeft="16dp"
+							android:paddingRight="16dp"
+							android:paddingTop="8dp"
+							android:paddingBottom="8dp">
+
+						<ImageView
+								tools:ignore="ContentDescription"
+								android:layout_width="wrap_content"
+								android:layout_height="wrap_content"
+								android:layout_marginEnd="16dp"
+								android:layout_marginRight="16dp"
+								android:scaleType="fitCenter"
+								android:src="@drawable/ic_add_white_24dp"
+								android:paddingTop="8dp"
+								android:paddingRight="16dp"
+								android:paddingBottom="8dp"
+								android:tint="@color/ic_tint" />
+
+						<TextView android:layout_width="wrap_content"
+						          android:layout_height="match_parent"
+						          android:textAppearance="@style/TextAppearance.AppCompat"
+						          android:gravity="center_vertical"
+						          android:text="@string/availability_add" />
+					</LinearLayout>
+
+					<TextView android:layout_width="match_parent"
+					          android:layout_height="match_parent"
+					          android:gravity="center_vertical"
+					          android:height="48dp"
+					          android:text="@string/markers"
+					          android:textAppearance="@style/TextAppearance.AppCompat.Small"
+					          android:paddingLeft="16dp"
+					          android:paddingRight="16dp" />
+
+
+					<LinearLayout android:layout_width="match_parent"
+					              android:layout_height="wrap_content"
+					              android:paddingTop="16dp"
+					              android:paddingBottom="16dp"
+					              android:orientation="vertical"
+					              android:paddingLeft="72dp"
+					              android:background="?attr/selectableItemBackground"
+					              android:onClick="editChecksum"
+					              android:paddingRight="16dp">
+
+						<TextView android:layout_width="wrap_content"
+						          android:layout_height="wrap_content"
+						          android:textAppearance="@style/TextAppearance.AppCompat"
+						          android:text="@string/checksumModulo" />
+
+						<TextView android:id="@+id/markerChecksum"
+						          android:layout_width="wrap_content"
+						          android:layout_height="wrap_content"
+						          android:text="@{experience.checksumText}"
+						          tools:text="Disabled"
+						          android:textAppearance="@style/TextAppearance.AppCompat.Small" />
+					</LinearLayout>
+
+					<View android:layout_width="match_parent"
+					      android:layout_height="1dp"
+					      android:background="#DDD"
+					      android:layout_marginLeft="72dp" />
+
+					<LinearLayout android:orientation="vertical"
+					              android:layout_width="match_parent"
+					              android:layout_height="match_parent"
+					              android:id="@+id/markerList">
+					</LinearLayout>
+
+					<LinearLayout android:orientation="horizontal"
+					              android:layout_width="match_parent"
+					              android:layout_height="match_parent"
+					              android:clickable="true"
+					              android:onClick="addMarker"
+					              android:id="@+id/markerAdd"
+					              android:paddingTop="8dp"
+					              android:paddingBottom="8dp"
+					              android:background="?attr/selectableItemBackground"
+					              android:paddingLeft="16dp"
+					              android:paddingRight="16dp">
+
+						<ImageView android:layout_width="wrap_content"
+						           android:layout_height="wrap_content"
+						           android:layout_marginEnd="16dp"
+						           android:layout_marginRight="16dp"
+						           android:scaleType="fitCenter"
+						           tools:ignore="ContentDescription"
+						           android:src="@drawable/ic_add_white_24dp"
+						           android:paddingTop="8dp"
+						           android:paddingRight="16dp"
+						           android:paddingBottom="8dp"
+						           android:tint="@color/ic_tint" />
+
+						<TextView
+								android:layout_width="wrap_content"
+								android:layout_height="match_parent"
+								android:gravity="center_vertical"
+								android:textAppearance="@style/TextAppearance.AppCompat"
+								android:text="@string/marker_add" />
+					</LinearLayout>
+
+				</LinearLayout>
+
 			</LinearLayout>
-
-			<LinearLayout android:orientation="vertical"
-			              android:layout_width="match_parent"
-			              android:layout_height="match_parent"
-			              android:id="@+id/markerList">
-			</LinearLayout>
-
-			<LinearLayout android:orientation="horizontal"
-			              android:layout_width="match_parent"
-			              android:layout_height="match_parent"
-			              android:clickable="true"
-			              android:onClick="addMarker"
-			              android:id="@+id/markerAdd"
-			              android:paddingTop="8dp"
-			              android:paddingBottom="8dp"
-			              android:background="?attr/selectableItemBackground"
-			              android:paddingLeft="16dp"
-			              android:paddingRight="16dp">
-
-				<ImageView android:layout_width="wrap_content"
-				           android:layout_height="wrap_content"
-				           android:layout_marginEnd="16dp"
-				           android:layout_marginRight="16dp"
-				           android:scaleType="fitCenter"
-				           tools:ignore="ContentDescription"
-				           android:src="@drawable/ic_add_white_24dp"
-				           android:paddingTop="8dp"
-				           android:paddingRight="16dp"
-				           android:paddingBottom="8dp"
-				           android:tint="@color/ic_tint" />
-
-				<TextView
-						android:layout_width="wrap_content"
-						android:layout_height="match_parent"
-						android:textSize="16sp"
-						android:textColor="#333"
-						android:gravity="center_vertical"
-						android:text="@string/marker_add" />
-			</LinearLayout>
-
-		</LinearLayout>
+		</ScrollView>
 
 	</LinearLayout>
-</ScrollView>
+</layout>

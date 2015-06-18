@@ -1,0 +1,38 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!--
+  ~ Artcodes recognises a different marker scheme that allows the
+  ~ creation of aesthetically pleasing, even beautiful, codes.
+  ~ Copyright (C) 2013-2015  The University of Nottingham
+  ~
+  ~ This program is free software: you can redistribute it and/or modify
+  ~ it under the terms of the GNU Affero General Public License as published
+  ~ by the Free Software Foundation, either version 3 of the License, or
+  ~ (at your option) any later version.
+  ~
+  ~ This program is distributed in the hope that it will be useful,
+  ~ but WITHOUT ANY WARRANTY; without even the implied warranty of
+  ~ MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+  ~ GNU Affero General Public License for more details.
+  ~
+  ~ You should have received a copy of the GNU Affero General Public License
+  ~ along with this program.  If not, see <http://www.gnu.org/licenses/>.
+  -->
+<manifest xmlns:android="http://schemas.android.com/apk/res/android"
+          package="uk.ac.horizon.artcodes.scanner">
+
+	<uses-permission android:name="android.permission.CAMERA" />
+
+	<uses-feature android:name="android.hardware.camera"
+	              android:required="false" />
+	<uses-feature android:name="android.hardware.camera.any"
+	              android:required="false" />
+	<uses-feature android:name="android.hardware.camera.front"
+	              android:required="false" />
+	<uses-feature android:name="android.hardware.camera.autofocus"
+	              android:required="false" />
+	<uses-feature android:name="android.hardware.camera.flash"
+	              android:required="false" />
+	<uses-feature android:name="android.hardware.touchscreen" />
+
+</manifest>
+            
