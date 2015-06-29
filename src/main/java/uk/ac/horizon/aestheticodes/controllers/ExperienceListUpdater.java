@@ -231,7 +231,7 @@ class ExperienceListUpdater extends AsyncTask<String, Experience, Collection<Str
 							}
 							else if (experience.getOp() == Experience.Operation.remove)
 							{
-								removals.add(experience.getId());
+								//removals.add(experience.getId());
 							}
 							else
 							{

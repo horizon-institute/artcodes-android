@@ -32,6 +32,14 @@ import android.view.WindowManager;
 import android.view.animation.Animation;
 import android.view.animation.AnimationUtils;
 import android.widget.Button;
+
+import org.json.JSONArray;
+import org.json.JSONException;
+import org.json.JSONObject;
+
+import java.util.ArrayList;
+import java.util.List;
+
 import uk.ac.horizon.aestheticodes.Aestheticodes;
 import uk.ac.horizon.aestheticodes.R;
 import uk.ac.horizon.aestheticodes.controllers.ExperienceListAdapter;
@@ -39,8 +47,6 @@ import uk.ac.horizon.aestheticodes.controllers.ExperienceListController;
 import uk.ac.horizon.aestheticodes.core.activities.ScanActivity;
 import uk.ac.horizon.aestheticodes.model.Experience;
 import uk.ac.horizon.aestheticodes.model.Marker;
-
-import java.util.List;
 
 public class AestheticodesActivity extends ScanActivity implements ExperienceListController.Listener
 {
@@ -82,6 +88,8 @@ public class AestheticodesActivity extends ScanActivity implements ExperienceLis
 		List<Experience> experienceList = experiences.getExperiences();
 		int index = experienceList.indexOf(experience);
 		getSupportActionBar().setSelectedNavigationItem(index);
+
+		addDefaultExperiences(Aestheticodes.getExperiences());
 	}
 
 
@@ -194,6 +202,74 @@ public class AestheticodesActivity extends ScanActivity implements ExperienceLis
 				return true;
 			}
 		});
+	}
+
+	private void addDefaultExperiences(ExperienceListController experienceListController)
+	{
+		try
+		{
+			String json = "[";
+			if (true) // use colour defaults
+				json += "{\"name\":\"2.1 Red\", \"UUID\":\"5a5d7329-a73a-45ac-9066-bdc922c93a66\", \"colourPreset\":[\"RGB\",1,0,0], \"minRegions\":5, \"maxRegions\":6, \"checksum\":3, \"icon\":\"http://www.nottingham.ac.uk/~pszwp/red.gif\"}," +
+						"{\"name\":\"2.2 Green\", \"UUID\":\"f988f134-780e-4760-8b65-516663c5fab8\", \"colourPreset\":[\"RGB\",0,1,0], \"minRegions\":5, \"maxRegions\":6, \"checksum\":3, \"icon\":\"http://www.nottingham.ac.uk/~pszwp/green.gif\"}," +
+						"{\"name\":\"2.3 Blue\", \"UUID\":\"3c9833bb-46df-406d-bae6-8d4c0410d02a\", \"colourPreset\":[\"RGB\",0,0,1], \"minRegions\":5, \"maxRegions\":6, \"checksum\":3, \"icon\":\"http://www.nottingham.ac.uk/~pszwp/blue.gif\"},";
+			if (true) // use extension defaults
+				json += "{\"name\":\"1.1 Area Order\", \"UUID\":\"6dd56665-8523-43e8-925d-71d6d94be4be\", \"minRegions\":5, \"maxRegions\":5, \"checksum\":3, \"description\":\"This experience orders the regions of an Artcode by their size. (AREA4321)\", \"icon\":\"http://www.nottingham.ac.uk/~pszwp/red.gif\"}," +
+								"{\"name\":\"1.2 Area Label/Orientation Order\", \"UUID\":\"ce4b84b6-6cfc-4969-a4e4-072334c337b8\", \"minRegions\":5, \"maxRegions\":5, \"checksum\":3, \"embeddedChecksum\":true, \"description\":\"This experience labels the regions of an Artcode by their size and then orders them by their orientation. (AO4321)\", \"icon\":\"http://www.nottingham.ac.uk/~pszwp/red.gif\"}," +
+								"{\"name\":\"1.3 Orientation Label/Area Order\", \"UUID\":\"1d4bac87-e9e3-4e12-8208-34c168922e34\", \"minRegions\":5, \"maxRegions\":5, \"checksum\":3, \"embeddedChecksum\":true, \"description\":\"This experience labels the regions of an Artcode by their orientation and then orders them by their size. (OA4321)\", \"icon\":\"http://www.nottingham.ac.uk/~pszwp/red.gif\"}," +
+								"{\"name\":\"1.4 Touching\", \"UUID\":\"069674f8-3a8b-49bd-aef6-5b0bc6196c67\", \"minRegions\":5, \"maxRegions\":5, \"checksum\":3, \"embeddedChecksum\":true, \"description\":\"This experience counts the number of other regions a region touches. This produces codes like 1-1:1-2:1-2:1-2:2-2 where 1-2 means a region with a value of 1 that is touching 2 other regions. The total of these touching numbers must be disiable by 3. (TOUCH4321)\", \"icon\":\"http://www.nottingham.ac.uk/~pszwp/red.gif\"}";
+			json += "]";
+			JSONArray arrayOfDefaultExperences = new JSONArray(json);
+
+			for (int i=0; i<arrayOfDefaultExperences.length(); ++i)
+			{
+				JSONObject experienceDict = arrayOfDefaultExperences.getJSONObject(i);
+				Experience experience = new Experience();
+				experience.setId(experienceDict.getString("UUID"));
+				experience.setOp(Experience.Operation.create);
+				experience.setName(experienceDict.getString("name"));
+				if (experienceDict.has("version"))
+					experience.setVersion(experienceDict.getInt("version"));
+
+				Experience existingExperience = experienceListController.get(experience.getId());
+				if (existingExperience == null || existingExperience.getVersion() < experience.getVersion())
+				{
+					if (experienceDict.has("icon"))
+						experience.setIcon(experienceDict.getString("icon"));
+					if (experienceDict.has("description"))
+						experience.setDescription(experienceDict.getString("description"));
+
+					if (experienceDict.has("minRegions"))
+						experience.setMinRegions(experienceDict.getInt("minRegions"));
+					if (experienceDict.has("maxRegions"))
+						experience.setMaxRegions(experienceDict.getInt("maxRegions"));
+					if (experienceDict.has("checksum"))
+						experience.setChecksumModulo(experienceDict.getInt("checksum"));
+					if (experienceDict.has("embeddedChecksum"))
+						experience.setEmbeddedChecksum(experienceDict.getBoolean("embeddedChecksum"));
+
+					if (experienceDict.has("colourPreset"))
+					{
+						List<Object> preset = new ArrayList<>();
+						JSONArray presetInJson = experienceDict.getJSONArray("colourPreset");
+						preset.add(presetInJson.getString(0));
+						for (int j = 1; j < presetInJson.length(); ++j)
+							preset.add(presetInJson.getDouble(j));
+						experience.setGreyscaleOptions(preset);
+					}
+					if (experienceDict.has("invertGreyscale"))
+						experience.setInvertGreyscale(experienceDict.getBoolean("invertGreyscale"));
+					if (experienceDict.has("hueShift"))
+						experience.setHueShift(experienceDict.getDouble("hueShift"));
+
+					experienceListController.add(experience);
+				}
+			}
+
+		} catch (JSONException e)
+		{
+			e.printStackTrace();
+		}
 	}
 
 	@Override
