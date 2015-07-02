@@ -241,7 +241,7 @@ public class GreyscaleSettingsActivity extends ActionBarActivity {
     @Override
     public boolean onCreateOptionsMenu(Menu menu) {
         // Inflate the menu; this adds items to the action bar if it is present.
-        getMenuInflater().inflate(R.menu.menu_greyscale_settings, menu);
+        //getMenuInflater().inflate(R.menu.menu_greyscale_settings, menu);
         return true;
     }
 
@@ -339,63 +339,92 @@ public class GreyscaleSettingsActivity extends ActionBarActivity {
             try {
                 timeOfLastAutoFocus = System.currentTimeMillis();
                 Camera.Size size = camera.getSize();
-                Mat drawImage = new Mat(size.height, size.width, CvType.CV_8UC3);
+                Mat drawImage = null;
                 result = null;
 
-                while (running) {
-                    try {
+                Mat greyImage = null;
+
+                while (running)
+                {
+                    try
+                    {
                         byte[] data = camera.getData();
-                        if (data != null) {
+                        if (data != null)
+                        {
+                            Mat yuvImage = MatTranform.cropNV12Data(data, size.height, size.width);
 
-                            Mat yuvImage = new Mat(size.height+size.height/2, size.width, CvType.CV_8UC1);
-                            yuvImage.put(0, 0, data);
-
-                            Mat greyImage = null;
-                            synchronized (lockObject) {
-                                if (hasChanged) {
+                            synchronized (lockObject)
+                            {
+                                if (hasChanged)
+                                {
                                     hasChanged = false;
+                                    greyscaler.release();
                                     greyscaler = experience.getGreyscaler();
                                 }
                             }
                             if (greyscaler != null)
                             {
-                                greyImage = greyscaler.greyscaleImage(yuvImage);
+                                greyImage = greyscaler.greyscaleImage(yuvImage, greyImage);
                             }
-                            yuvImage.release();
 
-                            if (greyImage!=null) {
+                            if (greyImage!=null)
+                            {
                                 MatTranform.rotate(greyImage, greyImage, 360 + 90 - camera.getRotation(), camera.isFront());
+                                if (drawImage==null)
+                                {
+                                    drawImage = new Mat(greyImage.rows(), greyImage.cols(), CvType.CV_8UC4);
+                                }
                                 Imgproc.cvtColor(greyImage, drawImage, Imgproc.COLOR_GRAY2BGRA);
-                                greyImage.release();
 
-                                if (result == null) {
+                                if (result == null || result.getWidth()!=drawImage.cols() || result.getHeight()!=drawImage.rows())
+                                {
                                     result = Bitmap.createBitmap(drawImage.cols(), drawImage.rows(), Bitmap.Config.ARGB_8888);
                                 }
                                 Utils.matToBitmap(drawImage, result);
                                 updateImage(result);
                             }
 
-                        } else {
+                            if (yuvImage!=null)
+                            {
+                                yuvImage.release();
+                            }
+
+                            System.gc();
+                        }
+                        else
+                        {
                             Log.i(TAG, "No data");
-                            synchronized (this) {
+                            synchronized (this)
+                            {
                                 wait(200);
                             }
                         }
-                    } catch (Exception e) {
+                    }
+                    catch (Exception e)
+                    {
                         Log.e(TAG, e.getMessage(), e);
                     }
 
                     // Test if camera needs to be focused
-                    if (CameraController.deviceNeedsManualAutoFocus && System.currentTimeMillis() - timeOfLastAutoFocus >= 5000) {
+                    if (CameraController.deviceNeedsManualAutoFocus && System.currentTimeMillis() - timeOfLastAutoFocus >= 5000)
+                    {
                         timeOfLastAutoFocus = System.currentTimeMillis();
-                        camera.performManualAutoFocus(new Camera.AutoFocusCallback() {
+                        camera.performManualAutoFocus(new Camera.AutoFocusCallback()
+                        {
                             @Override
-                            public void onAutoFocus(boolean b, Camera camera) {
+                            public void onAutoFocus(boolean b, Camera camera)
+                            {
                             }
                         });
                     }
                 }
-            } catch (Exception e) {
+                if (greyImage!=null)
+                {
+                    greyImage.release();
+                }
+            }
+            catch (Exception e)
+            {
                 Log.e(TAG, e.getMessage(), e);
             }
 

@@ -29,15 +29,93 @@ import org.opencv.imgproc.Imgproc;
 
 import java.util.ArrayList;
 import java.util.List;
+import java.util.concurrent.ExecutorService;
+import java.util.concurrent.Executors;
 
 /**
  * Class containing the method to greyscale an image.
- * This is a base abstract class, use a subclass like Greyscaler.RgbGreyscaler or Greyscaler.CmykGreyscaler.
+ * This is a base abstract class, use a subclass like Greyscaler.IntensityGreyscaler or Greyscaler.SingleChannelRgbGreyscaler.
  */
 public abstract class Greyscaler
 {
-    private final int hueShift;
-    private final boolean invert;
+    protected static final String KEY = "GREY";
+
+    protected final int hueShift;
+    protected final boolean invert;
+
+    protected Mat threeChannelBuffer = null;
+    /**
+     * This is a buffer that can be used by sub-classes for storing intermediate color data.
+     * If the array is not long enough (or null) recreate it at the desired length but never make it smaller.
+     * Data in this buffer may be overwritten.
+     */
+    protected byte[] colorPixelBuffer = null;
+
+    public static Greyscaler getGreyscaler(double hueShift, List<Object> greyscaleOptions, boolean invert)
+    {
+        int threadCount = 10;
+
+        if (greyscaleOptions!=null)
+        {
+            if (greyscaleOptions.size() == 4 && greyscaleOptions.get(0).equals("RGB"))
+            {
+                double r=(double)greyscaleOptions.get(1), g=(double)greyscaleOptions.get(2), b=(double)greyscaleOptions.get(3);
+                if (r==1 && g==0 && b==0)
+                {
+                    List<Greyscaler> greyscalers = new ArrayList<>();
+                    while (greyscalers.size() < threadCount)
+                    {
+                        greyscalers.add(new SingleChannelRgbGreyscaler(hueShift, 2, invert));
+                    }
+                    return new ThreadedGreyscaler(greyscalers);
+                }
+                else if (r==0 && g==1 && b==0)
+                {
+                    List<Greyscaler> greyscalers = new ArrayList<>();
+                    while (greyscalers.size() < threadCount)
+                    {
+                        greyscalers.add(new SingleChannelRgbGreyscaler(hueShift, 1, invert));
+                    }
+                    return new ThreadedGreyscaler(greyscalers);
+                }
+                else if (r==0 && g==0 && b==1)
+                {
+                    List<Greyscaler> greyscalers = new ArrayList<>();
+                    while (greyscalers.size() < threadCount)
+                    {
+                        greyscalers.add(new SingleChannelRgbGreyscaler(hueShift, 0, invert));
+                    }
+                    return new ThreadedGreyscaler(greyscalers);
+                }
+                else if (r==0.299 && g==0.587 && b==0.114)
+                {
+                    return new IntensityGreyscaler(hueShift, invert);
+                }
+                else
+                {
+                    return new Greyscaler.WeightedChannelRgbGreyscaler(hueShift, ((Number) greyscaleOptions.get(1)).doubleValue(), ((Number) greyscaleOptions.get(2)).doubleValue(), ((Number) greyscaleOptions.get(3)).doubleValue(), invert);
+                }
+            }
+            else if (greyscaleOptions.size() == 5 && greyscaleOptions.get(0).equals("CMYK")) {
+                List<Greyscaler> greyscalers = new ArrayList<>();
+                while (greyscalers.size() < threadCount)
+                {
+                    greyscalers.add(new Greyscaler.CmykGreyscaler(hueShift, ((Number) greyscaleOptions.get(1)).doubleValue(), ((Number) greyscaleOptions.get(2)).doubleValue(), ((Number) greyscaleOptions.get(3)).doubleValue(), ((Number) greyscaleOptions.get(4)).doubleValue(), invert));
+                }
+                return new ThreadedGreyscaler(greyscalers);
+            }
+            else if (greyscaleOptions.size() == 4 && greyscaleOptions.get(0).equals("CMY")) {
+                List<Greyscaler> greyscalers = new ArrayList<>();
+                while (greyscalers.size() < threadCount)
+                {
+                    greyscalers.add(new Greyscaler.CmyGreyscaler(hueShift, ((Number) greyscaleOptions.get(1)).doubleValue(), ((Number) greyscaleOptions.get(2)).doubleValue(), ((Number) greyscaleOptions.get(3)).doubleValue(), invert));
+                }
+                return new ThreadedGreyscaler(greyscalers);
+            }
+        }
+        return new IntensityGreyscaler(hueShift, invert);
+    }
+
     public Greyscaler(double hueShift, boolean invert)
     {
         // hue should be in range [0-180]
@@ -56,23 +134,31 @@ public abstract class Greyscaler
     /**
      * Create a greyscale image.
      * @param yuvImage A YUV NV12 image (CV_8UC1). Should not be null.
+     * @param greyscaleImage A greyscale image (CV_8UC1) to place the result in, depending on the method used this may or may not be used (can be null).
+     * @return A greyscale image. Depending on the method used this may or may not be the same buffer passed in as greyscaleImage.
      */
-    public Mat greyscaleImage(Mat yuvImage)
+    public Mat greyscaleImage(Mat yuvImage, Mat greyscaleImage)
     {
-        Mat greyscaleImage = null;
-        if (this.useIntensityShortcut())
+        if (this.useIntensityShortcut() && hueShift==0)
         {
-            Log.i("GREY", "using Intensity Shortcut");
+            if (greyscaleImage != null)
+            {
+                greyscaleImage.release();
+            }
             // cut off the UV components
             greyscaleImage = yuvImage.submat(0, (yuvImage.rows()/3)*2, 0, yuvImage.cols());
         }
         else
         {
-            Log.i("GREY", "Not using Intensity Shortcut");
-            Mat hueShiftedImage = new Mat((yuvImage.rows()/3)*2, yuvImage.cols(), CvType.CV_8UC3);
-            Imgproc.cvtColor(yuvImage, hueShiftedImage, Imgproc.COLOR_YUV2BGR_NV21);
-            this.justHueShiftImage(hueShiftedImage, hueShiftedImage);
-            greyscaleImage = this.justGreyscaleImage(hueShiftedImage, greyscaleImage);
+            int desiredRows = (yuvImage.rows() / 3) * 2, desiredCols = yuvImage.cols();
+            if (this.threeChannelBuffer==null || this.threeChannelBuffer.rows()!=desiredRows || this.threeChannelBuffer.cols()!=desiredCols)
+            {
+                Log.i(KEY, "Creating new Mat buffer (1)");
+                this.threeChannelBuffer = new Mat(desiredRows, desiredCols, CvType.CV_8UC3);
+            }
+            Imgproc.cvtColor(yuvImage, this.threeChannelBuffer, Imgproc.COLOR_YUV2BGR_NV21);
+            this.justHueShiftImage(this.threeChannelBuffer, this.threeChannelBuffer);
+            greyscaleImage = this.justGreyscaleImage(this.threeChannelBuffer, greyscaleImage);
         }
 
         if (this.invert)
@@ -82,7 +168,6 @@ public abstract class Greyscaler
 
         return greyscaleImage;
     }
-
 
     /**
      * Shift the hue of an image.
@@ -95,13 +180,19 @@ public abstract class Greyscaler
         {
             Imgproc.cvtColor(colorImage, resultImage, Imgproc.COLOR_BGR2HLS);
 
-            byte[] pixelData = new byte[colorImage.rows()*colorImage.cols()*colorImage.channels()];
-            colorImage.get(0,0,pixelData);
-            for (int i=0; i<pixelData.length; i+=colorImage.channels())
+            int desiredBufferSize = colorImage.rows()*colorImage.cols()*colorImage.channels();
+            if (this.colorPixelBuffer==null || this.colorPixelBuffer.length<desiredBufferSize)
             {
-                pixelData[i] = (byte) ((pixelData[i] + this.hueShift) % 181);
+                Log.i(KEY, "Creating new byte["+desiredBufferSize+"] buffer (2)");
+                this.colorPixelBuffer = new byte[desiredBufferSize];
             }
-            colorImage.put(0,0,pixelData);
+
+            colorImage.get(0,0,this.colorPixelBuffer);
+            for (int i=0; i<this.colorPixelBuffer.length; i+=colorImage.channels())
+            {
+                this.colorPixelBuffer[i] = (byte) ((this.colorPixelBuffer[i] + this.hueShift) % 181);
+            }
+            colorImage.put(0,0,this.colorPixelBuffer);
 
             // convert back to BGR
             Imgproc.cvtColor(resultImage, resultImage, Imgproc.COLOR_HLS2BGR);
@@ -122,74 +213,146 @@ public abstract class Greyscaler
     protected abstract boolean useIntensityShortcut();
 
 
-    public static class RgbGreyscaler extends Greyscaler
+    /**
+     * Release any resources held.
+     */
+    public void release()
     {
-        private final Mat weight;
-        private final boolean useIntensityShortcut;
-        private final int singleChannel;
-        public RgbGreyscaler(double hueShift, double redMultiplier, double greenMultiplier, double blueMultiplier, boolean invert)
+        if (this.threeChannelBuffer != null)
+        {
+            this.threeChannelBuffer.release();
+            this.threeChannelBuffer = null;
+        }
+        colorPixelBuffer = null;
+    }
+
+    public static class IntensityGreyscaler extends Greyscaler
+    {
+        public IntensityGreyscaler(double hueShift, boolean invert)
         {
             super(hueShift, invert);
-            this.useIntensityShortcut = redMultiplier == 0.299 &&
-                    greenMultiplier == 0.587 &&
-                    blueMultiplier == 0.114;
-            if (redMultiplier==1&&greenMultiplier==0&&blueMultiplier==0)
-            {
-                this.weight = null;
-                this.singleChannel = 2;
-            }
-            else if (redMultiplier==0&&greenMultiplier==1&&blueMultiplier==0)
-            {
-                this.weight = null;
-                this.singleChannel = 1;
-            }
-            else if (redMultiplier==0&&greenMultiplier==0&&blueMultiplier==1)
-            {
-                this.weight = null;
-                this.singleChannel = 0;
-            }
-            else if (!useIntensityShortcut)
-            {
-                this.singleChannel = -1;
-                this.weight = new Mat(1, 3,  CvType.CV_32FC1, new Scalar(0));
-                this.weight.put(0, 0, blueMultiplier);
-                this.weight.put(0, 1, greenMultiplier);
-                this.weight.put(0, 2, redMultiplier);
-            }
-            else
-            {
-                this.singleChannel = -1;
-                this.weight = null;
-            }
+            Log.i(KEY, "Creating IntensityGreyscaler");
         }
 
         @Override
-        protected boolean useIntensityShortcut() {
-            return this.useIntensityShortcut;
+        protected boolean useIntensityShortcut()
+        {
+            return true;
         }
 
         @Override
         protected Mat justGreyscaleImage(Mat colorImage, Mat greyscaleImage)
         {
-            if (this.singleChannel>=0)
+            if (greyscaleImage==null || greyscaleImage.rows()!=colorImage.rows() || greyscaleImage.cols()!=colorImage.cols())
             {
-                Log.i("GREY", "Single channel=" + this.singleChannel);
-                List<Mat> channels = new ArrayList<>(3);
-                Core.split(colorImage, channels);
-                return channels.get(this.singleChannel);
+                greyscaleImage = new Mat(colorImage.rows(), colorImage.cols(), CvType.CV_8UC1);
             }
-            else {
-                Log.i("GREY", "Mixed channel");
-                if (greyscaleImage==null)
-                {
-                    greyscaleImage = new Mat(colorImage.rows(), colorImage.cols(), CvType.CV_8UC1);
-                }
-                Core.transform(colorImage, greyscaleImage, this.weight);
-                return greyscaleImage;
-            }
+            Imgproc.cvtColor(colorImage, greyscaleImage, Imgproc.COLOR_BGR2GRAY);
+            return greyscaleImage;
         }
     }
 
+    // TODO: Investigate why this crashes when allocating the weight Mat.
+    public static class WeightedChannelRgbGreyscaler extends Greyscaler
+    {
+        private final Mat weight;
+        public WeightedChannelRgbGreyscaler(double hueShift, double redMultiplier, double greenMultiplier, double blueMultiplier, boolean invert)
+        {
+            super(hueShift, invert);
+            Log.i(KEY, "Creating WeightedChannelRgbGreyscaler");
+
+            this.weight = new Mat(1, 3,  CvType.CV_32FC1, new Scalar(0));
+            this.weight.put(0, 0, blueMultiplier);
+            this.weight.put(0, 1, greenMultiplier);
+            this.weight.put(0, 2, redMultiplier);
+        }
+
+        @Override
+        protected boolean useIntensityShortcut() {
+            return false;
+        }
+
+        @Override
+        protected Mat justGreyscaleImage(Mat colorImage, Mat greyscaleImage)
+        {
+            if (greyscaleImage==null || greyscaleImage.rows()!=colorImage.rows() || greyscaleImage.cols()!=colorImage.cols())
+            {
+                greyscaleImage = new Mat(colorImage.rows(), colorImage.cols(), CvType.CV_8UC1);
+            }
+            Core.transform(colorImage, greyscaleImage, this.weight);
+            return greyscaleImage;
+        }
+    }
+
+    public static class SingleChannelRgbGreyscaler extends Greyscaler
+    {
+        private final int singleChannel;
+        public SingleChannelRgbGreyscaler(double hueShift, int channel, boolean invert)
+        {
+            super(hueShift, invert);
+            Log.i(KEY, "Creating SingleChannelRgbGreyscaler");
+
+            if (0<=channel && channel<=2)
+            {
+                this.singleChannel = channel;
+            }
+            else
+            {
+                Log.e(KEY, "SingleChannelRgbGreyscaler received channel index out of range ("+channel+"), using 0.");
+                this.singleChannel = 0;
+            }
+        }
+
+        @Override
+        protected boolean useIntensityShortcut() {
+            return false;
+        }
+
+        private byte[] singleChannelGreyPixelBuffer = null;
+        @Override
+        protected Mat justGreyscaleImage(Mat colorImage, Mat greyscaleImage)
+        {
+            /*
+            // This method is much simpler (and a little faster) but randomly crashes :(
+            List<Mat> channels = new ArrayList<>(3);
+            Core.split(colorImage, channels);
+            return channels.get(this.singleChannel);
+            */
+
+            if (greyscaleImage==null || greyscaleImage.rows()!=colorImage.rows() || greyscaleImage.cols()!=colorImage.cols())
+            {
+                Log.i(KEY, "Creating new Mat buffer (3)");
+                greyscaleImage = new Mat(colorImage.size(), CvType.CV_8UC1);
+            }
+
+            int desiredColorBufferSize = colorImage.rows()*colorImage.cols()*colorImage.channels();
+            if (this.colorPixelBuffer ==null || this.colorPixelBuffer.length<desiredColorBufferSize)
+            {
+                Log.i(KEY, "Creating new byte["+desiredColorBufferSize+"] buffer (4)");
+                this.colorPixelBuffer = new byte[desiredColorBufferSize];
+            }
+
+            int desiredGreyBufferSize = colorImage.rows()*colorImage.cols();
+            if (this.singleChannelGreyPixelBuffer==null || this.singleChannelGreyPixelBuffer.length!=desiredGreyBufferSize)
+            {
+                Log.i(KEY, "Creating new byte["+desiredGreyBufferSize+"] buffer (5)");
+                this.singleChannelGreyPixelBuffer = new byte[desiredGreyBufferSize];
+            }
+
+            colorImage.get(0, 0, this.colorPixelBuffer);
+            int c=this.singleChannel, g=0, channels=colorImage.channels();
+            while (g<desiredGreyBufferSize)
+            {
+                this.singleChannelGreyPixelBuffer[g] = this.colorPixelBuffer[c];
+                ++g;
+                c+=channels;
+            }
+            greyscaleImage.put(0, 0, this.singleChannelGreyPixelBuffer);
+
+
+            return greyscaleImage;
+        }
+    }
 
     public static class CmykGreyscaler extends Greyscaler
     {
@@ -198,6 +361,8 @@ public abstract class Greyscaler
         public CmykGreyscaler(double hueShift, double cMultiplier, double mMultiplier, double yMultiplier, double kMultiplier, boolean invert)
         {
             super(hueShift, invert);
+            Log.i(KEY, "Creating CmykGreyscaler");
+
             this.cMultiplier=(float)cMultiplier;
             this.mMultiplier=(float)mMultiplier;
             this.yMultiplier=(float)yMultiplier;
@@ -232,8 +397,9 @@ public abstract class Greyscaler
         @Override
         protected Mat justGreyscaleImage(Mat colorImage, Mat greyscaleImage)
         {
-            if (greyscaleImage==null)
+            if (greyscaleImage==null || greyscaleImage.rows()!=colorImage.rows() || greyscaleImage.cols()!=colorImage.cols())
             {
+                Log.i(KEY, "Creating new Mat buffer (6)");
                 greyscaleImage = new Mat(colorImage.rows(), colorImage.cols(), CvType.CV_8UC1);
             }
 
@@ -242,47 +408,48 @@ public abstract class Greyscaler
             Here the same array is used as both input and output.
              */
 
-            byte[] pixelData = new byte[colorImage.rows() * colorImage.cols() * colorImage.channels()];
-            colorImage.get(0, 0, pixelData);
+            int desiredBufferSize = colorImage.rows() * colorImage.cols() * colorImage.channels();
+            if (this.colorPixelBuffer==null || this.colorPixelBuffer.length<desiredBufferSize)
+            {
+                Log.i(KEY, "Creating new byte["+desiredBufferSize+"] buffer (7)");
+                this.colorPixelBuffer = new byte[colorImage.rows() * colorImage.cols() * colorImage.channels()];
+            }
+            colorImage.get(0, 0, this.colorPixelBuffer);
             float k, r, g, b;
             if (this.singleChannel==-1) {
-                Log.i("GREY", "justGreyscaleImage CMYK mixed channel");
-                for (int i = 0, j = 0; i < pixelData.length; i += 3, ++j) {
-                    b = pixelData[i] / 255.0f;
-                    g = pixelData[i + 1] / 255.0f;
-                    r = pixelData[i + 2] / 255.0f;
+                for (int i = 0, j = 0; i < desiredBufferSize; i += 3, ++j) {
+                    b = this.colorPixelBuffer[i] / 255.0f;
+                    g = this.colorPixelBuffer[i + 1] / 255.0f;
+                    r = this.colorPixelBuffer[i + 2] / 255.0f;
                     k = Math.min(1 - r, Math.min(1 - g, 1 - b));
-                    pixelData[j] = (byte) (k * kMultiplier * 255);
-                    pixelData[j] += (byte) (255 * cMultiplier * ((1 - r - k) / (1 - k)));
-                    pixelData[j] += (byte) (255 * mMultiplier * ((1 - g - k) / (1 - k)));
-                    pixelData[j] += (byte) (255 * yMultiplier * ((1 - b - k) / (1 - k)));
+                    this.colorPixelBuffer[j] = (byte) (k * kMultiplier * 255);
+                    this.colorPixelBuffer[j] += (byte) (255 * cMultiplier * ((1 - r - k) / (1 - k)));
+                    this.colorPixelBuffer[j] += (byte) (255 * mMultiplier * ((1 - g - k) / (1 - k)));
+                    this.colorPixelBuffer[j] += (byte) (255 * yMultiplier * ((1 - b - k) / (1 - k)));
                 }
             }
             else if (this.singleChannel==3) // k only
             {
-                Log.i("GREY", "justGreyscaleImage CMYK k channel");
-                for (int i = 0, j = 0; i < pixelData.length; i += 3, ++j) {
-                    pixelData[j] = (byte) Math.min(255 - pixelData[i], Math.min(255 - pixelData[i+1], 255 - pixelData[i+2]));
+                for (int i = 0, j = 0; i < desiredBufferSize; i += 3, ++j) {
+                    this.colorPixelBuffer[j] = (byte) Math.min(255 - this.colorPixelBuffer[i], Math.min(255 - this.colorPixelBuffer[i+1], 255 - this.colorPixelBuffer[i+2]));
                 }
             }
             else // c, y or m only
             {
-                Log.i("GREY", "justGreyscaleImage CMYK single channel");
                 float[] bgr = new float[3];
-                for (int i = 0, j = 0; i < pixelData.length; i += 3, ++j) {
-                    bgr[0] = pixelData[i] / 255.0f;
-                    bgr[1] = pixelData[i + 1] / 255.0f;
-                    bgr[2] = pixelData[i + 2] / 255.0f;
+                for (int i = 0, j = 0; i < desiredBufferSize; i += 3, ++j) {
+                    bgr[0] = this.colorPixelBuffer[i] / 255.0f;
+                    bgr[1] = this.colorPixelBuffer[i + 1] / 255.0f;
+                    bgr[2] = this.colorPixelBuffer[i + 2] / 255.0f;
                     k = Math.min(1 - bgr[0], Math.min(1 - bgr[1], 1 - bgr[2]));
-                    pixelData[j] = (byte) (255 * ((1 - bgr[this.singleChannel] - k) / (1 - k)));
+                    this.colorPixelBuffer[j] = (byte) (255 * ((1 - bgr[this.singleChannel] - k) / (1 - k)));
                 }
             }
-            greyscaleImage.put(0, 0, pixelData);
+            greyscaleImage.put(0, 0, this.colorPixelBuffer);
 
             return greyscaleImage;
         }
     }
-
 
     public static class CmyGreyscaler extends Greyscaler
     {
@@ -291,6 +458,8 @@ public abstract class Greyscaler
         public CmyGreyscaler(double hueShift, double cMultiplier, double mMultiplier, double yMultiplier, boolean invert)
         {
             super(hueShift, invert);
+            Log.i(KEY, "Creating CmyGreyscaler");
+
             this.cMultiplier=(float)cMultiplier;
             this.mMultiplier=(float)mMultiplier;
             this.yMultiplier=(float)yMultiplier;
@@ -320,29 +489,177 @@ public abstract class Greyscaler
         @Override
         protected Mat justGreyscaleImage(Mat colorImage, Mat greyscaleImage)
         {
-            if (greyscaleImage==null)
+            if (greyscaleImage==null || greyscaleImage.rows()!=colorImage.rows() || greyscaleImage.cols()!=colorImage.cols())
             {
+                Log.i(KEY, "Creating new Mat buffer (7)");
                 greyscaleImage = new Mat(colorImage.rows(), colorImage.cols(), CvType.CV_8UC1);
             }
 
-            byte[] pixelData = new byte[colorImage.rows() * colorImage.cols() * colorImage.channels()];
-            colorImage.get(0, 0, pixelData);
+            int desiredBufferSize = colorImage.rows() * colorImage.cols() * colorImage.channels();
+            if (this.colorPixelBuffer==null || this.colorPixelBuffer.length<desiredBufferSize)
+            {
+                Log.i(KEY, "Creating new byte["+desiredBufferSize+"] buffer (8)");
+                this.colorPixelBuffer = new byte[colorImage.rows() * colorImage.cols() * colorImage.channels()];
+            }
+
+            colorImage.get(0, 0, this.colorPixelBuffer);
             if (this.singleChannel==-1)
             {
-                Log.i("GREY", "justGreyscaleImage CMY mixed channel");
-                for (int i = 0, j = 0; i < pixelData.length; i += 3, ++j) {
-                    pixelData[i] = (byte) ((1-pixelData[i+2]/255.0f)*this.cMultiplier*255 + (1-pixelData[i+1]/255.0f)*this.mMultiplier*255 + (1-pixelData[i]/255.0f)*this.yMultiplier*255);
+                for (int c = 0, g = 0; c < desiredBufferSize; c += 3, ++g) {
+                    this.colorPixelBuffer[g] = (byte) ((1-this.colorPixelBuffer[c+2]/255.0f)*this.cMultiplier*255 + (1-this.colorPixelBuffer[c+1]/255.0f)*this.mMultiplier*255 + (1-this.colorPixelBuffer[c]/255.0f)*this.yMultiplier*255);
                 }
             }
             else
             {
-                Log.i("GREY", "justGreyscaleImage CMY single channel");
-                for (int i = 0, j = 0; i < pixelData.length; i += 3, ++j) {
-                    pixelData[i] = (byte) (255 - pixelData[i+this.singleChannel]);
+                for (int c = 0, g = 0; c < desiredBufferSize; c += 3, ++g) {
+                    this.colorPixelBuffer[g] = (byte) (255 - this.colorPixelBuffer[c+this.singleChannel]);
                 }
+            }
+            greyscaleImage.put(0,0,this.colorPixelBuffer);
+            return greyscaleImage;
+        }
+    }
+
+
+    /**
+     * This class enables a given image to be processed concurrently over a number of threads.
+     */
+    public static class ThreadedGreyscaler extends Greyscaler
+    {
+
+        private List<Greyscaler> greyscalers;
+        private ExecutorService threadPool;
+
+        /**
+         * As Greyscaler objects are not thread safe the number given in the List is also the
+         * maximum number of threads that can concurrently process an image.
+         * @param greyscalers
+         */
+        public ThreadedGreyscaler(List<Greyscaler> greyscalers)
+        {
+            super(0, greyscalers == null || greyscalers.isEmpty() ? false : greyscalers.get(0).invert);
+            this.greyscalers = greyscalers;
+
+            threadPool = Executors.newFixedThreadPool(this.greyscalers.size() - 1);
+        }
+
+        @Override
+        public void release()
+        {
+            super.release();
+            threadPool.shutdown();
+            for (Greyscaler greyscaler : greyscalers)
+            {
+                greyscaler.release();
+            }
+        }
+
+        @Override
+        public Mat greyscaleImage(Mat yuvImage, Mat greyscaleImage)
+        {
+            int desiredRows = (yuvImage.rows() / 3) * 2, desiredCols = yuvImage.cols();
+            if (this.threeChannelBuffer == null || this.threeChannelBuffer.rows() != desiredRows || this.threeChannelBuffer.cols() != desiredCols)
+            {
+                Log.i(KEY, "Creating new Mat buffer (1)");
+                this.threeChannelBuffer = new Mat(desiredRows, desiredCols, CvType.CV_8UC3);
+            }
+            Imgproc.cvtColor(yuvImage, this.threeChannelBuffer, Imgproc.COLOR_YUV2BGR_NV21);
+
+            if (greyscaleImage == null || greyscaleImage.rows() != desiredRows || greyscaleImage.cols() != desiredCols)
+            {
+                greyscaleImage = new Mat(desiredRows, desiredCols, CvType.CV_8UC1);
+            }
+
+            List<GreyscalerTask> tasks = new ArrayList<>();
+            for (int i = 0; i < greyscalers.size(); ++i)
+            {
+                Greyscaler greyscaler = greyscalers.get(i);
+                GreyscalerTask task = new GreyscalerTask(
+                        greyscaler,
+                        this.threeChannelBuffer.submat(0, desiredRows, (desiredCols / greyscalers.size()) * i, (desiredCols / greyscalers.size()) * (i + 1)),
+                        greyscaleImage.submat(0, desiredRows, (desiredCols / greyscalers.size()) * i, (desiredCols / greyscalers.size()) * (i + 1)));
+                if (i < greyscalers.size() - 1)
+                {
+                    tasks.add(task);
+                    threadPool.execute(task);
+                } else
+                {
+                    task.run();
+                }
+            }
+            ;
+
+            for (GreyscalerTask task : tasks)
+            {
+                task.waitForTask();
+            }
+
+            if (this.invert)
+            {
+                Core.bitwise_not(greyscaleImage, greyscaleImage);
             }
 
             return greyscaleImage;
+        }
+
+
+        @Override
+        protected Mat justGreyscaleImage(Mat colorImage, Mat greyscaleImage)
+        {
+            return null;
+        }
+
+        @Override
+        protected boolean useIntensityShortcut()
+        {
+            return false;
+        }
+
+        /**
+         * This class takes a Greyscaler object and a sub region of an image (e.g.
+         * <code>Mat topHalf = mat.submat(0,mat.rows(),0,mat.cols()/2)</code>) so that the whole
+         * image can be processed over many threads. Greyscaler objects are not thread safe so
+         * don't use the same Greyscaler object in a different GreyscalerTask!
+         */
+        protected static class GreyscalerTask implements Runnable
+        {
+            private Greyscaler greyscaler;
+            private Mat rgbImage, greyscaleImage;
+
+            private boolean done = false;
+
+            public GreyscalerTask(Greyscaler greyscaler, Mat rgbImage, Mat greyscaleImage)
+            {
+                this.greyscaler = greyscaler;
+                this.rgbImage = rgbImage;
+                this.greyscaleImage = greyscaleImage;
+            }
+
+            public void run()
+            {
+                greyscaler.justHueShiftImage(rgbImage, rgbImage);
+                greyscaleImage = greyscaler.justGreyscaleImage(rgbImage, greyscaleImage);
+
+                synchronized (this)
+                {
+                    this.done = true;
+
+                    this.notifyAll();
+                }
+            }
+
+            public synchronized void waitForTask()
+            {
+                while (!this.done)
+                {
+                    try
+                    {
+                        this.wait();
+                    } catch (InterruptedException e)
+                    {
+                    }
+                }
+            }
         }
     }
 }

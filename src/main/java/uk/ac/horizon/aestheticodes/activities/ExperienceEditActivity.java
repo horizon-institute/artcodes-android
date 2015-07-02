@@ -24,6 +24,7 @@ import android.app.DatePickerDialog;
 import android.content.DialogInterface;
 import android.content.Intent;
 import android.os.Bundle;
+import android.os.Handler;
 import android.support.v4.app.DialogFragment;
 import android.support.v4.app.NavUtils;
 import android.support.v7.app.ActionBarActivity;
@@ -35,6 +36,7 @@ import android.view.View;
 import android.widget.DatePicker;
 import android.widget.ImageView;
 import android.widget.LinearLayout;
+import android.widget.ScrollView;
 import android.widget.TextView;
 
 import com.google.android.gms.location.places.Place;
@@ -162,6 +164,19 @@ public class ExperienceEditActivity extends ActionBarActivity
 		{
 			markerSettings.setVisibility(View.VISIBLE);
 			markerSettingsIcon.setImageResource(R.drawable.ic_expand_less_24dp);
+			// Scroll the settings that just appeared in to view:
+			new Handler().postDelayed(new Runnable()
+			{
+				@Override
+				public void run()
+				{
+					ScrollView scrollView = (ScrollView) findViewById(R.id.rootScrollView);
+					if (scrollView!=null && markerSettings!=null)
+					{
+						scrollView.smoothScrollTo(0, markerSettings.getTop());
+					}
+				}
+			}, 100);
 		}
 	}
 

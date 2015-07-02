@@ -27,6 +27,7 @@ import org.opencv.core.Core;
 import org.opencv.core.CvType;
 import org.opencv.core.Mat;
 import org.opencv.core.MatOfPoint;
+import org.opencv.core.Point;
 import org.opencv.core.Rect;
 import org.opencv.core.Scalar;
 import org.opencv.core.Size;
@@ -39,6 +40,9 @@ import java.util.List;
 
 public class MarkerDetector
 {
+	public static int frames = 0;
+	public static long fpsStartTime = 0;
+
 	public enum MarkerDrawMode
 	{
 		off, outline, regions
@@ -77,6 +81,8 @@ public class MarkerDetector
 				Mat drawImage = null;
 				result = null;
 
+				Mat croppedImage = null;
+
 				while (running)
 				{
 					try
@@ -90,11 +96,11 @@ public class MarkerDetector
 
 							Mat yuvImage = MatTranform.cropNV12Data(data, size.height, size.width);
 
-							Mat croppedImage = null;
-							if (greyscaler!=null)
+							synchronized (greyscalerLock)
 							{
-								croppedImage = greyscaler.greyscaleImage(yuvImage);
+								croppedImage = greyscaler.greyscaleImage(yuvImage, croppedImage);
 							}
+
 
 							if (cameraDrawMode!=CameraDrawMode.normal || markerDrawMode != MarkerDrawMode.off)
 							{
@@ -122,6 +128,7 @@ public class MarkerDetector
 								if(cameraDrawMode==CameraDrawMode.threshold)
 								{
 									Imgproc.cvtColor(croppedImage, drawImage, Imgproc.COLOR_GRAY2BGRA);
+									printFps();
 								}
 								else if (cameraDrawMode==CameraDrawMode.normal)
 								{
@@ -164,10 +171,6 @@ public class MarkerDetector
 							markerSelection.addMarkers(markers, listener);
 
 							yuvImage.release();
-							if (croppedImage!=null)
-							{
-								croppedImage.release();
-							}
 						}
 						else
 						{
@@ -195,6 +198,13 @@ public class MarkerDetector
 							}
 						});
 					}
+					frames++;
+				}
+
+
+				if (croppedImage!=null)
+				{
+					croppedImage.release();
 				}
 
 				//image.release();
@@ -341,7 +351,9 @@ public class MarkerDetector
 	private MarkerDrawMode markerDrawMode = MarkerDrawMode.off;
 	private CameraDrawMode cameraDrawMode = CameraDrawMode.normal;
 
-	private Greyscaler greyscaler = null;
+	private Greyscaler greyscaler = new Greyscaler.IntensityGreyscaler(0, false);
+	private Object greyscalerLock = new Object();
+
 	private MarkerCodeFactory markerCodeFactory = null;
 
 	public MarkerDetector(CameraController camera, Listener listener, ExperienceController experience)
@@ -361,9 +373,35 @@ public class MarkerDetector
 		this.markerDrawMode = mode;
 	}
 
-	public void setGreyscaler(Greyscaler greyscaler)
+	public void setGreyscaler(Greyscaler newGreyscaler)
 	{
-		this.greyscaler = greyscaler;
+		synchronized (greyscalerLock)
+		{
+			// it should not be possible to set a null object here as it will cause problems if (for some reason) no experience is selected
+			if (newGreyscaler==null)
+			{
+				newGreyscaler = new Greyscaler.IntensityGreyscaler(0, false);
+			}
+
+			Greyscaler oldGreyscaler = greyscaler;
+			greyscaler = newGreyscaler;
+
+			if (oldGreyscaler!=null)
+			{
+				oldGreyscaler.release();
+			}
+		}
+		resetFps();
+	}
+
+	public static void resetFps()
+	{
+		frames = 0;
+		fpsStartTime = System.currentTimeMillis();
+	}
+	public static void printFps()
+	{
+		Log.i("FPS", "Avg. FPS = " + 1000*((double)frames / ((double)System.currentTimeMillis()-(double)fpsStartTime)));
 	}
 
 	public void setMarkerCodeFactory(MarkerCodeFactory markerCodeFactory)

@@ -115,7 +115,7 @@
 	<string name="minimum">Minimum</string>
 	<string name="maximum">Maximum</string>
 	<string name="share">Share</string>
-    <string name="title_activity_greyscale_settings">GreyscaleSettingsActivity</string>
+    <string name="title_activity_greyscale_settings">Greyscale Settings</string>
 
     <string name="hello_world">Hello world!</string>
     <string name="action_settings">Settings</string>

@@ -39,7 +39,7 @@ public class MatTranform
 		return imgMat.submat(rowStart, rowStart + size, colStart, colStart + size);
 	}
 
-	static Mat cropNV12Data(byte[] data, int oRows, int oCols)
+	public static Mat cropNV12Data(byte[] data, int oRows, int oCols)
 	{
 		int size = Math.min(oRows,oCols);
 		size -= size%2;

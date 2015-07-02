@@ -87,7 +87,8 @@
             <SeekBar
                 android:layout_width="fill_parent"
                 android:layout_height="wrap_content"
-                android:id="@+id/hueSeekBar" />
+                android:id="@+id/hueSeekBar"
+                android:max="180"/>
 
         </LinearLayout>
     </RelativeLayout>

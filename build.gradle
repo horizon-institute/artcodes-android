@@ -57,8 +57,7 @@ android {
 
 		resConfigs "nodpi", "hdpi", "xhdpi", "xxhdpi", "xxxhdpi"
 	}
-
-	/*
+	
 	signingConfigs {
 		release {
 			storeFile file(project.property('keystore'))
@@ -77,7 +76,6 @@ android {
 			signingConfig signingConfigs.release
 		}
 	}
-	*/
 
 	lintOptions {
 		abortOnError false

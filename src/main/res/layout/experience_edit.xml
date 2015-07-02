@@ -24,7 +24,8 @@
             android:orientation="vertical"
             android:layout_width="match_parent"
             android:layout_height="match_parent"
-            tools:context=".activities.ExperienceEditActivity">
+            tools:context=".activities.ExperienceEditActivity"
+			android:id="@+id/rootScrollView">
 
 	<LinearLayout android:orientation="vertical"
 	              android:layout_width="fill_parent"
