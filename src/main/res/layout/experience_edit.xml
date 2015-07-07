@@ -30,9 +30,6 @@
 
 		<variable name="experience"
 		          type="uk.ac.horizon.artcodes.model.Experience" />
-
-		<variable name="settingsVisible"
-		          type="boolean" />
 	</data>
 
 	<LinearLayout android:layout_width="match_parent"
@@ -71,17 +68,14 @@
 					<LinearLayout
 							android:orientation="horizontal"
 							android:layout_width="match_parent"
-							android:layout_height="match_parent"
-							android:paddingLeft="16dp"
-							android:paddingRight="16dp">
+							android:layout_height="match_parent">
 
 						<ImageView
 								android:layout_width="56dp"
 								android:layout_height="56dp"
 								app:imageUrl="@{experience.icon}"
 								android:onClick="editImage"
-								android:layout_marginTop="12dp"
-								android:layout_marginLeft="4dp" />
+								android:layout_margin="16dp" />
 
 						<EditText
 								android:layout_width="match_parent"
@@ -89,7 +83,7 @@
 								android:hint="@string/experienceTitle"
 								android:text="@{experience.name}"
 								android:singleLine="true"
-								android:layout_marginLeft="16dp"
+								android:layout_margin="12dp"
 								android:textAppearance="@style/TextAppearance.AppCompat.Title"
 								android:layout_gravity="center_vertical" />
 					</LinearLayout>
@@ -98,8 +92,7 @@
 							android:orientation="horizontal"
 							android:layout_width="match_parent"
 							android:layout_height="match_parent"
-							android:paddingLeft="16dp"
-							android:paddingRight="16dp">
+							>
 
 						<ImageView
 								tools:ignore="ContentDescription"
@@ -107,9 +100,8 @@
 								android:layout_height="wrap_content"
 								android:scaleType="fitCenter"
 								android:src="@drawable/ic_subject_white_24dp"
-								android:paddingTop="10dp"
-								android:paddingRight="28dp"
-								android:tint="@color/ic_tint" />
+								android:tint="@color/ic_tint"
+								android:layout_margin="16dp" />
 
 						<EditText
 								android:layout_width="match_parent"
@@ -117,7 +109,8 @@
 								android:inputType="textMultiLine"
 								android:text="@{experience.description}"
 								android:textAppearance="@style/TextAppearance.AppCompat"
-								android:hint="@string/experienceDescription" />
+								android:hint="@string/experienceDescription"
+								android:layout_margin="12dp" />
 					</LinearLayout>
 
 					<TextView
@@ -140,37 +133,30 @@
 							android:layout_height="match_parent"
 							android:clickable="true"
 							android:onClick="addAvailability"
-							android:background="?attr/selectableItemBackground"
-							android:paddingLeft="16dp"
-							android:paddingRight="16dp"
-							android:paddingTop="8dp"
-							android:paddingBottom="8dp">
+							android:background="?attr/selectableItemBackground">
 
 						<ImageView
 								tools:ignore="ContentDescription"
 								android:layout_width="wrap_content"
 								android:layout_height="wrap_content"
-								android:layout_marginEnd="16dp"
-								android:layout_marginRight="16dp"
 								android:scaleType="fitCenter"
 								android:src="@drawable/ic_add_white_24dp"
-								android:paddingTop="8dp"
-								android:paddingRight="16dp"
-								android:paddingBottom="8dp"
-								android:tint="@color/ic_tint" />
+								android:tint="@color/ic_tint"
+								android:layout_margin="16dp" />
 
 						<TextView android:layout_width="wrap_content"
 						          android:layout_height="match_parent"
 						          android:textAppearance="@style/TextAppearance.AppCompat"
 						          android:gravity="center_vertical"
-						          android:text="@string/availability_add" />
+						          android:text="@string/availability_add"
+						          android:layout_margin="16dp" />
 					</LinearLayout>
 
 					<TextView android:layout_width="match_parent"
 					          android:layout_height="match_parent"
 					          android:gravity="center_vertical"
 					          android:height="48dp"
-					          android:text="@string/markers"
+					          android:text="@string/actions"
 					          android:textAppearance="@style/TextAppearance.AppCompat.Small"
 					          android:paddingLeft="16dp"
 					          android:paddingRight="16dp" />
@@ -182,9 +168,11 @@
 					              android:paddingBottom="16dp"
 					              android:orientation="vertical"
 					              android:paddingLeft="72dp"
+					              android:paddingStart="72dp"
 					              android:background="?attr/selectableItemBackground"
 					              android:onClick="editChecksum"
-					              android:paddingRight="16dp">
+					              android:paddingRight="16dp"
+					              android:paddingEnd="16dp">
 
 						<TextView android:layout_width="wrap_content"
 						          android:layout_height="wrap_content"
@@ -202,36 +190,28 @@
 					<View android:layout_width="match_parent"
 					      android:layout_height="1dp"
 					      android:background="#DDD"
-					      android:layout_marginLeft="72dp" />
+					      android:layout_marginLeft="72dp"
+					      android:layout_marginStart="72dp" />
 
 					<LinearLayout android:orientation="vertical"
 					              android:layout_width="match_parent"
 					              android:layout_height="match_parent"
-					              android:id="@+id/markerList">
+					              android:id="@+id/actionList">
 					</LinearLayout>
 
 					<LinearLayout android:orientation="horizontal"
 					              android:layout_width="match_parent"
 					              android:layout_height="match_parent"
 					              android:clickable="true"
-					              android:onClick="addMarker"
-					              android:id="@+id/markerAdd"
-					              android:paddingTop="8dp"
-					              android:paddingBottom="8dp"
-					              android:background="?attr/selectableItemBackground"
-					              android:paddingLeft="16dp"
-					              android:paddingRight="16dp">
+					              android:onClick="addAction"
+					              android:background="?attr/selectableItemBackground">
 
 						<ImageView android:layout_width="wrap_content"
 						           android:layout_height="wrap_content"
-						           android:layout_marginEnd="16dp"
-						           android:layout_marginRight="16dp"
+						           android:layout_margin="16dp"
 						           android:scaleType="fitCenter"
 						           tools:ignore="ContentDescription"
 						           android:src="@drawable/ic_add_white_24dp"
-						           android:paddingTop="8dp"
-						           android:paddingRight="16dp"
-						           android:paddingBottom="8dp"
 						           android:tint="@color/ic_tint" />
 
 						<TextView
@@ -239,13 +219,11 @@
 								android:layout_height="match_parent"
 								android:gravity="center_vertical"
 								android:textAppearance="@style/TextAppearance.AppCompat"
-								android:text="@string/marker_add" />
+								android:layout_margin="16dp"
+								android:text="@string/action_add" />
 					</LinearLayout>
-
 				</LinearLayout>
-
 			</LinearLayout>
 		</ScrollView>
-
 	</LinearLayout>
 </layout>

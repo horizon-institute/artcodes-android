@@ -20,24 +20,29 @@
 package uk.ac.horizon.artcodes;
 
 import android.app.Application;
-import uk.ac.horizon.artcodes.controller.ExperienceListController;
 
-public class Artcodes extends Application
+public final class Artcodes extends Application
 {
-	private static final ExperienceListController experiences = new ExperienceListController();
-
-	public static final boolean LOG_MARKER_IMAGE = false;
-
-
-	public static ExperienceListController getExperiences()
-	{
-		return experiences;
-	}
-
 	@Override
 	public void onCreate()
 	{
 		super.onCreate();
-		AnalyticsTrackers.initialize(this);
+		GoogleAnalytics.initialize(this);
 	}
+
+//	public static File createImageLogFile()
+//	{
+//		if(LOG_MARKER_IMAGE)
+//		{
+//			final String title = "IMG_" + System.currentTimeMillis();
+//			final File picturesDir = Environment.getExternalStoragePublicDirectory(Environment.DIRECTORY_PICTURES);
+//			final File directory = new File(picturesDir, "Artcodes");
+//			if (!directory.exists())
+//			{
+//				boolean success = directory.mkdir();
+//			}
+//			return new File(directory, title + ".jpg");
+//		}
+//		return null;
+//	}
 }

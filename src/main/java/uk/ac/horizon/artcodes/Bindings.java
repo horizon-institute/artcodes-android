@@ -22,14 +22,12 @@ package uk.ac.horizon.artcodes;
 import android.databinding.BindingAdapter;
 import android.os.Build;
 import android.text.TextWatcher;
-import android.view.View;
 import android.widget.Button;
 import android.widget.EditText;
 import android.widget.ImageView;
-import android.widget.TextView;
 import com.koushikdutta.ion.Ion;
 
-public class Bindings
+public final class Bindings
 {
 	@BindingAdapter("bind:imageUrl")
 	public static void bindImageURL(ImageView view, String url)
@@ -47,7 +45,7 @@ public class Bindings
 	}
 
 	@BindingAdapter("bind:icon")
-	public static void bindTextWatcher(Button view, int icon)
+	public static void bindIcon(Button view, int icon)
 	{
 		if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.JELLY_BEAN_MR1)
 		{

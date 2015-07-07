@@ -25,53 +25,44 @@ import org.opencv.core.Core;
 import org.opencv.core.CvType;
 import org.opencv.core.Mat;
 
+@SuppressWarnings("deprecation")
 public abstract class FrameProcessor implements Camera.PreviewCallback
 {
-	protected static Mat crop(Mat imgMat)
-	{
-		final int size = Math.min(imgMat.rows(), imgMat.cols());
-
-		final int colStart = (imgMat.cols() - size) / 2;
-		final int rowStart = (imgMat.rows() - size) / 2;
-
-		return imgMat.submat(rowStart, rowStart + size, colStart, colStart + size);
-	}
-
 	private byte[] buffer;
 	private Mat image;
+	private Mat croppedImage;
 	private boolean flip = false;
-	private int rotation = 0;
-
-	void startProcessing(Camera camera)
-	{
-		Camera.Parameters params = camera.getParameters();
-		int imageWidth = params.getPreviewSize().width;
-		int imageHeight = params.getPreviewSize().height;
-
-		int size = imageWidth * imageHeight;
-		size = size * ImageFormat.getBitsPerPixel(params.getPreviewFormat()) / 8;
-		buffer = new byte[size];
-		image = new Mat(imageHeight, imageWidth, CvType.CV_8UC1);
-
-		//int rotation = 360 + 90 - camera.getRotation();
-		//int angle = ((rotation / 90) % 4) * 90;
-		//boolean flip = camera.isFront();
-		rotation = 0;
-		flip = false;
-
-		camera.addCallbackBuffer(buffer);
-		camera.setPreviewCallbackWithBuffer(this);
-	}
+	private int rotations = 0;
 
 	@Override
 	public void onPreviewFrame(byte[] data, Camera camera)
 	{
 		image.put(0, 0, data);
-		processFrame(image);
+		process(croppedImage);
 		camera.addCallbackBuffer(buffer);
 	}
 
-	public abstract void processFrame(Mat image);
+	public abstract void process(Mat image);
+
+	protected Mat crop(Mat image, int surfaceWidth, int surfaceHeight)
+	{
+		return image;
+	}
+
+	protected void onCameraChanged(Camera camera, int surfaceWidth, int surfaceHeight)
+	{
+		final Camera.Parameters params = camera.getParameters();
+		final int imageWidth = params.getPreviewSize().width;
+		final int imageHeight = params.getPreviewSize().height;
+
+		final int size = imageWidth * imageHeight * ImageFormat.getBitsPerPixel(params.getPreviewFormat()) / 8;
+		buffer = new byte[size];
+		image = new Mat(imageHeight, imageWidth, CvType.CV_8UC1);
+		croppedImage = crop(image, surfaceWidth, surfaceHeight);
+
+		camera.addCallbackBuffer(buffer);
+		camera.setPreviewCallbackWithBuffer(this);
+	}
 
 	protected void rotate(Mat src, Mat dst)
 	{
@@ -81,17 +72,26 @@ public abstract class FrameProcessor implements Camera.PreviewCallback
 		}
 
 		//0 : flip vertical; 1 flip horizontal
-		int flip_horizontal_or_vertical = rotation > 0 ? 1 : 0;
+		int flip_horizontal_or_vertical = rotations > 0 ? 1 : 0;
 		if (flip)
 		{
 			flip_horizontal_or_vertical = -1;
 		}
-		int number = Math.abs(rotation / 90);
 
-		for (int i = 0; i != number; ++i)
+		for (int i = 0; i != rotations; ++i)
 		{
 			Core.transpose(dst, dst);
 			Core.flip(dst, dst, flip_horizontal_or_vertical);
 		}
+	}
+
+	void setFacing(int facing)
+	{
+		this.flip = facing == Camera.CameraInfo.CAMERA_FACING_FRONT;
+	}
+
+	void setOrientation(int orientation)
+	{
+		this.rotations = orientation / 90;
 	}
 }

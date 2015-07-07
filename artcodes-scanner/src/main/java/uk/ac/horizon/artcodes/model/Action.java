@@ -1,0 +1,99 @@
+/*
+ * Artcodes recognises a different marker scheme that allows the
+ * creation of aesthetically pleasing, even beautiful, codes.
+ * Copyright (C) 2013-2015  The University of Nottingham
+ *
+ * This program is free software: you can redistribute it and/or modify
+ * it under the terms of the GNU Affero General Public License as published
+ * by the Free Software Foundation, either version 3 of the License, or
+ * (at your option) any later version.
+ *
+ * This program is distributed in the hope that it will be useful,
+ * but WITHOUT ANY WARRANTY; without even the implied warranty of
+ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+ * GNU Affero General Public License for more details.
+ *
+ * You should have received a copy of the GNU Affero General Public License
+ * along with this program.  If not, see <http://www.gnu.org/licenses/>.
+ */
+
+package uk.ac.horizon.artcodes.model;
+
+import java.util.ArrayList;
+import java.util.List;
+
+public class Action
+{
+	public enum Match
+	{
+		any, all, sequence
+	}
+
+	private List<String> codes = new ArrayList<>();
+	private Match match = Match.any;
+	private String url;
+	private String name;
+	private String description;
+	private String image;
+	private boolean showDetail = false;
+
+	public List<String> getCodes()
+	{
+		return codes;
+	}
+
+	public String getDescription()
+	{
+		return description;
+	}
+
+	public void setDescription(String description)
+	{
+		this.description = description;
+	}
+
+	public String getImage()
+	{
+		return image;
+	}
+
+	public void setImage(String image)
+	{
+		this.image = image;
+	}
+
+	public Match getMatch()
+	{
+		return match;
+	}
+
+	public String getName()
+	{
+		return name;
+	}
+
+	public void setName(String name)
+	{
+		this.name = name;
+	}
+
+	public boolean getShowDetail()
+	{
+		return showDetail;
+	}
+
+	public void setShowDetail(boolean showDetail)
+	{
+		this.showDetail = showDetail;
+	}
+
+	public String getUrl()
+	{
+		return url;
+	}
+
+	public void setUrl(String url)
+	{
+		this.url = url;
+	}
+}

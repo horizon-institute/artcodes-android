@@ -16,48 +16,22 @@
  * You should have received a copy of the GNU Affero General Public License
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
+package uk.ac.horizon.artcodes.model;
 
-package uk.ac.horizon.artcodes.model;/*
- * Aestheticodes recognises a different marker scheme that allows the
- * creation of aesthetically pleasing, even beautiful, codes.
- * Copyright (C) 2015  Aestheticodes
- *
- *     This program is free software: you can redistribute it and/or modify
- *     it under the terms of the GNU Affero General Public License as published
- *     by the Free Software Foundation, either version 3 of the License, or
- *     (at your option) any later version.
- *
- *     This program is distributed in the hope that it will be useful,
- *     but WITHOUT ANY WARRANTY; without even the implied warranty of
- *     MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
- *     GNU Affero General Public License for more details.
- *
- *     You should have received a copy of the GNU Affero General Public License
- *     along with this program.  If not, see <http://www.gnu.org/licenses/>.
- */
-
-import android.databinding.BaseObservable;
-import android.databinding.Bindable;
+import uk.ac.horizon.artcodes.scanner.process.ImageProcessor;
 
 import java.util.ArrayList;
-import java.util.Collections;
+import java.util.Collection;
 import java.util.List;
 
-@SuppressWarnings("unused")
-public class Experience extends BaseObservable
+public class Experience
 {
-	@SuppressWarnings("unused")
 	public enum Operation
 	{
 		create, retrieve, update, deleted, add, remove
 	}
 
-	public enum Threshold
-	{
-		temporalTile, resize
-	}
-
-	private final List<Marker> markers = new ArrayList<>();
+	private final List<Action> actions = new ArrayList<>();
 	private final List<Availability> availabilities = new ArrayList<>();
 
 	private String id;
@@ -69,7 +43,6 @@ public class Experience extends BaseObservable
 	//private String ownerID;
 	private String author;
 	private String callback;
-	private String markerFactory;
 
 	private Long updated;
 	private Long created;
@@ -85,25 +58,21 @@ public class Experience extends BaseObservable
 	private int validationRegionValue = 1;
 	private int checksumModulo = 3;
 	private boolean embeddedChecksum = false;
-	private Threshold threshold = Threshold.temporalTile;
+	private List<ImageProcessor> threshold = new ArrayList<>();
+	private String detector;
 
 	public Experience()
 	{
 	}
 
+	public Collection<Action> getActions()
+	{
+		return actions;
+	}
+
 	public List<Availability> getAvailabilities()
 	{
 		return availabilities;
-	}
-
-	public Long getUpdated()
-	{
-		return updated;
-	}
-
-	public void setUpdated(Long updated)
-	{
-		this.updated = updated;
 	}
 
 	public String getCallback()
@@ -116,15 +85,9 @@ public class Experience extends BaseObservable
 		this.callback = callback;
 	}
 
-	@Bindable
 	public int getChecksumModulo()
 	{
 		return checksumModulo;
-	}
-
-	public String getChecksumText()
-	{
-		return Integer.toString(checksumModulo);
 	}
 
 	public void setChecksumModulo(int checksumModulo)
@@ -132,7 +95,11 @@ public class Experience extends BaseObservable
 		this.checksumModulo = checksumModulo;
 	}
 
-	@Bindable
+	public String getChecksumText()
+	{
+		return Integer.toString(checksumModulo);
+	}
+
 	public String getDescription()
 	{
 		return description;
@@ -141,6 +108,11 @@ public class Experience extends BaseObservable
 	public void setDescription(String description)
 	{
 		this.description = description;
+	}
+
+	public String getDetector()
+	{
+		return detector;
 	}
 
 	public boolean getEmbeddedChecksum()
@@ -183,11 +155,6 @@ public class Experience extends BaseObservable
 		this.image = image;
 	}
 
-	public List<Marker> getMarkers()
-	{
-		return markers;
-	}
-
 	public int getMaxEmptyRegions()
 	{
 		return maxEmptyRegions;
@@ -228,7 +195,6 @@ public class Experience extends BaseObservable
 		this.minRegions = minRegions;
 	}
 
-	@Bindable
 	public String getName()
 	{
 		return name;
@@ -239,24 +205,8 @@ public class Experience extends BaseObservable
 		this.name = name;
 	}
 
-	public Marker getMarker(String code)
+	public String getNextUnusedCode()
 	{
-		for (Marker marker : markers)
-		{
-			if (code.equals(marker.getCode()))
-			{
-				return marker;
-			}
-		}
-		return null;
-	}
-
-	public String getNextUnusedMarker()
-	{
-		if (markers.isEmpty())
-		{
-			return "1:1:1:1:1";
-		}
 		List<Integer> code = null;
 		while (true)
 		{
@@ -279,93 +229,13 @@ public class Experience extends BaseObservable
 				}
 
 				String markerCode = result.toString();
-				if (getMarker(markerCode) == null)
-				{
-					return markerCode;
-				}
+				// TODO Action == any && hasCod
+				//if (getMarker(markerCode) == null)
+				//{
+				//	return markerCode;
+				//}
 			}
 		}
-	}
-
-	List<Integer> getNextCode(List<Integer> code)
-	{
-		if (code == null)
-		{
-			int size = minRegions;
-			code = new ArrayList<>();
-			for (int index = 0; index < size; index++)
-			{
-				code.add(1);
-			}
-			return code;
-		}
-
-		int size = code.size();
-		for (int i = (size - 1); i >= 0; i--)
-		{
-			int number = code.get(i);
-			int value = number + 1;
-			code.set(i, value);
-			if (value <= maxRegionValue)
-			{
-				break;
-			}
-			else if (i == 0)
-			{
-				if (size == maxRegions)
-				{
-					return null;
-				}
-				else
-				{
-					size++;
-					code = new ArrayList<>();
-					for (int index = 0; index < size; index++)
-					{
-						code.add(1);
-					}
-					return code;
-				}
-			}
-			else
-			{
-				number = code.get(i - 1);
-				value = number + 1;
-				code.set(i, value);
-			}
-		}
-
-		return code;
-	}
-
-	public void update()
-	{
-		int maxValue = 3;
-		int minRegion = 100;
-		int maxRegion = 3;
-		for (Marker marker : markers)
-		{
-			String[] values = marker.getCode().split(":");
-			minRegion = Math.min(minRegion, values.length);
-			maxRegion = Math.max(maxRegion, values.length);
-			for (String value : values)
-			{
-				try
-				{
-					int codeValue = Integer.parseInt(value);
-					maxValue = Math.max(maxValue, codeValue);
-				}
-				catch (Exception e)
-				{
-				}
-			}
-		}
-
-		this.maxRegionValue = maxValue;
-		this.minRegions = minRegion;
-		this.minRegions = maxRegion;
-
-		Collections.sort(markers, Marker.comparator);
 	}
 
 	public Operation getOp()
@@ -388,9 +258,19 @@ public class Experience extends BaseObservable
 		this.originalID = originalID;
 	}
 
-	public Threshold getThreshold()
+	public List<ImageProcessor> getThreshold()
 	{
 		return threshold;
+	}
+
+	public Long getUpdated()
+	{
+		return updated;
+	}
+
+	public void setUpdated(Long updated)
+	{
+		this.updated = updated;
 	}
 
 	public int getValidationRegionValue()
@@ -466,6 +346,89 @@ public class Experience extends BaseObservable
 		}
 
 		return hasValidationRegions(markerCodes);
+	}
+
+	public void update()
+	{
+		int maxValue = 3;
+		int minRegion = 100;
+		int maxRegion = 3;
+		for (Action action : actions)
+		{
+			// TODO
+//			String[] values = marker.getCode().split(":");
+//			minRegion = Math.min(minRegion, values.length);
+//			maxRegion = Math.max(maxRegion, values.length);
+//			for (String value : values)
+//			{
+//				try
+//				{
+//					int codeValue = Integer.parseInt(value);
+//					maxValue = Math.max(maxValue, codeValue);
+//				}
+//				catch (Exception e)
+//				{
+//					Log.w("", e.getMessage(), e);
+//				}
+//			}
+		}
+
+		this.maxRegionValue = maxValue;
+		this.minRegions = minRegion;
+		this.minRegions = maxRegion;
+
+		// TODO Collections.sort(actions, Marker.comparator);
+	}
+
+	List<Integer> getNextCode(List<Integer> code)
+	{
+		if (code == null)
+		{
+			int size = minRegions;
+			code = new ArrayList<>();
+			for (int index = 0; index < size; index++)
+			{
+				code.add(1);
+			}
+			return code;
+		}
+
+		int size = code.size();
+		for (int i = (size - 1); i >= 0; i--)
+		{
+			int number = code.get(i);
+			int value = number + 1;
+			code.set(i, value);
+			if (value <= maxRegionValue)
+			{
+				break;
+			}
+			else if (i == 0)
+			{
+				if (size == maxRegions)
+				{
+					return null;
+				}
+				else
+				{
+					size++;
+					code = new ArrayList<>();
+					for (int index = 0; index < size; index++)
+					{
+						code.add(1);
+					}
+					return code;
+				}
+			}
+			else
+			{
+				number = code.get(i - 1);
+				value = number + 1;
+				code.set(i, value);
+			}
+		}
+
+		return code;
 	}
 
 	/**

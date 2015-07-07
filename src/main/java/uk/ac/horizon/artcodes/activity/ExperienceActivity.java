@@ -21,37 +21,33 @@ package uk.ac.horizon.artcodes.activity;
 
 import android.content.Intent;
 import android.databinding.DataBindingUtil;
+import android.os.Build;
 import android.os.Bundle;
 import android.support.v7.app.AppCompatActivity;
+import android.util.Log;
 import android.view.View;
-import com.google.android.gms.analytics.HitBuilders;
-import com.google.android.gms.analytics.Tracker;
-import uk.ac.horizon.artcodes.AnalyticsTrackers;
-import uk.ac.horizon.aestheticodes.R;
-import uk.ac.horizon.artcodes.controller.ExperienceLoader;
-import uk.ac.horizon.aestheticodes.databinding.ExperienceBinding;
+import uk.ac.horizon.artcodes.GoogleAnalytics;
+import uk.ac.horizon.artcodes.R;
+import uk.ac.horizon.artcodes.databinding.ExperienceBinding;
 import uk.ac.horizon.artcodes.model.Experience;
+import uk.ac.horizon.artcodes.model.loader.ExperienceLoader;
+import uk.ac.horizon.artcodes.model.loader.LoadListener;
+import uk.ac.horizon.artcodes.model.loader.Ref;
 
 public class ExperienceActivity extends AppCompatActivity
 {
-	private String experienceID;
+	private Ref<Experience> experience;
 	private ExperienceBinding binding;
 
 	public void editExperience(View view)
 	{
-		Intent intent = new Intent(ExperienceActivity.this, ExperienceEditActivity.class);
-		intent.putExtra("experience", experienceID);
-
-		startActivity(intent);
+		ExperienceLoader.startActivity(ExperienceEditActivity.class, experience, this);
 	}
 
-	@Override
-	protected void onStart()
+	public void scanExperience(View view)
 	{
-		super.onStart();
-		Tracker tracker = AnalyticsTrackers.getInstance().get(AnalyticsTrackers.Target.APP);
-		tracker.setScreenName("Experience " + experienceID + " Screen");
-		tracker.send(new HitBuilders.ScreenViewBuilder().build());
+		Log.i("", "Scan");
+		ExperienceLoader.startActivity(ArtcodeActivity.class, experience, this);
 	}
 
 	public void shareExperience(View view)
@@ -60,18 +56,13 @@ public class ExperienceActivity extends AppCompatActivity
 		intent.setType("text/plain");
 		intent.addFlags(Intent.FLAG_ACTIVITY_CLEAR_WHEN_TASK_RESET);
 
-		if(binding.getExperience() != null)
+		if (experience.isLoaded())
 		{
-			intent.putExtra(Intent.EXTRA_SUBJECT, binding.getExperience().getName());
+			intent.putExtra(Intent.EXTRA_SUBJECT, experience.get().getName());
 		}
-		intent.putExtra(Intent.EXTRA_TEXT, "http://aestheticodes.appspot.com/experience/info/" + experienceID);
+		intent.putExtra(Intent.EXTRA_TEXT, experience.getUri());
 		Intent openInChooser = Intent.createChooser(intent, "Share with...");
 		startActivity(openInChooser);
-	}
-
-	public void openExperience(View view)
-	{
-
 	}
 
 	@Override
@@ -79,25 +70,41 @@ public class ExperienceActivity extends AppCompatActivity
 	{
 		super.onCreate(savedInstanceState);
 
-		getWindow().getDecorView().setSystemUiVisibility(View.SYSTEM_UI_FLAG_LAYOUT_STABLE | View.SYSTEM_UI_FLAG_LAYOUT_FULLSCREEN);
+		if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.JELLY_BEAN)
+		{
+			getWindow().getDecorView().setSystemUiVisibility(View.SYSTEM_UI_FLAG_LAYOUT_STABLE | View.SYSTEM_UI_FLAG_LAYOUT_FULLSCREEN);
+		}
 
 		binding = DataBindingUtil.setContentView(this, R.layout.experience);
 
 		// TODO bindView(R.id.openExperience, new TintAdapter<Experience>("image"));
-		//bindView(R.id.openExperience, new TintAdapter<Experience>("image"));
 
-		final Bundle extras = getIntent().getExtras();
-		experienceID = extras.getString("experience");
-		new ExperienceLoader(this)
+		onNewIntent(getIntent());
+	}
+
+	@Override
+	protected void onNewIntent(final Intent intent)
+	{
+		super.onNewIntent(intent);
+		experience = ExperienceLoader.from(intent);
+		experience.load(this, new LoadListener<Experience>()
 		{
 			@Override
-			protected void onProgressUpdate(Experience... values)
+			public void onLoaded(Experience item)
 			{
-				if(values != null && values.length != 0)
+				if (item != null)
 				{
-					binding.setExperience(values[0]);
+					GoogleAnalytics.trackEvent("Experience", "Loaded " + item.getId());
 				}
+				binding.setExperience(item);
 			}
-		}.execute(experienceID);
+		});
+	}
+
+	@Override
+	protected void onStart()
+	{
+		super.onStart();
+		GoogleAnalytics.trackScreen("Experience Screen");
 	}
 }

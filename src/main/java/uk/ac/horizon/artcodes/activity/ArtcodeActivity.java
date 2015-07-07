@@ -1,5 +1,5 @@
 /*
- * Artcodes recognises a different marker scheme that allows the
+ * Artcodes recognises a different action scheme that allows the
  * creation of aesthetically pleasing, even beautiful, codes.
  * Copyright (C) 2013-2015  The University of Nottingham
  *
@@ -21,256 +21,40 @@ package uk.ac.horizon.artcodes.activity;
 import android.content.Intent;
 import android.net.Uri;
 import android.os.Bundle;
+import android.support.v4.app.NavUtils;
 import android.util.Log;
-import android.view.Menu;
-import android.view.MenuInflater;
 import android.view.MenuItem;
 import android.view.View;
-import android.view.WindowManager;
-import android.widget.Button;
-import com.google.android.gms.analytics.HitBuilders;
-import com.google.android.gms.analytics.Tracker;
-import uk.ac.horizon.artcodes.AnalyticsTrackers;
-import uk.ac.horizon.aestheticodes.R;
-import uk.ac.horizon.artcodes.scanner.ExperienceScanner;
+import uk.ac.horizon.artcodes.ArtcodeFeature;
+import uk.ac.horizon.artcodes.GoogleAnalytics;
+import uk.ac.horizon.artcodes.databinding.ScannerActionBinding;
+import uk.ac.horizon.artcodes.model.Action;
+import uk.ac.horizon.artcodes.model.Experience;
+import uk.ac.horizon.artcodes.scanner.Feature;
+import uk.ac.horizon.artcodes.scanner.VisibilityAnimator;
 import uk.ac.horizon.artcodes.scanner.activity.ScannerActivity;
-import uk.ac.horizon.artcodes.model.Marker;
+import uk.ac.horizon.artcodes.scanner.detect.ActionDetectionHandler;
+import uk.ac.horizon.artcodes.scanner.detect.MarkerDetectionHandler;
 
 public class ArtcodeActivity extends ScannerActivity
 {
-	private Button markerButton;
-	private boolean autoOpen = false;
-	private String currentCode = null;
-	private String experienceURL = null;
-
-	@Override
-	public boolean onCreateOptionsMenu(Menu menu)
-	{
-		MenuInflater inflater = getMenuInflater();
-		inflater.inflate(R.menu.capture_actions, menu);
-
-		return super.onCreateOptionsMenu(menu);
-	}
-
-//	@Override
-//	public void experienceSelected(Experience experience)
-//	{
-//		super.experienceSelected(experience);
-//
-//		Log.i("", "Selected Experience changed to " + experience.getId());
-//		Tracker tracker = AnalyticsTrackers.getInstance().get(AnalyticsTrackers.Target.APP);
-//		tracker.send(new HitBuilders.EventBuilder("Experience", "Selected " + experience.getId()).build());
-//
-//		if (getSupportActionBar() != null)
-//		{
-//			getSupportActionBar().setDisplayShowTitleEnabled(true);
-//			getSupportActionBar().setTitle(experience.getName());
-//			if (experience.getIcon() != null)
-//			{
-////				Ion.with(this).load(experience.getIcon())
-////				Aestheticodes.getPicasso(this).load(experience.getIcon()).into(new Target()
-////				{
-////					@Override
-////					public void onBitmapLoaded(Bitmap bitmap, Picasso.LoadedFrom from)
-////					{
-////						getSupportActionBar().setIcon(new BitmapDrawable(getResources(), bitmap));
-////					}
-////
-////					@Override
-////					public void onBitmapFailed(Drawable errorDrawable)
-////					{
-////
-////					}
-////
-////					@Override
-////					public void onPrepareLoad(Drawable placeHolderDrawable)
-////					{
-////
-////					}
-////				});
-//			}
-//		}
-//	}
-
-	@Override
-	protected void onStart()
-	{
-		super.onStart();
-		Tracker tracker = AnalyticsTrackers.getInstance().get(AnalyticsTrackers.Target.APP);
-		tracker.setScreenName("Scan Screen");
-		tracker.send(new HitBuilders.ScreenViewBuilder().build());
-	}
-
-	@Override
-	protected void onNewIntent(Intent intent)
-	{
-		if (intent.getAction().equals(Intent.ACTION_VIEW))
-		{
-			Uri data = intent.getData();
-			if (data != null)
-			{
-				Log.i("", "Intent URL = " + data);
-				this.experienceURL = data.toString();
-			}
-		}
-		else
-		{
-			super.onNewIntent(intent);
-		}
-	}
-
-//	@Override
-//	public void markerChanged(final String markerCode)
-//	{
-//		Log.i("", "Marker changing from " + currentCode + " to " + markerCode);
-//		final String oldCode = currentCode;
-//		currentCode = markerCode;
-//
-//		if (markerCode != null)
-//		{
-//			//Tracker tracker = AnalyticsTrackers.getInstance().get(AnalyticsTrackers.Target.APP);
-//			//tracker.send(new HitBuilders.EventBuilder("Marker", "Detected " + markerCode)
-//			//		.setLabel(binding.getExperience().getName() + "(" + binding.getExperience().getId() + ")")
-//			//		.build());
-//			//final Marker marker = experience.get().getMarker(markerCode);
-//			//if (marker != null && Artcodes.LOG_MARKER_IMAGE)
-//			{
-//				final byte[] data = camera.getData();
-//				if (data != null)
-//				{
-//					runOnUiThread(new Runnable()
-//					{
-//						public boolean isExternalStorageWritable()
-//						{
-//							String state = Environment.getExternalStorageState();
-//							if (Environment.MEDIA_MOUNTED.equals(state))
-//							{
-//								return true;
-//							}
-//							return false;
-//						}
-//
-//						@Override
-//						public void run()
-//						{
-//							try
-//							{
-//								final String title = "IMG_" + System.currentTimeMillis();
-//								final File picturesDir = Environment.getExternalStoragePublicDirectory(Environment.DIRECTORY_PICTURES);
-//								final File directory = new File(picturesDir, "Artcodes");
-//								if (!directory.exists())
-//								{
-//									boolean success = directory.mkdir();
-//								}
-//								camera.saveImage(new File(directory, title + ".jpg"));
-//							}
-//							catch (Exception e)
-//							{
-//								Log.w("", e.getMessage(), e);
-//							}
-//						}
-//					});
-//				}
-//			}
-//			if (autoOpen)
-//			{
-////				if (marker != null)
-////				{
-////					openMarker(marker);
-////				}
-//			}
-//			else
-//			{
-//				runOnUiThread(new Runnable()
-//				{
-//					@Override
-//					public void run()
-//					{
-////						if (marker != null)
-////						{
-////							if (marker.getTitle() != null && !marker.getTitle().isEmpty())
-////							{
-////								markerButton.setText(getString(R.string.marker_open, marker.getTitle()));
-////							}
-////							else
-////							{
-////								markerButton.setText(getString(R.string.marker_open_code, marker.getCode()));
-////							}
-////							markerButton.setOnClickListener(new View.OnClickListener()
-////							{
-////								@Override
-////								public void onClick(View v)
-////								{
-////									openMarker(marker);
-////								}
-////							});
-////
-////							if (oldCode == null)
-////							{
-////								Log.i("", "Slide in");
-////								markerButton.setVisibility(View.VISIBLE);
-////								markerButton.startAnimation(AnimationUtils.loadAnimation(ArtcodeActivity.this, R.anim.slide_in));
-////							}
-////						}
-//						//else
-//						//{
-//						//markerButton.setText("Unknown Marker " + markerCode);
-//						//markerButton.setCompoundDrawablesWithIntrinsicBounds(0,0,R.drawable.ic_add_white_36dp, 0);
-//						//markerButton.setOnClickListener(new View.OnClickListener()
-//						//{
-//						//	@Override
-//						//	public void onClick(View v)
-//						//	{
-//						//	}
-//						//});
-//						//}
-//					}
-//				});
-//			}
-//		}
-//		else if (markerButton.getVisibility() == View.VISIBLE)
-//		{
-//			runOnUiThread(new Runnable()
-//			{
-//				@Override
-//				public void run()
-//				{
-//					Animation animation = AnimationUtils.loadAnimation(ArtcodeActivity.this, R.anim.slide_out);
-//					animation.setAnimationListener(new Animation.AnimationListener()
-//					{
-//						@Override
-//						public void onAnimationStart(Animation animation)
-//						{
-//
-//						}
-//
-//						@Override
-//						public void onAnimationEnd(Animation animation)
-//						{
-//							markerButton.setVisibility(View.INVISIBLE);
-//						}
-//
-//						@Override
-//						public void onAnimationRepeat(Animation animation)
-//						{
-//
-//						}
-//					});
-//					markerButton.startAnimation(animation);
-//				}
-//			});
-//		}
-//	}
+	private ScannerActionBinding actionBinding;
+	private Action action;
+	private VisibilityAnimator actionAnimator;
 
 	@Override
 	public void onCreate(Bundle savedInstanceState)
 	{
 		super.onCreate(savedInstanceState);
-		getWindow().addFlags(WindowManager.LayoutParams.FLAG_KEEP_SCREEN_ON);
 
-		ExperienceScanner experience = new ExperienceScanner();
-		experience.setName("Test Experience");
-		binding.setExperience(experience);
+		actionBinding = ScannerActionBinding.inflate(getLayoutInflater(), binding.contentFrame, false);
+		binding.contentFrame.addView(actionBinding.getRoot());
+		actionAnimator = new VisibilityAnimator(actionBinding.getRoot());
+
+		if (getSupportActionBar() != null)
+		{
+			getSupportActionBar().setDisplayHomeAsUpEnabled(true);
+		}
 	}
 
 	@Override
@@ -278,68 +62,116 @@ public class ArtcodeActivity extends ScannerActivity
 	{
 		switch (item.getItemId())
 		{
-			case R.id.home:
-				startActivity(new Intent(this, ExperienceListActivity.class));
+			case android.R.id.home:
+				NavUtils.navigateUpTo(this, upIntent());
 				return true;
-			case R.id.experiences:
-				startActivity(new Intent(this, ExperienceListActivity.class));
-				return true;
-			default:
-				return super.onOptionsItemSelected(item);
+		}
+		return super.onOptionsItemSelected(item);
+	}
+
+	public void openAction(View view)
+	{
+		GoogleAnalytics.trackEvent("action", "Opened " + action);
+		//camera.stop();
+		if (action.getShowDetail())
+		{
+			ActionActivity.start(this, action);
+		}
+		else
+		{
+			startActivity(new Intent(Intent.ACTION_VIEW, Uri.parse(action.getUrl())));
 		}
 	}
 
-	protected void updateMenu()
+	@Override
+	protected MarkerDetectionHandler createMarkerHandler(final Experience experience)
 	{
-		//super.updateMenu();
+		return new ActionDetectionHandler(experience)
+		{
+			@Override
+			public void onActionChanged(Action newAction)
+			{
+				if (newAction != null)
+				{
+					GoogleAnalytics.trackEvent("action", "Detected " + newAction);
 
-//		Button autoOpenButton = (Button) findViewById(uk.ac.horizon.artcodes.scanner.R.id.autoOpenButton);
-//		autoOpenButton.setVisibility(View.VISIBLE);
-//		autoOpenButton.setOnClickListener(new View.OnClickListener()
-//		{
-//			@Override
-//			public void onClick(View v)
-//			{
-//				autoOpen = !autoOpen;
-//				updateMenu();
-//				if (currentCode != null)
-//				{
-//					String code = currentCode;
-//					currentCode = null;
-//					//markerChanged(code);
-//				}
-//			}
-//		});
-//		if (autoOpen)
-//		{
-//			autoOpenButton.setText(getString(R.string.auto_open));
-//			autoOpenButton.setCompoundDrawablesWithIntrinsicBounds(uk.ac.horizon.artcodes.scanner.R.drawable.ic_open_in_new_white_24dp, 0, 0, 0);
-//		}
-//		else
-//		{
-//			autoOpenButton.setText(getString(R.string.auto_open_off));
-//			autoOpenButton.setCompoundDrawablesWithIntrinsicBounds(R.drawable.ic_popup_white_24dp, 0, 0, 0);
-//		}
+					if (Feature.isEnabled(ArtcodeFeature.LOG_SCAN_IMAGE))
+					{
+						try
+						{
+							// TODO camera.saveImage(Artcodes.createImageLogFile());
+						}
+						catch (Exception e)
+						{
+							Log.w("", e.getMessage(), e);
+						}
+					}
+
+					if (action == null)
+					{
+						action = newAction;
+						actionBinding.setAction(action);
+
+						runOnUiThread(new Runnable()
+						{
+							@Override
+							public void run()
+							{
+								actionAnimator.showView();
+							}
+						});
+					}
+					else if (!action.equals(newAction))
+					{
+						action = newAction;
+						actionBinding.setAction(action);
+					}
+				}
+				else if (action != null)
+				{
+					action = null;
+					runOnUiThread(new Runnable()
+					{
+						@Override
+						public void run()
+						{
+							actionAnimator.hideView();
+						}
+					});
+				}
+			}
+		};
 	}
 
-	private void openMarker(Marker marker)
+	@Override
+	protected void onStart()
 	{
-//		Tracker tracker = AnalyticsTrackers.getInstance().get(AnalyticsTrackers.Target.APP);
-//		tracker.send(new HitBuilders.EventBuilder("Marker", "Opened " + marker.getCode())
-//				.setLabel(experience.get().getName() + "(" + experience.get().getId() + ")")
-//				.build());
-//		camera.stop();
-//		if (marker.getShowDetail())
-//		{
-//			Intent intent = new Intent(this, MarkerActivity.class);
-//			intent.putExtra("experience", experience.get().getId());
-//			intent.putExtra("marker", marker.getCode());
-//
-//			startActivity(intent);
-//		}
-//		else
-//		{
-//			startActivity(new Intent(Intent.ACTION_VIEW, Uri.parse(marker.getAction())));
-//		}
+		super.onStart();
+		GoogleAnalytics.trackScreen("Scan Screen");
+	}
+
+	@Override
+	protected void setExperience(Experience experience)
+	{
+		super.setExperience(experience);
+
+		Log.i("", "Set experience " + experience);
+		if (experience != null)
+		{
+			GoogleAnalytics.trackEvent("Experience", "Loaded " + experience.getId());
+		}
+
+		if (experience != null)
+		{
+			RecentExperiences.with(this).add(experience.getId());
+		}
+	}
+
+	private Intent upIntent()
+	{
+		final Intent intent = new Intent(this, ExperienceActivity.class);
+		intent.putExtra("experience", getExperience().getId());
+
+		return intent;
 	}
 }

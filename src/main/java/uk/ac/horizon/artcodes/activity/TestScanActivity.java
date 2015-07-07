@@ -30,7 +30,7 @@ import android.widget.LinearLayout;
 import android.widget.TextView;
 import com.google.gson.Gson;
 import com.google.gson.GsonBuilder;
-import uk.ac.horizon.aestheticodes.R;
+import uk.ac.horizon.artcodes.R;
 import uk.ac.horizon.artcodes.model.Experience;
 
 import java.net.URLEncoder;
@@ -71,7 +71,7 @@ public class TestScanActivity extends Activity
 				try
 				{
 					Experience experience = createExperience();
-					experience.setCallback("http://aestheticodes.appspot.com/marker/{code}");
+					experience.setCallback("http://aestheticodes.appspot.com/action/{code}");
 					String url = getString(R.string.artcode_scan_scheme) + ":" + URLEncoder.encode(experienceToJson(experience), "UTF-8");
 					Log.i("", url);
 					startActivity(new Intent(Intent.ACTION_VIEW, Uri.parse(url)));
@@ -119,10 +119,10 @@ public class TestScanActivity extends Activity
 		}
 		else if (resultCode == Activity.RESULT_OK)
 		{
-			String marker = data.getStringExtra("marker");
+			String marker = data.getStringExtra("action");
 			if (marker == null)
 			{
-				label.setText("scan result for null marker");
+				label.setText("scan result for null action");
 			}
 			else
 			{

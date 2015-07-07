@@ -27,27 +27,26 @@ import android.databinding.ViewDataBinding;
 import android.graphics.Bitmap;
 import android.net.Uri;
 import android.os.Bundle;
-import android.support.v4.app.DialogFragment;
 import android.support.v4.app.NavUtils;
 import android.support.v7.app.AppCompatActivity;
 import android.view.Menu;
 import android.view.MenuItem;
 import android.view.View;
-import com.google.android.gms.analytics.HitBuilders;
-import com.google.android.gms.analytics.Tracker;
 import com.google.android.gms.location.places.Place;
 import com.google.android.gms.location.places.ui.PlacePicker;
-import uk.ac.horizon.artcodes.AnalyticsTrackers;
-import uk.ac.horizon.aestheticodes.R;
-import uk.ac.horizon.artcodes.controller.ExperienceLoader;
-import uk.ac.horizon.aestheticodes.databinding.ExperienceEditAvailabilityBinding;
-import uk.ac.horizon.aestheticodes.databinding.ExperienceEditBinding;
-import uk.ac.horizon.aestheticodes.databinding.ExperienceEditMarkerBinding;
-import uk.ac.horizon.artcodes.dialog.EditMarkerChecksumDialog;
-import uk.ac.horizon.artcodes.dialog.EditMarkerDialog;
+import uk.ac.horizon.artcodes.GoogleAnalytics;
+import uk.ac.horizon.artcodes.R;
+import uk.ac.horizon.artcodes.databinding.ExperienceEditActionBinding;
+import uk.ac.horizon.artcodes.databinding.ExperienceEditActionCodeBinding;
+import uk.ac.horizon.artcodes.databinding.ExperienceEditAvailabilityBinding;
+import uk.ac.horizon.artcodes.databinding.ExperienceEditBinding;
+import uk.ac.horizon.artcodes.dialog.EditChecksumDialog;
+import uk.ac.horizon.artcodes.model.Action;
 import uk.ac.horizon.artcodes.model.Availability;
 import uk.ac.horizon.artcodes.model.Experience;
-import uk.ac.horizon.artcodes.model.Marker;
+import uk.ac.horizon.artcodes.model.loader.ExperienceLoader;
+import uk.ac.horizon.artcodes.model.loader.LoadListener;
+import uk.ac.horizon.artcodes.model.loader.Ref;
 
 import java.util.Calendar;
 
@@ -58,28 +57,23 @@ public class ExperienceEditActivity extends AppCompatActivity
 	private static final int ICON_PICKER_REQUEST = 123;
 
 	private ExperienceEditBinding binding;
-	private String experienceID;
+	private Ref<Experience> experience;
+
+	public void addAction(View view)
+	{
+		experience.get().getActions().add(new Action());
+		updateActions();
+	}
 
 	public void addAvailability(View view)
 	{
-		binding.getExperience().getAvailabilities().add(new Availability());
+		experience.get().getAvailabilities().add(new Availability());
 		updateAvailabilities();
-	}
-
-	public void addMarker(View view)
-	{
-		DialogFragment newFragment = new EditMarkerDialog();
-		newFragment.show(getSupportFragmentManager(), "marker.edit");
 	}
 
 	public void editChecksum(View view)
 	{
-		new EditMarkerChecksumDialog().show(getSupportFragmentManager(), "ChecksumModulo");
-	}
-
-	public void deleteMarker(View view)
-	{
-
+		new EditChecksumDialog().show(getSupportFragmentManager(), "ChecksumModulo");
 	}
 
 	public void editIcon(View view)
@@ -125,11 +119,6 @@ public class ExperienceEditActivity extends AppCompatActivity
 		return super.onOptionsItemSelected(item);
 	}
 
-	public void toggleMarkerSettings(View view)
-	{
-		binding.setSettingsVisible(!binding.getSettingsVisible());
-	}
-
 	protected void onActivityResult(int requestCode, int resultCode, Intent data)
 	{
 		if (requestCode == PLACE_PICKER_REQUEST)
@@ -166,16 +155,53 @@ public class ExperienceEditActivity extends AppCompatActivity
 		}
 	}
 
-	private void showDatePickerDialog(long timestamp, DatePickerDialog.OnDateSetListener listener)
+	@Override
+	protected void onCreate(Bundle savedInstanceState)
 	{
-		final Calendar calendar = Calendar.getInstance();
-		calendar.setTimeInMillis(timestamp);
-		int mYear = calendar.get(Calendar.YEAR);
-		int mMonth = calendar.get(Calendar.MONTH);
-		int mDay = calendar.get(Calendar.DAY_OF_MONTH);
+		super.onCreate(savedInstanceState);
 
-		DatePickerDialog dialog = new DatePickerDialog(this, listener, mYear, mMonth, mDay);
-		dialog.show();
+		binding = DataBindingUtil.setContentView(this, R.layout.experience_edit);
+		experience = ExperienceLoader.from(savedInstanceState, getIntent());
+		experience.load(this, new LoadListener<Experience>()
+		{
+			@Override
+			public void onLoaded(Experience item)
+			{
+				if (item != null)
+				{
+					GoogleAnalytics.trackEvent("Experience", "Loaded " + item.getId());
+				}
+				binding.setExperience(item);
+			}
+		});
+
+		binding.addOnRebindCallback(new OnRebindCallback()
+		{
+			@Override
+			public void onBound(ViewDataBinding binding)
+			{
+				updateActions();
+				updateAvailabilities();
+			}
+		});
+
+		setSupportActionBar(binding.toolbar);
+
+		binding.toolbar.setNavigationIcon(R.drawable.ic_close_white_24dp);
+	}
+
+	@Override
+	protected void onSaveInstanceState(Bundle outState)
+	{
+		super.onSaveInstanceState(outState);
+		// TODO outState.putString("experience", binding.getExperience().toJson());
+	}
+
+	@Override
+	protected void onStart()
+	{
+		super.onStart();
+		GoogleAnalytics.trackScreen("Experience Edit Screen");
 	}
 
 	private void selectImage(int request_id)
@@ -188,16 +214,43 @@ public class ExperienceEditActivity extends AppCompatActivity
 		}
 	}
 
-	private void updateMarkers()
+	private void showDatePickerDialog(long timestamp, DatePickerDialog.OnDateSetListener listener)
 	{
-		binding.markerList.removeAllViews();
+		final Calendar calendar = Calendar.getInstance();
+		calendar.setTimeInMillis(timestamp);
+		int mYear = calendar.get(Calendar.YEAR);
+		int mMonth = calendar.get(Calendar.MONTH);
+		int mDay = calendar.get(Calendar.DAY_OF_MONTH);
+
+		DatePickerDialog dialog = new DatePickerDialog(this, listener, mYear, mMonth, mDay);
+		dialog.show();
+	}
+
+	private Intent upIntent()
+	{
+		final Intent intent = new Intent(this, ExperienceActivity.class);
+		intent.putExtra("experience", experience.getUri());
+
+		return intent;
+	}
+
+	private void updateActions()
+	{
+		binding.actionList.removeAllViews();
 		if (binding.getExperience() != null)
 		{
-			for (Marker marker : binding.getExperience().getMarkers())
+			for (Action action : binding.getExperience().getActions())
 			{
-				ExperienceEditMarkerBinding markerBinding = ExperienceEditMarkerBinding.inflate(getLayoutInflater(), binding.markerList, false);
-				markerBinding.setMarker(marker);
-				binding.markerList.addView(markerBinding.getRoot());
+				ExperienceEditActionBinding markerBinding = ExperienceEditActionBinding.inflate(getLayoutInflater(), binding.actionList, false);
+				markerBinding.setAction(action);
+				for (String code : action.getCodes())
+				{
+					ExperienceEditActionCodeBinding codeBinding = ExperienceEditActionCodeBinding.inflate(getLayoutInflater(), markerBinding.markerCodes, false);
+					codeBinding.setAction(action);
+					markerBinding.markerCodes.addView(codeBinding.getRoot());
+				}
+
+				binding.actionList.addView(markerBinding.getRoot());
 			}
 		}
 	}
@@ -205,92 +258,14 @@ public class ExperienceEditActivity extends AppCompatActivity
 	private void updateAvailabilities()
 	{
 		binding.availabilityList.removeAllViews();
-		if(binding.getExperience() != null)
+		if (binding.getExperience() != null)
 		{
 			for (Availability availability : binding.getExperience().getAvailabilities())
 			{
 				ExperienceEditAvailabilityBinding availabilityBinding = ExperienceEditAvailabilityBinding.inflate(getLayoutInflater(), binding.availabilityList, false);
 				availabilityBinding.setMarker(availability);
-				binding.markerList.addView(availabilityBinding.getRoot());
+				binding.availabilityList.addView(availabilityBinding.getRoot());
 			}
 		}
-	}
-
-	@Override
-	protected void onCreate(Bundle savedInstanceState)
-	{
-		super.onCreate(savedInstanceState);
-
-		binding = DataBindingUtil.setContentView(this, R.layout.experience_edit);
-		experienceID = getIntent().getStringExtra("experience");
-		if (savedInstanceState != null && savedInstanceState.getString("experience") != null)
-		{
-			//binding.setExperience(ExperienceViewModel.create(savedInstanceState.getString("experience")));
-		}
-		else if (experienceID != null)
-		{
-			new ExperienceLoader(this)
-			{
-				@Override
-				protected void onProgressUpdate(Experience... values)
-				{
-					if (values != null && values.length != 0)
-					{
-						binding.setExperience(values[0]);
-						//setModel(values[0]);
-					}
-				}
-			}.execute(experienceID);
-		}
-		else
-		{
-			//binding.setExperience(new Experience(this));
-		}
-
-		binding.addOnRebindCallback(new OnRebindCallback()
-		{
-			@Override
-			public void onBound(ViewDataBinding binding)
-			{
-				super.onBound(binding);
-				updateMarkers();
-				updateAvailabilities();
-			}
-		});
-
-		setSupportActionBar(binding.toolbar);
-		binding.toolbar.setNavigationIcon(R.drawable.ic_close_white_24dp);
-//			getSupportActionBar().setDisplayHomeAsUpEnabled(true);
-	}
-
-	@Override
-	protected void onStart()
-	{
-		super.onStart();
-		Tracker tracker = AnalyticsTrackers.getInstance().get(AnalyticsTrackers.Target.APP);
-		if (experienceID == null)
-		{
-			tracker.setScreenName("New Experience Edit Screen");
-		}
-		else
-		{
-			tracker.setScreenName("Experience " + experienceID + " Edit Screen");
-		}
-		tracker.send(new HitBuilders.ScreenViewBuilder().build());
-	}
-
-	@Override
-	protected void onSaveInstanceState(Bundle outState)
-	{
-		super.onSaveInstanceState(outState);
-		// TODO outState.putString("experience", binding.getExperience().toJson());
-	}
-
-	private Intent upIntent()
-	{
-		final Intent intent = new Intent(this, ExperienceActivity.class);
-		intent.putExtra("experience", experienceID);
-
-		return intent;
 	}
 }

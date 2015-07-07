@@ -17,18 +17,25 @@
   ~ You should have received a copy of the GNU Affero General Public License
   ~ along with this program.  If not, see <http://www.gnu.org/licenses/>.
   -->
-<resources xmlns:tools="http://schemas.android.com/tools">
+<resources>
 	<string name="app_name">Artcodes</string>
 	<string name="property_set">Set %s</string>
 	<string name="code_text">Marker %s</string>
 	<string name="marker_open">Open %s</string>
+	<string name="found">Found %s</string>
 	<string name="marker_open_code">Open Marker %s</string>
 	<string name="action_experiences">Experiences</string>
-	<string name="marker_add">Add Marker</string>
+	<string name="action_add">Add Action</string>
 	<string name="dialog_action_set">Set</string>
 	<string name="dialog_action_cancel">Cancel</string>
 	<string name="dialog_action_delete">Delete</string>
 	<string name="markerCode">Marker Code</string>
+	<string name="recommended">Recommended</string>
+	<string name="recent">Recent</string>
+	<string name="welcome_title">Create beautiful codes with Artcodes</string>
+	<string name="welcome_text">Artcodes uses a different marker scheme that allows us to create aesthetically pleasing, even beautiful, codes. \n\nThese codes are designed and can be made part of the patterns and designs we see on everyday objects in our lives.</string>
+	<string name="more">More</string>
+	<string name="gotit">Got It</string>
 	<!-- Default WebSites -->
 	<string name="URL">URL</string>
 	<string name="regions">Regions</string>
@@ -64,7 +71,7 @@
 	<string name="experienceDescription">Description</string>
 	<string name="experienceIcon">Icon</string>
 	<string name="experienceImage">Image</string>
-	<string name="markers">Markers</string>
+	<string name="actions">Actions</string>
 	<string name="markerShowDetail">Show Detail Screen</string>
 	<string name="delete">Delete</string>
 	<string name="minimum">Minimum</string>
@@ -80,4 +87,5 @@
 	<string name="events">Events</string>
 	<string name="availability">Availability</string>
 	<string name="availability_add">Add Availability</string>
+	<string name="action_name">Name</string>
 </resources>

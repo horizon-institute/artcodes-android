@@ -1,0 +1,94 @@
+<?xml version="1.0" encoding="utf-8"?>
+
+<!--
+  ~ Aestheticodes recognises a different marker scheme that allows the
+  ~ creation of aesthetically pleasing, even beautiful, codes.
+  ~ Copyright (C) 2013-2015  The University of Nottingham
+  ~
+  ~     This program is free software: you can redistribute it and/or modify
+  ~     it under the terms of the GNU Affero General Public License as published
+  ~     by the Free Software Foundation, either version 3 of the License, or
+  ~     (at your option) any later version.
+  ~
+  ~     This program is distributed in the hope that it will be useful,
+  ~     but WITHOUT ANY WARRANTY; without even the implied warranty of
+  ~     MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+  ~     GNU Affero General Public License for more details.
+  ~
+  ~     You should have received a copy of the GNU Affero General Public License
+  ~     along with this program.  If not, see <http://www.gnu.org/licenses/>.
+  -->
+<merge xmlns:android="http://schemas.android.com/apk/res/android"
+       xmlns:tools="http://schemas.android.com/tools"
+       android:id="@+id/content_frame"
+       android:layout_width="match_parent"
+       android:layout_height="match_parent"
+       tools:context=".activities.GreyscaleSettingsActivity">
+
+	<SurfaceView android:id="@+id/greyColorPreview"
+	             android:layout_width="fill_parent"
+	             android:layout_height="fill_parent" />
+
+	<ImageView android:id="@+id/greyPreview"
+	           android:layout_width="fill_parent"
+	           android:layout_height="wrap_content"
+	           android:contentDescription="Greyscale image of camera feed" />
+
+	<RelativeLayout android:orientation="vertical"
+	                android:layout_gravity="bottom"
+	                android:layout_width="fill_parent"
+	                android:layout_height="fill_parent">
+
+		<LinearLayout android:id="@+id/bottomView"
+		              android:layout_width="fill_parent"
+		              android:layout_height="wrap_content"
+		              android:background="#AFFF"
+		              android:layout_alignParentLeft="true"
+		              android:layout_alignParentBottom="true"
+		              android:layout_alignParentRight="true"
+		              android:layout_alignParentEnd="true"
+		              android:layout_alignParentStart="true"
+		              android:orientation="vertical"
+		              android:paddingBottom="40dp"
+		              android:paddingLeft="10dp"
+		              android:paddingTop="10dp"
+		              android:paddingRight="10dp">
+
+			<android.support.v7.widget.SwitchCompat
+					android:layout_width="fill_parent"
+					android:layout_height="wrap_content"
+					android:text="Invert"
+					android:id="@+id/greyscaleInvertSwitch"
+					style="@style/Base.TextAppearance.AppCompat.Medium"
+					android:checked="false" />
+
+			<TextView android:layout_width="fill_parent"
+			          android:layout_height="wrap_content"
+			          android:id="@+id/modeText"
+			          android:text="Presets"
+			          style="@style/Base.TextAppearance.AppCompat.Medium"
+			          android:gravity="left"
+			          android:layout_marginTop="10dp" />
+
+			<Spinner
+					android:layout_width="fill_parent"
+					android:layout_height="wrap_content"
+					android:id="@+id/colourPresetSpinner" />
+
+			<TextView android:layout_width="fill_parent"
+			          android:layout_height="wrap_content"
+			          android:id="@+id/hueSeekBarLabel"
+			          android:text="Hue"
+			          style="@style/Base.TextAppearance.AppCompat.Medium"
+			          android:gravity="left"
+			          android:layout_marginTop="10dp" />
+
+			<SeekBar
+					android:layout_width="fill_parent"
+					android:layout_height="wrap_content"
+					android:id="@+id/hueSeekBar"
+					android:max="180" />
+
+		</LinearLayout>
+	</RelativeLayout>
+</merge>

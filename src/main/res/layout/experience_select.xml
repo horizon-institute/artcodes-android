@@ -19,8 +19,157 @@
   ~ along with this program.  If not, see <http://www.gnu.org/licenses/>.
   -->
 
-<android.support.v7.widget.RecyclerView xmlns:android="http://schemas.android.com/apk/res/android"
-              android:layout_width="fill_parent"
-              android:layout_height="fill_parent">
+<layout xmlns:android="http://schemas.android.com/apk/res/android"
+        xmlns:app="http://schemas.android.com/apk/res-auto">
 
-</android.support.v7.widget.RecyclerView>
+	<data>
+
+		<import type="android.view.View" />
+
+		<variable name="welcomeHidden"
+		          type="boolean" />
+	</data>
+
+	<ScrollView
+			android:layout_height="match_parent"
+			android:layout_width="match_parent">
+
+		<LinearLayout
+				android:layout_height="wrap_content"
+				android:layout_width="match_parent"
+				android:orientation="vertical"
+				>
+
+			<android.support.v7.widget.CardView
+					android:layout_width="match_parent"
+					android:layout_height="wrap_content"
+					app:cardElevation="2dp"
+					app:cardBackgroundColor="@color/apptheme_primary"
+					android:visibility="@{welcomeHidden ? View.GONE : View.VISIBLE}"
+					android:layout_margin="16dp">
+
+				<LinearLayout
+						android:layout_height="wrap_content"
+						android:layout_width="match_parent"
+						android:orientation="vertical"
+						android:padding="16dp">
+
+					<ImageView
+							android:layout_width="match_parent"
+							android:layout_height="wrap_content"
+							android:layout_marginBottom="16dp"
+							android:src="@drawable/penguins_small"
+							android:tint="#FFF"
+							android:scaleType="fitCenter" />
+
+					<TextView
+							android:layout_width="match_parent"
+							android:layout_height="wrap_content"
+							android:layout_marginBottom="16dp"
+							android:textAppearance="@style/TextAppearance.AppCompat.Medium"
+							android:textColor="#FFF"
+							android:text="@string/welcome_title" />
+
+					<TextView
+							android:layout_width="match_parent"
+							android:layout_height="wrap_content"
+							android:layout_marginBottom="16dp"
+							android:textAppearance="@style/TextAppearance.AppCompat"
+							android:textColor="#FFF"
+							android:text="@string/welcome_text" />
+
+					<LinearLayout
+							android:layout_width="wrap_content"
+							android:layout_height="wrap_content"
+							android:orientation="horizontal"
+							android:layout_gravity="end">
+
+						<Button android:layout_width="wrap_content"
+						        android:layout_height="wrap_content"
+						        android:textColor="#FFF"
+						        android:onClick="scanTestExperience"
+						        android:text="@string/more"
+						        style="@style/Widget.AppCompat.Button.Borderless" />
+
+						<Button android:layout_width="wrap_content"
+						        android:layout_height="wrap_content"
+						        android:textColor="#FFF"
+						        android:onClick="dismissWelcome"
+						        android:text="@string/gotit"
+						        style="@style/Widget.AppCompat.Button.Borderless"
+						        android:backgroundTint="@color/apptheme_primary_dark" />
+					</LinearLayout>
+				</LinearLayout>
+			</android.support.v7.widget.CardView>
+
+			<LinearLayout
+					android:layout_width="match_parent"
+					android:layout_height="wrap_content"
+					android:orientation="horizontal"
+					android:layout_marginLeft="16dp"
+					android:layout_marginRight="16dp">
+
+				<TextView android:layout_width="0dp"
+				          android:layout_height="match_parent"
+				          android:layout_weight="1"
+				          android:textAppearance="@style/TextAppearance.AppCompat.Title"
+				          android:text="@string/recent"
+				          android:gravity="center_vertical" />
+
+				<Button android:layout_width="wrap_content"
+				        android:layout_height="wrap_content"
+				        android:minHeight="32dp"
+				        android:minWidth="64dp"
+				        android:textSize="12sp"
+				        android:textColor="#FFF"
+				        android:backgroundTint="@color/apptheme_primary"
+				        android:text="@string/more" />
+
+			</LinearLayout>
+
+			<LinearLayout
+					android:layout_width="match_parent"
+					android:layout_height="wrap_content"
+					android:orientation="horizontal"
+					android:id="@+id/recentExperiences"
+					android:layout_margin="8dp">
+
+			</LinearLayout>
+
+			<LinearLayout
+					android:layout_width="match_parent"
+					android:layout_height="wrap_content"
+					android:layout_marginTop="8dp"
+					android:layout_marginBottom="8dp"
+					android:orientation="horizontal">
+
+				<TextView android:layout_width="0dp"
+				          android:layout_height="match_parent"
+				          android:layout_weight="1"
+				          android:textAppearance="@style/TextAppearance.AppCompat.Title"
+				          android:text="@string/recommended"
+				          android:gravity="center_vertical" />
+
+				<Button android:layout_width="wrap_content"
+				        android:layout_height="wrap_content"
+				        android:minHeight="32dp"
+				        android:minWidth="64dp"
+				        android:textSize="12sp"
+				        android:textColor="#FFF"
+				        android:backgroundTint="@color/apptheme_primary"
+				        android:text="@string/more" />
+
+			</LinearLayout>
+
+			<LinearLayout
+					android:layout_width="match_parent"
+					android:layout_height="wrap_content"
+					android:orientation="vertical"
+					android:id="@+id/recommendedExperiences">
+
+			</LinearLayout>
+
+		</LinearLayout>
+	</ScrollView>
+
+</layout>

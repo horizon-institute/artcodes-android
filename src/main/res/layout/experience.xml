@@ -123,7 +123,7 @@
 				        android:paddingLeft="32dp"
 				        android:paddingRight="32dp"
 				        android:textColor="#FFF"
-				        android:onClick="openExperience"
+				        android:onClick="scanExperience"
 				        style="@style/Widget.AppCompat.Button"
 				        android:layout_marginBottom="16dp"
 				        android:background="@drawable/custom_button"
@@ -160,7 +160,7 @@
 					        android:padding="8dp"
 					        android:textAlignment="center"
 					        android:textColor="#666"
-					        android:background="?android:attr/selectableItemBackground" />
+					        android:background="?attr/selectableItemBackground" />
 
 					<Button android:layout_width="wrap_content"
 					        android:layout_height="wrap_content"
@@ -175,7 +175,7 @@
 					        android:padding="8dp"
 					        android:textAlignment="center"
 					        android:textColor="#666"
-					        android:background="?android:attr/selectableItemBackground" />
+					        android:background="?attr/selectableItemBackground" />
 				</LinearLayout>
 			</LinearLayout>
 		</android.support.v4.widget.NestedScrollView>
