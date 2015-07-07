@@ -1,0 +1,48 @@
+{
+    "actions": [
+        {
+            "codes": [
+                "1:1:1:3"
+            ],
+            "name": "Valid Code",
+            "url": "http://www.aestheticodes.com"
+        },
+        {
+            "codes": [
+                "1:1:1:2"
+            ],
+            "name": "Invalid Code",
+            "url": "http://www.dboxy.org/d-box-111234/"
+        },
+        {
+            "codes": [
+                "1:1:1:3",
+                "1:1:1:6"
+            ],
+            "name": "Group Code",
+            "match": "all",
+            "url": "http://www.dboxy.org/d-box-111234/"
+        },
+        {
+            "codes": [
+                "1:1:1:6"
+            ],
+            "url": "http://www.dboxy.org/d-box-111124/",
+            "title": "Detail Code",
+            "showDetail": true,
+            "image": "http://www.nasa.gov/images/content/641181main_30dor2_665.jpg",
+            "description": "A description"
+        }
+    ],
+    "id": "4c758e29-0759-4583-a0d4-71ee692b7f86",
+    "name": "Test",
+    "icon": "http://www.wornchaos.org/experiences/uk.ac.horizon.aestheticodes.default.png",
+    "description": "A simple experience for testing.",
+    "minRegions": 4,
+    "maxRegions": 4,
+    "maxEmptyRegions": 0,
+    "maxRegionValue": 6,
+    "validationRegions": 0,
+    "validationRegionValue": 1,
+    "checksumModulo": 3
+}
