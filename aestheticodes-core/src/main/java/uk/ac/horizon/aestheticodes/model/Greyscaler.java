@@ -557,6 +557,7 @@ public abstract class Greyscaler
         @Override
         public Mat greyscaleImage(Mat yuvImage, Mat greyscaleImage)
         {
+            // create buffers if they don't already exist as the tasks will need somewhere to put the result:
             int desiredRows = (yuvImage.rows() / 3) * 2, desiredCols = yuvImage.cols();
             if (this.threeChannelBuffer == null || this.threeChannelBuffer.rows() != desiredRows || this.threeChannelBuffer.cols() != desiredCols)
             {
@@ -570,6 +571,7 @@ public abstract class Greyscaler
                 greyscaleImage = new Mat(desiredRows, desiredCols, CvType.CV_8UC1);
             }
 
+            // Create/run tasks. Each task works on a strip of the image so that the underlying data is continuous (well if the original image was in the first place).
             List<GreyscalerTask> tasks = new ArrayList<>();
             for (int i = 0; i < greyscalers.size(); ++i)
             {
@@ -587,8 +589,8 @@ public abstract class Greyscaler
                     task.run();
                 }
             }
-            ;
 
+            // Wait for the tasks to be completed.
             for (GreyscalerTask task : tasks)
             {
                 task.waitForTask();

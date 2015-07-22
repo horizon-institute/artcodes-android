@@ -231,7 +231,8 @@ class ExperienceListUpdater extends AsyncTask<String, Experience, Collection<Str
 							}
 							else if (experience.getOp() == Experience.Operation.remove)
 							{
-								//removals.add(experience.getId());
+								// comment this line to stop sever deleting stuff
+								// removals.add(experience.getId());
 							}
 							else
 							{
