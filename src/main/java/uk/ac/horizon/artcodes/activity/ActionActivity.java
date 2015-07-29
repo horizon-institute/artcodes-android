@@ -24,33 +24,21 @@ import android.databinding.DataBindingUtil;
 import android.net.Uri;
 import android.os.Bundle;
 import android.support.v7.app.AppCompatActivity;
-import android.util.Log;
 import android.view.View;
-import com.google.gson.Gson;
+import uk.ac.horizon.artcodes.ArtcodeStorage;
 import uk.ac.horizon.artcodes.GoogleAnalytics;
 import uk.ac.horizon.artcodes.R;
 import uk.ac.horizon.artcodes.databinding.ActionBinding;
+import uk.ac.horizon.artcodes.json.ExperienceParserFactory;
 import uk.ac.horizon.artcodes.model.Action;
-import uk.ac.horizon.artcodes.model.loader.ExperienceLoader;
+import uk.ac.horizon.artcodes.storage.StoreListener;
 
 public class ActionActivity extends AppCompatActivity
 {
-	public static Action from(Intent intent)
-	{
-		Log.i("", "New Intent: " + intent);
-		if (intent.getStringExtra("action") != null)
-		{
-			Gson gson = ExperienceLoader.createParser();
-			return gson.fromJson(intent.getStringExtra("action"), Action.class);
-		}
-		return null;
-	}
-
 	public static void start(Context context, Action action)
 	{
 		Intent intent = new Intent(context, ActionActivity.class);
-		Gson gson = ExperienceLoader.createParser();
-		intent.putExtra("action", gson.toJson(action));
+		intent.putExtra("action", ExperienceParserFactory.toJson(action));
 		context.startActivity(intent);
 	}
 
@@ -62,7 +50,18 @@ public class ActionActivity extends AppCompatActivity
 		super.onCreate(savedInstanceState);
 
 		binding = DataBindingUtil.setContentView(this, R.layout.action);
-		binding.setAction(from(getIntent()));
+		Intent intent = getIntent();
+		if (intent.getStringExtra("action") != null)
+		{
+			ArtcodeStorage.load(Action.class).fromJson(intent.getStringExtra("action")).async(new StoreListener<Action>()
+			{
+				@Override
+				public void onItemChanged(Action item)
+				{
+					binding.setAction(item);
+				}
+			});
+		}
 	}
 
 	public void open(View view)
@@ -77,6 +76,6 @@ public class ActionActivity extends AppCompatActivity
 	protected void onStart()
 	{
 		super.onStart();
-		GoogleAnalytics.trackScreen("Marker Screen");
+		GoogleAnalytics.trackScreen("Action Screen");
 	}
 }

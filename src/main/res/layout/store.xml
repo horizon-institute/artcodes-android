@@ -1,0 +1,74 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!--
+  ~ Artcodes recognises a different marker scheme that allows the
+  ~ creation of aesthetically pleasing, even beautiful, codes.
+  ~ Copyright (C) 2013-2015  The University of Nottingham
+  ~
+  ~ This program is free software: you can redistribute it and/or modify
+  ~ it under the terms of the GNU Affero General Public License as published
+  ~ by the Free Software Foundation, either version 3 of the License, or
+  ~ (at your option) any later version.
+  ~
+  ~ This program is distributed in the hope that it will be useful,
+  ~ but WITHOUT ANY WARRANTY; without even the implied warranty of
+  ~ MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+  ~ GNU Affero General Public License for more details.
+  ~
+  ~ You should have received a copy of the GNU Affero General Public License
+  ~ along using this program.  If not, see <http://www.gnu.org/licenses/>.
+  -->
+
+<layout xmlns:android="http://schemas.android.com/apk/res/android"
+        xmlns:tools="http://schemas.android.com/tools"
+        tools:context="uk.ac.horizon.artcodes.activity.ExperienceSelectActivity">
+
+	<data>
+
+		<import type="android.view.View" />
+
+		<variable
+				name="store"
+				type="uk.ac.horizon.artcodes.storage.ExperienceStore" />
+	</data>
+
+	<LinearLayout
+			android:layout_width="match_parent"
+			android:layout_height="wrap_content"
+			android:gravity="center_vertical"
+			android:background="?attr/selectableItemBackground"
+			android:orientation="horizontal">
+
+		<ImageView
+				android:layout_width="24dp"
+				android:layout_height="24dp"
+				android:layout_margin="16dp"
+				tools:src="@drawable/ic_smartphone_black_36dp"
+				android:tint="@color/ic_tint"
+				android:src="@{store.icon}" />
+
+		<LinearLayout
+				android:layout_width="0dp"
+				android:layout_height="wrap_content"
+				android:layout_weight="1"
+				android:layout_margin="16dp"
+				android:orientation="vertical">
+
+			<TextView
+					android:layout_width="match_parent"
+					android:layout_height="wrap_content"
+					android:text="@{store.saveText}"
+					android:textAppearance="@style/TextAppearance.AppCompat"
+					tools:text="Save to Artcode Server" />
+
+			<TextView
+					android:layout_width="match_parent"
+					android:layout_height="wrap_content"
+					android:visibility="@{store.name == null ? View.GONE : View.VISIBLE}"
+					android:text="@{store.name}"
+					android:id="@+id/hint_text"
+					android:textAppearance="@style/TextAppearance.AppCompat.Small"
+					tools:text="kevin.glover@gmail.com" />
+
+		</LinearLayout>
+	</LinearLayout>
+</layout>

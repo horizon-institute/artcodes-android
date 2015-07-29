@@ -15,10 +15,13 @@
   ~ GNU Affero General Public License for more details.
   ~
   ~ You should have received a copy of the GNU Affero General Public License
-  ~ along with this program.  If not, see <http://www.gnu.org/licenses/>.
+  ~ along using this program.  If not, see <http://www.gnu.org/licenses/>.
   -->
 <resources>
 	<string name="app_name">Artcodes</string>
+	<string name="hint_near">Nearby</string>
+	<string name="hint_new">New</string>
+	<string name="hint_popular">Popular</string>
 	<string name="property_set">Set %s</string>
 	<string name="code_text">Marker %s</string>
 	<string name="marker_open">Open %s</string>
@@ -43,7 +46,7 @@
 	<string name="regions_value">%s Regions</string>
 	<string name="maxRegionValue">Max Items per Region</string>
 	<string name="maxRegionValue_desc">The maximum number of items that can be in a region in a valid Artcode.</string>
-	<string name="checksumModulo">Checksum Value</string>
+	<string name="checksumModulo">Checksum</string>
 	<string name="checksumModulo_off">Disabled</string>
 	<string name="checksumModulo_desc">The Artcode checksum: the sum of all regions
 		must be divisible by this value to be valid.
@@ -88,4 +91,27 @@
 	<string name="availability">Availability</string>
 	<string name="availability_add">Add Availability</string>
 	<string name="action_name">Name</string>
+	<string name="action_deleted">Deleted</string>
+	<string name="action_delete_undo">Undo</string>
+	<string name="marker_config">Marker Configuration</string>
+	<string name="close">close</string>
+	<string name="home">Scan Now</string>
+	<string name="library">My Library</string>
+	<string name="favourites">Favourites</string>
+	<string name="favourite">Favourite</string>
+	<string name="device">Device</string>
+	<string name="artcodeServer">Artcode Server</string>
+	<string name="save_google">Save to Artcode Server</string>
+	<string name="save_local">Save to Device</string>
+	<string name="nearby">Nearby</string>
+	<string name="unstar">Unstar</string>
+	<string name="star">Star</string>
+	<string name="starred">Starred</string>
+	<string name="edit_copy">Edit Copy</string>
+
+	<string-array name="tab_names">
+		<item>Info</item>
+		<item>Availability</item>
+		<item>Actions</item>
+	</string-array>
 </resources>

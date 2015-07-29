@@ -15,7 +15,7 @@
   ~ GNU Affero General Public License for more details.
   ~
   ~ You should have received a copy of the GNU Affero General Public License
-  ~ along with this program.  If not, see <http://www.gnu.org/licenses/>.
+  ~ along using this program.  If not, see <http://www.gnu.org/licenses/>.
   -->
 
 <layout xmlns:android="http://schemas.android.com/apk/res/android"
@@ -38,6 +38,7 @@
 			android:padding="16dp"
 			android:visibility="invisible"
 			android:textAppearance="@style/TextAppearance.AppCompat.Title"
+            android:onClick="openAction"
 			style="@style/Widget.AppCompat.Button"
 			android:text="@{action.name}"
 			tools:text="Marker Blah"

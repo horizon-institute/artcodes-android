@@ -5,15 +5,31 @@ import org.opencv.core.CvType;
 import org.opencv.core.Mat;
 import org.opencv.imgproc.Imgproc;
 
-/**
- * Created by kevin on 07/07/2015.
- */
 public class HueShifter implements ImageProcessor
 {
 	private int hueShift;
 
 	private transient Mat threeChannelBuffer = null;
 	private transient byte[] colorPixelBuffer = null;
+
+	public HueShifter()
+	{
+	}
+
+	public HueShifter(int hueShift)
+	{
+		this.hueShift = hueShift;
+	}
+
+	public int getHueShift()
+	{
+		return hueShift;
+	}
+
+	public void setHueShift(int hueShift)
+	{
+		this.hueShift = hueShift;
+	}
 
 	@Override
 	public Mat process(Mat image, boolean detected)

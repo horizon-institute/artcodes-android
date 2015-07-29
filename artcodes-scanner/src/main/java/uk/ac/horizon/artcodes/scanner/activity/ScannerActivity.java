@@ -23,15 +23,12 @@ import android.databinding.DataBindingUtil;
 import android.net.Uri;
 import android.os.Build;
 import android.os.Bundle;
-import android.support.v7.app.AppCompatActivity;
 import android.util.Log;
 import android.view.View;
 import android.view.WindowManager;
 import org.opencv.android.OpenCVLoader;
+import uk.ac.horizon.artcodes.ArtcodeStorage;
 import uk.ac.horizon.artcodes.model.Experience;
-import uk.ac.horizon.artcodes.model.loader.ExperienceLoader;
-import uk.ac.horizon.artcodes.model.loader.LoadListener;
-import uk.ac.horizon.artcodes.model.loader.Ref;
 import uk.ac.horizon.artcodes.scanner.ExperienceFrameProcessor;
 import uk.ac.horizon.artcodes.scanner.R;
 import uk.ac.horizon.artcodes.scanner.VisibilityAnimator;
@@ -41,11 +38,10 @@ import uk.ac.horizon.artcodes.scanner.detect.CodeDetectionHandler;
 import uk.ac.horizon.artcodes.scanner.detect.MarkerDetectionHandler;
 import uk.ac.horizon.artcodes.scanner.overlay.Overlay;
 
-public class ScannerActivity extends AppCompatActivity
+public class ScannerActivity extends ExperienceActivityBase
 {
 	protected ScannerBinding binding;
 	// TODO Use binding variables
-	private Ref<Experience> experience;
 	private CameraAdapter camera;
 	private Overlay overlay;
 	private VisibilityAnimator menuAnimator;
@@ -53,24 +49,6 @@ public class ScannerActivity extends AppCompatActivity
 	public void flipCamera(View view)
 	{
 		camera.flipCamera();
-	}
-
-	public Experience getExperience()
-	{
-		return experience.get();
-	}
-
-	protected void setExperience(Experience experience)
-	{
-		binding.setExperience(experience);
-		if (experience != null)
-		{
-			camera.setFrameProcessor(new ExperienceFrameProcessor(experience, createMarkerHandler(experience), overlay));
-		}
-		else
-		{
-			camera.setFrameProcessor(null);
-		}
 	}
 
 	public void hideMenu(View view)
@@ -103,6 +81,8 @@ public class ScannerActivity extends AppCompatActivity
 			getWindow().getDecorView().setSystemUiVisibility(View.SYSTEM_UI_FLAG_LAYOUT_HIDE_NAVIGATION | View.SYSTEM_UI_FLAG_LAYOUT_STABLE);
 		}
 
+		ArtcodeStorage.initialize(this);
+
 		binding = DataBindingUtil.setContentView(this, R.layout.scanner);
 		camera = new CameraAdapter(this);
 		binding.setCamera(camera);
@@ -111,9 +91,21 @@ public class ScannerActivity extends AppCompatActivity
 		setSupportActionBar(binding.toolbar);
 
 		menuAnimator = new VisibilityAnimator(binding.settingsMenu, binding.settingsMenuButton);
+	}
 
-		Log.i("", "Intent onCreate: " + getIntent());
-		onNewIntent(getIntent());
+	@Override
+	public void onItemChanged(Experience experience)
+	{
+		super.onItemChanged(experience);
+		binding.setExperience(experience);
+		if (experience != null)
+		{
+			camera.setFrameProcessor(new ExperienceFrameProcessor(experience, createMarkerHandler(experience), overlay));
+		}
+		else
+		{
+			camera.setFrameProcessor(null);
+		}
 	}
 
 	public void showMenu(View view)
@@ -145,21 +137,6 @@ public class ScannerActivity extends AppCompatActivity
 				}
 			}
 		};
-	}
-
-	@Override
-	protected void onNewIntent(Intent intent)
-	{
-		super.onNewIntent(intent);
-		experience = ExperienceLoader.from(intent);
-		experience.load(this, new LoadListener<Experience>()
-		{
-			@Override
-			public void onLoaded(Experience item)
-			{
-				setExperience(item);
-			}
-		});
 	}
 
 	static

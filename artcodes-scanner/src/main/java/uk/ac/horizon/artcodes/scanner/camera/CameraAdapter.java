@@ -45,7 +45,7 @@ public class CameraAdapter extends BaseObservable
 	private static final String THREAD_NAME = "Frame Processor";
 	public static boolean deviceNeedsManualAutoFocus = false;
 
-	@BindingAdapter("bind:height")
+	@BindingAdapter("height")
 	public static void bindHeight(View view, Integer height)
 	{
 		if (height != null)
@@ -55,7 +55,7 @@ public class CameraAdapter extends BaseObservable
 		}
 	}
 
-	@BindingAdapter("bind:snacktext")
+	@BindingAdapter("snacktext")
 	public static void bindSnackText(View view, int string)
 	{
 		if (string != 0)
@@ -64,8 +64,8 @@ public class CameraAdapter extends BaseObservable
 		}
 	}
 
-	@BindingAdapter("bind:surface")
-	public static void bindTextWatcher(SurfaceView view, SurfaceHolder.Callback callback)
+	@BindingAdapter("surface")
+	public static void bindSurface(SurfaceView view, SurfaceHolder.Callback callback)
 	{
 		view.getHolder().addCallback(callback);
 	}

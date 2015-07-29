@@ -16,79 +16,103 @@
   ~     GNU Affero General Public License for more details.
   ~
   ~     You should have received a copy of the GNU Affero General Public License
-  ~     along with this program.  If not, see <http://www.gnu.org/licenses/>.
+  ~     along using this program.  If not, see <http://www.gnu.org/licenses/>.
   -->
-<merge xmlns:android="http://schemas.android.com/apk/res/android"
-       xmlns:tools="http://schemas.android.com/tools"
-       android:id="@+id/content_frame"
-       android:layout_width="match_parent"
-       android:layout_height="match_parent"
-       tools:context=".activities.GreyscaleSettingsActivity">
+<layout xmlns:android="http://schemas.android.com/apk/res/android"
+        xmlns:app="http://schemas.android.com/apk/res-auto"
+        xmlns:tools="http://schemas.android.com/tools"
+        tools:context=".activities.ScannerActivity">
 
-	<SurfaceView android:id="@+id/greyColorPreview"
-	             android:layout_width="fill_parent"
-	             android:layout_height="fill_parent" />
+	<data>
 
-	<ImageView android:id="@+id/greyPreview"
-	           android:layout_width="fill_parent"
-	           android:layout_height="wrap_content"
-	           android:contentDescription="Greyscale image of camera feed" />
+		<import type="android.view.View" />
 
-	<RelativeLayout android:orientation="vertical"
-	                android:layout_gravity="bottom"
-	                android:layout_width="fill_parent"
-	                android:layout_height="fill_parent">
+		<variable
+				name="experience"
+				type="uk.ac.horizon.artcodes.model.Experience" />
 
-		<LinearLayout android:id="@+id/bottomView"
-		              android:layout_width="fill_parent"
-		              android:layout_height="wrap_content"
-		              android:background="#AFFF"
-		              android:layout_alignParentLeft="true"
-		              android:layout_alignParentBottom="true"
-		              android:layout_alignParentRight="true"
-		              android:layout_alignParentEnd="true"
-		              android:layout_alignParentStart="true"
-		              android:orientation="vertical"
-		              android:paddingBottom="40dp"
-		              android:paddingLeft="10dp"
-		              android:paddingTop="10dp"
-		              android:paddingRight="10dp">
+		<variable
+				name="camera"
+				type="uk.ac.horizon.artcodes.scanner.camera.CameraAdapter" />
 
-			<android.support.v7.widget.SwitchCompat
+		<variable
+				name="overlay"
+				type="uk.ac.horizon.artcodes.scanner.overlay.Overlay" />
+	</data>
+
+	<FrameLayout
+			android:layout_width="match_parent"
+			android:layout_height="match_parent">
+
+		<SurfaceView
+				android:layout_width="fill_parent"
+				android:layout_height="fill_parent"
+				app:surface="@{camera.surfaceCallback}" />
+
+		<ImageView
+				android:layout_width="match_parent"
+				android:layout_height="match_parent"
+				android:scaleType="fitXY"
+				app:imageBitmap="@{overlay.bitmap}"
+				tools:ignore="ContentDescription" />
+
+		<RelativeLayout
+				android:layout_width="fill_parent"
+				android:layout_height="fill_parent"
+				android:layout_gravity="bottom"
+				android:orientation="vertical">
+
+			<LinearLayout
+					android:id="@+id/bottomView"
 					android:layout_width="fill_parent"
 					android:layout_height="wrap_content"
-					android:text="Invert"
-					android:id="@+id/greyscaleInvertSwitch"
-					style="@style/Base.TextAppearance.AppCompat.Medium"
-					android:checked="false" />
+					android:layout_alignParentBottom="true"
+					android:layout_alignParentEnd="true"
+					android:layout_alignParentLeft="true"
+					android:layout_alignParentRight="true"
+					android:layout_alignParentStart="true"
+					android:background="#AFFF"
+					android:orientation="vertical"
+					android:padding="16dp">
 
-			<TextView android:layout_width="fill_parent"
-			          android:layout_height="wrap_content"
-			          android:id="@+id/modeText"
-			          android:text="Presets"
-			          style="@style/Base.TextAppearance.AppCompat.Medium"
-			          android:gravity="left"
-			          android:layout_marginTop="10dp" />
+				<android.support.v7.widget.SwitchCompat
+						android:id="@+id/invertSwitch"
+						style="@style/Base.TextAppearance.AppCompat"
+						android:layout_width="fill_parent"
+						android:layout_height="wrap_content"
+						android:checked="false"
+						android:text="Invert" />
 
-			<Spinner
-					android:layout_width="fill_parent"
-					android:layout_height="wrap_content"
-					android:id="@+id/colourPresetSpinner" />
+				<TextView
+						android:id="@+id/modeText"
+						style="@style/Base.TextAppearance.AppCompat"
+						android:layout_width="fill_parent"
+						android:layout_height="wrap_content"
+						android:layout_marginTop="10dp"
+						android:gravity="left"
+						android:text="Presets" />
 
-			<TextView android:layout_width="fill_parent"
-			          android:layout_height="wrap_content"
-			          android:id="@+id/hueSeekBarLabel"
-			          android:text="Hue"
-			          style="@style/Base.TextAppearance.AppCompat.Medium"
-			          android:gravity="left"
-			          android:layout_marginTop="10dp" />
+				<Spinner
+						android:id="@+id/colourPresetSpinner"
+						android:layout_width="fill_parent"
+						android:layout_height="wrap_content" />
 
-			<SeekBar
-					android:layout_width="fill_parent"
-					android:layout_height="wrap_content"
-					android:id="@+id/hueSeekBar"
-					android:max="180" />
+				<TextView
+						android:id="@+id/hueSeekBarLabel"
+						style="@style/Base.TextAppearance.AppCompat"
+						android:layout_width="fill_parent"
+						android:layout_height="wrap_content"
+						android:layout_marginTop="10dp"
+						android:gravity="left"
+						android:text="Hue" />
 
-		</LinearLayout>
-	</RelativeLayout>
-</merge>
+				<SeekBar
+						android:id="@+id/hueSlider"
+						android:layout_width="fill_parent"
+						android:layout_height="wrap_content"
+						android:max="180" />
+
+			</LinearLayout>
+		</RelativeLayout>
+	</FrameLayout>
+</layout>

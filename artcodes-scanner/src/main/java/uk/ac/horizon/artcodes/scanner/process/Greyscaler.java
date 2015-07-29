@@ -41,40 +41,40 @@ public abstract class Greyscaler
 			if (greyscaleOptions.size() == 4 && greyscaleOptions.get(0).equals("RGB"))
 			{
 				double r = (double) greyscaleOptions.get(1), g = (double) greyscaleOptions.get(2), b = (double) greyscaleOptions.get(3);
-				if (r == 1 && g == 0 && b == 0)
+//				if (r == 1 && g == 0 && b == 0)
+//				{
+//					List<Greyscaler> greyscalers = new ArrayList<>();
+//					while (greyscalers.size() < threadCount)
+//					{
+//						greyscalers.add(new RGBGreyscaler(hueShift, 2, invert));
+//					}
+//					return new ThreadedGreyscaler(greyscalers);
+//				}
+//				else if (r == 0 && g == 1 && b == 0)
+//				{
+//					List<Greyscaler> greyscalers = new ArrayList<>();
+//					while (greyscalers.size() < threadCount)
+//					{
+//						greyscalers.add(new RGBGreyscaler(hueShift, 1, invert));
+//					}
+//					return new ThreadedGreyscaler(greyscalers);
+//				}
+//				else if (r == 0 && g == 0 && b == 1)
+//				{
+//					List<Greyscaler> greyscalers = new ArrayList<>();
+//					while (greyscalers.size() < threadCount)
+//					{
+//						greyscalers.add(new RGBGreyscaler(hueShift, 0, invert));
+//					}
+//					return new ThreadedGreyscaler(greyscalers);
+//				}
+//				else if (r == 0.299 && g == 0.587 && b == 0.114)
+//				{
+//					return new IntensityGreyscaler(hueShift, invert);
+//				}
+//				else
 				{
-					List<Greyscaler> greyscalers = new ArrayList<>();
-					while (greyscalers.size() < threadCount)
-					{
-						greyscalers.add(new RGBGreyscaler(hueShift, 2, invert));
-					}
-					return new ThreadedGreyscaler(greyscalers);
-				}
-				else if (r == 0 && g == 1 && b == 0)
-				{
-					List<Greyscaler> greyscalers = new ArrayList<>();
-					while (greyscalers.size() < threadCount)
-					{
-						greyscalers.add(new RGBGreyscaler(hueShift, 1, invert));
-					}
-					return new ThreadedGreyscaler(greyscalers);
-				}
-				else if (r == 0 && g == 0 && b == 1)
-				{
-					List<Greyscaler> greyscalers = new ArrayList<>();
-					while (greyscalers.size() < threadCount)
-					{
-						greyscalers.add(new RGBGreyscaler(hueShift, 0, invert));
-					}
-					return new ThreadedGreyscaler(greyscalers);
-				}
-				else if (r == 0.299 && g == 0.587 && b == 0.114)
-				{
-					return new IntensityGreyscaler(hueShift, invert);
-				}
-				else
-				{
-					return new WeightedChannelRgbGreyscaler(hueShift, ((Number) greyscaleOptions.get(1)).doubleValue(), ((Number) greyscaleOptions.get(2)).doubleValue(), ((Number) greyscaleOptions.get(3)).doubleValue(), invert);
+					return new WeightedChannelRgbGreyscaler(((Number) greyscaleOptions.get(1)).doubleValue(), ((Number) greyscaleOptions.get(2)).doubleValue(), ((Number) greyscaleOptions.get(3)).doubleValue());
 				}
 			}
 			else if (greyscaleOptions.size() == 5 && greyscaleOptions.get(0).equals("CMYK"))
@@ -96,7 +96,7 @@ public abstract class Greyscaler
 				return new ThreadedGreyscaler(greyscalers);
 			}
 		}
-		return new IntensityGreyscaler(hueShift, invert);
+		return null; //new IntensityGreyscaler(hueShift, invert);
 	}
 
 	/**

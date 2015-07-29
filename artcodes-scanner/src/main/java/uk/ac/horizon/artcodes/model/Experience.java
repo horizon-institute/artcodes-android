@@ -18,21 +18,32 @@
  */
 package uk.ac.horizon.artcodes.model;
 
+import android.databinding.BaseObservable;
+import android.databinding.Bindable;
+import android.util.Log;
+import android.widget.CompoundButton;
+import uk.ac.horizon.artcodes.scanner.BR;
 import uk.ac.horizon.artcodes.scanner.process.ImageProcessor;
+import uk.ac.horizon.artcodes.ui.SimpleTextWatcher;
 
 import java.util.ArrayList;
-import java.util.Collection;
 import java.util.List;
 
-public class Experience
+public class Experience extends BaseObservable
 {
-	public enum Operation
+	public enum Status
 	{
-		create, retrieve, update, deleted, add, remove
+		downloaded, modified, uploading
+	}
+
+	public enum Visibility
+	{
+		personal, secret, published
 	}
 
 	private final List<Action> actions = new ArrayList<>();
 	private final List<Availability> availabilities = new ArrayList<>();
+	private final List<ImageProcessor> threshold = new ArrayList<>();
 
 	private String id;
 	private String name;
@@ -40,34 +51,35 @@ public class Experience
 	private String image;
 	private String description;
 	private int version = 1;
-	//private String ownerID;
+	private String authorID;
 	private String author;
 	private String callback;
-
 	private Long updated;
 	private Long created;
-
 	private String originalID;
+	private Visibility visibility = Visibility.secret;
 
-	private Operation op = null;
-	private int minRegions = 5;
-	private int maxRegions = 5;
-	private int maxEmptyRegions = 0;
-	private int maxRegionValue = 6;
-	private int validationRegions = 0;
-	private int validationRegionValue = 1;
+	// Transient properties calculated before use
+	private transient int minRegions = 5;
+	private transient int maxRegions = 5;
+	private transient int maxRegionValue = 6;
+
 	private int checksumModulo = 3;
 	private boolean embeddedChecksum = false;
-	private List<ImageProcessor> threshold = new ArrayList<>();
 	private String detector;
 
 	public Experience()
 	{
 	}
 
-	public Collection<Action> getActions()
+	public List<Action> getActions()
 	{
 		return actions;
+	}
+
+	public String getAuthorID()
+	{
+		return authorID;
 	}
 
 	public List<Availability> getAvailabilities()
@@ -100,6 +112,29 @@ public class Experience
 		return Integer.toString(checksumModulo);
 	}
 
+	public SimpleTextWatcher getDescWatcher()
+	{
+		return new SimpleTextWatcher()
+		{
+			@Override
+			public String getText()
+			{
+				return description;
+			}
+
+			@Override
+			public void onTextChanged(String value)
+			{
+				if (!value.equals(description))
+				{
+					description = value;
+					notifyPropertyChanged(BR.description);
+				}
+			}
+		};
+	}
+
+	@Bindable
 	public String getDescription()
 	{
 		return description;
@@ -125,6 +160,7 @@ public class Experience
 		this.embeddedChecksum = embeddedChecksum;
 	}
 
+	@Bindable
 	public String getIcon()
 	{
 		return icon;
@@ -133,6 +169,7 @@ public class Experience
 	public void setIcon(String icon)
 	{
 		this.icon = icon;
+		notifyPropertyChanged(BR.icon);
 	}
 
 	public String getId()
@@ -145,6 +182,7 @@ public class Experience
 		this.id = id;
 	}
 
+	@Bindable
 	public String getImage()
 	{
 		return image;
@@ -153,16 +191,7 @@ public class Experience
 	public void setImage(String image)
 	{
 		this.image = image;
-	}
-
-	public int getMaxEmptyRegions()
-	{
-		return maxEmptyRegions;
-	}
-
-	public void setMaxEmptyRegions(int maxEmptyRegions)
-	{
-		this.maxEmptyRegions = maxEmptyRegions;
+		notifyPropertyChanged(BR.image);
 	}
 
 	public int getMaxRegionValue()
@@ -195,6 +224,7 @@ public class Experience
 		this.minRegions = minRegions;
 	}
 
+	@Bindable
 	public String getName()
 	{
 		return name;
@@ -205,8 +235,31 @@ public class Experience
 		this.name = name;
 	}
 
+	public SimpleTextWatcher getNameWatcher()
+	{
+		return new SimpleTextWatcher()
+		{
+			@Override
+			public String getText()
+			{
+				return name;
+			}
+
+			@Override
+			public void onTextChanged(String value)
+			{
+				if (!value.equals(name))
+				{
+					name = value;
+					notifyPropertyChanged(BR.name);
+				}
+			}
+		};
+	}
+
 	public String getNextUnusedCode()
 	{
+		update();
 		List<Integer> code = null;
 		while (true)
 		{
@@ -216,7 +269,7 @@ public class Experience
 				return null;
 			}
 
-			if (isValidMarker(code, null))
+			if (isValidCode(code, null))
 			{
 				StringBuilder result = new StringBuilder();
 				for (int index = 0; index < code.size(); index++)
@@ -229,23 +282,13 @@ public class Experience
 				}
 
 				String markerCode = result.toString();
-				// TODO Action == any && hasCod
-				//if (getMarker(markerCode) == null)
-				//{
-				//	return markerCode;
-				//}
+				// In sequence too?
+				if (!hasCode(markerCode, Action.Match.any))
+				{
+					return markerCode;
+				}
 			}
 		}
-	}
-
-	public Operation getOp()
-	{
-		return op;
-	}
-
-	public void setOp(Operation op)
-	{
-		this.op = op;
 	}
 
 	public String getOriginalID()
@@ -256,6 +299,26 @@ public class Experience
 	public void setOriginalID(String originalID)
 	{
 		this.originalID = originalID;
+	}
+
+	public CompoundButton.OnCheckedChangeListener getPublishedListener()
+	{
+		return new CompoundButton.OnCheckedChangeListener()
+		{
+			@Override
+			public void onCheckedChanged(CompoundButton buttonView, boolean isChecked)
+			{
+				if (isChecked)
+				{
+					visibility = Visibility.published;
+				}
+				else
+				{
+					visibility = Visibility.secret;
+				}
+				notifyPropertyChanged(BR.published);
+			}
+		};
 	}
 
 	public List<ImageProcessor> getThreshold()
@@ -273,26 +336,6 @@ public class Experience
 		this.updated = updated;
 	}
 
-	public int getValidationRegionValue()
-	{
-		return validationRegionValue;
-	}
-
-	public void setValidationRegionValue(int validationRegionValue)
-	{
-		this.validationRegionValue = validationRegionValue;
-	}
-
-	public int getValidationRegions()
-	{
-		return validationRegions;
-	}
-
-	public void setValidationRegions(int validationRegions)
-	{
-		this.validationRegions = validationRegions;
-	}
-
 	public int getVersion()
 	{
 		return version;
@@ -303,7 +346,18 @@ public class Experience
 		this.version = version;
 	}
 
-	public boolean isValidMarker(List<Integer> markerCodes, Integer embeddedChecksum)
+	public Visibility getVisibility()
+	{
+		return visibility;
+	}
+
+	@Bindable
+	public boolean isPublished()
+	{
+		return visibility == Visibility.published;
+	}
+
+	public boolean isValidCode(List<Integer> markerCodes, Integer embeddedChecksum)
 	{
 		if (markerCodes == null)
 		{
@@ -317,14 +371,10 @@ public class Experience
 		{
 			return false; // Too long
 		}
-		else if (!hasValidNumberofEmptyRegions(markerCodes))
-		{
-			return false; // Incorrect Empty Regions
-		}
 
 		for (Integer value : markerCodes)
 		{
-			//check if leaves are with in accepted range.
+			//check if leaves are using in accepted range.
 			if (value > maxRegionValue)
 			{
 				return false; // value is too Big
@@ -345,37 +395,40 @@ public class Experience
 			return false; // Embedded checksum markers are not valid.
 		}
 
-		return hasValidationRegions(markerCodes);
+		return true;
 	}
 
 	public void update()
 	{
 		int maxValue = 3;
-		int minRegion = 100;
-		int maxRegion = 3;
+		int minRegionCount = 100;
+		int maxRegionCount = 3;
 		for (Action action : actions)
 		{
-			// TODO
-//			String[] values = marker.getCode().split(":");
-//			minRegion = Math.min(minRegion, values.length);
-//			maxRegion = Math.max(maxRegion, values.length);
-//			for (String value : values)
-//			{
-//				try
-//				{
-//					int codeValue = Integer.parseInt(value);
-//					maxValue = Math.max(maxValue, codeValue);
-//				}
-//				catch (Exception e)
-//				{
-//					Log.w("", e.getMessage(), e);
-//				}
-//			}
+			for (String code : action.getCodes())
+			{
+				String[] values = code.split(":");
+				minRegionCount = Math.min(minRegionCount, values.length);
+				maxRegionCount = Math.max(maxRegionCount, values.length);
+				for (String value : values)
+				{
+					try
+					{
+						int codeValue = Integer.parseInt(value);
+						maxValue = Math.max(maxValue, codeValue);
+					}
+					catch (Exception e)
+					{
+						Log.w("", e.getMessage(), e);
+					}
+				}
+			}
 		}
 
 		this.maxRegionValue = maxValue;
-		this.minRegions = minRegion;
-		this.minRegions = maxRegion;
+		this.minRegions = minRegionCount;
+		this.maxRegions = maxRegionCount;
+		Log.i("", "Regions " + minRegionCount + "-" + maxRegionCount + " using max of " + maxValue);
 
 		// TODO Collections.sort(actions, Marker.comparator);
 	}
@@ -431,6 +484,24 @@ public class Experience
 		return code;
 	}
 
+	private boolean hasCode(String code, Action.Match... matches)
+	{
+		for (Action action : actions)
+		{
+			for (Action.Match match : matches)
+			{
+				if (match == action.getMatch())
+				{
+					if (action.getCodes().contains(code))
+					{
+						return true;
+					}
+				}
+			}
+		}
+		return false;
+	}
+
 	/**
 	 * This function divides the total number of leaves in the marker by the
 	 * value given in the checksumModulo preference. Code is valid if the modulo is 0.
@@ -461,44 +532,5 @@ public class Experience
 			weightedSum += code.get(i) * (i + 1);
 		}
 		return embeddedChecksum == (weightedSum % 7 == 0 ? 7 : weightedSum % 7);
-	}
-
-	private boolean hasValidNumberofEmptyRegions(List<Integer> marker)
-	{
-		int empty = 0;
-		for (Integer value : marker)
-		{
-			if (value == 0)
-			{
-				empty++;
-			}
-		}
-		return maxEmptyRegions >= empty;
-	}
-
-	/**
-	 * It checks the number of validation branches as given in the preferences.
-	 * The code is valid if the number of branches which contains the validation
-	 * code are equal or greater than the number of validation branches
-	 * mentioned in the preferences.
-	 *
-	 * @return true if the number of validation branches are >= validation
-	 * branch value in the preference otherwise it returns false.
-	 */
-	private boolean hasValidationRegions(List<Integer> markerCodes)
-	{
-		if (validationRegions <= 0)
-		{
-			return true;
-		}
-		int validationRegionCount = 0;
-		for (int code : markerCodes)
-		{
-			if (code == validationRegionValue)
-			{
-				validationRegionCount++;
-			}
-		}
-		return validationRegionCount >= validationRegions;
 	}
 }

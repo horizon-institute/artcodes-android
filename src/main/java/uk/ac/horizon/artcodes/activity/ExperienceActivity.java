@@ -23,31 +23,94 @@ import android.content.Intent;
 import android.databinding.DataBindingUtil;
 import android.os.Build;
 import android.os.Bundle;
-import android.support.v7.app.AppCompatActivity;
+import android.text.Layout;
 import android.util.Log;
 import android.view.View;
+import android.view.ViewTreeObserver;
+import uk.ac.horizon.artcodes.Feature;
 import uk.ac.horizon.artcodes.GoogleAnalytics;
 import uk.ac.horizon.artcodes.R;
 import uk.ac.horizon.artcodes.databinding.ExperienceBinding;
 import uk.ac.horizon.artcodes.model.Experience;
-import uk.ac.horizon.artcodes.model.loader.ExperienceLoader;
-import uk.ac.horizon.artcodes.model.loader.LoadListener;
-import uk.ac.horizon.artcodes.model.loader.Ref;
+import uk.ac.horizon.artcodes.scanner.activity.ExperienceActivityBase;
+import uk.ac.horizon.artcodes.storage.ExperienceListStore;
 
-public class ExperienceActivity extends AppCompatActivity
+public class ExperienceActivity extends ExperienceActivityBase
 {
-	private Ref<Experience> experience;
 	private ExperienceBinding binding;
 
 	public void editExperience(View view)
 	{
-		ExperienceLoader.startActivity(ExperienceEditActivity.class, experience, this);
+		startActivity(ExperienceEditActivity.class);
+	}
+
+	@Override
+	public void onItemChanged(Experience experience)
+	{
+		super.onItemChanged(experience);
+		Log.i("", "Set experience " + experience);
+		if (experience != null)
+		{
+			GoogleAnalytics.trackEvent("Experience", "Loaded " + experience.getId());
+		}
+		binding.setExperience(experience);
+
+		if (Feature.get(this, R.bool.feature_favourites).isEnabled())
+		{
+			binding.experienceFavouriteButton.setVisibility(View.VISIBLE);
+		}
+
+		if (Feature.get(this, R.bool.feature_history).isEnabled())
+		{
+			binding.experienceHistoryButton.setVisibility(View.VISIBLE);
+		}
+
+		if (!getUri().startsWith("http"))
+		{
+			binding.experienceShareButton.setVisibility(View.GONE);
+		}
+
+		binding.experienceDescription.getViewTreeObserver().addOnGlobalLayoutListener(new ViewTreeObserver.OnGlobalLayoutListener()
+		{
+			@Override
+			public void onGlobalLayout()
+			{
+				if (binding.experienceDescription.getLineCount() > 1)
+				{
+					binding.experienceDescription.getViewTreeObserver().removeOnGlobalLayoutListener(this);
+					Layout layout = binding.experienceDescription.getLayout();
+					if (layout != null)
+					{
+						int lines = layout.getLineCount();
+						if (lines > 0)
+						{
+							int ellipsisCount = layout.getEllipsisCount(lines - 1);
+							if (ellipsisCount == 0)
+							{
+								binding.experienceDescriptionMore.setVisibility(View.GONE);
+							}
+							else
+							{
+								binding.experienceDescriptionMore.setVisibility(View.VISIBLE);
+							}
+						}
+					}
+				}
+			}
+		});
+	}
+
+	public void readDescription(View view)
+	{
+		// TODO Animate
+		binding.experienceDescriptionMore.setVisibility(View.GONE);
+		binding.experienceDescription.setMaxLines(Integer.MAX_VALUE);
+		binding.scrollView.smoothScrollTo(0, binding.experienceDescription.getTop());
 	}
 
 	public void scanExperience(View view)
 	{
-		Log.i("", "Scan");
-		ExperienceLoader.startActivity(ArtcodeActivity.class, experience, this);
+		startActivity(ArtcodeActivity.class);
 	}
 
 	public void shareExperience(View view)
@@ -56,13 +119,32 @@ public class ExperienceActivity extends AppCompatActivity
 		intent.setType("text/plain");
 		intent.addFlags(Intent.FLAG_ACTIVITY_CLEAR_WHEN_TASK_RESET);
 
-		if (experience.isLoaded())
+		if (isLoaded())
 		{
-			intent.putExtra(Intent.EXTRA_SUBJECT, experience.get().getName());
+			intent.putExtra(Intent.EXTRA_SUBJECT, getExperience().getName());
 		}
-		intent.putExtra(Intent.EXTRA_TEXT, experience.getUri());
+		intent.putExtra(Intent.EXTRA_TEXT, getUri());
 		Intent openInChooser = Intent.createChooser(intent, "Share with...");
 		startActivity(openInChooser);
+	}
+
+	public void starExperience(View view)
+	{
+		ExperienceListStore store = ExperienceListStore.with(this, "starred");
+		if (store.contains(getUri()))
+		{
+			store.remove(getUri());
+		}
+		else
+		{
+			store.add(getUri());
+		}
+		updateStarred();
+	}
+
+	public void startExperienceHistory(View view)
+	{
+		startActivity(ExperienceHistoryActivity.class);
 	}
 
 	@Override
@@ -80,25 +162,14 @@ public class ExperienceActivity extends AppCompatActivity
 		// TODO bindView(R.id.openExperience, new TintAdapter<Experience>("image"));
 
 		onNewIntent(getIntent());
-	}
 
-	@Override
-	protected void onNewIntent(final Intent intent)
-	{
-		super.onNewIntent(intent);
-		experience = ExperienceLoader.from(intent);
-		experience.load(this, new LoadListener<Experience>()
+		setSupportActionBar(binding.toolbar);
+		if (getSupportActionBar() != null)
 		{
-			@Override
-			public void onLoaded(Experience item)
-			{
-				if (item != null)
-				{
-					GoogleAnalytics.trackEvent("Experience", "Loaded " + item.getId());
-				}
-				binding.setExperience(item);
-			}
-		});
+			getSupportActionBar().setDisplayHomeAsUpEnabled(true);
+		}
+
+		updateStarred();
 	}
 
 	@Override
@@ -106,5 +177,20 @@ public class ExperienceActivity extends AppCompatActivity
 	{
 		super.onStart();
 		GoogleAnalytics.trackScreen("Experience Screen");
+	}
+
+	private void updateStarred()
+	{
+		ExperienceListStore store = ExperienceListStore.with(this, "starred");
+		if (store.contains(getUri()))
+		{
+			binding.experienceFavouriteButton.setText(R.string.unstar);
+			binding.experienceFavouriteButton.setCompoundDrawablesWithIntrinsicBounds(0, R.drawable.ic_star_black_24dp, 0, 0);
+		}
+		else
+		{
+			binding.experienceFavouriteButton.setText(R.string.star);
+			binding.experienceFavouriteButton.setCompoundDrawablesWithIntrinsicBounds(0, R.drawable.ic_star_border_black_24dp, 0, 0);
+		}
 	}
 }

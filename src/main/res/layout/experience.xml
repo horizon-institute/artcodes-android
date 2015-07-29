@@ -16,7 +16,7 @@
   ~ GNU Affero General Public License for more details.
   ~
   ~ You should have received a copy of the GNU Affero General Public License
-  ~ along with this program.  If not, see <http://www.gnu.org/licenses/>.
+  ~ along using this program.  If not, see <http://www.gnu.org/licenses/>.
   -->
 
 <layout xmlns:android="http://schemas.android.com/apk/res/android"
@@ -42,19 +42,26 @@
 		<android.support.design.widget.AppBarLayout
 				android:layout_width="match_parent"
 				android:layout_height="wrap_content"
+				android:id="@+id/appbar"
 				android:fitsSystemWindows="true">
+
 
 			<android.support.design.widget.CollapsingToolbarLayout
 					android:layout_width="match_parent"
-					android:layout_height="wrap_content"
-					app:layout_scrollFlags="scroll"
-					android:fitsSystemWindows="true">
+					android:layout_height="match_parent"
+					android:fitsSystemWindows="true"
+					android:theme="@style/ThemeOverlay.AppCompat.Dark.ActionBar"
+					app:title="@{experience.name}"
+					app:expandedTitleTextAppearance="@style/TextAppearance.Design.CollapsingToolbar.Expanded.Transparent"
+					app:layout_scrollFlags="scroll|exitUntilCollapsed"
+					app:contentScrim="?attr/colorPrimary"
+					app:expandedTitleMarginStart="48dp"
+					app:expandedTitleMarginEnd="64dp">
 
 				<ImageView
 						android:layout_width="match_parent"
 						android:layout_height="wrap_content"
-						android:id="@+id/experienceImage"
-						android:src="@drawable/aestheticodes"
+						android:minHeight="200dp"
 						android:adjustViewBounds="true"
 						tools:ignore="ContentDescription"
 						android:scaleType="centerCrop"
@@ -62,10 +69,19 @@
 						app:imageUrl="@{experience.image}"
 						app:layout_collapseMode="parallax" />
 
+				<View
+						android:layout_width="match_parent"
+						android:layout_height="80dp"
+						android:fitsSystemWindows="true"
+						app:layout_collapseMode="pin"
+						android:background="@drawable/image_protection_scrim" />
+
 				<android.support.v7.widget.Toolbar
 						android:layout_height="?attr/actionBarSize"
 						android:layout_width="match_parent"
-						app:layout_collapseMode="pin" />
+						android:id="@+id/toolbar"
+						app:layout_collapseMode="pin"
+						app:popupTheme="@style/ThemeOverlay.AppCompat.Light" />
 			</android.support.design.widget.CollapsingToolbarLayout>
 
 		</android.support.design.widget.AppBarLayout>
@@ -73,19 +89,22 @@
 		<android.support.v4.widget.NestedScrollView
 				android:layout_width="match_parent"
 				android:layout_height="match_parent"
+				android:id="@+id/scroll_view"
 				app:layout_behavior="@string/appbar_scrolling_view_behavior">
 
 			<LinearLayout
+					android:layout_width="fill_parent"
+					android:layout_height="wrap_content"
+					android:layout_marginBottom="8dp"
 					android:orientation="vertical"
-					android:layout_width="match_parent"
-					android:layout_height="match_parent"
-					android:layout_marginLeft="@dimen/detail_edge_margin"
-					android:layout_marginRight="@dimen/detail_edge_margin"
+					android:elevation="2dp"
 					android:background="#FFF">
 
-				<RelativeLayout android:layout_width="fill_parent"
-				                android:layout_height="wrap_content"
-				                android:padding="16dp">
+				<LinearLayout
+						android:orientation="horizontal"
+						android:layout_width="fill_parent"
+						android:layout_height="wrap_content"
+						android:padding="16dp">
 
 					<ImageView
 							android:id="@+id/experienceIcon"
@@ -93,51 +112,48 @@
 							android:layout_height="56dp"
 							android:layout_marginEnd="16dp"
 							android:layout_marginRight="16dp"
-							android:layout_alignParentStart="true"
-							android:layout_alignParentLeft="true"
-							android:layout_alignParentTop="true"
 							android:scaleType="fitCenter"
 							app:imageUrl="@{experience.icon}"
 							tools:ignore="ContentDescription"
-							android:src="@mipmap/ic_launcher" />
+							android:src="@mipmap/ic_launcher"
+							android:layout_gravity="center_vertical" />
 
-					<TextView android:layout_width="wrap_content"
-					          android:layout_height="wrap_content"
-					          android:layout_alignParentTop="false"
-					          android:layout_toRightOf="@+id/experienceIcon"
-					          android:layout_toEndOf="@+id/experienceIcon"
-					          android:layout_centerVertical="true"
-					          android:textAppearance="@style/TextAppearance.AppCompat.Title"
-					          tools:text="Artcodes"
-					          android:text="@{experience.name}" />
+					<TextView
+							android:id="@+id/experienceTitle"
+							android:layout_width="0dp"
+							android:layout_height="wrap_content"
+							android:layout_weight="1"
+							android:text="@{experience.name}"
+							tools:text="Artcodes"
+							style="@style/TextAppearance.AppCompat.Title"
+							android:layout_gravity="center_vertical" />
 
-				</RelativeLayout>
+				</LinearLayout>
 
-				<Button android:layout_width="wrap_content"
-				        android:layout_height="wrap_content"
-				        android:text="@string/scan"
-				        android:id="@+id/openExperience"
-				        android:layout_gravity="end"
-				        android:layout_marginLeft="16dp"
-				        android:layout_marginRight="16dp"
-				        android:paddingLeft="32dp"
-				        android:paddingRight="32dp"
-				        android:textColor="#FFF"
-				        android:onClick="scanExperience"
-				        style="@style/Widget.AppCompat.Button"
-				        android:layout_marginBottom="16dp"
-				        android:background="@drawable/custom_button"
-				        android:backgroundTint="@color/apptheme_primary" />
+				<TextView
+						android:layout_width="wrap_content"
+						android:layout_height="wrap_content"
+						android:id="@+id/experienceDescription"
+						android:layout_gravity="center_horizontal"
+						android:text="@{experience.description}"
+						android:singleLine="false"
+						android:paddingLeft="16dp"
+						android:paddingRight="16dp"
+						style="@style/TextAppearance.AppCompat.Body1"
+						android:maxLines="@integer/experience_description_max_lines"
+						tools:text="Lorem ipsum dolor sit amet, consectetur adipiscing elit, sed do eiusmod tempor incididunt ut labore et dolore magna aliqua. Ut enim ad minim veniam, quis nostrud exercitation ullamco laboris nisi ut aliquip ex ea commodo consequat. Duis aute irure dolor in reprehenderit in voluptate velit esse cillum dolore eu fugiat nulla pariatur. Excepteur sint occaecat cupidatat non proident, sunt in culpa qui officia deserunt mollit anim id est laborum."
+						android:ellipsize="end" />
 
-				<TextView android:layout_width="wrap_content"
-				          android:layout_height="wrap_content"
-				          android:layout_gravity="center_horizontal"
-				          android:singleLine="false"
-				          android:paddingLeft="16dp"
-				          android:paddingRight="16dp"
-				          android:paddingBottom="16dp"
-				          android:textAppearance="@style/TextAppearance.AppCompat.Body1"
-				          android:text="@{experience.description}" />
+				<Button
+						android:layout_width="wrap_content"
+						android:layout_height="wrap_content"
+						android:text="Read More"
+						android:id="@+id/experience_description_more"
+						style="@style/Widget.AppCompat.Button.Borderless.Colored"
+						android:onClick="readDescription"
+						android:paddingLeft="16dp"
+						android:paddingRight="16dp"
+						android:layout_marginTop="-8dp" />
 
 				<LinearLayout
 						android:orientation="horizontal"
@@ -145,37 +161,65 @@
 						android:layout_height="match_parent"
 						android:paddingLeft="16dp"
 						android:paddingRight="16dp"
-						android:gravity="center_horizontal">
+						android:gravity="center_horizontal"
+						android:layout_marginTop="16dp">
 
-					<Button android:layout_width="wrap_content"
-					        android:layout_height="wrap_content"
-					        style="@style/Widget.AppCompat.ActionButton"
-					        android:text="@string/edit"
-					        android:drawablePadding="4dp"
-					        android:gravity="start|center_vertical"
-					        android:id="@+id/editExperience"
-					        android:onClick="editExperience"
-					        android:drawableTop="@drawable/ic_edit_black_24dp"
-					        android:layout_weight="1"
-					        android:padding="8dp"
-					        android:textAlignment="center"
-					        android:textColor="#666"
-					        android:background="?attr/selectableItemBackground" />
+					<Button
+							android:layout_width="wrap_content"
+							android:layout_height="wrap_content"
+							style="@style/Widget.AppCompat.ActionButton"
+							android:text="@string/edit"
+							android:drawablePadding="4dp"
+							android:gravity="center"
+							android:id="@+id/experience_edit_button"
+							android:onClick="editExperience"
+							android:drawableTop="@drawable/ic_edit_black_24dp"
+							android:layout_weight="1"
+							android:padding="8dp"
+							android:background="?attr/selectableItemBackground" />
 
-					<Button android:layout_width="wrap_content"
-					        android:layout_height="wrap_content"
-					        style="@style/Widget.AppCompat.ActionButton"
-					        android:text="@string/share"
-					        android:drawablePadding="4dp"
-					        android:gravity="start|center_vertical"
-					        android:id="@+id/shareExperience"
-					        android:onClick="shareExperience"
-					        android:drawableTop="@drawable/ic_share_black_24dp"
-					        android:layout_weight="1"
-					        android:padding="8dp"
-					        android:textAlignment="center"
-					        android:textColor="#666"
-					        android:background="?attr/selectableItemBackground" />
+					<Button
+							android:layout_width="wrap_content"
+							android:layout_height="wrap_content"
+							style="@style/Widget.AppCompat.ActionButton"
+							android:text="Scan History"
+							android:drawablePadding="4dp"
+							android:gravity="center"
+							android:id="@+id/experience_history_button"
+							android:onClick="startExperienceHistory"
+							android:drawableTop="@drawable/ic_history_black_24dp"
+							android:layout_weight="1"
+							android:padding="8dp"
+							android:visibility="gone"
+							android:background="?attr/selectableItemBackground" />
+
+					<Button
+							android:layout_width="wrap_content"
+							android:layout_height="wrap_content"
+							style="@style/Widget.AppCompat.ActionButton"
+							android:text="@string/star"
+							android:drawablePadding="4dp"
+							android:gravity="center"
+							android:id="@+id/experience_favourite_button"
+							android:onClick="starExperience"
+							android:drawableTop="@drawable/ic_star_border_black_24dp"
+							android:layout_weight="1"
+							android:padding="8dp"
+							android:background="?attr/selectableItemBackground" />
+
+					<Button
+							android:layout_width="wrap_content"
+							android:layout_height="wrap_content"
+							style="@style/Widget.AppCompat.ActionButton"
+							android:text="@string/share"
+							android:drawablePadding="4dp"
+							android:gravity="center"
+							android:id="@+id/experience_share_button"
+							android:onClick="shareExperience"
+							android:drawableTop="@drawable/ic_share_black_24dp"
+							android:layout_weight="1"
+							android:padding="8dp"
+							android:background="?attr/selectableItemBackground" />
 				</LinearLayout>
 			</LinearLayout>
 		</android.support.v4.widget.NestedScrollView>
@@ -191,5 +235,17 @@
 			             android:layout_width="wrap_content"
 			             android:layout_height="wrap_content" />
 		</LinearLayout>
+
+		<android.support.design.widget.FloatingActionButton
+				android:layout_width="wrap_content"
+				android:layout_height="wrap_content"
+				android:layout_margin="16dp"
+				android:src="@drawable/ic_photo_camera_black_24dp"
+				android:tint="#FFF"
+				android:elevation="4dp"
+				app:pressedTranslationZ="8dp"
+				android:onClick="scanExperience"
+				app:layout_anchor="@id/appbar"
+				app:layout_anchorGravity="bottom|right|end" />
 	</android.support.design.widget.CoordinatorLayout>
 </layout>

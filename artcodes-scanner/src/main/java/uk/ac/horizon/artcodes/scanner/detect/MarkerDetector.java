@@ -34,22 +34,6 @@ import java.util.Map;
 
 public class MarkerDetector
 {
-	/**
-	 * Possible error states that can be set when creating a MarkerCode
-	 */
-	public enum DetectionError
-	{
-		noSubContours,
-		tooManyEmptyRegions,
-		nestedRegions,
-		numberOfRegions,
-		numberOfDots,
-		checksum,
-		validationRegions,
-		OK,
-		unknown
-	}
-
 	protected static final int REGION_INVALID = -1;
 	protected static final int REGION_EMPTY = 0;
 	//indexes of leaf nodes in contour tree hierarchy.
@@ -191,10 +175,6 @@ public class MarkerDetector
 		}
 	}
 
-	public void generateExtraFrameDetails(Mat thresholdedImage, List<MatOfPoint> contours, Mat hierarchy)
-	{
-	}
-
 	protected Marker.MarkerDetails createMarkerDetailsForNode(int nodeIndex, List<MatOfPoint> contours, Mat hierarchy, Experience experience)
 	{
 		Marker.MarkerDetails markerDetails = parseRegionsAt(nodeIndex, contours, hierarchy, experience);
@@ -229,8 +209,8 @@ public class MarkerDetector
 		int currentRegionIndex = (int) hierarchy.get(0, nodeIndex)[FIRST_NODE];
 		if (currentRegionIndex < 0)
 		{
-			// TODO error[errorIndex] = DetectionError.noSubContours;
-			return null; // There are no regions.
+			// There are no regions.
+			return null;
 		}
 
 		int regionCount = 0;
@@ -244,11 +224,8 @@ public class MarkerDetector
 			final int regionValue = getRegionValue(currentRegionIndex, hierarchy, experience.getMaxRegionValue());
 			if (regionValue == REGION_EMPTY)
 			{
-				if (++emptyRegions > experience.getMaxEmptyRegions())
-				{
-					// TODO error[errorIndex] = DetectionError.tooManyEmptyRegions;
-					return null; // Too many empty regions.
-				}
+				// Too many empty regions.
+				return null;
 			}
 
 			if (regionValue == REGION_INVALID)
@@ -264,14 +241,14 @@ public class MarkerDetector
 					}
 				}
 
-				// TODO error[errorIndex] = DetectionError.nestedRegions;
-				return null; // Too many levels or dots.
+				// Too many levels or dots.
+				return null;
 			}
 
 			if (++regionCount > experience.getMaxRegions())
 			{
-				// TODO error[errorIndex] = DetectionError.numberOfRegions;
-				return null; // Too many regions.
+				// Too many regions.
+				return null;
 			}
 
 			// Add region value to code:
@@ -288,7 +265,6 @@ public class MarkerDetector
 		// Marker should have at least one non-empty branch. If all branches are empty then return false.
 		if ((regionCount - emptyRegions) < 1)
 		{
-			// TODO error[errorIndex] = DetectionError.tooManyEmptyRegions;
 			return null;
 		}
 
@@ -325,29 +301,12 @@ public class MarkerDetector
 	 */
 	protected boolean validate(Marker.MarkerDetails details, Experience experience)
 	{
-		//NSMutableString *strError = [[NSMutableString alloc] init];
-		//NSArray *code = [details.regions valueForKey:REGION_VALUE];
 		List<Integer> code = new ArrayList<>();
 		for (Map<String, Object> region : details.regions)
 		{
 			code.add((Integer) region.get(Marker.MarkerDetails.REGION_VALUE));
 		}
 
-		boolean result = experience.isValidMarker(code, details.embeddedChecksum);
-
-        /*if ([strError rangeOfString:@"Too many dots"].location != NSNotFound)
-        {
-            error[0] = numberOfDots;
-        }
-        else if ([strError rangeOfString:@"checksum"].location != NSNotFound)
-        {
-            error[0] = checksum;
-        }
-        else if ([strError rangeOfString:@"Validation regions"].location != NSNotFound)
-        {
-            error[0] = validationRegions;
-        }*/
-
-		return result;
+		return experience.isValidCode(code, details.embeddedChecksum);
 	}
 }

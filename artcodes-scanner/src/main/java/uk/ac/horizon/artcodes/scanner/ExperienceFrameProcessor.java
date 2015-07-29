@@ -59,6 +59,8 @@ public class ExperienceFrameProcessor extends FrameProcessor
 		this.handler = handler;
 		this.overlay = overlay;
 
+		experience.update();
+		Log.i("", "Regions " + experience.getMinRegions() + "-" + experience.getMaxRegions() + " using max of " + experience.getMaxRegionValue() + " and checksum of " + experience.getChecksumModulo());
 		if (experience.getThreshold().isEmpty())
 		{
 			experience.getThreshold().add(new TileThresholder());

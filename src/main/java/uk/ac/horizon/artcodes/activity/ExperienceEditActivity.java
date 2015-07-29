@@ -19,88 +19,101 @@
 
 package uk.ac.horizon.artcodes.activity;
 
-import android.app.DatePickerDialog;
 import android.content.Intent;
 import android.databinding.DataBindingUtil;
-import android.databinding.OnRebindCallback;
-import android.databinding.ViewDataBinding;
-import android.graphics.Bitmap;
 import android.net.Uri;
 import android.os.Bundle;
+import android.support.v4.app.Fragment;
+import android.support.v4.app.FragmentManager;
+import android.support.v4.app.FragmentPagerAdapter;
 import android.support.v4.app.NavUtils;
-import android.support.v7.app.AppCompatActivity;
+import android.util.Log;
 import android.view.Menu;
 import android.view.MenuItem;
 import android.view.View;
-import com.google.android.gms.location.places.Place;
-import com.google.android.gms.location.places.ui.PlacePicker;
 import uk.ac.horizon.artcodes.GoogleAnalytics;
 import uk.ac.horizon.artcodes.R;
-import uk.ac.horizon.artcodes.databinding.ExperienceEditActionBinding;
-import uk.ac.horizon.artcodes.databinding.ExperienceEditActionCodeBinding;
-import uk.ac.horizon.artcodes.databinding.ExperienceEditAvailabilityBinding;
 import uk.ac.horizon.artcodes.databinding.ExperienceEditBinding;
-import uk.ac.horizon.artcodes.dialog.EditChecksumDialog;
-import uk.ac.horizon.artcodes.model.Action;
-import uk.ac.horizon.artcodes.model.Availability;
+import uk.ac.horizon.artcodes.fragment.ExperienceEditActionFragment;
+import uk.ac.horizon.artcodes.fragment.ExperienceEditAvailabilityFragment;
+import uk.ac.horizon.artcodes.fragment.ExperienceEditInfoFragment;
+import uk.ac.horizon.artcodes.json.ExperienceParserFactory;
 import uk.ac.horizon.artcodes.model.Experience;
-import uk.ac.horizon.artcodes.model.loader.ExperienceLoader;
-import uk.ac.horizon.artcodes.model.loader.LoadListener;
-import uk.ac.horizon.artcodes.model.loader.Ref;
+import uk.ac.horizon.artcodes.scanner.activity.ExperienceActivityBase;
+import uk.ac.horizon.artcodes.storage.ExperienceStorage;
 
-import java.util.Calendar;
-
-public class ExperienceEditActivity extends AppCompatActivity
+public class ExperienceEditActivity extends ExperienceActivityBase
 {
-	private static final int PLACE_PICKER_REQUEST = 119;
-	private static final int IMAGE_PICKER_REQUEST = 121;
-	private static final int ICON_PICKER_REQUEST = 123;
+	public static final int IMAGE_PICKER_REQUEST = 121;
+	public static final int ICON_PICKER_REQUEST = 123;
+
+	public class ExperienceEditPagerAdapter extends FragmentPagerAdapter
+	{
+		private final String[] tabTitles;
+
+		public ExperienceEditPagerAdapter(FragmentManager fm, String[] titles)
+		{
+			super(fm);
+			tabTitles = titles;
+		}
+
+		@Override
+		public int getCount()
+		{
+			return tabTitles.length;
+		}
+
+		@Override
+		public Fragment getItem(int position)
+		{
+			switch (position)
+			{
+				case 0:
+					return new ExperienceEditInfoFragment();
+				case 1:
+					return new ExperienceEditAvailabilityFragment();
+				case 2:
+					return new ExperienceEditActionFragment();
+			}
+			return null;
+		}
+
+		@Override
+		public CharSequence getPageTitle(int position)
+		{
+			// Generate title based on item position
+			return tabTitles[position];
+		}
+	}
 
 	private ExperienceEditBinding binding;
-	private Ref<Experience> experience;
-
-	public void addAction(View view)
-	{
-		experience.get().getActions().add(new Action());
-		updateActions();
-	}
-
-	public void addAvailability(View view)
-	{
-		experience.get().getAvailabilities().add(new Availability());
-		updateAvailabilities();
-	}
-
-	public void editChecksum(View view)
-	{
-		new EditChecksumDialog().show(getSupportFragmentManager(), "ChecksumModulo");
-	}
 
 	public void editIcon(View view)
 	{
-		Intent intent = new Intent(Intent.ACTION_GET_CONTENT);
-		intent.setType("image/*");
-		if (intent.resolveActivity(getPackageManager()) != null)
-		{
-			startActivityForResult(intent, ICON_PICKER_REQUEST);
-		}
+		selectImage(ICON_PICKER_REQUEST);
 	}
 
 	public void editImage(View view)
 	{
-		Intent intent = new Intent(Intent.ACTION_GET_CONTENT);
-		intent.setType("image/*");
-		if (intent.resolveActivity(getPackageManager()) != null)
-		{
-			startActivityForResult(intent, IMAGE_PICKER_REQUEST);
-		}
+		selectImage(IMAGE_PICKER_REQUEST);
 	}
 
 	@Override
 	public boolean onCreateOptionsMenu(Menu menu)
 	{
 		getMenuInflater().inflate(R.menu.save_menu, menu);
+		//updateSave();
 		return super.onCreateOptionsMenu(menu);
+	}
+
+	@Override
+	public void onItemChanged(Experience experience)
+	{
+		super.onItemChanged(experience);
+		if (experience != null)
+		{
+			GoogleAnalytics.trackEvent("Experience", "Loaded " + experience.getId());
+		}
 	}
 
 	@Override
@@ -109,11 +122,11 @@ public class ExperienceEditActivity extends AppCompatActivity
 		switch (item.getItemId())
 		{
 			case android.R.id.home:
-				NavUtils.navigateUpTo(this, upIntent());
+				NavUtils.navigateUpTo(this, createIntent(Experience.class));
 				return true;
 			case R.id.save:
-				// TODO binding.getExperience().save(Experience.Operation.update);
-				NavUtils.navigateUpTo(this, upIntent());
+				ExperienceStorage.save(getExperience()).to(ExperienceStorage.getDefaultStore()).async();
+				NavUtils.navigateUpTo(this, createIntent(Experience.class));
 				return true;
 		}
 		return super.onOptionsItemSelected(item);
@@ -121,38 +134,25 @@ public class ExperienceEditActivity extends AppCompatActivity
 
 	protected void onActivityResult(int requestCode, int resultCode, Intent data)
 	{
-		if (requestCode == PLACE_PICKER_REQUEST)
+		Log.i("", "Activity result for " + requestCode);
+		Log.i("", "Activity result is " + resultCode);
+		if (requestCode == IMAGE_PICKER_REQUEST)
 		{
 			if (resultCode == RESULT_OK)
 			{
-				final Place place = PlacePicker.getPlace(data, this);
-				final int index = data.getIntExtra("availIndex", 0);
-				if (index >= 0)
-				{
-					final Availability availability = binding.getExperience().getAvailabilities().get(index);
-					availability.setName(place.getName().toString());
-					availability.setAddress(place.getAddress().toString());
-					availability.setLat(place.getLatLng().latitude);
-					availability.setLon(place.getLatLng().longitude);
-				}
-			}
-		}
-		else if (requestCode == IMAGE_PICKER_REQUEST)
-		{
-			if (resultCode == RESULT_OK)
-			{
-				Bitmap thumbnail = data.getParcelableExtra("data");
 				Uri fullPhotoUri = data.getData();
-
+				getExperience().setImage(fullPhotoUri.toString());
 			}
 		}
 		else if (requestCode == ICON_PICKER_REQUEST)
 		{
 			if (resultCode == RESULT_OK)
 			{
-
+				Uri fullPhotoUri = data.getData();
+				getExperience().setIcon(fullPhotoUri.toString());
 			}
 		}
+		super.onActivityResult(requestCode, resultCode, data);
 	}
 
 	@Override
@@ -161,41 +161,48 @@ public class ExperienceEditActivity extends AppCompatActivity
 		super.onCreate(savedInstanceState);
 
 		binding = DataBindingUtil.setContentView(this, R.layout.experience_edit);
-		experience = ExperienceLoader.from(savedInstanceState, getIntent());
-		experience.load(this, new LoadListener<Experience>()
-		{
-			@Override
-			public void onLoaded(Experience item)
-			{
-				if (item != null)
-				{
-					GoogleAnalytics.trackEvent("Experience", "Loaded " + item.getId());
-				}
-				binding.setExperience(item);
-			}
-		});
 
-		binding.addOnRebindCallback(new OnRebindCallback()
+		String[] tabs = getResources().getStringArray(R.array.tab_names);
+
+		binding.viewpager.setAdapter(new ExperienceEditPagerAdapter(getSupportFragmentManager(), tabs));
+		binding.tabs.setupWithViewPager(binding.viewpager);
+
+		if (savedInstanceState != null)
 		{
-			@Override
-			public void onBound(ViewDataBinding binding)
-			{
-				updateActions();
-				updateAvailabilities();
-			}
-		});
+			binding.viewpager.setCurrentItem(savedInstanceState.getInt("tab", 0));
+		}
 
 		setSupportActionBar(binding.toolbar);
 
 		binding.toolbar.setNavigationIcon(R.drawable.ic_close_white_24dp);
+		binding.toolbar.setTitle("");
 	}
 
 	@Override
 	protected void onSaveInstanceState(Bundle outState)
 	{
 		super.onSaveInstanceState(outState);
-		// TODO outState.putString("experience", binding.getExperience().toJson());
+
+		outState.putInt("tab", binding.viewpager.getCurrentItem());
+		outState.putString("experience", ExperienceParserFactory.toJson(getExperience()));
 	}
+//
+//	private void updateSave()
+//	{
+//		ExperienceListStore store = ExperienceListStore.with(this, "library");
+//		if(getUri() == null)
+//		{
+//			saveItem.setTitle("Create");
+//		}
+//		else if(store.contains(getUri()))
+//		{
+//			saveItem.setTitle(R.string.save);
+//		}
+//		else
+//		{
+//			saveItem.setTitle("Create Copy");
+//		}
+//	}
 
 	@Override
 	protected void onStart()
@@ -211,61 +218,6 @@ public class ExperienceEditActivity extends AppCompatActivity
 		if (intent.resolveActivity(getPackageManager()) != null)
 		{
 			startActivityForResult(intent, request_id);
-		}
-	}
-
-	private void showDatePickerDialog(long timestamp, DatePickerDialog.OnDateSetListener listener)
-	{
-		final Calendar calendar = Calendar.getInstance();
-		calendar.setTimeInMillis(timestamp);
-		int mYear = calendar.get(Calendar.YEAR);
-		int mMonth = calendar.get(Calendar.MONTH);
-		int mDay = calendar.get(Calendar.DAY_OF_MONTH);
-
-		DatePickerDialog dialog = new DatePickerDialog(this, listener, mYear, mMonth, mDay);
-		dialog.show();
-	}
-
-	private Intent upIntent()
-	{
-		final Intent intent = new Intent(this, ExperienceActivity.class);
-		intent.putExtra("experience", experience.getUri());
-
-		return intent;
-	}
-
-	private void updateActions()
-	{
-		binding.actionList.removeAllViews();
-		if (binding.getExperience() != null)
-		{
-			for (Action action : binding.getExperience().getActions())
-			{
-				ExperienceEditActionBinding markerBinding = ExperienceEditActionBinding.inflate(getLayoutInflater(), binding.actionList, false);
-				markerBinding.setAction(action);
-				for (String code : action.getCodes())
-				{
-					ExperienceEditActionCodeBinding codeBinding = ExperienceEditActionCodeBinding.inflate(getLayoutInflater(), markerBinding.markerCodes, false);
-					codeBinding.setAction(action);
-					markerBinding.markerCodes.addView(codeBinding.getRoot());
-				}
-
-				binding.actionList.addView(markerBinding.getRoot());
-			}
-		}
-	}
-
-	private void updateAvailabilities()
-	{
-		binding.availabilityList.removeAllViews();
-		if (binding.getExperience() != null)
-		{
-			for (Availability availability : binding.getExperience().getAvailabilities())
-			{
-				ExperienceEditAvailabilityBinding availabilityBinding = ExperienceEditAvailabilityBinding.inflate(getLayoutInflater(), binding.availabilityList, false);
-				availabilityBinding.setMarker(availability);
-				binding.availabilityList.addView(availabilityBinding.getRoot());
-			}
 		}
 	}
 }

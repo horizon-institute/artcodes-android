@@ -141,4 +141,9 @@ public class Overlay extends BaseObservable
 		feedback = layers[THRESHOLD_LAYER].getFeedback();
 		notifyPropertyChanged(BR.feedback);
 	}
+
+	public void setThresholdLayer(Layer layer)
+	{
+		layers[THRESHOLD_LAYER] = layer;
+	}
 }

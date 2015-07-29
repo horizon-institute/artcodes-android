@@ -19,10 +19,15 @@
 
 package uk.ac.horizon.artcodes.model;
 
+import android.databinding.BaseObservable;
+import android.databinding.Bindable;
+import uk.ac.horizon.artcodes.scanner.BR;
+import uk.ac.horizon.artcodes.ui.SimpleTextWatcher;
+
 import java.util.ArrayList;
 import java.util.List;
 
-public class Action
+public class Action extends BaseObservable
 {
 	public enum Match
 	{
@@ -42,6 +47,7 @@ public class Action
 		return codes;
 	}
 
+	@Bindable
 	public String getDescription()
 	{
 		return description;
@@ -67,6 +73,7 @@ public class Action
 		return match;
 	}
 
+	@Bindable
 	public String getName()
 	{
 		return name;
@@ -75,6 +82,28 @@ public class Action
 	public void setName(String name)
 	{
 		this.name = name;
+	}
+
+	public SimpleTextWatcher getNameWatcher()
+	{
+		return new SimpleTextWatcher()
+		{
+			@Override
+			public String getText()
+			{
+				return name;
+			}
+
+			@Override
+			public void onTextChanged(String value)
+			{
+				if (!value.equals(name))
+				{
+					name = value;
+					notifyPropertyChanged(BR.name);
+				}
+			}
+		};
 	}
 
 	public boolean getShowDetail()
@@ -87,6 +116,7 @@ public class Action
 		this.showDetail = showDetail;
 	}
 
+	@Bindable
 	public String getUrl()
 	{
 		return url;
@@ -95,5 +125,63 @@ public class Action
 	public void setUrl(String url)
 	{
 		this.url = url;
+	}
+
+	public SimpleTextWatcher getUrlWatcher()
+	{
+		return new SimpleTextWatcher()
+		{
+			@Override
+			public String getText()
+			{
+				return url;
+			}
+
+			@Override
+			public void onTextChanged(String value)
+			{
+				if (!value.equals(url))
+				{
+					url = value;
+					notifyPropertyChanged(BR.url);
+				}
+			}
+		};
+	}
+
+	@Override
+	public String toString()
+	{
+		final StringBuilder builder = new StringBuilder();
+		builder.append("Action ");
+		builder.append(name);
+		builder.append(" (");
+		boolean comma = false;
+		for (String code : codes)
+		{
+			if (comma)
+			{
+				if (match == Match.all)
+				{
+					builder.append(" + ");
+				}
+				else if (match == Match.any)
+				{
+					builder.append(", ");
+				}
+				else if (match == Match.sequence)
+				{
+					builder.append(" -> ");
+				}
+			}
+			else
+			{
+				comma = true;
+			}
+
+			builder.append(code);
+		}
+		builder.append(")");
+		return builder.toString();
 	}
 }

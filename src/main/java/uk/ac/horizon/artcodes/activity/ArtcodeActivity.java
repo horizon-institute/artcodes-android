@@ -25,21 +25,23 @@ import android.support.v4.app.NavUtils;
 import android.util.Log;
 import android.view.MenuItem;
 import android.view.View;
-import uk.ac.horizon.artcodes.ArtcodeFeature;
+import uk.ac.horizon.artcodes.Feature;
 import uk.ac.horizon.artcodes.GoogleAnalytics;
+import uk.ac.horizon.artcodes.R;
 import uk.ac.horizon.artcodes.databinding.ScannerActionBinding;
 import uk.ac.horizon.artcodes.model.Action;
 import uk.ac.horizon.artcodes.model.Experience;
-import uk.ac.horizon.artcodes.scanner.Feature;
 import uk.ac.horizon.artcodes.scanner.VisibilityAnimator;
 import uk.ac.horizon.artcodes.scanner.activity.ScannerActivity;
 import uk.ac.horizon.artcodes.scanner.detect.ActionDetectionHandler;
 import uk.ac.horizon.artcodes.scanner.detect.MarkerDetectionHandler;
+import uk.ac.horizon.artcodes.storage.ExperienceListStore;
 
 public class ArtcodeActivity extends ScannerActivity
 {
+	private static final String EXTRA_CUSTOM_TABS_SESSION_ID = "android.support.CUSTOM_TABS:session_id";
+
 	private ScannerActionBinding actionBinding;
-	private Action action;
 	private VisibilityAnimator actionAnimator;
 
 	@Override
@@ -58,29 +60,32 @@ public class ArtcodeActivity extends ScannerActivity
 	}
 
 	@Override
+	public void onItemChanged(Experience experience)
+	{
+		super.onItemChanged(experience);
+
+		Log.i("", "Set experience " + experience);
+		if (experience != null)
+		{
+			GoogleAnalytics.trackEvent("Experience", "Loaded " + experience.getId());
+		}
+
+		if (experience != null)
+		{
+			ExperienceListStore.with(this, "recent").add(experience.getId());
+		}
+	}
+
+	@Override
 	public boolean onOptionsItemSelected(MenuItem item)
 	{
 		switch (item.getItemId())
 		{
 			case android.R.id.home:
-				NavUtils.navigateUpTo(this, upIntent());
+				NavUtils.navigateUpTo(this, createIntent(ExperienceActivity.class));
 				return true;
 		}
 		return super.onOptionsItemSelected(item);
-	}
-
-	public void openAction(View view)
-	{
-		GoogleAnalytics.trackEvent("action", "Opened " + action);
-		//camera.stop();
-		if (action.getShowDetail())
-		{
-			ActionActivity.start(this, action);
-		}
-		else
-		{
-			startActivity(new Intent(Intent.ACTION_VIEW, Uri.parse(action.getUrl())));
-		}
 	}
 
 	@Override
@@ -89,13 +94,13 @@ public class ArtcodeActivity extends ScannerActivity
 		return new ActionDetectionHandler(experience)
 		{
 			@Override
-			public void onActionChanged(Action newAction)
+			public void onActionChanged(final Action action)
 			{
-				if (newAction != null)
+				if (action != null)
 				{
-					GoogleAnalytics.trackEvent("action", "Detected " + newAction);
+					GoogleAnalytics.trackEvent("action", "Detected " + action);
 
-					if (Feature.isEnabled(ArtcodeFeature.LOG_SCAN_IMAGE))
+					if (Feature.get(ArtcodeActivity.this, R.bool.feature_log_scanned_images).isEnabled())
 					{
 						try
 						{
@@ -107,29 +112,39 @@ public class ArtcodeActivity extends ScannerActivity
 						}
 					}
 
-					if (action == null)
+					actionBinding.setAction(action);
+					actionBinding.getRoot().setOnClickListener(new View.OnClickListener()
 					{
-						action = newAction;
-						actionBinding.setAction(action);
-
-						runOnUiThread(new Runnable()
+						@Override
+						public void onClick(View v)
 						{
-							@Override
-							public void run()
+							GoogleAnalytics.trackEvent("action", "Opened " + action);
+							//camera.stop();
+							// TODO ExperienceLoaders.with(ArtcodeActivity.this).logAction(getRef());
+							if (action.getShowDetail())
 							{
-								actionAnimator.showView();
+								ActionActivity.start(ArtcodeActivity.this, action);
 							}
-						});
-					}
-					else if (!action.equals(newAction))
+							else
+							{
+								Intent intent = new Intent(Intent.ACTION_VIEW, Uri.parse(action.getUrl()));
+								intent.putExtra(EXTRA_CUSTOM_TABS_SESSION_ID, -1); // -1 or any valid session id returned from newSession() call
+
+								startActivity(intent);
+							}
+						}
+					});
+					runOnUiThread(new Runnable()
 					{
-						action = newAction;
-						actionBinding.setAction(action);
-					}
+						@Override
+						public void run()
+						{
+							actionAnimator.showView();
+						}
+					});
 				}
-				else if (action != null)
+				else
 				{
-					action = null;
 					runOnUiThread(new Runnable()
 					{
 						@Override
@@ -140,7 +155,9 @@ public class ArtcodeActivity extends ScannerActivity
 					});
 				}
 			}
-		};
+		}
+
+				;
 	}
 
 	@Override
@@ -148,30 +165,5 @@ public class ArtcodeActivity extends ScannerActivity
 	{
 		super.onStart();
 		GoogleAnalytics.trackScreen("Scan Screen");
-	}
-
-	@Override
-	protected void setExperience(Experience experience)
-	{
-		super.setExperience(experience);
-
-		Log.i("", "Set experience " + experience);
-		if (experience != null)
-		{
-			GoogleAnalytics.trackEvent("Experience", "Loaded " + experience.getId());
-		}
-
-		if (experience != null)
-		{
-			RecentExperiences.with(this).add(experience.getId());
-		}
-	}
-
-	private Intent upIntent()
-	{
-		final Intent intent = new Intent(this, ExperienceActivity.class);
-		intent.putExtra("experience", getExperience().getId());
-
-		return intent;
 	}
 }

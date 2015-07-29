@@ -19,7 +19,17 @@
 
 package uk.ac.horizon.artcodes;
 
+import android.accounts.Account;
+import android.accounts.AccountManager;
 import android.app.Application;
+import com.google.android.gms.auth.GoogleAuthUtil;
+import uk.ac.horizon.artcodes.json.ExperienceParserFactory;
+import uk.ac.horizon.artcodes.storage.AppEngineStore;
+import uk.ac.horizon.artcodes.storage.ContentStore;
+import uk.ac.horizon.artcodes.storage.ExperienceFileStore;
+import uk.ac.horizon.artcodes.storage.HTTPStore;
+import uk.ac.horizon.artcodes.storage.JsonStore;
+import uk.ac.horizon.artcodes.storage.Storage;
 
 public final class Artcodes extends Application
 {
@@ -28,6 +38,23 @@ public final class Artcodes extends Application
 	{
 		super.onCreate();
 		GoogleAnalytics.initialize(this);
+
+		Storage storage = new Storage(new ExperienceParserFactory(this));
+
+		final AccountManager manager = AccountManager.get(this);
+		final Account[] accounts = manager.getAccountsByType(GoogleAuthUtil.GOOGLE_ACCOUNT_TYPE);
+		for (Account account : accounts)
+		{
+			storage.register(new AppEngineStore(this, account.name));
+		}
+
+		storage.register(new ExperienceFileStore());
+		storage.register(new ContentStore(this));
+		storage.register(new JsonStore());
+		storage.register(new JsonStore("x-artcode-scan"));
+		storage.register(new HTTPStore(this));
+
+		ArtcodeStorage.setStorage(storage);
 	}
 
 //	public static File createImageLogFile()
