@@ -168,7 +168,7 @@
 							android:layout_width="wrap_content"
 							android:layout_height="wrap_content"
 							style="@style/Widget.AppCompat.ActionButton"
-							android:text="@string/edit"
+							android:text="@{experience.editable ? @string/edit : @string/edit_copy}"
 							android:drawablePadding="4dp"
 							android:gravity="center"
 							android:id="@+id/experience_edit_button"
@@ -219,6 +219,7 @@
 							android:drawableTop="@drawable/ic_share_black_24dp"
 							android:layout_weight="1"
 							android:padding="8dp"
+							android:visibility="@{experience.sharable ? View.VISIBLE : View.GONE}"
 							android:background="?attr/selectableItemBackground" />
 				</LinearLayout>
 			</LinearLayout>

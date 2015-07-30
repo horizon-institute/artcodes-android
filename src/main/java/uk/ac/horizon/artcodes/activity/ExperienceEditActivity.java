@@ -19,6 +19,7 @@
 
 package uk.ac.horizon.artcodes.activity;
 
+import android.content.Context;
 import android.content.Intent;
 import android.databinding.DataBindingUtil;
 import android.net.Uri;
@@ -33,6 +34,7 @@ import android.view.MenuItem;
 import android.view.View;
 import uk.ac.horizon.artcodes.GoogleAnalytics;
 import uk.ac.horizon.artcodes.R;
+import uk.ac.horizon.artcodes.adapter.ExperienceAdapter;
 import uk.ac.horizon.artcodes.databinding.ExperienceEditBinding;
 import uk.ac.horizon.artcodes.fragment.ExperienceEditActionFragment;
 import uk.ac.horizon.artcodes.fragment.ExperienceEditAvailabilityFragment;
@@ -44,6 +46,13 @@ import uk.ac.horizon.artcodes.storage.ExperienceStorage;
 
 public class ExperienceEditActivity extends ExperienceActivityBase
 {
+	public static void start(Context context, Experience experience)
+	{
+		Intent intent = new Intent(context, ExperienceEditActivity.class);
+		intent.putExtra("experience", ExperienceParserFactory.toJson(experience));
+		context.startActivity(intent);
+	}
+
 	public static final int IMAGE_PICKER_REQUEST = 121;
 	public static final int ICON_PICKER_REQUEST = 123;
 
@@ -116,17 +125,24 @@ public class ExperienceEditActivity extends ExperienceActivityBase
 		}
 	}
 
+	private Intent createCancelIntent()
+	{
+		Intent intent = (Intent) getIntent().clone();
+		intent.setClass(this, ExperienceActivity.class);
+		return intent;
+	}
+
 	@Override
 	public boolean onOptionsItemSelected(MenuItem item)
 	{
 		switch (item.getItemId())
 		{
 			case android.R.id.home:
-				NavUtils.navigateUpTo(this, createIntent(Experience.class));
+				NavUtils.navigateUpTo(this, createCancelIntent());
 				return true;
 			case R.id.save:
 				ExperienceStorage.save(getExperience()).to(ExperienceStorage.getDefaultStore()).async();
-				NavUtils.navigateUpTo(this, createIntent(Experience.class));
+				NavUtils.navigateUpTo(this, createIntent(ExperienceActivity.class));
 				return true;
 		}
 		return super.onOptionsItemSelected(item);

@@ -31,41 +31,25 @@ import java.util.List;
 
 public class Experience extends BaseObservable
 {
-	public enum Status
-	{
-		downloaded, modified, uploading
-	}
-
-	public enum Visibility
-	{
-		personal, secret, published
-	}
-
 	private final List<Action> actions = new ArrayList<>();
 	private final List<Availability> availabilities = new ArrayList<>();
 	private final List<ImageProcessor> threshold = new ArrayList<>();
-
 	private String id;
 	private String name;
 	private String icon;
 	private String image;
 	private String description;
-	private int version = 1;
-	private String authorID;
 	private String author;
 	private String callback;
-	private Long updated;
-	private Long created;
 	private String originalID;
 	private Visibility visibility = Visibility.secret;
-
 	// Transient properties calculated before use
 	private transient int minRegions = 5;
 	private transient int maxRegions = 5;
 	private transient int maxRegionValue = 6;
-
 	private int checksumModulo = 3;
 	private boolean embeddedChecksum = false;
+	private boolean editable = false;
 	private String detector;
 
 	public Experience()
@@ -77,9 +61,9 @@ public class Experience extends BaseObservable
 		return actions;
 	}
 
-	public String getAuthorID()
+	public boolean isEditable()
 	{
-		return authorID;
+		return editable;
 	}
 
 	public List<Availability> getAvailabilities()
@@ -321,29 +305,14 @@ public class Experience extends BaseObservable
 		};
 	}
 
+	public boolean isSharable()
+	{
+		return id != null && (id.startsWith("http:") || id.startsWith("https:"));
+	}
+
 	public List<ImageProcessor> getThreshold()
 	{
 		return threshold;
-	}
-
-	public Long getUpdated()
-	{
-		return updated;
-	}
-
-	public void setUpdated(Long updated)
-	{
-		this.updated = updated;
-	}
-
-	public int getVersion()
-	{
-		return version;
-	}
-
-	public void setVersion(int version)
-	{
-		this.version = version;
 	}
 
 	public Visibility getVisibility()
@@ -532,5 +501,15 @@ public class Experience extends BaseObservable
 			weightedSum += code.get(i) * (i + 1);
 		}
 		return embeddedChecksum == (weightedSum % 7 == 0 ? 7 : weightedSum % 7);
+	}
+
+	public enum Status
+	{
+		loaded, modified, saving
+	}
+
+	public enum Visibility
+	{
+		personal, secret, published
 	}
 }

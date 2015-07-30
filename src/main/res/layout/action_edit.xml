@@ -28,9 +28,6 @@
 
 		<import type="android.view.View" />
 
-		<variable name="editing"
-		          type="boolean" />
-
 		<variable name="action"
 		          type="uk.ac.horizon.artcodes.model.Action" />
 	</data>
@@ -52,32 +49,114 @@
 					android:layout_width="24dp"
 					android:layout_height="24dp"
 					android:layout_margin="16dp"
-					tools:src="@drawable/ic_smartphone_black_36dp"
+					android:src="@drawable/ic_smartphone_black_36dp"
 					android:tint="@color/ic_tint" />
 
-			<LinearLayout
-					android:layout_width="0dp"
-					android:layout_height="wrap_content"
-					android:layout_weight="1"
-					android:layout_margin="16dp"
-					android:orientation="vertical">
-
-				<TextView
+			<FrameLayout android:layout_width="0dp"
+			             android:layout_height="wrap_content"
+			             android:layout_weight="1">
+				<LinearLayout
 						android:layout_width="match_parent"
 						android:layout_height="wrap_content"
-						android:text="@{action.name}"
-						android:textAppearance="@style/TextAppearance.AppCompat"
-						tools:text="Action Name" />
+						android:layout_margin="16dp"
+						android:id="@+id/overview"
+						android:orientation="vertical">
 
-				<TextView
+					<TextView
+							android:layout_width="match_parent"
+							android:layout_height="wrap_content"
+							android:text="@{action.name}"
+							android:hint="@string/action_name"
+							android:textColor="#000"
+							android:textAppearance="@style/TextAppearance.AppCompat" />
+
+					<TextView
+							android:layout_width="match_parent"
+							android:layout_height="wrap_content"
+							android:text="@{action.displayUrl}"
+							android:id="@+id/hint_text"
+							android:textAppearance="@style/TextAppearance.AppCompat.Small"
+							tools:text="www.cs.nott.ac.uk" />
+
+				</LinearLayout>
+
+				<LinearLayout
 						android:layout_width="match_parent"
 						android:layout_height="wrap_content"
-						android:text="@{action.url}"
-						android:id="@+id/hint_text"
-						android:textAppearance="@style/TextAppearance.AppCompat.Small"
-						tools:text="http://www.cs.nott.ac.uk" />
+						android:orientation="horizontal"
+						android:id="@+id/editview"
+						android:visibility="gone">
 
-			</LinearLayout>
+					<LinearLayout
+							android:layout_width="0dp"
+							android:layout_weight="1"
+							android:layout_marginLeft="12dp"
+							android:layout_marginRight="12dp"
+							android:layout_marginTop="6dp"
+							android:layout_marginBottom="6dp"
+							android:layout_height="wrap_content"
+							android:orientation="vertical">
+
+						<EditText
+								android:layout_width="match_parent"
+								android:layout_height="wrap_content"
+								android:hint="@string/action_name"
+								android:inputType="text"
+								android:singleLine="true"
+								android:textAppearance="@style/TextAppearance.AppCompat"
+								tools:text="Action Name"
+								app:textWatcher="@{action.nameWatcher}"
+								android:id="@+id/action_name" />
+
+						<EditText
+								android:layout_width="match_parent"
+								android:layout_height="wrap_content"
+								android:hint="@string/URL"
+								app:textWatcher="@{action.urlWatcher}"
+								android:inputType="textUri"
+								android:layout_gravity="center_vertical"
+								android:textAppearance="@style/TextAppearance.AppCompat"
+								tools:text="http://www.cs.nott.ac.uk" />
+
+						<Spinner
+								android:layout_width="match_parent"
+								android:layout_height="wrap_content"
+								android:visibility="gone"
+								android:id="@+id/spinner" />
+
+						<LinearLayout
+								android:orientation="vertical"
+								android:layout_width="match_parent"
+								android:layout_height="match_parent"
+								android:id="@+id/marker_codes"
+								>
+						</LinearLayout>
+
+						<EditText
+								android:layout_width="match_parent"
+								android:layout_height="wrap_content"
+								android:hint="@string/markerCode"
+								android:digits="0123456789:"
+								android:inputType="time"
+								android:singleLine="true"
+								android:textAppearance="@style/TextAppearance.AppCompat"
+								android:id="@+id/new_marker_code" />
+					</LinearLayout>
+
+					<ImageView
+							android:layout_width="wrap_content"
+							android:layout_height="wrap_content"
+							android:layout_gravity="center_vertical"
+							android:src="@drawable/ic_close_black_18dp"
+							android:tint="@color/ic_tint"
+							android:scaleType="fitCenter"
+							android:background="?attr/selectableItemBackground"
+							android:padding="8dp"
+							android:id="@+id/action_delete" />
+				</LinearLayout>
+			</FrameLayout>
+
+
 
 			<ImageView
 					android:layout_width="wrap_content"
@@ -86,82 +165,8 @@
 					android:id="@+id/expand_image"
 					android:layout_gravity="center_vertical"
 					android:tint="@color/ic_tint"
-					android:src="@{editing ? @drawable/ic_expand_less_24dp : @drawable/ic_expand_more_24dp}"
-					tools:src="@drawable/ic_expand_more_24dp" />
+					android:src="@drawable/ic_expand_more_24dp" />
 		</LinearLayout>
 
-		<LinearLayout
-				android:layout_width="match_parent"
-				android:layout_height="wrap_content"
-				android:orientation="horizontal"
-				android:visibility="@{editing ? View.VISIBLE : View.GONE}">
-
-			<LinearLayout
-					android:layout_width="0dp"
-					android:layout_marginLeft="68dp"
-					android:layout_marginStart="68dp"
-					android:layout_marginTop="8dp"
-					android:layout_marginBottom="8dp"
-					android:layout_weight="1"
-					android:layout_height="wrap_content"
-					android:orientation="vertical">
-
-				<EditText
-						android:layout_width="match_parent"
-						android:layout_height="wrap_content"
-						android:hint="@string/action_name"
-						android:inputType="text"
-						android:singleLine="true"
-						android:textAppearance="@style/TextAppearance.AppCompat"
-						tools:text="Action Name"
-						app:textWatcher="@{action.nameWatcher}"
-						android:id="@+id/action_name" />
-
-				<EditText
-						android:layout_width="match_parent"
-						android:layout_height="wrap_content"
-						android:hint="@string/URL"
-						app:textWatcher="@{action.urlWatcher}"
-						android:inputType="textUri"
-						android:layout_gravity="center_vertical"
-						android:textAppearance="@style/TextAppearance.AppCompat"
-						tools:text="http://www.cs.nott.ac.uk" />
-
-				<Spinner
-						android:layout_width="match_parent"
-						android:layout_height="wrap_content"
-						android:visibility="gone"
-						android:id="@+id/spinner" />
-
-				<LinearLayout
-						android:orientation="vertical"
-						android:layout_width="match_parent"
-						android:layout_height="match_parent"
-						android:id="@+id/marker_codes"
-						>
-				</LinearLayout>
-
-				<EditText
-						android:layout_width="match_parent"
-						android:layout_height="wrap_content"
-						android:hint="@string/markerCode"
-						android:digits="0123456789:"
-						android:inputType="time"
-						android:singleLine="true"
-						android:textAppearance="@style/TextAppearance.AppCompat"
-						android:id="@+id/new_marker_code" />
-			</LinearLayout>
-
-			<ImageView
-					android:layout_width="wrap_content"
-					android:layout_height="wrap_content"
-					android:layout_gravity="center_vertical"
-					android:src="@drawable/ic_close_black_18dp"
-					android:tint="@color/ic_tint"
-					android:scaleType="fitCenter"
-					android:background="?attr/selectableItemBackground"
-					android:padding="8dp"
-					android:id="@+id/action_delete" />
-		</LinearLayout>
 	</LinearLayout>
 </layout>

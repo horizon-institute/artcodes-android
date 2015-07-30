@@ -57,7 +57,25 @@ public class ExperienceEditActionFragment extends ExperienceEditFragment
 				@Override
 				public void onClick(View v)
 				{
-					holder.binding.setEditing(!holder.binding.getEditing());
+					if (selected != null)
+					{
+						selected.overview.setVisibility(View.VISIBLE);
+						selected.editview.setVisibility(View.GONE);
+						selected.expandImage.setImageResource(R.drawable.ic_expand_more_24dp);
+					}
+
+					if (selected != holder.binding)
+					{
+						holder.binding.overview.setVisibility(View.GONE);
+						holder.binding.editview.setVisibility(View.VISIBLE);
+						holder.binding.expandImage.setImageResource(R.drawable.ic_expand_less_24dp);
+						holder.binding.actionName.requestFocus();
+						selected = holder.binding;
+					}
+					else
+					{
+						selected = null;
+					}
 				}
 			});
 			holder.binding.newMarkerCode.addTextChangedListener(new SimpleTextWatcher()
@@ -113,6 +131,7 @@ public class ExperienceEditActionFragment extends ExperienceEditFragment
 	}
 
 	private ExperienceEditActionsBinding binding;
+	private ActionEditBinding selected;
 
 	@Nullable
 	@Override

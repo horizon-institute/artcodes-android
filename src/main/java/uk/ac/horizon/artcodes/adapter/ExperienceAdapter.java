@@ -5,9 +5,13 @@ import android.content.Intent;
 import android.support.v7.util.SortedList;
 import android.support.v7.widget.RecyclerView;
 import android.support.v7.widget.util.SortedListAdapterCallback;
+import android.text.TextUtils;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
+
+import com.google.common.collect.Ordering;
+
 import uk.ac.horizon.artcodes.activity.ArtcodeActivity;
 import uk.ac.horizon.artcodes.activity.ExperienceActivity;
 import uk.ac.horizon.artcodes.databinding.ExperienceItemBinding;
@@ -16,6 +20,9 @@ import uk.ac.horizon.artcodes.model.Experience;
 
 public class ExperienceAdapter extends RecyclerView.Adapter<ExperienceAdapter.ExperienceViewHolder>
 {
+	public static final Ordering<String> CASE_INSENSITIVE_NULL_SAFE_ORDER =
+			Ordering.from(String.CASE_INSENSITIVE_ORDER).nullsLast();
+
 	public class ExperienceViewHolder extends RecyclerView.ViewHolder
 	{
 		private ExperienceItemBinding binding;
@@ -39,19 +46,23 @@ public class ExperienceAdapter extends RecyclerView.Adapter<ExperienceAdapter.Ex
 			@Override
 			public boolean areContentsTheSame(Experience oldItem, Experience newItem)
 			{
-				return oldItem.getId().equals(newItem.getId());
+				return TextUtils.equals(oldItem.getId(), newItem.getId());
 			}
 
 			@Override
 			public boolean areItemsTheSame(Experience item1, Experience item2)
 			{
-				return item1.getId().equals(item2.getId());
+				return TextUtils.equals(item1.getId(), item2.getId());
 			}
 
 			@Override
 			public int compare(Experience o1, Experience o2)
 			{
-				return o1.getName().compareTo(o2.getName());
+				int result = CASE_INSENSITIVE_NULL_SAFE_ORDER.compare(o1.getName(), o2.getName());
+				if (result != 0) {
+					return result;
+				}
+				return CASE_INSENSITIVE_NULL_SAFE_ORDER.compare(o1.getId(), o2.getId());
 			}
 		});
 	}
@@ -77,7 +88,7 @@ public class ExperienceAdapter extends RecyclerView.Adapter<ExperienceAdapter.Ex
 			@Override
 			public void onClick(View v)
 			{
-				startActivity(ExperienceActivity.class, experience);
+				ExperienceActivity.start(context, experience);
 			}
 		});
 		holder.binding.scanButton.setOnClickListener(new View.OnClickListener()

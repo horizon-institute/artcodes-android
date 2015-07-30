@@ -21,6 +21,7 @@ package uk.ac.horizon.artcodes.model;
 
 import android.databinding.BaseObservable;
 import android.databinding.Bindable;
+import android.net.Uri;
 import uk.ac.horizon.artcodes.scanner.BR;
 import uk.ac.horizon.artcodes.ui.SimpleTextWatcher;
 
@@ -29,6 +30,8 @@ import java.util.List;
 
 public class Action extends BaseObservable
 {
+	private static final String HTTP_PREFIX = "http://";
+
 	public enum Match
 	{
 		any, all, sequence
@@ -134,19 +137,36 @@ public class Action extends BaseObservable
 			@Override
 			public String getText()
 			{
-				return url;
+				return getDisplayUrl();
 			}
 
 			@Override
 			public void onTextChanged(String value)
 			{
-				if (!value.equals(url))
+				Uri uri = Uri.parse(value);
+				String urlValue = value;
+				if(uri.getScheme() == null)
 				{
-					url = value;
+					urlValue = HTTP_PREFIX + value;
+				}
+				if (!urlValue.equals(url))
+				{
+					url = urlValue;
 					notifyPropertyChanged(BR.url);
+					notifyPropertyChanged(BR.displayUrl);
 				}
 			}
 		};
+	}
+
+	@Bindable
+	public String getDisplayUrl()
+	{
+		if(url != null && url.startsWith(HTTP_PREFIX))
+		{
+			return url.substring(HTTP_PREFIX.length());
+		}
+		return url;
 	}
 
 	@Override

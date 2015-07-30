@@ -5,6 +5,9 @@ import android.graphics.Bitmap;
 import android.graphics.BitmapFactory;
 import android.net.Uri;
 import android.util.Log;
+import com.android.volley.Cache;
+import com.android.volley.NetworkResponse;
+import com.android.volley.toolbox.HttpHeaderParser;
 import com.google.android.gms.auth.GoogleAuthUtil;
 import com.google.common.hash.Hashing;
 import com.google.common.hash.HashingInputStream;
@@ -12,14 +15,18 @@ import com.google.common.hash.HashingOutputStream;
 import com.google.common.io.ByteStreams;
 import uk.ac.horizon.artcodes.model.Experience;
 
+import java.io.ByteArrayInputStream;
 import java.io.File;
 import java.io.FileInputStream;
 import java.io.IOException;
 import java.io.InputStream;
+import java.io.InputStreamReader;
 import java.io.OutputStreamWriter;
 import java.net.HttpURLConnection;
 import java.net.URL;
+import java.util.HashMap;
 import java.util.HashSet;
+import java.util.Map;
 import java.util.Set;
 
 class AppEngineUpload implements Runnable
@@ -43,7 +50,10 @@ class AppEngineUpload implements Runnable
 		try
 		{
 			// TODO Save temp file, notify starting
+
+			// If auto upload
 			final Experience experience = saver.getItem();
+			experience.update();
 
 			final Set<String> images = new HashSet<>();
 			conditionalAdd(images, experience.getImage());
@@ -80,8 +90,18 @@ class AppEngineUpload implements Runnable
 			}
 
 			HttpURLConnection connection = save(experience);
+			byte[] bytes = ByteStreams.toByteArray(connection.getInputStream());
+			Map<String, String> headers = new HashMap<>();
+			for(String headerName: connection.getHeaderFields().keySet())
+			{
+				headers.put(headerName, connection.getHeaderField(headerName));
+			}
 
-			// TODO Remove temp, notify
+			String charset= HttpHeaderParser.parseCharset(headers, "UTF-8");
+			Experience saved = saver.parser.parse(new InputStreamReader(new ByteArrayInputStream(bytes), charset));
+
+			Cache.Entry entry = HttpHeaderParser.parseCacheHeaders(new NetworkResponse(connection.getResponseCode(), bytes, headers, false));
+			HTTPStore.getQueue(context).getCache().put(saved.getId(), entry);
 		}
 		catch (Exception e)
 		{

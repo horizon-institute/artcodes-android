@@ -44,7 +44,7 @@
 					android:layout_height="150dp"
 					android:id="@+id/experience_image"
 					app:imageUrl="@{experience.image}"
-					android:src="@drawable/ic_photo_camera_black_24dp"
+					android:src="@drawable/ic_insert_photo_black_48dp"
 					android:adjustViewBounds="true"
 					tools:ignore="ContentDescription"
 					android:scaleType="fitCenter"
@@ -66,7 +66,7 @@
 							android:id="@+id/experience_icon"
 							app:imageUrl="@{experience.icon}"
 							android:onClick="editIcon"
-							android:src="@drawable/ic_photo_camera_black_24dp"
+							android:src="@drawable/ic_insert_photo_black_48dp"
 							android:layout_margin="16dp"
 							android:background="?attr/selectableItemBackground" />
 

@@ -1,6 +1,5 @@
 package uk.ac.horizon.artcodes.fragment;
 
-import android.content.Intent;
 import android.os.Bundle;
 import android.support.annotation.Nullable;
 import android.support.v4.app.Fragment;
@@ -37,7 +36,7 @@ public class ExperienceLibraryFragment extends Fragment
 			@Override
 			public void onClick(View v)
 			{
-				startActivity(new Intent(getActivity(), ExperienceEditActivity.class));
+				ExperienceEditActivity.start(getActivity(), new Experience());
 			}
 		});
 

@@ -1,7 +1,6 @@
 package uk.ac.horizon.artcodes.storage;
 
 import android.content.Context;
-import android.util.Log;
 import com.android.volley.AuthFailureError;
 import com.android.volley.DefaultRetryPolicy;
 import com.android.volley.Request;
@@ -16,6 +15,8 @@ import java.util.Map;
 
 public class HTTPStore implements Store
 {
+	private static RequestQueue requestQueue;
+
 	private static final int timeout = 10000;
 	protected final Context context;
 
@@ -50,32 +51,13 @@ public class HTTPStore implements Store
 		})
 		{
 			@Override
-			public void addMarker(String tag)
-			{
-				super.addMarker(tag);
-				Log.i("", loader.getUri() + ": " + tag);
-			}
-
-			@Override
 			public Map<String, String> getHeaders() throws AuthFailureError
 			{
 				return getRequestHeaders();
 			}
 		};
-		RequestQueue requestQueue = getQueue();
-//		Cache.Entry entry = requestQueue.getCache().get(request.getCacheKey());
-//		if (entry != null)
-//		{
-//			try
-//			{
-//				loader.parse(new String(entry.data, HttpHeaderParser.parseCharset(entry.responseHeaders)));
-//			}
-//			catch (Exception e)
-//			{
-//				Log.w("", e.getMessage(), e);
-//			}
-//		}
 
+		RequestQueue requestQueue = getQueue(context);
 		request.setRetryPolicy(new DefaultRetryPolicy(
 				timeout,
 				DefaultRetryPolicy.DEFAULT_MAX_RETRIES,
@@ -84,9 +66,13 @@ public class HTTPStore implements Store
 		requestQueue.add(request);
 	}
 
-	protected RequestQueue getQueue()
+	public static RequestQueue getQueue(Context context)
 	{
-		return Volley.newRequestQueue(context.getApplicationContext());
+		if(requestQueue == null)
+		{
+			requestQueue = Volley.newRequestQueue(context.getApplicationContext());
+		}
+		return requestQueue;
 	}
 
 	protected Map<String, String> getRequestHeaders()

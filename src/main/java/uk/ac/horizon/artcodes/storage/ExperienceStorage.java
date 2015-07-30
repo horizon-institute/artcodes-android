@@ -10,6 +10,7 @@ import java.util.Map;
 public class ExperienceStorage extends ArtcodeStorage
 {
 	private static ExperienceStore defaultStore;
+	private static List<StoreListener<Experience>> listeners = new ArrayList<>();
 
 	public static List<ExperienceStore> list()
 	{
@@ -22,6 +23,11 @@ public class ExperienceStorage extends ArtcodeStorage
 			}
 		}
 		return stores;
+	}
+
+	public static void addListener(StoreListener<Experience> listener)
+	{
+		listeners.add(listener);
 	}
 
 	public static ExperienceStore getDefaultStore()

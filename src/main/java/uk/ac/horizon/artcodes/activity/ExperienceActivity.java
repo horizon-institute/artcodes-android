@@ -19,6 +19,7 @@
 
 package uk.ac.horizon.artcodes.activity;
 
+import android.content.Context;
 import android.content.Intent;
 import android.databinding.DataBindingUtil;
 import android.os.Build;
@@ -31,12 +32,20 @@ import uk.ac.horizon.artcodes.Feature;
 import uk.ac.horizon.artcodes.GoogleAnalytics;
 import uk.ac.horizon.artcodes.R;
 import uk.ac.horizon.artcodes.databinding.ExperienceBinding;
+import uk.ac.horizon.artcodes.json.ExperienceParserFactory;
 import uk.ac.horizon.artcodes.model.Experience;
 import uk.ac.horizon.artcodes.scanner.activity.ExperienceActivityBase;
 import uk.ac.horizon.artcodes.storage.ExperienceListStore;
 
 public class ExperienceActivity extends ExperienceActivityBase
 {
+	public static void start(Context context, Experience experience)
+	{
+		Intent intent = new Intent(context, ExperienceActivity.class);
+		intent.putExtra("experience", ExperienceParserFactory.toJson(experience));
+		context.startActivity(intent);
+	}
+
 	private ExperienceBinding binding;
 
 	public void editExperience(View view)
@@ -55,19 +64,9 @@ public class ExperienceActivity extends ExperienceActivityBase
 		}
 		binding.setExperience(experience);
 
-		if (Feature.get(this, R.bool.feature_favourites).isEnabled())
-		{
-			binding.experienceFavouriteButton.setVisibility(View.VISIBLE);
-		}
-
 		if (Feature.get(this, R.bool.feature_history).isEnabled())
 		{
 			binding.experienceHistoryButton.setVisibility(View.VISIBLE);
-		}
-
-		if (!getUri().startsWith("http"))
-		{
-			binding.experienceShareButton.setVisibility(View.GONE);
 		}
 
 		binding.experienceDescription.getViewTreeObserver().addOnGlobalLayoutListener(new ViewTreeObserver.OnGlobalLayoutListener()
