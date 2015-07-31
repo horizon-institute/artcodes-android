@@ -95,8 +95,8 @@
 	<string name="action_delete_undo">Undo</string>
 	<string name="marker_config">Marker Configuration</string>
 	<string name="close">close</string>
-	<string name="home">Scan Now</string>
-	<string name="library">My Library</string>
+	<string name="nav_home">Scan Now</string>
+	<string name="nav_library">My Library</string>
 	<string name="favourites">Favourites</string>
 	<string name="favourite">Favourite</string>
 	<string name="device">Device</string>
@@ -106,12 +106,15 @@
 	<string name="nearby">Nearby</string>
 	<string name="unstar">Unstar</string>
 	<string name="star">Star</string>
-	<string name="starred">Starred</string>
+	<string name="nav_starred">Starred</string>
 	<string name="edit_copy">Edit Copy</string>
+	<string name="invert">Invert</string>
+	<string name="presets">Presets</string>
+	<string name="hue">Hue</string>
 
-	<string-array name="tab_names">
-		<item>Info</item>
-		<item>Availability</item>
-		<item>Actions</item>
-	</string-array>
+	<string name="fragment_info">Info</string>
+	<string name="fragment_availability">Availability</string>
+	<string name="fragment_action">Actions</string>
+	<string name="fragment_colour">Colour</string>
+	<string name="nav_features">Features</string>
 </resources>

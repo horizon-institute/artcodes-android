@@ -10,11 +10,14 @@ import android.support.v7.app.ActionBarDrawerToggle;
 import android.support.v7.app.AppCompatActivity;
 import android.util.Log;
 import android.view.MenuItem;
+import android.view.View;
+import uk.ac.horizon.artcodes.Feature;
 import uk.ac.horizon.artcodes.R;
 import uk.ac.horizon.artcodes.databinding.NavigationBinding;
 import uk.ac.horizon.artcodes.fragment.ExperienceLibraryFragment;
 import uk.ac.horizon.artcodes.fragment.ExperienceSelectFragment;
 import uk.ac.horizon.artcodes.fragment.ExperienceStarFragment;
+import uk.ac.horizon.artcodes.fragment.FeatureListFragment;
 
 public class NavigationActivity extends AppCompatActivity implements
 		NavigationView.OnNavigationItemSelectedListener
@@ -94,8 +97,31 @@ public class NavigationActivity extends AppCompatActivity implements
 		MenuItem item = binding.navigation.getMenu().findItem(navigationIndex);
 		item.setChecked(true);
 
+		final View headerView = binding.navigation.inflateHeaderView(R.layout.navigation_header);
+
+		final MenuItem featureItem = binding.navigation.getMenu().findItem(R.id.nav_features);
+		if (Feature.get(this, R.bool.feature_edit_features).isEnabled())
+		{
+			featureItem.setVisible(true);
+		}
+		else
+		{
+			headerView.setLongClickable(true);
+			headerView.setOnLongClickListener(new View.OnLongClickListener()
+			{
+				@Override
+				public boolean onLongClick(View v)
+				{
+					featureItem.setVisible(true);
+					Feature.get(getBaseContext(), R.bool.feature_edit_features).setEnabled(true);
+					return false;
+				}
+			});
+		}
+
 		drawerToggle = new ActionBarDrawerToggle(this, binding.drawer, binding.toolbar, R.string.open, R.string.close);
 		binding.drawer.setDrawerListener(drawerToggle);
+
 		drawerToggle.syncState();
 
 		navigate(item);
@@ -124,6 +150,10 @@ public class NavigationActivity extends AppCompatActivity implements
 
 			case R.id.nav_library:
 				getSupportFragmentManager().beginTransaction().replace(R.id.content, new ExperienceLibraryFragment()).commit();
+				break;
+
+			case R.id.nav_features:
+				getSupportFragmentManager().beginTransaction().replace(R.id.content, new FeatureListFragment()).commit();
 				break;
 		}
 	}

@@ -4,16 +4,21 @@
 		<item
 				android:id="@+id/nav_home"
 				android:icon="@drawable/ic_photo_camera_black_24dp"
-				android:title="@string/home" />
+				android:title="@string/nav_home" />
 
 		<item
 				android:id="@+id/nav_starred"
 				android:icon="@drawable/ic_star_black_24dp"
-				android:title="@string/starred" />
+				android:title="@string/nav_starred" />
 
 		<item
 				android:id="@+id/nav_library"
 				android:icon="@drawable/ic_library_books_black_24dp"
-				android:title="@string/library" />
+				android:title="@string/nav_library" />
+
+		<item
+				android:id="@+id/nav_features"
+				android:title="@string/nav_features"
+				android:visible="false" />
 	</group>
 </menu>

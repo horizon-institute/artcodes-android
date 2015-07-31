@@ -56,63 +56,43 @@
 				app:imageBitmap="@{overlay.bitmap}"
 				tools:ignore="ContentDescription" />
 
-		<RelativeLayout
-				android:layout_width="fill_parent"
-				android:layout_height="fill_parent"
+		<LinearLayout
+				android:id="@+id/bottomView"
+				android:layout_width="match_parent"
+				android:layout_height="wrap_content"
 				android:layout_gravity="bottom"
+				android:background="#AFFF"
 				android:orientation="vertical">
 
-			<LinearLayout
-					android:id="@+id/bottomView"
+			<android.support.v7.widget.SwitchCompat
+					android:id="@+id/invertSwitch"
+					style="@style/Base.TextAppearance.AppCompat"
 					android:layout_width="fill_parent"
 					android:layout_height="wrap_content"
-					android:layout_alignParentBottom="true"
-					android:layout_alignParentEnd="true"
-					android:layout_alignParentLeft="true"
-					android:layout_alignParentRight="true"
-					android:layout_alignParentStart="true"
-					android:background="#AFFF"
-					android:orientation="vertical"
-					android:padding="16dp">
+					android:checked="false"
+					android:padding="16dp"
+					android:text="@string/invert" />
 
-				<android.support.v7.widget.SwitchCompat
-						android:id="@+id/invertSwitch"
-						style="@style/Base.TextAppearance.AppCompat"
-						android:layout_width="fill_parent"
-						android:layout_height="wrap_content"
-						android:checked="false"
-						android:text="Invert" />
+			<Spinner
+					android:id="@+id/colourPresetSpinner"
+					android:layout_width="fill_parent"
+					android:layout_height="wrap_content" />
 
-				<TextView
-						android:id="@+id/modeText"
-						style="@style/Base.TextAppearance.AppCompat"
-						android:layout_width="fill_parent"
-						android:layout_height="wrap_content"
-						android:layout_marginTop="10dp"
-						android:gravity="left"
-						android:text="Presets" />
+			<TextView
+					android:id="@+id/hueSeekBarLabel"
+					style="@style/Base.TextAppearance.AppCompat"
+					android:layout_width="fill_parent"
+					android:layout_height="wrap_content"
+					android:layout_marginTop="10dp"
+					android:text="@string/hue" />
 
-				<Spinner
-						android:id="@+id/colourPresetSpinner"
-						android:layout_width="fill_parent"
-						android:layout_height="wrap_content" />
+			<SeekBar
+					android:id="@+id/hueSlider"
+					android:layout_width="fill_parent"
+					android:layout_height="wrap_content"
+					android:padding="16dp"
+					android:max="180" />
 
-				<TextView
-						android:id="@+id/hueSeekBarLabel"
-						style="@style/Base.TextAppearance.AppCompat"
-						android:layout_width="fill_parent"
-						android:layout_height="wrap_content"
-						android:layout_marginTop="10dp"
-						android:gravity="left"
-						android:text="Hue" />
-
-				<SeekBar
-						android:id="@+id/hueSlider"
-						android:layout_width="fill_parent"
-						android:layout_height="wrap_content"
-						android:max="180" />
-
-			</LinearLayout>
-		</RelativeLayout>
+		</LinearLayout>
 	</FrameLayout>
 </layout>

@@ -30,6 +30,12 @@ public class ExperienceEditAvailabilityFragment extends ExperienceEditFragment
 {
 	private static final int PLACE_PICKER_REQUEST = 119;
 
+	@Override
+	public int getTitleResource()
+	{
+		return R.string.fragment_availability;
+	}
+
 	private class AvailabilityAdapter extends RecyclerView.Adapter<AvailabilityAdapter.ViewHolder>
 	{
 		public class ViewHolder extends RecyclerView.ViewHolder

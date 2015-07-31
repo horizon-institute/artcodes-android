@@ -19,10 +19,20 @@ public final class Feature
 		this.featureID = featureID;
 	}
 
+	public int getId()
+	{
+		return featureID;
+	}
+
+	public String getName()
+	{
+		return context.getResources().getResourceEntryName(featureID);
+	}
+
 	public boolean isEnabled()
 	{
 		final SharedPreferences preferences = context.getSharedPreferences(Feature.class.getName(), Context.MODE_PRIVATE);
-		final String featureName = context.getResources().getResourceEntryName(featureID);
+		final String featureName = getName();
 		if (preferences.contains(featureName))
 		{
 			return preferences.getBoolean(featureName, false);
@@ -33,7 +43,7 @@ public final class Feature
 	public void setEnabled(boolean enabled)
 	{
 		final SharedPreferences preferences = context.getSharedPreferences(Feature.class.getName(), Context.MODE_PRIVATE);
-		final String featureName = context.getResources().getResourceEntryName(featureID);
+		final String featureName = getName();
 		preferences.edit().putBoolean(featureName, enabled).apply();
 	}
 }

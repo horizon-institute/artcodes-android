@@ -133,6 +133,12 @@ public class ExperienceEditActionFragment extends ExperienceEditFragment
 	private ExperienceEditActionsBinding binding;
 	private ActionEditBinding selected;
 
+	@Override
+	public int getTitleResource()
+	{
+		return R.string.fragment_action;
+	}
+
 	@Nullable
 	@Override
 	public View onCreateView(LayoutInflater inflater, ViewGroup container, Bundle savedInstanceState)
