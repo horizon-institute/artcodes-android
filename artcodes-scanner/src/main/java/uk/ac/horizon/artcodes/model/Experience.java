@@ -33,7 +33,7 @@ public class Experience extends BaseObservable
 {
 	private final List<Action> actions = new ArrayList<>();
 	private final List<Availability> availabilities = new ArrayList<>();
-	private final List<ImageProcessor> threshold = new ArrayList<>();
+	private final List<ImageProcessor> processors = new ArrayList<>();
 	private String id;
 	private String name;
 	private String icon;
@@ -43,10 +43,12 @@ public class Experience extends BaseObservable
 	private String callback;
 	private String originalID;
 	private Visibility visibility = Visibility.secret;
-	// Transient properties calculated before use
+
+	// Transient properties now calculated before use
 	private transient int minRegions = 5;
 	private transient int maxRegions = 5;
 	private transient int maxRegionValue = 6;
+
 	private int checksumModulo = 3;
 	private boolean embeddedChecksum = false;
 	private boolean editable = false;
@@ -310,9 +312,9 @@ public class Experience extends BaseObservable
 		return id != null && (id.startsWith("http:") || id.startsWith("https:"));
 	}
 
-	public List<ImageProcessor> getThreshold()
+	public List<ImageProcessor> getProcessors()
 	{
-		return threshold;
+		return processors;
 	}
 
 	public Visibility getVisibility()

@@ -61,9 +61,9 @@ public class ExperienceFrameProcessor extends FrameProcessor
 
 		experience.update();
 		Log.i("", "Regions " + experience.getMinRegions() + "-" + experience.getMaxRegions() + " using max of " + experience.getMaxRegionValue() + " and checksum of " + experience.getChecksumModulo());
-		if (experience.getThreshold().isEmpty())
+		if (experience.getProcessors().isEmpty())
 		{
-			experience.getThreshold().add(new TileThresholder());
+			experience.getProcessors().add(new TileThresholder());
 		}
 		detector = createMarkerDetector(experience);
 	}
@@ -73,7 +73,7 @@ public class ExperienceFrameProcessor extends FrameProcessor
 	{
 		try
 		{
-			for (ImageProcessor imageProcessor : experience.getThreshold())
+			for (ImageProcessor imageProcessor : experience.getProcessors())
 			{
 				imageProcessor.process(frame, detected);
 			}
