@@ -32,17 +32,22 @@ import android.util.Log;
 import android.view.Menu;
 import android.view.MenuItem;
 import android.view.View;
+import uk.ac.horizon.artcodes.Feature;
 import uk.ac.horizon.artcodes.GoogleAnalytics;
 import uk.ac.horizon.artcodes.R;
-import uk.ac.horizon.artcodes.adapter.ExperienceAdapter;
 import uk.ac.horizon.artcodes.databinding.ExperienceEditBinding;
 import uk.ac.horizon.artcodes.fragment.ExperienceEditActionFragment;
 import uk.ac.horizon.artcodes.fragment.ExperienceEditAvailabilityFragment;
+import uk.ac.horizon.artcodes.fragment.ExperienceEditFragment;
 import uk.ac.horizon.artcodes.fragment.ExperienceEditInfoFragment;
+import uk.ac.horizon.artcodes.fragment.ExperienceEditColourFragment;
 import uk.ac.horizon.artcodes.json.ExperienceParserFactory;
 import uk.ac.horizon.artcodes.model.Experience;
 import uk.ac.horizon.artcodes.scanner.activity.ExperienceActivityBase;
 import uk.ac.horizon.artcodes.storage.ExperienceStorage;
+
+import java.util.ArrayList;
+import java.util.List;
 
 public class ExperienceEditActivity extends ExperienceActivityBase
 {
@@ -58,40 +63,38 @@ public class ExperienceEditActivity extends ExperienceActivityBase
 
 	public class ExperienceEditPagerAdapter extends FragmentPagerAdapter
 	{
-		private final String[] tabTitles;
+		private final List<ExperienceEditFragment> fragments = new ArrayList<>();
 
-		public ExperienceEditPagerAdapter(FragmentManager fm, String[] titles)
+		public ExperienceEditPagerAdapter(FragmentManager fm)
 		{
 			super(fm);
-			tabTitles = titles;
+
+			fragments.add(new ExperienceEditInfoFragment());
+			fragments.add(new ExperienceEditAvailabilityFragment());
+			fragments.add(new ExperienceEditActionFragment());
+			if(Feature.get(getApplicationContext(), R.bool.feature_edit_colour).isEnabled())
+			{
+				fragments.add(new ExperienceEditColourFragment());
+			}
 		}
 
 		@Override
 		public int getCount()
 		{
-			return tabTitles.length;
+			return fragments.size();
 		}
 
 		@Override
 		public Fragment getItem(int position)
 		{
-			switch (position)
-			{
-				case 0:
-					return new ExperienceEditInfoFragment();
-				case 1:
-					return new ExperienceEditAvailabilityFragment();
-				case 2:
-					return new ExperienceEditActionFragment();
-			}
-			return null;
+			return fragments.get(position);
 		}
 
 		@Override
 		public CharSequence getPageTitle(int position)
 		{
 			// Generate title based on item position
-			return tabTitles[position];
+			return getString(fragments.get(position).getTitleResource());
 		}
 	}
 
@@ -177,10 +180,7 @@ public class ExperienceEditActivity extends ExperienceActivityBase
 		super.onCreate(savedInstanceState);
 
 		binding = DataBindingUtil.setContentView(this, R.layout.experience_edit);
-
-		String[] tabs = getResources().getStringArray(R.array.tab_names);
-
-		binding.viewpager.setAdapter(new ExperienceEditPagerAdapter(getSupportFragmentManager(), tabs));
+		binding.viewpager.setAdapter(new ExperienceEditPagerAdapter(getSupportFragmentManager()));
 		binding.tabs.setupWithViewPager(binding.viewpager);
 
 		if (savedInstanceState != null)
