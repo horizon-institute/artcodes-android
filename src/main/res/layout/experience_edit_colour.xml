@@ -28,10 +28,6 @@
 		<import type="android.view.View" />
 
 		<variable
-				name="experience"
-				type="uk.ac.horizon.artcodes.model.Experience" />
-
-		<variable
 				name="camera"
 				type="uk.ac.horizon.artcodes.scanner.camera.CameraAdapter" />
 

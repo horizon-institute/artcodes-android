@@ -19,7 +19,6 @@
 
 package uk.ac.horizon.artcodes.fragment;
 
-import android.databinding.DataBindingUtil;
 import android.os.Bundle;
 import android.support.annotation.Nullable;
 import android.util.Log;
@@ -29,12 +28,14 @@ import android.view.ViewGroup;
 import android.widget.AdapterView;
 import android.widget.CompoundButton;
 import android.widget.SeekBar;
+import org.opencv.android.OpenCVLoader;
 import org.opencv.core.Mat;
 import uk.ac.horizon.artcodes.R;
 import uk.ac.horizon.artcodes.databinding.ExperienceEditColourBinding;
 import uk.ac.horizon.artcodes.scanner.camera.CameraAdapter;
 import uk.ac.horizon.artcodes.scanner.camera.FrameProcessor;
 import uk.ac.horizon.artcodes.scanner.overlay.Overlay;
+import uk.ac.horizon.artcodes.scanner.overlay.ThresholdLayer;
 import uk.ac.horizon.artcodes.scanner.process.HueShifter;
 import uk.ac.horizon.artcodes.scanner.process.ImageProcessor;
 import uk.ac.horizon.artcodes.scanner.process.IntensityGreyscaler;
@@ -47,6 +48,14 @@ import java.util.List;
 
 public class ExperienceEditColourFragment extends ExperienceEditFragment
 {
+	static
+	{
+		if (!OpenCVLoader.initDebug())
+		{
+			Log.e("", "Error Initializing OpenCV");
+		}
+	}
+
 	private final Object lockObject = new Object();
 	private final List<ImageProcessor> presets = new ArrayList<>();
 	private ExperienceEditColourBinding binding;
@@ -85,12 +94,11 @@ public class ExperienceEditColourFragment extends ExperienceEditFragment
 	@Override
 	public View onCreateView(final LayoutInflater inflater, ViewGroup container, Bundle savedInstanceState)
 	{
-		super.onCreate(savedInstanceState);
-		binding = DataBindingUtil.setContentView(getActivity(), R.layout.experience_edit_colour);
+		binding = ExperienceEditColourBinding.inflate(inflater, container, false);
 		camera = new CameraAdapter(getActivity());
 		binding.setCamera(camera);
 		overlay = new Overlay();
-		// TODO overlay.setThresholdLayer(new ThresholdLayer);
+		overlay.setThresholdLayer(new ThresholdLayer());
 		binding.setOverlay(overlay);
 
 		presets.add(new IntensityGreyscaler());
@@ -109,21 +117,23 @@ public class ExperienceEditColourFragment extends ExperienceEditFragment
 				{
 					if(hueShifter.getHueShift() != 0)
 					{
-						hueShifter.process(image, false);
+						image = hueShifter.process(image, false);
 					}
 					if(preset != null)
 					{
-						preset.process(image, false);
+						image = preset.process(image, false);
 					}
 					if(inverter != null)
 					{
-						inverter.process(image, false);
+						image = inverter.process(image, false);
 					}
 
 					if (overlay.hasOutput(image))
 					{
 						rotate(image, image);
 					}
+
+					overlay.drawThreshold(image);
 				}
 				catch (Exception e)
 				{

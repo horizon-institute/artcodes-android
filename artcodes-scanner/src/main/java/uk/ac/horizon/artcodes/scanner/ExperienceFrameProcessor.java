@@ -75,7 +75,7 @@ public class ExperienceFrameProcessor extends FrameProcessor
 		{
 			for (ImageProcessor imageProcessor : experience.getProcessors())
 			{
-				imageProcessor.process(frame, detected);
+				frame = imageProcessor.process(frame, detected);
 			}
 
 			if (overlay.hasOutput(frame))
