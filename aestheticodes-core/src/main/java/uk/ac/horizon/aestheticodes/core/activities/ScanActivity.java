@@ -266,6 +266,10 @@ public class ScanActivity extends ActionBarActivity implements ExperienceControl
 		{
 			detector.setMarkerDrawMode(MarkerDetector.MarkerDrawMode.regions);
 		}
+		else if (detector.getMarkerDrawMode() == MarkerDetector.MarkerDrawMode.regions)
+		{
+			detector.setMarkerDrawMode(MarkerDetector.MarkerDrawMode.debug);
+		}
 		else
 		{
 			detector.setMarkerDrawMode(MarkerDetector.MarkerDrawMode.off);
@@ -373,7 +377,12 @@ public class ScanActivity extends ActionBarActivity implements ExperienceControl
 		}
 		else if (detector.shouldDrawThreshold() == MarkerDetector.CameraDrawMode.grey)
 		{
-			thresholdDisplayButton.setText(getString(R.string.threshold_off));
+			thresholdDisplayButton.setText(getString(R.string.threshold_grey));
+			thresholdDisplayButton.setCompoundDrawablesWithIntrinsicBounds(R.drawable.ic_filter_b_and_w_off_white_24dp, 0, 0, 0);
+		}
+		else if (detector.shouldDrawThreshold() == MarkerDetector.CameraDrawMode.depth)
+		{
+			thresholdDisplayButton.setText(getString(R.string.threshold_depth));
 			thresholdDisplayButton.setCompoundDrawablesWithIntrinsicBounds(R.drawable.ic_filter_b_and_w_off_white_24dp, 0, 0, 0);
 		}
 
@@ -388,10 +397,15 @@ public class ScanActivity extends ActionBarActivity implements ExperienceControl
 			markerDisplayButton.setCompoundDrawablesWithIntrinsicBounds(R.drawable.ic_border_outer_white_24dp, 0, 0, 0);
 			markerDisplayButton.setText(getString(R.string.marker_outline));
 		}
-		else
+		else if (detector.getMarkerDrawMode() == MarkerDetector.MarkerDrawMode.regions)
 		{
 			markerDisplayButton.setCompoundDrawablesWithIntrinsicBounds(R.drawable.ic_border_all_white_24dp, 0, 0, 0);
 			markerDisplayButton.setText(getString(R.string.marker_on));
+		}
+		else if (detector.getMarkerDrawMode() == MarkerDetector.MarkerDrawMode.debug)
+		{
+			markerDisplayButton.setCompoundDrawablesWithIntrinsicBounds(R.drawable.ic_border_all_white_24dp, 0, 0, 0);
+			markerDisplayButton.setText(getString(R.string.marker_debug));
 		}
 
 		//private ImageView autoOpenIcon;

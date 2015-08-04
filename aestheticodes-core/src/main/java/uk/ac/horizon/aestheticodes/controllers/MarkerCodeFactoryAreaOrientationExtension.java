@@ -24,7 +24,6 @@ import org.opencv.core.Mat;
 import org.opencv.core.MatOfPoint;
 import org.opencv.core.Point;
 import org.opencv.core.Rect;
-import org.opencv.core.RotatedRect;
 import org.opencv.core.Scalar;
 import org.opencv.imgproc.Imgproc;
 import org.opencv.imgproc.Moments;
@@ -160,7 +159,7 @@ public class MarkerCodeFactoryAreaOrientationExtension extends MarkerCodeFactory
     }
 
     @Override
-    protected MarkerCode.MarkerDetails parseRegionsAt(int nodeIndex, List<MatOfPoint> contours, Mat hierarchy, Experience experience, DetectionError[] error, int errorIndex)
+    protected MarkerCode.MarkerDetails parseRegionsAt(int nodeIndex, List<MatOfPoint> contours, Mat hierarchy, Experience experience, DetectionStatus[] error, int errorIndex)
     {
         MarkerCode.MarkerDetails details = super.parseRegionsAt(nodeIndex, contours, hierarchy, experience, error, errorIndex);
 

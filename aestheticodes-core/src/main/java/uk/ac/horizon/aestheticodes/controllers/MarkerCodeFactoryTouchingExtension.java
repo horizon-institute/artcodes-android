@@ -85,7 +85,7 @@ public class MarkerCodeFactoryTouchingExtension extends MarkerCodeFactory
     }
 
     @Override
-    protected MarkerCode.MarkerDetails parseRegionsAt(int nodeIndex, List<MatOfPoint> contours, Mat hierarchy, Experience experience, DetectionError[] error, int errorIndex)
+    protected MarkerCode.MarkerDetails parseRegionsAt(int nodeIndex, List<MatOfPoint> contours, Mat hierarchy, Experience experience, DetectionStatus[] error, int errorIndex)
     {
         MarkerCode.MarkerDetails details =  super.parseRegionsAt(nodeIndex, contours, hierarchy, experience, error, errorIndex);
 
@@ -177,11 +177,19 @@ public class MarkerCodeFactoryTouchingExtension extends MarkerCodeFactory
     }
 
     @Override
-    protected boolean validate(MarkerCode.MarkerDetails details, Experience experience, DetectionError[] error, int errorIndex)
+    protected boolean validate(MarkerCode.MarkerDetails details, Experience experience, DetectionStatus[] error, int errorIndex)
     {
         if (super.validate(details, experience, error, errorIndex))
         {
-            return ((TouchingMarkerDetails)details).touchCount() % 3 == 0;
+            if (((TouchingMarkerDetails)details).touchCount() % 3 == 0 && ((TouchingMarkerDetails)details).touchCount() > 0)
+            {
+                return true;
+            }
+            else
+            {
+                error[errorIndex] = DetectionStatus.extensionSpecificError;
+                return false;
+            }
         }
         else
         {
@@ -213,5 +221,15 @@ public class MarkerCodeFactoryTouchingExtension extends MarkerCodeFactory
                 }
             }
         }
+    }
+
+    @Override
+    public String[] getDebugMessagesForErrorType(DetectionStatus errorType, Experience experience)
+    {
+        if (errorType==DetectionStatus.extensionSpecificError)
+        {
+            return new String[] {"Wrong number of touching regions", "The total value of touching regions must be more than 0 and a multiple of 3"};
+        }
+        return super.getDebugMessagesForErrorType(errorType, experience);
     }
 }

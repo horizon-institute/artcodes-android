@@ -36,10 +36,13 @@
 
 	<string name="threshold_on">Threshold</string>
 	<string name="threshold_off">Threshold</string>
+	<string name="threshold_grey">Grey</string>
+	<string name="threshold_depth">Depth</string>
 
 	<string name="marker_off">Markers</string>
-	<string name="marker_outline">Markers</string>
-	<string name="marker_on">Markers</string>
+	<string name="marker_outline">Outline</string>
+	<string name="marker_on">Regions</string>
+	<string name="marker_debug">Debug</string>
 	<string name="display_menu">Display Menu</string>
 
 	<string name="artcode_scan_scheme">x-artcode-scan</string>

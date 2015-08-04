@@ -36,7 +36,7 @@ public class MarkerCodeFactoryAreaOrderExtension extends MarkerCodeFactory
     private static final String REGION_AREA = "area";
 
     @Override
-    protected MarkerCode.MarkerDetails parseRegionsAt(int nodeIndex, List<MatOfPoint> contours, Mat hierarchy, Experience experience, DetectionError[] error, int errorIndex)
+    protected MarkerCode.MarkerDetails parseRegionsAt(int nodeIndex, List<MatOfPoint> contours, Mat hierarchy, Experience experience, DetectionStatus[] error, int errorIndex)
     {
         MarkerCode.MarkerDetails details = super.parseRegionsAt(nodeIndex, contours, hierarchy, experience, error, errorIndex);
 

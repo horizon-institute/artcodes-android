@@ -79,13 +79,25 @@ public class ExperienceListAdapter extends BaseAdapter implements ExperienceList
 			@Override
 			public int compare(Experience experience, Experience experience2)
 			{
-				if (experience.getName() != null && experience2.getName() != null)
+				String name1 = experience==null ? null : experience.getName();
+				String name2 = experience2==null ? null : experience2.getName();
+
+				// sort so null appears last in the list
+				if (name1==null && name2==null)
 				{
-					return experience.getName().compareToIgnoreCase(experience2.getName());
+					return 0;
+				}
+				else if (name1==null && name2!=null)
+				{
+					return 1;
+				}
+				else if (name1!=null && name2==null)
+				{
+					return -1;
 				}
 				else
 				{
-					return 0;
+					return name1.compareToIgnoreCase(name2);
 				}
 			}
 		});

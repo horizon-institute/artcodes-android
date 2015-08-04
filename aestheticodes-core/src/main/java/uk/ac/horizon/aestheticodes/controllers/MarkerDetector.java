@@ -45,11 +45,11 @@ public class MarkerDetector
 
 	public enum MarkerDrawMode
 	{
-		off, outline, regions
+		off, outline, regions, debug
 	}
 	public enum CameraDrawMode
 	{
-		normal, grey, threshold
+		normal, grey, threshold, depth
 	}
 
 	public static interface Listener
@@ -231,14 +231,25 @@ public class MarkerDetector
 				List<MarkerCode> foundMarkers = new ArrayList<>();
 				// Find blobs using connect component.
 				Imgproc.findContours(inputImage, contours, hierarchy, Imgproc.RETR_TREE, Imgproc.CHAIN_APPROX_NONE);
+				if (contours.size()==0)
+				{
+					return foundMarkers;
+				}
+
+				if (cameraDrawMode==CameraDrawMode.depth)
+				{
+					drawDepth(drawImage, contours, hierarchy);
+				}
+
+				MarkerCodeFactory.DetectionStatus[] errors = new MarkerCodeFactory.DetectionStatus[contours.size()];
 
 				if (markerCodeFactory != null)
 				{
 					for (int i = 0; i < contours.size(); i++)
 					{
 						//final MarkerCode code = MarkerCode.findMarker(hierarchy, i, experience.get());
-						MarkerCodeFactory.DetectionError[] error = new MarkerCodeFactory.DetectionError[1];
-						final MarkerCode code = markerCodeFactory.createMarkerForNode(i, contours, hierarchy, experience.get(), error, 0);
+						errors[i] = MarkerCodeFactory.DetectionStatus.unknown;
+						final MarkerCode code = markerCodeFactory.createMarkerForNode(i, contours, hierarchy, experience.get(), errors, i);
 						if (code != null)
 						{
 							// if marker found then add in the list.
@@ -251,6 +262,11 @@ public class MarkerDetector
 							}
 						}
 					}
+				}
+
+				if (markerDrawMode == MarkerDrawMode.debug)
+				{
+					drawDebug(drawImage, contours, hierarchy, errors);
 				}
 
 				if (markerDrawMode != MarkerDrawMode.off && drawImage != null)
@@ -271,6 +287,166 @@ public class MarkerDetector
 			{
 				contours.clear();
 				hierarchy.release();
+			}
+		}
+
+		private void labelDepthOfContourHierarchy(Mat hierarchy, int[] depthArray, int rootIndex, int rootValue)
+		{
+			int CV_NEXT=0, CV_CHILD=2, CV_PARENT=3;
+
+			for (int i=rootIndex; i>-1 && i<depthArray.length; i=(int)hierarchy.get(0, i)[CV_NEXT])
+			{
+				// label given node
+				depthArray[i] = rootValue;
+				// label children
+				labelDepthOfContourHierarchy(hierarchy, depthArray, (int)hierarchy.get(0, i)[CV_CHILD], rootValue+1);
+			}
+		}
+
+		private void  drawDepth(Mat drawImage, List<MatOfPoint> contours, Mat hierarchy)
+		{
+			drawImage.setTo(new Scalar(0,0,0,255));
+			if (contours.size()==0)
+			{
+				return;
+			}
+
+			// get the depth of the contours, we can't use the hierarchy because we need to know
+			// the maximum depth
+			int numOfContours = (int) contours.size();
+			int[] depth = new int[numOfContours];
+			labelDepthOfContourHierarchy(hierarchy, depth, 0, 1);
+
+			// contours are grouped by depth so them can be drawn over each other in order of depth
+			// without holes
+			List<List<Integer>> buckets = new ArrayList<>();
+			for (int i=0; i<numOfContours; ++i)
+			{
+				while (depth[i]>buckets.size())
+				{
+					buckets.add(new ArrayList<Integer>());
+				}
+				buckets.get(depth[i]-1).add(i);
+			}
+
+			Point offsetPoint = new Point(0, 0);
+			for (int bucketIndex=0; bucketIndex<buckets.size(); ++bucketIndex)
+			{
+				List<Integer> bucket = buckets.get(bucketIndex);
+				int step = (int) ((255.0 / (buckets.size())) * (bucketIndex+1));
+				Scalar depthColour = new Scalar(step, step, step, 255);
+				for (int i : bucket)
+				{
+					// drawing many contours with drawContours (set contour index to -1) does not
+					// seem to work, so we draw them individually. Drawing with/without holes does
+					// not seem to affect draw time.
+					Imgproc.drawContours(drawImage, contours, i, depthColour, -1, 8, hierarchy, 0, offsetPoint);
+				}
+			}
+		}
+
+		private void drawDebug(Mat drawImage, ArrayList<MatOfPoint> contours, Mat hierarchy, MarkerCodeFactory.DetectionStatus[] errors)
+		{
+			if (contours.isEmpty())
+			{
+				return;
+			}
+
+			// setup buckets to place contour indexes in depending on their status
+			// ATM only the highest level error is drawn, but this might change so keep track of all of them.
+			int numOfBuckets = 9;
+			List<List<Integer>> buckets = new ArrayList<>();
+			for (int i=0; i<numOfBuckets; ++i)
+			{
+				buckets.add(new ArrayList<Integer>());
+			}
+
+			// label contours by depth in the hierarchy, white contours are even black contours are odd
+			// this is so we can only process black contours as the display can look confusing if you have the same error on nested contours (and officially an Artcodes hierarchy should be black-white-black).
+			int[] depth = new int[contours.size()];
+			labelDepthOfContourHierarchy(hierarchy, depth, 0, 0);
+
+			// Place (black/odd) contours in buckets
+			// if you use black & white contours the display can look very confusing.
+			MarkerCodeFactory.DetectionStatus[] errorTypes = new MarkerCodeFactory.DetectionStatus[] {MarkerCodeFactory.DetectionStatus.noSubContours, MarkerCodeFactory.DetectionStatus.tooManyEmptyRegions, MarkerCodeFactory.DetectionStatus.nestedRegions, MarkerCodeFactory.DetectionStatus.numberOfRegions, MarkerCodeFactory.DetectionStatus.numberOfDots, MarkerCodeFactory.DetectionStatus.checksum, MarkerCodeFactory.DetectionStatus.validationRegions, MarkerCodeFactory.DetectionStatus.extensionSpecificError, MarkerCodeFactory.DetectionStatus.OK};
+			for (int i=0; i<errors.length; ++i)
+			{
+				if (depth[i]%2==0)
+				{
+					continue;
+				}
+
+				for (int j=0; j<numOfBuckets; ++j)
+				{
+					if (errors[i] == errorTypes[j])
+					{
+						buckets.get(j).add(i);
+						break;
+					}
+				}
+			}
+
+			// draw contours with highest level error status
+			for (int bucket=numOfBuckets-1; bucket>=1; bucket--)
+			{
+				MarkerCodeFactory.DetectionStatus errorType = errorTypes[bucket];
+
+				if (!buckets.get(bucket).isEmpty())
+				{
+					for (Integer contour : buckets.get(bucket))
+					{
+						markerCodeFactory.drawErrorDebug(contour, errorType, drawImage, contours, hierarchy, experience.get());
+					}
+
+					// the rest of the code below just prints a message to the screen to let the
+					// user know what is wrong with the (non-)detected marker. ATM this draws the
+					// message to the OpenCV image. In the future this should change the UI label
+					// at the bottom of the screen.
+
+					// print text message:
+					String[] debugMessages = markerCodeFactory.getDebugMessagesForErrorType(errorType, experience.get());
+					String str = debugMessages[0];
+
+					double fontScaleStep = 0.1;
+					int[] baseLine = new int[1];
+					if (str!=null && !str.equals(""))
+					{
+						double fontScale = 1 + fontScaleStep;
+						int fontThickness = 2, textWidth = drawImage.cols() + 1;
+						while (textWidth > drawImage.cols())
+						{ // decrease font scale until the text fits in the image
+							fontScale -= fontScaleStep;
+							Size size = Core.getTextSize(str, Core.FONT_HERSHEY_SIMPLEX, fontScale, fontThickness, baseLine);
+							textWidth = (int) size.width;
+						}
+						int xPositionOfCentredText = (drawImage.cols() - textWidth) / 2;
+						int yPositionOfCentredText = drawImage.rows() - 40;
+
+						Core.putText(drawImage, str, new Point(xPositionOfCentredText, yPositionOfCentredText), Core.FONT_HERSHEY_SIMPLEX, fontScale, new Scalar(0, 0, 0, 255), fontThickness + 5);
+						Core.putText(drawImage, str, new Point(xPositionOfCentredText, yPositionOfCentredText), Core.FONT_HERSHEY_SIMPLEX, fontScale, errorType.getColor(), fontThickness);
+					}
+
+					// print secondary message
+					str = debugMessages[1];
+
+					if (str!=null && !str.equals(""))
+					{
+						double fontScale = 0.7 + fontScaleStep;
+						int fontThickness = 2, textWidth = drawImage.cols()+1;
+						while (textWidth > drawImage.cols()) { // decrease font scale until the text fits in the image
+							fontScale -= fontScaleStep;
+							Size size = Core.getTextSize(str, Core.FONT_HERSHEY_SIMPLEX, fontScale, fontThickness, baseLine);
+							textWidth = (int) size.width;
+						}
+						int xPositionOfCentredText = (drawImage.cols()-textWidth)/2;
+						int yPositionOfCentredText = drawImage.rows() - 10;
+
+						Core.putText(drawImage, str, new Point(xPositionOfCentredText, yPositionOfCentredText), Core.FONT_HERSHEY_SIMPLEX, fontScale, new Scalar(0,0,0,255), fontThickness+5);
+						Core.putText(drawImage, str, new Point(xPositionOfCentredText, yPositionOfCentredText), Core.FONT_HERSHEY_SIMPLEX, fontScale, errorType.getColor(), fontThickness);
+					}
+
+					break;
+				}
 			}
 		}
 
@@ -425,6 +601,9 @@ public class MarkerDetector
 				this.setCameraDrawMode(CameraDrawMode.threshold);
 				break;
 			case threshold:
+				//this.setCameraDrawMode(CameraDrawMode.depth);
+				//break;
+			//case depth:
 				this.setCameraDrawMode(CameraDrawMode.normal);
 				break;
 		}

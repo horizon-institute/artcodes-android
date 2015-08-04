@@ -23,7 +23,6 @@ import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
-import java.util.Objects;
 
 import uk.ac.horizon.aestheticodes.controllers.MarkerCodeFactory;
 import uk.ac.horizon.aestheticodes.controllers.MarkerCodeFactoryAreaOrderExtension;
@@ -194,20 +193,29 @@ public class Experience
 
 	public String getMarkerError(List<Integer> markerCodes, Integer embeddedChecksum)
 	{
+		return getMarkerError(markerCodes, embeddedChecksum, new MarkerCodeFactory.DetectionStatus[1], 0);
+	}
+
+	public String getMarkerError(List<Integer> markerCodes, Integer embeddedChecksum, MarkerCodeFactory.DetectionStatus[] error, int errorIndex)
+	{
 		if (markerCodes == null)
 		{
+			error[errorIndex] = MarkerCodeFactory.DetectionStatus.unknown;
 			return "No Code";
 		}
 		else if (markerCodes.size() < minRegions)
 		{
+			error[errorIndex] = MarkerCodeFactory.DetectionStatus.numberOfRegions;
 			return "Marker too Short";
 		}
 		else if (markerCodes.size() > maxRegions)
 		{
+			error[errorIndex] = MarkerCodeFactory.DetectionStatus.numberOfRegions;
 			return "Marker too Long";
 		}
 		else if (!hasValidNumberofEmptyRegions(markerCodes))
 		{
+			error[errorIndex] = MarkerCodeFactory.DetectionStatus.tooManyEmptyRegions;
 			return "Incorrect Empty Regions";
 		}
 
@@ -216,27 +224,32 @@ public class Experience
 			//check if leaves are with in accepted range.
 			if (value > maxRegionValue)
 			{
+				error[errorIndex] = MarkerCodeFactory.DetectionStatus.numberOfDots;
 				return value + " is too Big";
 			}
 		}
 
 		if (embeddedChecksum == null && !hasValidChecksum(markerCodes))
 		{
+			error[errorIndex] = MarkerCodeFactory.DetectionStatus.checksum;
 			return "Region Total not Divisable by " + checksumModulo;
 		}
 		else if (this.embeddedChecksum && embeddedChecksum != null && !hasValidEmbeddedChecksum(markerCodes, embeddedChecksum))
 		{
+			error[errorIndex] = MarkerCodeFactory.DetectionStatus.checksum;
 			return "Region Total not Divisable by " + embeddedChecksum.toString();
 		}
 		else if (!this.embeddedChecksum && embeddedChecksum != null)
 		{
 			// Embedded checksum is turned off yet one was provided to this function (this should never happen unless the settings are changed in the middle of detection)
+			error[errorIndex] = MarkerCodeFactory.DetectionStatus.unknown;
 			return "Embedded checksum markers are not valid.";
 		}
 
 
 		if (!hasValidationRegions(markerCodes))
 		{
+			error[errorIndex] = MarkerCodeFactory.DetectionStatus.validationRegions;
 			return validationRegions + " Regions of " + validationRegionValue + " Required";
 		}
 
@@ -504,7 +517,12 @@ public class Experience
 
 	public boolean isValidMarker(List<Integer> markerCodes, Integer embeddedChecksum)
 	{
-		return getMarkerError(markerCodes, embeddedChecksum) == null;
+		return isValidMarker(markerCodes, embeddedChecksum, new MarkerCodeFactory.DetectionStatus[1], 0);
+	}
+
+	public boolean isValidMarker(List<Integer> markerCodes, Integer embeddedChecksum, MarkerCodeFactory.DetectionStatus[] error, int errorIndex)
+	{
+		return getMarkerError(markerCodes, embeddedChecksum, error, errorIndex) == null;
 	}
 
 	public boolean isValidMarker(String marker, boolean partial)
