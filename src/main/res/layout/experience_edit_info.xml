@@ -30,6 +30,9 @@
 
 		<variable name="experience"
 		          type="uk.ac.horizon.artcodes.model.Experience" />
+
+		<variable name="experienceEditor"
+		          type="uk.ac.horizon.artcodes.ui.ExperienceEditor" />
 	</data>
 
 	<ScrollView android:layout_width="match_parent"
@@ -74,7 +77,7 @@
 							android:layout_width="match_parent"
 							android:layout_height="wrap_content"
 							android:hint="@string/experienceTitle"
-							app:textWatcher="@{experience.nameWatcher}"
+							app:textWatcher="@{experienceEditor.nameWatcher}"
 							android:singleLine="true"
 							android:layout_margin="12dp"
 							android:textAppearance="@style/TextAppearance.AppCompat.Title"
@@ -100,7 +103,7 @@
 							android:layout_width="match_parent"
 							android:layout_height="wrap_content"
 							android:inputType="textMultiLine"
-							app:textWatcher="@{experience.descWatcher}"
+							app:textWatcher="@{experienceEditor.descWatcher}"
 							android:textAppearance="@style/TextAppearance.AppCompat"
 							android:hint="@string/experienceDescription"
 							android:layout_margin="12dp" />

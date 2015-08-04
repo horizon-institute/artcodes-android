@@ -41,10 +41,8 @@ import uk.ac.horizon.artcodes.fragment.ExperienceEditAvailabilityFragment;
 import uk.ac.horizon.artcodes.fragment.ExperienceEditFragment;
 import uk.ac.horizon.artcodes.fragment.ExperienceEditInfoFragment;
 import uk.ac.horizon.artcodes.fragment.ExperienceEditColourFragment;
-import uk.ac.horizon.artcodes.json.ExperienceParserFactory;
+import uk.ac.horizon.artcodes.ExperienceParser;
 import uk.ac.horizon.artcodes.model.Experience;
-import uk.ac.horizon.artcodes.scanner.activity.ExperienceActivityBase;
-import uk.ac.horizon.artcodes.storage.ExperienceStorage;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -54,7 +52,7 @@ public class ExperienceEditActivity extends ExperienceActivityBase
 	public static void start(Context context, Experience experience)
 	{
 		Intent intent = new Intent(context, ExperienceEditActivity.class);
-		intent.putExtra("experience", ExperienceParserFactory.toJson(experience));
+		intent.putExtra("experience", ExperienceParser.createGson(context).toJson(experience));
 		context.startActivity(intent);
 	}
 
@@ -118,16 +116,6 @@ public class ExperienceEditActivity extends ExperienceActivityBase
 		return super.onCreateOptionsMenu(menu);
 	}
 
-	@Override
-	public void onItemChanged(Experience experience)
-	{
-		super.onItemChanged(experience);
-		if (experience != null)
-		{
-			GoogleAnalytics.trackEvent("Experience", "Loaded " + experience.getId());
-		}
-	}
-
 	private Intent createCancelIntent()
 	{
 		Intent intent = (Intent) getIntent().clone();
@@ -144,7 +132,7 @@ public class ExperienceEditActivity extends ExperienceActivityBase
 				NavUtils.navigateUpTo(this, createCancelIntent());
 				return true;
 			case R.id.save:
-				ExperienceStorage.save(getExperience()).to(ExperienceStorage.getDefaultStore()).async();
+				getAccount().saveExperience(getExperience());
 				NavUtils.navigateUpTo(this, createIntent(ExperienceActivity.class));
 				return true;
 		}
@@ -200,7 +188,7 @@ public class ExperienceEditActivity extends ExperienceActivityBase
 		super.onSaveInstanceState(outState);
 
 		outState.putInt("tab", binding.viewpager.getCurrentItem());
-		outState.putString("experience", ExperienceParserFactory.toJson(getExperience()));
+		outState.putString("experience", getAccount().getGson().toJson(getExperience()));
 	}
 //
 //	private void updateSave()

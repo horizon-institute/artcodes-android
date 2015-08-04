@@ -30,6 +30,9 @@
 
 		<variable name="action"
 		          type="uk.ac.horizon.artcodes.model.Action" />
+
+		<variable name="actionEditor"
+		          type="uk.ac.horizon.artcodes.ui.ActionEditor" />
 	</data>
 
 	<LinearLayout
@@ -105,14 +108,14 @@
 								android:singleLine="true"
 								android:textAppearance="@style/TextAppearance.AppCompat"
 								tools:text="Action Name"
-								app:textWatcher="@{action.nameWatcher}"
+								app:textWatcher="@{actionEditor.nameWatcher}"
 								android:id="@+id/action_name" />
 
 						<EditText
 								android:layout_width="match_parent"
 								android:layout_height="wrap_content"
 								android:hint="@string/URL"
-								app:textWatcher="@{action.urlWatcher}"
+								app:textWatcher="@{actionEditor.urlWatcher}"
 								android:inputType="textUri"
 								android:layout_gravity="center_vertical"
 								android:textAppearance="@style/TextAppearance.AppCompat"
@@ -155,8 +158,6 @@
 							android:id="@+id/action_delete" />
 				</LinearLayout>
 			</FrameLayout>
-
-
 
 			<ImageView
 					android:layout_width="wrap_content"

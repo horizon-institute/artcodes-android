@@ -1,4 +1,4 @@
-package uk.ac.horizon.artcodes.storage;
+package uk.ac.horizon.artcodes.account;
 
 import android.content.Context;
 import android.graphics.Bitmap;
@@ -14,6 +14,7 @@ import com.google.common.hash.HashingInputStream;
 import com.google.common.hash.HashingOutputStream;
 import com.google.common.io.ByteStreams;
 import uk.ac.horizon.artcodes.model.Experience;
+import uk.ac.horizon.artcodes.source.HTTPSource;
 
 import java.io.ByteArrayInputStream;
 import java.io.File;
@@ -34,14 +35,14 @@ class AppEngineUpload implements Runnable
 	private static final String root = "http://aestheticodes.appspot.com/experience";
 	private static final int imageMaxSize = 1024;
 	private final Context context;
-	private AppEngineStore store;
-	private Saver saver;
+	private AppEngineAccount account;
+	private Experience experience;
 
-	public AppEngineUpload(Context context, AppEngineStore store, Saver saver)
+	public AppEngineUpload(Context context, AppEngineAccount account, Experience experience)
 	{
 		this.context = context;
-		this.store = store;
-		this.saver = saver;
+		this.account = account;
+		this.experience = experience;
 	}
 
 	@Override
@@ -52,7 +53,6 @@ class AppEngineUpload implements Runnable
 			// TODO Save temp file, notify starting
 
 			// If auto upload
-			final Experience experience = saver.getItem();
 			experience.update();
 
 			final Set<String> images = new HashSet<>();
@@ -98,10 +98,10 @@ class AppEngineUpload implements Runnable
 			}
 
 			String charset= HttpHeaderParser.parseCharset(headers, "UTF-8");
-			Experience saved = saver.parser.parse(new InputStreamReader(new ByteArrayInputStream(bytes), charset));
+			Experience saved = account.getGson().fromJson(new InputStreamReader(new ByteArrayInputStream(bytes), charset), Experience.class);
 
 			Cache.Entry entry = HttpHeaderParser.parseCacheHeaders(new NetworkResponse(connection.getResponseCode(), bytes, headers, false));
-			HTTPStore.getQueue(context).getCache().put(saved.getId(), entry);
+			HTTPSource.getQueue(context).getCache().put(saved.getId(), entry);
 		}
 		catch (Exception e)
 		{
@@ -192,7 +192,7 @@ class AppEngineUpload implements Runnable
 		String token = null;
 		try
 		{
-			token = store.getToken();
+			token = account.getToken();
 			connection.setRequestProperty("Authorization", "Bearer " + token);
 		}
 		catch (Exception e)
@@ -244,7 +244,7 @@ class AppEngineUpload implements Runnable
 		String token = null;
 		try
 		{
-			token = store.getToken();
+			token = account.getToken();
 			connection.setRequestProperty("Authorization", "Bearer " + token);
 		}
 		catch (Exception e)
@@ -252,7 +252,7 @@ class AppEngineUpload implements Runnable
 			Log.e("", e.getMessage(), e);
 		}
 
-		String experienceJSON = saver.toJson();
+		String experienceJSON = account.getGson().toJson(experience);
 		Log.i("", "Saving " + experienceJSON);
 		OutputStreamWriter out = new OutputStreamWriter(connection.getOutputStream());
 		out.write(experienceJSON);

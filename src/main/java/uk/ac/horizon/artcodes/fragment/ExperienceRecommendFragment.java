@@ -22,7 +22,6 @@ package uk.ac.horizon.artcodes.fragment;
 import android.content.Intent;
 import android.net.Uri;
 import android.os.Bundle;
-import android.support.v4.app.Fragment;
 import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
@@ -35,16 +34,14 @@ import uk.ac.horizon.artcodes.activity.ExperienceActivity;
 import uk.ac.horizon.artcodes.databinding.ExperienceItemBinding;
 import uk.ac.horizon.artcodes.databinding.ExperienceSelectBinding;
 import uk.ac.horizon.artcodes.databinding.ExperienceSelectGroupBinding;
-import uk.ac.horizon.artcodes.json.ExperienceParserFactory;
+import uk.ac.horizon.artcodes.ExperienceParser;
 import uk.ac.horizon.artcodes.model.Experience;
-import uk.ac.horizon.artcodes.storage.ExperienceListStore;
-import uk.ac.horizon.artcodes.storage.ExperienceStorage;
-import uk.ac.horizon.artcodes.storage.StoreListener;
+import uk.ac.horizon.artcodes.source.Target;
 
 import java.util.List;
 import java.util.Map;
 
-public class ExperienceSelectFragment extends Fragment
+public class ExperienceRecommendFragment extends ArtcodeFragmentBase
 {
 	private static final int RECENT_MAX = 3;
 	private ExperienceSelectBinding binding;
@@ -104,16 +101,22 @@ public class ExperienceSelectFragment extends Fragment
 
 	private void loadExperiences(final LayoutInflater inflater)
 	{
-		final List<String> allRecentItems = ExperienceListStore.with(getActivity(), "recent").get();
-		updateGroup(inflater, recentBinding, allRecentItems.subList(0, Math.min(RECENT_MAX, allRecentItems.size())));
-		ExperienceStorage.loadRecommended().async(new StoreListener<Map<String, List<String>>>()
+		getAccount().getRecent().loadInto(new Target<List<String>>() {
+			@Override
+			public void onLoaded(List<String> item)
+			{
+				updateGroup(inflater, recentBinding, item.subList(0, Math.min(RECENT_MAX, item.size())));
+			}
+		});
+
+		getAccount().getRecommended().loadInto(new Target<Map<String, List<String>>>()
 		{
 			@Override
-			public void onItemChanged(Map<String, List<String>> experiences)
+			public void onLoaded(Map<String, List<String>> item)
 			{
-				updateGroup(inflater, nearbyBinding, experiences.get("nearby"));
-				updateGroup(inflater, newBinding, experiences.get("new"));
-				updateGroup(inflater, popularBinding, experiences.get("popular"));
+				updateGroup(inflater, nearbyBinding, item.get("nearby"));
+				updateGroup(inflater, newBinding, item.get("new"));
+				updateGroup(inflater, popularBinding, item.get("popular"));
 			}
 		});
 	}
@@ -121,7 +124,7 @@ public class ExperienceSelectFragment extends Fragment
 	private void startActivity(Class<?> activity, Experience experience)
 	{
 		Intent intent = new Intent(getActivity(), activity);
-		intent.putExtra("experience", ExperienceParserFactory.toJson(experience));
+		intent.putExtra("experience", ExperienceParser.createGson(getActivity()).toJson(experience));
 		startActivity(intent);
 	}
 
@@ -139,10 +142,10 @@ public class ExperienceSelectFragment extends Fragment
 				final ExperienceItemBinding experienceBinding = ExperienceItemBinding.inflate(inflater, binding.items, false);
 				experienceBinding.getRoot().setVisibility(View.GONE);
 				Log.i("", uri);
-				ExperienceStorage.load(Experience.class).fromUri(uri).async(new StoreListener<Experience>()
+				getAccount().getExperience(uri).loadInto(new Target<Experience>()
 				{
 					@Override
-					public void onItemChanged(final Experience experience)
+					public void onLoaded(final Experience experience)
 					{
 						experienceBinding.setExperience(experience);
 						experienceBinding.getRoot().setOnClickListener(new View.OnClickListener()

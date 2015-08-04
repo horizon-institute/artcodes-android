@@ -15,7 +15,7 @@ import uk.ac.horizon.artcodes.Feature;
 import uk.ac.horizon.artcodes.R;
 import uk.ac.horizon.artcodes.databinding.NavigationBinding;
 import uk.ac.horizon.artcodes.fragment.ExperienceLibraryFragment;
-import uk.ac.horizon.artcodes.fragment.ExperienceSelectFragment;
+import uk.ac.horizon.artcodes.fragment.ExperienceRecommendFragment;
 import uk.ac.horizon.artcodes.fragment.ExperienceStarFragment;
 import uk.ac.horizon.artcodes.fragment.FeatureListFragment;
 
@@ -141,7 +141,7 @@ public class NavigationActivity extends AppCompatActivity implements
 		switch (item.getItemId())
 		{
 			case R.id.nav_home:
-				getSupportFragmentManager().beginTransaction().replace(R.id.content, new ExperienceSelectFragment()).commit();
+				getSupportFragmentManager().beginTransaction().replace(R.id.content, new ExperienceRecommendFragment()).commit();
 				break;
 
 			case R.id.nav_starred:

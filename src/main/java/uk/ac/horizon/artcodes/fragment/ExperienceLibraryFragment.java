@@ -2,7 +2,6 @@ package uk.ac.horizon.artcodes.fragment;
 
 import android.os.Bundle;
 import android.support.annotation.Nullable;
-import android.support.v4.app.Fragment;
 import android.support.v7.widget.LinearLayoutManager;
 import android.view.LayoutInflater;
 import android.view.View;
@@ -11,13 +10,8 @@ import uk.ac.horizon.artcodes.activity.ExperienceEditActivity;
 import uk.ac.horizon.artcodes.adapter.ExperienceAdapter;
 import uk.ac.horizon.artcodes.databinding.ExperienceLibraryBinding;
 import uk.ac.horizon.artcodes.model.Experience;
-import uk.ac.horizon.artcodes.storage.ExperienceListStore;
-import uk.ac.horizon.artcodes.storage.ExperienceStorage;
-import uk.ac.horizon.artcodes.storage.StoreListener;
 
-import java.util.List;
-
-public class ExperienceLibraryFragment extends Fragment
+public class ExperienceLibraryFragment extends ArtcodeFragmentBase
 {
 	private ExperienceLibraryBinding binding;
 	private ExperienceAdapter adapter;
@@ -40,8 +34,6 @@ public class ExperienceLibraryFragment extends Fragment
 			}
 		});
 
-		loadExperiences();
-
 		return binding.getRoot();
 	}
 
@@ -62,30 +54,10 @@ public class ExperienceLibraryFragment extends Fragment
 		}
 	}
 
-	private void loadExperiences()
+	@Override
+	public void onResume()
 	{
-		//binding.progress.setRefreshing(true);
-
-		ExperienceStorage.loadLibrary().async(new StoreListener<List<String>>()
-		{
-			@Override
-			public void onItemChanged(final List<String> uris)
-			{
-				ExperienceListStore.with(getActivity(), "library").set(uris);
-
-				//binding.progress.setRefreshing(false);
-				for (String uri : uris)
-				{
-					ExperienceStorage.load(Experience.class).fromUri(uri).async(new StoreListener<Experience>()
-					{
-						@Override
-						public void onItemChanged(Experience item)
-						{
-							adapter.add(item);
-						}
-					});
-				}
-			}
-		});
+		super.onResume();
+		getAccount().getLibrary().loadInto(adapter);
 	}
 }

@@ -21,16 +21,13 @@ package uk.ac.horizon.artcodes.model;
 
 import android.databinding.BaseObservable;
 import android.databinding.Bindable;
-import android.net.Uri;
-import uk.ac.horizon.artcodes.scanner.BR;
-import uk.ac.horizon.artcodes.ui.SimpleTextWatcher;
 
 import java.util.ArrayList;
 import java.util.List;
 
 public class Action extends BaseObservable
 {
-	private static final String HTTP_PREFIX = "http://";
+	public static final String HTTP_PREFIX = "http://";
 
 	public enum Match
 	{
@@ -87,28 +84,6 @@ public class Action extends BaseObservable
 		this.name = name;
 	}
 
-	public SimpleTextWatcher getNameWatcher()
-	{
-		return new SimpleTextWatcher()
-		{
-			@Override
-			public String getText()
-			{
-				return name;
-			}
-
-			@Override
-			public void onTextChanged(String value)
-			{
-				if (!value.equals(name))
-				{
-					name = value;
-					notifyPropertyChanged(BR.name);
-				}
-			}
-		};
-	}
-
 	public boolean getShowDetail()
 	{
 		return showDetail;
@@ -128,35 +103,6 @@ public class Action extends BaseObservable
 	public void setUrl(String url)
 	{
 		this.url = url;
-	}
-
-	public SimpleTextWatcher getUrlWatcher()
-	{
-		return new SimpleTextWatcher()
-		{
-			@Override
-			public String getText()
-			{
-				return getDisplayUrl();
-			}
-
-			@Override
-			public void onTextChanged(String value)
-			{
-				Uri uri = Uri.parse(value);
-				String urlValue = value;
-				if(uri.getScheme() == null)
-				{
-					urlValue = HTTP_PREFIX + value;
-				}
-				if (!urlValue.equals(url))
-				{
-					url = urlValue;
-					notifyPropertyChanged(BR.url);
-					notifyPropertyChanged(BR.displayUrl);
-				}
-			}
-		};
 	}
 
 	@Bindable

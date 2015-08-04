@@ -15,10 +15,11 @@ import com.google.common.collect.Ordering;
 import uk.ac.horizon.artcodes.activity.ArtcodeActivity;
 import uk.ac.horizon.artcodes.activity.ExperienceActivity;
 import uk.ac.horizon.artcodes.databinding.ExperienceItemBinding;
-import uk.ac.horizon.artcodes.json.ExperienceParserFactory;
+import uk.ac.horizon.artcodes.ExperienceParser;
 import uk.ac.horizon.artcodes.model.Experience;
+import uk.ac.horizon.artcodes.source.Target;
 
-public class ExperienceAdapter extends RecyclerView.Adapter<ExperienceAdapter.ExperienceViewHolder>
+public class ExperienceAdapter extends RecyclerView.Adapter<ExperienceAdapter.ExperienceViewHolder> implements Target<Experience>
 {
 	public static final Ordering<String> CASE_INSENSITIVE_NULL_SAFE_ORDER =
 			Ordering.from(String.CASE_INSENSITIVE_ORDER).nullsLast();
@@ -67,11 +68,6 @@ public class ExperienceAdapter extends RecyclerView.Adapter<ExperienceAdapter.Ex
 		});
 	}
 
-	public void add(Experience item)
-	{
-		experiences.add(item);
-	}
-
 	@Override
 	public int getItemCount()
 	{
@@ -107,10 +103,16 @@ public class ExperienceAdapter extends RecyclerView.Adapter<ExperienceAdapter.Ex
 		return new ExperienceViewHolder(ExperienceItemBinding.inflate(LayoutInflater.from(parent.getContext()), parent, false));
 	}
 
+	@Override
+	public void onLoaded(Experience item)
+	{
+		experiences.add(item);
+	}
+
 	private void startActivity(Class<?> activity, Experience experience)
 	{
 		Intent intent = new Intent(context, activity);
-		intent.putExtra("experience", ExperienceParserFactory.toJson(experience));
+		intent.putExtra("experience", ExperienceParser.createGson(context).toJson(experience));
 		context.startActivity(intent);
 	}
 }

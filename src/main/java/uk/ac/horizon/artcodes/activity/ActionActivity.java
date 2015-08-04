@@ -23,22 +23,21 @@ import android.content.Intent;
 import android.databinding.DataBindingUtil;
 import android.net.Uri;
 import android.os.Bundle;
-import android.support.v7.app.AppCompatActivity;
 import android.view.View;
-import uk.ac.horizon.artcodes.ArtcodeStorage;
 import uk.ac.horizon.artcodes.GoogleAnalytics;
 import uk.ac.horizon.artcodes.R;
 import uk.ac.horizon.artcodes.databinding.ActionBinding;
-import uk.ac.horizon.artcodes.json.ExperienceParserFactory;
+import uk.ac.horizon.artcodes.ExperienceParser;
 import uk.ac.horizon.artcodes.model.Action;
-import uk.ac.horizon.artcodes.storage.StoreListener;
+import uk.ac.horizon.artcodes.source.IntentSource;
+import uk.ac.horizon.artcodes.source.Target;
 
-public class ActionActivity extends AppCompatActivity
+public class ActionActivity extends ArtcodeActivityBase
 {
 	public static void start(Context context, Action action)
 	{
 		Intent intent = new Intent(context, ActionActivity.class);
-		intent.putExtra("action", ExperienceParserFactory.toJson(action));
+		intent.putExtra("action", ExperienceParser.createGson(context).toJson(action));
 		context.startActivity(intent);
 	}
 
@@ -50,18 +49,13 @@ public class ActionActivity extends AppCompatActivity
 		super.onCreate(savedInstanceState);
 
 		binding = DataBindingUtil.setContentView(this, R.layout.action);
-		Intent intent = getIntent();
-		if (intent.getStringExtra("action") != null)
-		{
-			ArtcodeStorage.load(Action.class).fromJson(intent.getStringExtra("action")).async(new StoreListener<Action>()
+		new IntentSource<Action>(getAccount(), getIntent(), savedInstanceState, Action.class).loadInto(new Target<Action>() {
+			@Override
+			public void onLoaded(Action item)
 			{
-				@Override
-				public void onItemChanged(Action item)
-				{
-					binding.setAction(item);
-				}
-			});
-		}
+				binding.setAction(item);
+			}
+		});
 	}
 
 	public void open(View view)

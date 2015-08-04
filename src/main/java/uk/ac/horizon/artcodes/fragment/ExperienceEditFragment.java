@@ -5,7 +5,7 @@ import android.support.v4.app.Fragment;
 import uk.ac.horizon.artcodes.activity.ExperienceEditActivity;
 import uk.ac.horizon.artcodes.model.Experience;
 
-public abstract class ExperienceEditFragment extends Fragment
+public abstract class ExperienceEditFragment extends ArtcodeFragmentBase
 {
 	public Experience getExperience()
 	{

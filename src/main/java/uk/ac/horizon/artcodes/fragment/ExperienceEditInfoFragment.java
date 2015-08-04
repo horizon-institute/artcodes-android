@@ -7,6 +7,7 @@ import android.view.View;
 import android.view.ViewGroup;
 import uk.ac.horizon.artcodes.R;
 import uk.ac.horizon.artcodes.databinding.ExperienceEditInfoBinding;
+import uk.ac.horizon.artcodes.ui.ExperienceEditor;
 
 public class ExperienceEditInfoFragment extends ExperienceEditFragment
 {
@@ -31,5 +32,6 @@ public class ExperienceEditInfoFragment extends ExperienceEditFragment
 	{
 		super.onResume();
 		binding.setExperience(getExperience());
+		binding.setExperienceEditor(new ExperienceEditor(getExperience()));
 	}
 }

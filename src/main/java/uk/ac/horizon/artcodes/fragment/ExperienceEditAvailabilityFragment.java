@@ -16,12 +16,11 @@ import android.widget.DatePicker;
 import com.google.android.gms.location.places.Place;
 import com.google.android.gms.location.places.ui.PlacePicker;
 import uk.ac.horizon.artcodes.R;
+import uk.ac.horizon.artcodes.account.AccountInfo;
+import uk.ac.horizon.artcodes.databinding.AccountBinding;
 import uk.ac.horizon.artcodes.databinding.AvailabilityEditBinding;
 import uk.ac.horizon.artcodes.databinding.ExperienceEditAvailabilitiesBinding;
-import uk.ac.horizon.artcodes.databinding.StoreBinding;
 import uk.ac.horizon.artcodes.model.Availability;
-import uk.ac.horizon.artcodes.storage.ExperienceStorage;
-import uk.ac.horizon.artcodes.storage.ExperienceStore;
 
 import java.util.Calendar;
 import java.util.List;
@@ -178,7 +177,7 @@ public class ExperienceEditAvailabilityFragment extends ExperienceEditFragment
 	public View onCreateView(LayoutInflater inflater, ViewGroup container, Bundle savedInstanceState)
 	{
 		binding = ExperienceEditAvailabilitiesBinding.inflate(inflater, container, false);
-		binding.setStore(ExperienceStorage.getDefaultStore());
+		binding.setAccount(getAccount().getInfo());
 		binding.storeToggle.setOnClickListener(new View.OnClickListener()
 		{
 			@Override
@@ -231,18 +230,18 @@ public class ExperienceEditAvailabilityFragment extends ExperienceEditFragment
 		}
 	}
 
-	private StoreBinding createStore(final ExperienceStore store)
+	private AccountBinding createAccount(final AccountInfo account)
 	{
-		final StoreBinding accountBinding = StoreBinding.inflate(getActivity().getLayoutInflater(), binding.accountList, false);
-		accountBinding.setStore(store);
+		final AccountBinding accountBinding = AccountBinding.inflate(getActivity().getLayoutInflater(), binding.accountList, false);
+		accountBinding.setAccount(account);
 		accountBinding.getRoot().setOnClickListener(new View.OnClickListener()
 		{
 			@Override
 			public void onClick(View v)
 			{
-				binding.setStore(store);
+				binding.setAccount(account);
 				binding.setShowAccounts(false);
-				updateStores();
+				updateAccounts();
 			}
 		});
 
@@ -270,14 +269,14 @@ public class ExperienceEditAvailabilityFragment extends ExperienceEditFragment
 		dialog.show();
 	}
 
-	private void updateStores()
+	private void updateAccounts()
 	{
 		binding.accountList.removeAllViews();
-		for (ExperienceStore store : ExperienceStorage.list())
+		for (AccountInfo account : getArtcodes().getAccounts())
 		{
-			if (store != binding.getStore())
+			if (account != binding.getAccount())
 			{
-				createStore(store);
+				createAccount(account);
 			}
 		}
 	}

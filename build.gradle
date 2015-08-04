@@ -47,6 +47,7 @@ dependencies {
 	compile 'com.google.android.gms:play-services-analytics:7.5.0'
 	compile 'com.google.android.gms:play-services-identity:7.5.0'
 	compile 'com.google.android.gms:play-services-plus:7.5.0'
+	compile 'com.mcxiaoke.volley:library:1.0.16'
 }
 
 android {

@@ -24,7 +24,6 @@ import android.util.Log;
 import android.widget.CompoundButton;
 import uk.ac.horizon.artcodes.scanner.BR;
 import uk.ac.horizon.artcodes.scanner.process.ImageProcessor;
-import uk.ac.horizon.artcodes.ui.SimpleTextWatcher;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -96,28 +95,6 @@ public class Experience extends BaseObservable
 	public String getChecksumText()
 	{
 		return Integer.toString(checksumModulo);
-	}
-
-	public SimpleTextWatcher getDescWatcher()
-	{
-		return new SimpleTextWatcher()
-		{
-			@Override
-			public String getText()
-			{
-				return description;
-			}
-
-			@Override
-			public void onTextChanged(String value)
-			{
-				if (!value.equals(description))
-				{
-					description = value;
-					notifyPropertyChanged(BR.description);
-				}
-			}
-		};
 	}
 
 	@Bindable
@@ -219,28 +196,6 @@ public class Experience extends BaseObservable
 	public void setName(String name)
 	{
 		this.name = name;
-	}
-
-	public SimpleTextWatcher getNameWatcher()
-	{
-		return new SimpleTextWatcher()
-		{
-			@Override
-			public String getText()
-			{
-				return name;
-			}
-
-			@Override
-			public void onTextChanged(String value)
-			{
-				if (!value.equals(name))
-				{
-					name = value;
-					notifyPropertyChanged(BR.name);
-				}
-			}
-		};
 	}
 
 	public String getNextUnusedCode()

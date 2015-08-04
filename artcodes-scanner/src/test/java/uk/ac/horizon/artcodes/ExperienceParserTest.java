@@ -1,17 +1,15 @@
-package uk.ac.horizon.artcodes.json;
+package uk.ac.horizon.artcodes;
 
+import com.google.gson.Gson;
 import org.junit.Test;
 import uk.ac.horizon.artcodes.model.Action;
 import uk.ac.horizon.artcodes.model.Experience;
 import uk.ac.horizon.artcodes.scanner.process.ImageProcessor;
 import uk.ac.horizon.artcodes.scanner.process.TileThresholder;
 
-import java.io.File;
-import java.io.FileReader;
 import java.io.IOException;
-import java.net.URL;
 
-public class JsonTest
+public class ExperienceParserTest
 {
 	@Test
 	public void testExperienceRoundTrip() throws IOException
@@ -20,10 +18,10 @@ public class JsonTest
 		final Action action = new Action();
 		experience.getActions().add(action);
 
-		final JsonParser<Experience> parser = new ExperienceParserFactory(null).parserFor(Experience.class);
-		final String json1 = parser.toJson(experience);
-		final Experience parsed = parser.parse(json1);
-		final String json2 = parser.toJson(parsed);
+		final Gson gson = ExperienceParser.createGson(null);
+		final String json1 = gson.toJson(experience);
+		final Experience parsed = gson.fromJson(json1, Experience.class);
+		final String json2 = gson.toJson(parsed);
 
 		assert json1.equals(json2);
 	}
@@ -59,11 +57,11 @@ public class JsonTest
 	{
 		ImageProcessor imageProcessor = new TileThresholder();
 
-		final JsonParser<ImageProcessor> parser = new ExperienceParserFactory(null).parserFor(ImageProcessor.class);
+		final Gson gson = ExperienceParser.createGson(null);
 
-		String json = parser.toJson(imageProcessor);
+		String json = gson.toJson(imageProcessor);
 
-		ImageProcessor parsed = parser.parse(json);
+		ImageProcessor parsed = gson.fromJson(json, ImageProcessor.class);
 		assert parsed != null;
 		assert parsed.getClass().equals(TileThresholder.class);
 	}

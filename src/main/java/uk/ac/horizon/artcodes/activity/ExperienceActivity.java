@@ -25,24 +25,22 @@ import android.databinding.DataBindingUtil;
 import android.os.Build;
 import android.os.Bundle;
 import android.text.Layout;
-import android.util.Log;
 import android.view.View;
 import android.view.ViewTreeObserver;
 import uk.ac.horizon.artcodes.Feature;
 import uk.ac.horizon.artcodes.GoogleAnalytics;
 import uk.ac.horizon.artcodes.R;
 import uk.ac.horizon.artcodes.databinding.ExperienceBinding;
-import uk.ac.horizon.artcodes.json.ExperienceParserFactory;
+import uk.ac.horizon.artcodes.ExperienceParser;
 import uk.ac.horizon.artcodes.model.Experience;
-import uk.ac.horizon.artcodes.scanner.activity.ExperienceActivityBase;
-import uk.ac.horizon.artcodes.storage.ExperienceListStore;
+import uk.ac.horizon.artcodes.source.UriList;
 
 public class ExperienceActivity extends ExperienceActivityBase
 {
 	public static void start(Context context, Experience experience)
 	{
 		Intent intent = new Intent(context, ExperienceActivity.class);
-		intent.putExtra("experience", ExperienceParserFactory.toJson(experience));
+		intent.putExtra("experience", ExperienceParser.createGson(context).toJson(experience));
 		context.startActivity(intent);
 	}
 
@@ -54,14 +52,9 @@ public class ExperienceActivity extends ExperienceActivityBase
 	}
 
 	@Override
-	public void onItemChanged(Experience experience)
+	public void onLoaded(Experience experience)
 	{
-		super.onItemChanged(experience);
-		Log.i("", "Set experience " + experience);
-		if (experience != null)
-		{
-			GoogleAnalytics.trackEvent("Experience", "Loaded " + experience.getId());
-		}
+		super.onLoaded(experience);
 		binding.setExperience(experience);
 
 		if (Feature.get(this, R.bool.feature_history).isEnabled())
@@ -129,14 +122,14 @@ public class ExperienceActivity extends ExperienceActivityBase
 
 	public void starExperience(View view)
 	{
-		ExperienceListStore store = ExperienceListStore.with(this, "starred");
-		if (store.contains(getUri()))
+		UriList<Experience> starred = getAccount().getStarred();
+		if (starred.contains(getUri()))
 		{
-			store.remove(getUri());
+			starred.remove(getUri());
 		}
 		else
 		{
-			store.add(getUri());
+			starred.add(getUri());
 		}
 		updateStarred();
 	}
@@ -180,8 +173,7 @@ public class ExperienceActivity extends ExperienceActivityBase
 
 	private void updateStarred()
 	{
-		ExperienceListStore store = ExperienceListStore.with(this, "starred");
-		if (store.contains(getUri()))
+		if (getAccount().getStarred().contains(getUri()))
 		{
 			binding.experienceFavouriteButton.setText(R.string.unstar);
 			binding.experienceFavouriteButton.setCompoundDrawablesWithIntrinsicBounds(0, R.drawable.ic_star_black_24dp, 0, 0);

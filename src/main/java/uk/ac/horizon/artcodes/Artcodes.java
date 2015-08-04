@@ -19,43 +19,64 @@
 
 package uk.ac.horizon.artcodes;
 
-import android.accounts.Account;
 import android.accounts.AccountManager;
 import android.app.Application;
+import android.util.Log;
 import com.google.android.gms.auth.GoogleAuthUtil;
-import uk.ac.horizon.artcodes.json.ExperienceParserFactory;
-import uk.ac.horizon.artcodes.storage.AppEngineStore;
-import uk.ac.horizon.artcodes.storage.ContentStore;
-import uk.ac.horizon.artcodes.storage.ExperienceFileStore;
-import uk.ac.horizon.artcodes.storage.HTTPStore;
-import uk.ac.horizon.artcodes.storage.JsonStore;
-import uk.ac.horizon.artcodes.storage.Storage;
+import uk.ac.horizon.artcodes.account.Account;
+import uk.ac.horizon.artcodes.account.AccountInfo;
+import uk.ac.horizon.artcodes.account.AppEngineAccount;
+import uk.ac.horizon.artcodes.account.LocalAccount;
+import uk.ac.horizon.artcodes.source.ContentSource;
+import uk.ac.horizon.artcodes.source.FileSource;
+import uk.ac.horizon.artcodes.source.HTTPSource;
+
+import java.util.ArrayList;
+import java.util.List;
 
 public final class Artcodes extends Application
 {
+	private Account account;
+
 	@Override
 	public void onCreate()
 	{
 		super.onCreate();
 		GoogleAnalytics.initialize(this);
 
-		Storage storage = new Storage(new ExperienceParserFactory(this));
-
-		final AccountManager manager = AccountManager.get(this);
-		final Account[] accounts = manager.getAccountsByType(GoogleAuthUtil.GOOGLE_ACCOUNT_TYPE);
-		for (Account account : accounts)
-		{
-			storage.register(new AppEngineStore(this, account.name));
-		}
-
-		storage.register(new ExperienceFileStore());
-		storage.register(new ContentStore(this));
-		storage.register(new JsonStore());
-		storage.register(new JsonStore("x-artcode-scan"));
-		storage.register(new HTTPStore(this));
-
-		ArtcodeStorage.setStorage(storage);
+		// TODO SharedPreferences
+		final List<AccountInfo> infos = getAccounts();
+		setAccount(infos.get(0).create());
 	}
+
+	public Account getAccount()
+	{
+		return account;
+	}
+
+	public List<AccountInfo> getAccounts()
+	{
+		final List<AccountInfo> result = new ArrayList<>();
+		final AccountManager manager = AccountManager.get(this);
+		final android.accounts.Account[] accounts = manager.getAccountsByType(GoogleAuthUtil.GOOGLE_ACCOUNT_TYPE);
+		for(android.accounts.Account account: accounts)
+		{
+			result.add(new AppEngineAccount.Info(this, account.name));
+		}
+		result.add(new LocalAccount.Info(this));
+		return result;
+	}
+
+	public void setAccount(Account account)
+	{
+		this.account = account;
+
+		account.add(new ContentSource.Factory());
+		account.add(new HTTPSource.Factory());
+		account.add(new FileSource.Factory());
+	}
+
+	//public List<Ac>
 
 //	public static File createImageLogFile()
 //	{

@@ -27,8 +27,8 @@
 		<import type="android.view.View" />
 
 		<variable
-				name="store"
-				type="uk.ac.horizon.artcodes.storage.ExperienceStore" />
+				name="account"
+				type="uk.ac.horizon.artcodes.account.AccountInfo" />
 	</data>
 
 	<LinearLayout
@@ -44,7 +44,7 @@
 				android:layout_margin="16dp"
 				tools:src="@drawable/ic_smartphone_black_36dp"
 				android:tint="@color/ic_tint"
-				android:src="@{store.icon}" />
+				android:src="@{account.icon}" />
 
 		<LinearLayout
 				android:layout_width="0dp"
@@ -56,15 +56,15 @@
 			<TextView
 					android:layout_width="match_parent"
 					android:layout_height="wrap_content"
-					android:text="@{store.saveText}"
+					android:text="@{account.name}"
 					android:textAppearance="@style/TextAppearance.AppCompat"
 					tools:text="Save to Artcode Server" />
 
 			<TextView
 					android:layout_width="match_parent"
 					android:layout_height="wrap_content"
-					android:visibility="@{store.name == null ? View.GONE : View.VISIBLE}"
-					android:text="@{store.name}"
+					android:visibility="@{account.username == null ? View.GONE : View.VISIBLE}"
+					android:text="@{account.username}"
 					android:id="@+id/hint_text"
 					android:textAppearance="@style/TextAppearance.AppCompat.Small"
 					tools:text="kevin.glover@gmail.com" />

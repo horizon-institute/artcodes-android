@@ -25,9 +25,11 @@ import android.support.v4.app.NavUtils;
 import android.util.Log;
 import android.view.MenuItem;
 import android.view.View;
+import uk.ac.horizon.artcodes.Artcodes;
 import uk.ac.horizon.artcodes.Feature;
 import uk.ac.horizon.artcodes.GoogleAnalytics;
 import uk.ac.horizon.artcodes.R;
+import uk.ac.horizon.artcodes.account.Account;
 import uk.ac.horizon.artcodes.databinding.ScannerActionBinding;
 import uk.ac.horizon.artcodes.model.Action;
 import uk.ac.horizon.artcodes.model.Experience;
@@ -35,9 +37,10 @@ import uk.ac.horizon.artcodes.scanner.VisibilityAnimator;
 import uk.ac.horizon.artcodes.scanner.activity.ScannerActivity;
 import uk.ac.horizon.artcodes.scanner.detect.ActionDetectionHandler;
 import uk.ac.horizon.artcodes.scanner.detect.MarkerDetectionHandler;
-import uk.ac.horizon.artcodes.storage.ExperienceListStore;
+import uk.ac.horizon.artcodes.source.IntentSource;
+import uk.ac.horizon.artcodes.source.Target;
 
-public class ArtcodeActivity extends ScannerActivity
+public class ArtcodeActivity extends ScannerActivity implements Target<Experience>
 {
 	private static final String EXTRA_CUSTOM_TABS_SESSION_ID = "android.support.CUSTOM_TABS:session_id";
 
@@ -59,20 +62,26 @@ public class ArtcodeActivity extends ScannerActivity
 		}
 	}
 
-	@Override
-	public void onItemChanged(Experience experience)
+	protected Artcodes getArtcodes()
 	{
-		super.onItemChanged(experience);
+		return (Artcodes) getApplication();
+	}
+
+	protected Account getAccount()
+	{
+		return getArtcodes().getAccount();
+	}
+
+	@Override
+	public void onLoaded(Experience experience)
+	{
+		super.onLoaded(experience);
 
 		Log.i("", "Set experience " + experience);
 		if (experience != null)
 		{
 			GoogleAnalytics.trackEvent("Experience", "Loaded " + experience.getId());
-		}
-
-		if (experience != null)
-		{
-			ExperienceListStore.with(this, "recent").add(experience.getId());
+			getAccount().getRecent().add(experience.getId());
 		}
 	}
 
@@ -82,10 +91,17 @@ public class ArtcodeActivity extends ScannerActivity
 		switch (item.getItemId())
 		{
 			case android.R.id.home:
-				NavUtils.navigateUpTo(this, createIntent(ExperienceActivity.class));
+				NavUtils.navigateUpTo(this, ExperienceActivityBase.createIntent(this, ExperienceActivity.class, getExperience()));
 				return true;
 		}
 		return super.onOptionsItemSelected(item);
+	}
+
+	@Override
+	protected void onPostCreate(Bundle savedInstanceState)
+	{
+		super.onPostCreate(savedInstanceState);
+		new IntentSource<Experience>(getAccount(), getIntent(), savedInstanceState, Experience.class).loadInto(this);
 	}
 
 	@Override
@@ -98,8 +114,8 @@ public class ArtcodeActivity extends ScannerActivity
 			{
 				if (action != null)
 				{
+					// TODO getAccount().scanned(experience.getId(), action, camera);
 					GoogleAnalytics.trackEvent("action", "Detected " + action);
-
 					if (Feature.get(ArtcodeActivity.this, R.bool.feature_log_scanned_images).isEnabled())
 					{
 						try
@@ -155,9 +171,7 @@ public class ArtcodeActivity extends ScannerActivity
 					});
 				}
 			}
-		}
-
-				;
+		};
 	}
 
 	@Override

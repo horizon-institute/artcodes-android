@@ -14,6 +14,7 @@ import uk.ac.horizon.artcodes.databinding.ActionEditBinding;
 import uk.ac.horizon.artcodes.databinding.ActionEditCodeBinding;
 import uk.ac.horizon.artcodes.databinding.ExperienceEditActionsBinding;
 import uk.ac.horizon.artcodes.model.Action;
+import uk.ac.horizon.artcodes.ui.ActionEditor;
 import uk.ac.horizon.artcodes.ui.MarkerFormat;
 import uk.ac.horizon.artcodes.ui.SimpleTextWatcher;
 
@@ -52,6 +53,7 @@ public class ExperienceEditActionFragment extends ExperienceEditFragment
 		{
 			final Action action = actions.get(position);
 			holder.binding.setAction(action);
+			holder.binding.setActionEditor(new ActionEditor(action));
 			holder.binding.editToggle.setOnClickListener(new View.OnClickListener()
 			{
 				@Override

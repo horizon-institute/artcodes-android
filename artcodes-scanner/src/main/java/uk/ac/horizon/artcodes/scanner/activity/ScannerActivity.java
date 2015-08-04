@@ -23,11 +23,11 @@ import android.databinding.DataBindingUtil;
 import android.net.Uri;
 import android.os.Build;
 import android.os.Bundle;
+import android.support.v7.app.AppCompatActivity;
 import android.util.Log;
 import android.view.View;
 import android.view.WindowManager;
 import org.opencv.android.OpenCVLoader;
-import uk.ac.horizon.artcodes.ArtcodeStorage;
 import uk.ac.horizon.artcodes.model.Experience;
 import uk.ac.horizon.artcodes.scanner.ExperienceFrameProcessor;
 import uk.ac.horizon.artcodes.scanner.R;
@@ -38,13 +38,14 @@ import uk.ac.horizon.artcodes.scanner.detect.CodeDetectionHandler;
 import uk.ac.horizon.artcodes.scanner.detect.MarkerDetectionHandler;
 import uk.ac.horizon.artcodes.scanner.overlay.Overlay;
 
-public class ScannerActivity extends ExperienceActivityBase
+public class ScannerActivity extends AppCompatActivity
 {
 	protected ScannerBinding binding;
 	// TODO Use binding variables
 	private CameraAdapter camera;
 	private Overlay overlay;
 	private VisibilityAnimator menuAnimator;
+	private Experience experience;
 
 	public void flipCamera(View view)
 	{
@@ -81,8 +82,6 @@ public class ScannerActivity extends ExperienceActivityBase
 			getWindow().getDecorView().setSystemUiVisibility(View.SYSTEM_UI_FLAG_LAYOUT_HIDE_NAVIGATION | View.SYSTEM_UI_FLAG_LAYOUT_STABLE);
 		}
 
-		ArtcodeStorage.initialize(this);
-
 		binding = DataBindingUtil.setContentView(this, R.layout.scanner);
 		camera = new CameraAdapter(this);
 		binding.setCamera(camera);
@@ -93,10 +92,14 @@ public class ScannerActivity extends ExperienceActivityBase
 		menuAnimator = new VisibilityAnimator(binding.settingsMenu, binding.settingsMenuButton);
 	}
 
-	@Override
-	public void onItemChanged(Experience experience)
+	protected Experience getExperience()
 	{
-		super.onItemChanged(experience);
+		return experience;
+	}
+
+	public void onLoaded(Experience experience)
+	{
+		this.experience = experience;
 		binding.setExperience(experience);
 		if (experience != null)
 		{
