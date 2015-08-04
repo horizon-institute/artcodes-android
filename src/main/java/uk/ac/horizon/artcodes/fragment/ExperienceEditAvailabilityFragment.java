@@ -21,6 +21,7 @@ import uk.ac.horizon.artcodes.databinding.AccountBinding;
 import uk.ac.horizon.artcodes.databinding.AvailabilityEditBinding;
 import uk.ac.horizon.artcodes.databinding.ExperienceEditAvailabilitiesBinding;
 import uk.ac.horizon.artcodes.model.Availability;
+import uk.ac.horizon.artcodes.ui.ExperienceEditor;
 
 import java.util.Calendar;
 import java.util.List;
@@ -210,6 +211,7 @@ public class ExperienceEditAvailabilityFragment extends ExperienceEditFragment
 	{
 		super.onResume();
 		binding.setExperience(getExperience());
+		binding.setExperienceEditor(new ExperienceEditor(getExperience()));
 		binding.list.setAdapter(new AvailabilityAdapter(getExperience().getAvailabilities()));
 	}
 

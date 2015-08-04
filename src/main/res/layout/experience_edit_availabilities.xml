@@ -36,6 +36,9 @@
 
 		<variable name="experience"
 		          type="uk.ac.horizon.artcodes.model.Experience" />
+
+		<variable name="experienceEditor"
+		          type="uk.ac.horizon.artcodes.ui.ExperienceEditor" />
 	</data>
 
 	<android.support.design.widget.CoordinatorLayout
@@ -104,7 +107,7 @@
 					android:layout_margin="16dp"
 					android:text="Available publicly"
 					android:checked="@{experience.published}"
-					app:onCheckedChangeListener="@{experience.publishedListener}" />
+					app:onCheckedChangeListener="@{experienceEditor.publishedListener}" />
 
 			<FrameLayout android:layout_width="match_parent"
 			             android:layout_height="wrap_content">

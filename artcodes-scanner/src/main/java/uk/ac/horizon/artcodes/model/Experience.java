@@ -242,26 +242,6 @@ public class Experience extends BaseObservable
 		this.originalID = originalID;
 	}
 
-	public CompoundButton.OnCheckedChangeListener getPublishedListener()
-	{
-		return new CompoundButton.OnCheckedChangeListener()
-		{
-			@Override
-			public void onCheckedChanged(CompoundButton buttonView, boolean isChecked)
-			{
-				if (isChecked)
-				{
-					visibility = Visibility.published;
-				}
-				else
-				{
-					visibility = Visibility.secret;
-				}
-				notifyPropertyChanged(BR.published);
-			}
-		};
-	}
-
 	public boolean isSharable()
 	{
 		return id != null && (id.startsWith("http:") || id.startsWith("https:"));
@@ -322,6 +302,11 @@ public class Experience extends BaseObservable
 		}
 
 		return true;
+	}
+
+	public void setVisibility(Visibility visibility)
+	{
+		this.visibility = visibility;
 	}
 
 	public void update()

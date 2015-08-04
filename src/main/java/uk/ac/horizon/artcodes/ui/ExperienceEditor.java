@@ -6,6 +6,7 @@ import android.net.Uri;
 import android.os.Build;
 import android.support.v4.util.LruCache;
 import android.widget.Button;
+import android.widget.CompoundButton;
 import android.widget.EditText;
 import android.widget.ImageView;
 import android.widget.TextView;
@@ -48,6 +49,27 @@ public class ExperienceEditor
 					experience.setDescription(value);
 					experience.notifyPropertyChanged(BR.description);
 				}
+			}
+		};
+	}
+
+
+	public CompoundButton.OnCheckedChangeListener getPublishedListener()
+	{
+		return new CompoundButton.OnCheckedChangeListener()
+		{
+			@Override
+			public void onCheckedChanged(CompoundButton buttonView, boolean isChecked)
+			{
+				if (isChecked)
+				{
+					experience.setVisibility(Experience.Visibility.published);
+				}
+				else
+				{
+					experience.setVisibility(Experience.Visibility.secret);
+				}
+				experience.notifyPropertyChanged(BR.published);
 			}
 		};
 	}
