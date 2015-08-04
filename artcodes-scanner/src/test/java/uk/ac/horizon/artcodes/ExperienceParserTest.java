@@ -53,16 +53,19 @@ public class ExperienceParserTest
 	}
 
 	@Test
-	public void testThresholderParse()
+	public void testThresholderExperienceParse()
 	{
-		ImageProcessor imageProcessor = new TileThresholder();
+		Experience experience = new Experience();
+		experience.getProcessors().clear();
+		experience.getProcessors().add(new TileThresholder());
 
 		final Gson gson = ExperienceParser.createGson(null);
 
-		String json = gson.toJson(imageProcessor);
+		String json = gson.toJson(experience);
+		System.out.println(json);
 
-		ImageProcessor parsed = gson.fromJson(json, ImageProcessor.class);
+		Experience parsed = gson.fromJson(json, Experience.class);
 		assert parsed != null;
-		assert parsed.getClass().equals(TileThresholder.class);
+		assert parsed.getProcessors().get(0).getClass().equals(TileThresholder.class);
 	}
 }
