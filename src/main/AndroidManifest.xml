@@ -106,6 +106,7 @@
 		<activity
 				android:name=".activity.ExperienceActivity"
 				android:parentActivityName=".activity.NavigationActivity"
+				android:screenOrientation="portrait"
 				android:exported="true"
 				android:theme="@style/Theme.Artcodes.Transparent">
 			<meta-data
@@ -139,7 +140,8 @@
 			</intent-filter>
 		</activity>
 		<activity
-				android:name=".activity.NavigationActivity">
+				android:name=".activity.NavigationActivity"
+				android:screenOrientation="portrait">
 			<intent-filter>
 				<action android:name="android.intent.action.MAIN" />
 

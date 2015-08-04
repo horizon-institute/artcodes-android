@@ -65,7 +65,13 @@ public class HTTPSource<T> extends UriSource<T>
 			@Override
 			public void onResponse(String response)
 			{
-				target.onLoaded(account.getGson().<T>fromJson(response, type));
+				try {
+					target.onLoaded(account.getGson().<T>fromJson(response, type));
+				}
+				catch (Exception e)
+				{
+					Log.e("HTTPSource", "Something went wrong while trying to parse response from the server. Most likely behind a wifi sign in page.", e);
+				}
 			}
 		}, new Response.ErrorListener()
 		{
