@@ -114,8 +114,12 @@ public class ExperienceFrameProcessor extends FrameProcessor
 		final int colStart = (image.width() - size) / 2;
 		final int rowStart = (image.height() - size) / 2;
 
-		float sizeRatio = Math.max(surfaceHeight, surfaceWidth) / Math.max(image.width(), image.height());
-		int viewfinderSize = (int) Math.max(colStart * sizeRatio, rowStart * sizeRatio);
+		final float surfaceMax = Math.max(surfaceHeight, surfaceWidth);
+
+		float sizeRatio = surfaceMax / Math.max(image.width(), image.height());
+		Log.i("", "Size ratio = " + sizeRatio);
+
+		int viewfinderSize = (int) (Math.max(colStart, rowStart) * sizeRatio);
 		Log.i("", "Size = " + size + ", Viewfinder size = " + viewfinderSize);
 		overlay.setViewfinderSize(viewfinderSize);
 
