@@ -85,6 +85,7 @@ public class AppEngineAccount extends AccountBase
 						String token = getToken();
 						Map<String, String> headers = new HashMap<>();
 						headers.put("Authorization", "Bearer " + token);
+						Log.i("", "Got token " + token);
 						return headers;
 					}
 					catch (Exception e)
@@ -134,7 +135,7 @@ public class AppEngineAccount extends AccountBase
 			@Override
 			public void loadInto(final Target<Experience> target)
 			{
-				new HTTPSource<List<String>>(AppEngineAccount.this, "http://aestheticodes.appspot.com/experiences", new TypeToken<List<String>>() {}.getType()).loadInto(new Target<List<String>>()
+				getSource("http://aestheticodes.appspot.com/experiences", new TypeToken<List<String>>() {}).loadInto(new Target<List<String>>()
 				{
 					@Override
 					public void onLoaded(List<String> item)
