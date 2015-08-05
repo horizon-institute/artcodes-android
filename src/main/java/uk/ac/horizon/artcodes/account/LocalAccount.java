@@ -2,6 +2,8 @@ package uk.ac.horizon.artcodes.account;
 
 import android.content.Context;
 import android.graphics.drawable.Drawable;
+import android.os.Handler;
+import android.os.Looper;
 import android.util.Log;
 import uk.ac.horizon.artcodes.ExperienceParser;
 import uk.ac.horizon.artcodes.R;
@@ -12,6 +14,7 @@ import uk.ac.horizon.artcodes.source.Target;
 
 import java.io.File;
 import java.io.FileWriter;
+import java.net.URI;
 import java.util.UUID;
 
 public class LocalAccount extends AccountBase
@@ -81,25 +84,32 @@ public class LocalAccount extends AccountBase
 			{
 				try
 				{
-					File directory = getDirectory();
-					if (experience.getId() == null || !experience.getId().startsWith("file:"))
+					final File directory = getDirectory();
+					final String directoryURI = directory.toURI().toString();
+					File file;
+					if (experience.getId() == null || !experience.getId().startsWith(directoryURI))
 					{
 						String id = UUID.randomUUID().toString();
-						File file = new File(directory, id);
+						file = new File(directory, id);
 						experience.setId(file.toURI().toString());
-
-						FileWriter writer = new FileWriter(file);
-						getGson().toJson(experience, writer);
-						writer.flush();
-						writer.close();
 					}
+					else
+					{
+						file = new File(URI.create(experience.getId()));
+					}
+					experience.setEditable(true);
+
+					FileWriter writer = new FileWriter(file);
+					getGson().toJson(experience, writer);
+					writer.flush();
+					writer.close();
 				}
 				catch (Exception e)
 				{
 					Log.e("", e.getMessage(), e);
 				}
 			}
-		});
+		}).start();
 	}
 
 	@Override
@@ -116,12 +126,20 @@ public class LocalAccount extends AccountBase
 					public void run()
 					{
 						File directory = getDirectory();
-						for (File file : directory.listFiles())
+						Log.i("", "Listing " + directory.getAbsolutePath());
+						for (final File file : directory.listFiles())
 						{
-							getSource(file.toURI().toString(), Experience.class).loadInto(target);
+							new Handler(Looper.getMainLooper()).post(new Runnable()
+							{
+								@Override
+								public void run()
+								{
+									getSource(file.toURI().toString(), Experience.class).loadInto(target);
+								}
+							});
 						}
 					}
-				});
+				}).start();
 			}
 		};
 	}
