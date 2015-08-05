@@ -25,6 +25,7 @@ public class ExperienceLibraryFragment extends ArtcodeFragmentBase
 		binding.list.setLayoutManager(new LinearLayoutManager(getActivity()));
 		adapter = new ExperienceAdapter(getActivity());
 		binding.list.setAdapter(adapter);
+		binding.progress.setEnabled(false);
 		binding.fab.setOnClickListener(new View.OnClickListener()
 		{
 			@Override

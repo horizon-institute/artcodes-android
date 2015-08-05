@@ -9,10 +9,16 @@
 			android:layout_width="match_parent"
 			android:layout_height="match_parent">
 
-		<android.support.v7.widget.RecyclerView
+		<uk.ac.horizon.artcodes.ui.RefreshView
 				android:layout_width="match_parent"
 				android:layout_height="match_parent"
-				android:id="@+id/list" />
+				android:id="@+id/progress">
+
+			<android.support.v7.widget.RecyclerView
+					android:layout_width="match_parent"
+					android:layout_height="match_parent"
+					android:id="@+id/list" />
+		</uk.ac.horizon.artcodes.ui.RefreshView>
 
 		<android.support.design.widget.FloatingActionButton
 				android:layout_width="wrap_content"

@@ -21,10 +21,10 @@ package uk.ac.horizon.artcodes.fragment;
 
 import android.os.Bundle;
 import android.support.v7.widget.LinearLayoutManager;
+import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
-import android.view.ViewTreeObserver;
 import org.jetbrains.annotations.Nullable;
 import uk.ac.horizon.artcodes.Feature;
 import uk.ac.horizon.artcodes.R;
@@ -53,18 +53,6 @@ public class ExperienceRecommendFragment extends ArtcodeFragmentBase
 		binding.list.setAdapter(adapter);
 		adapter.setShowHeaderItem(Feature.get(getActivity(), R.bool.feature_show_welcome).isEnabled());
 		binding.progress.setEnabled(false);
-		binding.progress.getViewTreeObserver().addOnGlobalLayoutListener(new ViewTreeObserver.OnGlobalLayoutListener()
-		{
-			@Override
-			public void onGlobalLayout()
-			{
-				binding.progress.getViewTreeObserver().removeGlobalOnLayoutListener(this);
-				if (progress != 0)
-				{
-					binding.progress.setRefreshing(true);
-				}
-			}
-		});
 
 		loadExperiences();
 
@@ -94,8 +82,8 @@ public class ExperienceRecommendFragment extends ArtcodeFragmentBase
 			@Override
 			public void onLoaded(List<String> item)
 			{
-				decrementProgress();
 				updateGroup("recent", item.subList(0, Math.min(RECENT_MAX, item.size())));
+				decrementProgress();
 			}
 		});
 
@@ -105,11 +93,11 @@ public class ExperienceRecommendFragment extends ArtcodeFragmentBase
 			@Override
 			public void onLoaded(Map<String, List<String>> item)
 			{
-				decrementProgress();
 				for (String group : item.keySet())
 				{
 					updateGroup(group, item.get(group));
 				}
+				decrementProgress();
 			}
 		});
 	}

@@ -74,7 +74,7 @@ android {
 	defaultConfig {
 		applicationId "uk.ac.horizon.aestheticodes"
 		versionName '3.0 alpha'
-		versionCode 400042
+		versionCode 400043
 		minSdkVersion 10
 		targetSdkVersion 22
 		resConfigs "nodpi", "hdpi", "xhdpi", "xxhdpi", "xxxhdpi"

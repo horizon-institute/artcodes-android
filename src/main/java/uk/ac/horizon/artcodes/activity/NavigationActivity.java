@@ -136,7 +136,6 @@ public class NavigationActivity extends AppCompatActivity implements
 
 	private void navigate(MenuItem item)
 	{
-		Log.i("", "Open " + item.getItemId());
 		binding.toolbar.setTitle(item.getTitle());
 		switch (item.getItemId())
 		{
