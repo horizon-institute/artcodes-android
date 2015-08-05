@@ -19,22 +19,17 @@
 
 package uk.ac.horizon.artcodes.fragment;
 
-import android.content.Intent;
-import android.net.Uri;
 import android.os.Bundle;
-import android.util.Log;
+import android.support.v7.widget.LinearLayoutManager;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
+import android.view.ViewTreeObserver;
 import org.jetbrains.annotations.Nullable;
 import uk.ac.horizon.artcodes.Feature;
 import uk.ac.horizon.artcodes.R;
-import uk.ac.horizon.artcodes.activity.ArtcodeActivity;
-import uk.ac.horizon.artcodes.activity.ExperienceActivity;
-import uk.ac.horizon.artcodes.databinding.ExperienceItemBinding;
-import uk.ac.horizon.artcodes.databinding.ExperienceSelectBinding;
-import uk.ac.horizon.artcodes.databinding.ExperienceSelectGroupBinding;
-import uk.ac.horizon.artcodes.ExperienceParser;
+import uk.ac.horizon.artcodes.adapter.SectionedExperienceAdapter;
+import uk.ac.horizon.artcodes.databinding.ExperienceRecommendBinding;
 import uk.ac.horizon.artcodes.model.Experience;
 import uk.ac.horizon.artcodes.source.Target;
 
@@ -44,140 +39,98 @@ import java.util.Map;
 public class ExperienceRecommendFragment extends ArtcodeFragmentBase
 {
 	private static final int RECENT_MAX = 3;
-	private ExperienceSelectBinding binding;
-	private ExperienceSelectGroupBinding recentBinding;
-	private ExperienceSelectGroupBinding nearbyBinding;
-	private ExperienceSelectGroupBinding newBinding;
-	private ExperienceSelectGroupBinding popularBinding;
+	private SectionedExperienceAdapter adapter;
+	private int progress = 0;
+	private ExperienceRecommendBinding binding;
 
 	@Nullable
 	@Override
 	public View onCreateView(final LayoutInflater inflater, ViewGroup container, Bundle savedInstanceState)
 	{
-		binding = ExperienceSelectBinding.inflate(inflater, container, false);
-		if (Feature.get(getActivity(), R.bool.feature_show_welcome).isEnabled())
+		binding = ExperienceRecommendBinding.inflate(inflater, container, false);
+		binding.list.setLayoutManager(new LinearLayoutManager(getActivity()));
+		adapter = new SectionedExperienceAdapter(getActivity());
+		binding.list.setAdapter(adapter);
+		adapter.setShowHeaderItem(Feature.get(getActivity(), R.bool.feature_show_welcome).isEnabled());
+		binding.progress.setEnabled(false);
+		binding.progress.getViewTreeObserver().addOnGlobalLayoutListener(new ViewTreeObserver.OnGlobalLayoutListener()
 		{
-			binding.welcome.setVisibility(View.VISIBLE);
-			binding.dismissButton.setOnClickListener(new View.OnClickListener()
+			@Override
+			public void onGlobalLayout()
 			{
-				@Override
-				public void onClick(View v)
+				binding.progress.getViewTreeObserver().removeGlobalOnLayoutListener(this);
+				if (progress != 0)
 				{
-					binding.welcome.setVisibility(View.GONE);
-					Feature.get(getActivity(), R.bool.feature_show_welcome).setEnabled(false);
+					binding.progress.setRefreshing(true);
 				}
-			});
-			binding.moreButton.setOnClickListener(new View.OnClickListener()
-			{
-				@Override
-				public void onClick(View v)
-				{
-					startActivity(new Intent(Intent.ACTION_VIEW, Uri.parse("http://aestheticodes.com/info/")));
-				}
-			});
-		}
-		else
-		{
-			binding.welcome.setVisibility(View.GONE);
-		}
+			}
+		});
 
-		recentBinding = ExperienceSelectGroupBinding.inflate(inflater, binding.layout, false);
-		recentBinding.title.setText(R.string.recent);
-		nearbyBinding = ExperienceSelectGroupBinding.inflate(inflater, binding.layout, false);
-		nearbyBinding.title.setText(R.string.hint_near);
-		newBinding = ExperienceSelectGroupBinding.inflate(inflater, binding.layout, false);
-		newBinding.title.setText(R.string.hint_new);
-		popularBinding = ExperienceSelectGroupBinding.inflate(inflater, binding.layout, false);
-		popularBinding.title.setText(R.string.hint_popular);
-		binding.layout.addView(recentBinding.getRoot());
-		binding.layout.addView(nearbyBinding.getRoot());
-		binding.layout.addView(newBinding.getRoot());
-		binding.layout.addView(popularBinding.getRoot());
-
-		loadExperiences(inflater);
+		loadExperiences();
 
 		return binding.getRoot();
 	}
 
-	private void loadExperiences(final LayoutInflater inflater)
+	private void incrementProgress()
 	{
-		getAccount().getRecent().loadInto(new Target<List<String>>() {
+		progress += 1;
+		binding.progress.setRefreshing(true);
+	}
+
+	private void decrementProgress()
+	{
+		progress -= 1;
+		if (progress == 0)
+		{
+			binding.progress.setRefreshing(false);
+		}
+	}
+
+	private void loadExperiences()
+	{
+		incrementProgress();
+		getAccount().getRecent().loadInto(new Target<List<String>>()
+		{
 			@Override
 			public void onLoaded(List<String> item)
 			{
-				updateGroup(inflater, recentBinding, item.subList(0, Math.min(RECENT_MAX, item.size())));
+				decrementProgress();
+				updateGroup("recent", item.subList(0, Math.min(RECENT_MAX, item.size())));
 			}
 		});
 
+		incrementProgress();
 		getAccount().getRecommended().loadInto(new Target<Map<String, List<String>>>()
 		{
 			@Override
 			public void onLoaded(Map<String, List<String>> item)
 			{
-				updateGroup(inflater, nearbyBinding, item.get("nearby"));
-				updateGroup(inflater, newBinding, item.get("new"));
-				updateGroup(inflater, popularBinding, item.get("popular"));
+				decrementProgress();
+				for (String group : item.keySet())
+				{
+					updateGroup(group, item.get(group));
+				}
 			}
 		});
 	}
 
-	private void startActivity(Class<?> activity, Experience experience)
+	private void updateGroup(final String group, List<String> ids)
 	{
-		Intent intent = new Intent(getActivity(), activity);
-		intent.putExtra("experience", ExperienceParser.createGson(getActivity()).toJson(experience));
-		startActivity(intent);
-	}
-
-	private void updateGroup(LayoutInflater inflater, final ExperienceSelectGroupBinding binding, List<String> ids)
-	{
-		if (ids == null || ids.isEmpty())
+		int index = 0;
+		for (final String uri : ids)
 		{
-			binding.getRoot().setVisibility(View.GONE);
-		}
-		else
-		{
-			binding.items.removeAllViews();
-			for (final String uri : ids)
+			final int experienceIndex = index;
+			incrementProgress();
+			getAccount().getExperience(uri).loadInto(new Target<Experience>()
 			{
-				final ExperienceItemBinding experienceBinding = ExperienceItemBinding.inflate(inflater, binding.items, false);
-				experienceBinding.getRoot().setVisibility(View.GONE);
-				Log.i("", uri);
-				getAccount().getExperience(uri).loadInto(new Target<Experience>()
+				@Override
+				public void onLoaded(final Experience experience)
 				{
-					@Override
-					public void onLoaded(final Experience experience)
-					{
-						experienceBinding.setExperience(experience);
-						experienceBinding.getRoot().setOnClickListener(new View.OnClickListener()
-						{
-							@Override
-							public void onClick(View v)
-							{
-								startActivity(ExperienceActivity.class, experience);
-							}
-						});
-						experienceBinding.scanButton.setOnClickListener(new View.OnClickListener()
-						{
-							@Override
-							public void onClick(View v)
-							{
-								startActivity(ArtcodeActivity.class, experience);
-							}
-						});
-						experienceBinding.getRoot().setVisibility(View.VISIBLE);
-						binding.getRoot().setVisibility(View.VISIBLE);
-					}
-				});
-
-				binding.items.addView(experienceBinding.getRoot());
-			}
+					decrementProgress();
+					adapter.addExperience(experience, group, experienceIndex);
+				}
+			});
+			index++;
 		}
 	}
-
-//	@Override
-//	protected void onStart()
-//	{
-//		super.onStart();
-//		GoogleAnalytics.trackScreen("Experience Select Screen");
-//	}
 }

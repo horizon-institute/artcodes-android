@@ -213,6 +213,7 @@ public class ExperienceEditAvailabilityFragment extends ExperienceEditFragment
 		binding.setExperience(getExperience());
 		binding.setExperienceEditor(new ExperienceEditor(getExperience()));
 		binding.list.setAdapter(new AvailabilityAdapter(getExperience().getAvailabilities()));
+		updateAccounts();
 	}
 
 	@Override

@@ -118,6 +118,11 @@ public class Experience extends BaseObservable
 		return embeddedChecksum;
 	}
 
+	public void setEditable(boolean editable)
+	{
+		this.editable = editable;
+	}
+
 	public void setEmbeddedChecksum(boolean embeddedChecksum)
 	{
 		this.embeddedChecksum = embeddedChecksum;

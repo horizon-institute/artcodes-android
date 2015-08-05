@@ -69,7 +69,7 @@ public class AppEngineAccount extends AccountBase
 		@Override
 		public String[] getPrefixes()
 		{
-			return new String[]{"http://aestheticodes.appspot.com/", "https://aestheticodes.appspot.com/"};
+			return new String[]{"http://aestheticodes.appspot.com/", "https://aestheticodes.appspot.com/", "https://www.googleapis.com/plus/v1/people/me"};
 		}
 
 		@Override
@@ -85,7 +85,6 @@ public class AppEngineAccount extends AccountBase
 						String token = getToken();
 						Map<String, String> headers = new HashMap<>();
 						headers.put("Authorization", "Bearer " + token);
-						Log.i("", "Got token " + token);
 						return headers;
 					}
 					catch (Exception e)
