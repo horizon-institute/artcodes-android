@@ -74,6 +74,8 @@ public final class Artcodes extends Application
 		account.add(new ContentSource.Factory());
 		account.add(new HTTPSource.Factory());
 		account.add(new FileSource.Factory());
+
+		Log.i("", "Set account " + account.getInfo().getId());
 	}
 
 	//public List<Ac>
