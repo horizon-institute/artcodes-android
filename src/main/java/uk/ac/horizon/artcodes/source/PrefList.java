@@ -26,7 +26,8 @@ public abstract class PrefList<T> implements UriList<T>
 	public void add(String uri)
 	{
 		List<String> list = getList();
-		list.add(uri);
+		list.remove(uri);
+		list.add(0, uri);
 		preferences.edit().putString(name, gson.toJson(list)).apply();
 	}
 
