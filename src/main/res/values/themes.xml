@@ -66,4 +66,9 @@
 		<item name="android:textAllCaps" tools:ignore="NewApi">true</item>
 		<item name="textAllCaps">true</item>
 	</style>
+
+	<style name="ButtonDark">
+		<item name="colorButtonNormal">@color/apptheme_primary_dark</item>
+		<item name="android:colorButtonNormal">@color/apptheme_primary_dark</item>
+	</style>
 </resources>

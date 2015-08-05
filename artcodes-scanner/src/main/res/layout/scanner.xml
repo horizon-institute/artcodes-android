@@ -63,6 +63,7 @@
 					android:fitsSystemWindows="true"
 					android:background="@color/viewfinder_mask"
 					android:title="@{experience.name}"
+					android:theme="@style/ThemeOverlay.AppCompat.Dark.ActionBar"
 					app:height="@{overlay.viewfinderSize}" />
 
 			<RelativeLayout

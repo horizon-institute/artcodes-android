@@ -81,7 +81,7 @@
 						android:layout_width="match_parent"
 						android:id="@+id/toolbar"
 						app:layout_collapseMode="pin"
-						app:popupTheme="@style/ThemeOverlay.AppCompat.Light" />
+						android:theme="@style/ThemeOverlay.AppCompat.Dark.ActionBar" />
 			</android.support.design.widget.CollapsingToolbarLayout>
 
 		</android.support.design.widget.AppBarLayout>
@@ -134,7 +134,6 @@
 						android:layout_width="wrap_content"
 						android:layout_height="wrap_content"
 						android:id="@+id/experienceDescription"
-						android:layout_gravity="center_horizontal"
 						android:text="@{experience.description}"
 						android:singleLine="false"
 						android:paddingLeft="16dp"
@@ -153,7 +152,8 @@
 						android:onClick="readDescription"
 						android:paddingLeft="16dp"
 						android:paddingRight="16dp"
-						android:layout_marginTop="-8dp" />
+						android:layout_marginTop="-8dp"
+						android:visibility="gone" />
 
 				<LinearLayout
 						android:orientation="horizontal"

@@ -23,6 +23,7 @@
         xmlns:android="http://schemas.android.com/apk/res/android"
         xmlns:app="http://schemas.android.com/apk/res-auto"
         tools:context=".activity.NavigationActivity">
+
 	<ScrollView
 			android:layout_height="match_parent"
 			android:layout_width="match_parent"
@@ -91,9 +92,9 @@
 						        android:textColor="#FFF"
 						        android:id="@+id/dismiss_button"
 						        android:text="@string/gotit"
-						        style="@style/Widget.AppCompat.Button.Borderless"
-						        android:background="@drawable/abc_btn_default_mtrl_shape"
-						        android:backgroundTint="@color/apptheme_primary_dark" />
+						        style="@style/Widget.AppCompat.Button"
+						        android:stateListAnimator="@null"
+						        android:theme="@style/ButtonDark"/>
 					</LinearLayout>
 				</LinearLayout>
 			</android.support.v7.widget.CardView>
