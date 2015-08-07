@@ -152,6 +152,20 @@
 		                android:layout_alignParentRight="true"
 		                android:layout_alignParentEnd="true"
 		                android:layout_alignParentStart="true">
+			<LinearLayout
+				android:id="@+id/historyThumbnails"
+				android:layout_width="fill_parent"
+				android:layout_height="wrap_content"
+				android:gravity="center"
+				android:orientation="horizontal"
+				android:layout_alignParentTop="true"
+				android:layout_alignParentLeft="true"
+				android:layout_alignParentBottom="false"
+				android:layout_alignParentRight="true"
+				android:padding="2dp"
+				android:animateLayoutChanges="true"
+				>
+			</LinearLayout>
 
 			<TextView android:layout_width="fill_parent"
 			          android:layout_height="fill_parent"

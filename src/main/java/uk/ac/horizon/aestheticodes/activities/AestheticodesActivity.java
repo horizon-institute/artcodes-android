@@ -20,10 +20,12 @@ package uk.ac.horizon.aestheticodes.activities;
 
 import android.content.Context;
 import android.content.Intent;
+import android.content.res.Resources;
 import android.net.Uri;
 import android.os.Bundle;
 import android.support.v7.app.ActionBar;
 import android.util.Log;
+import android.util.TypedValue;
 import android.view.Menu;
 import android.view.MenuInflater;
 import android.view.MenuItem;
@@ -32,10 +34,13 @@ import android.view.WindowManager;
 import android.view.animation.Animation;
 import android.view.animation.AnimationUtils;
 import android.widget.Button;
+import android.widget.ImageView;
+import android.widget.LinearLayout;
 
 import org.json.JSONArray;
 import org.json.JSONException;
 import org.json.JSONObject;
+import org.opencv.core.Scalar;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -47,6 +52,8 @@ import uk.ac.horizon.aestheticodes.controllers.ExperienceListController;
 import uk.ac.horizon.aestheticodes.core.activities.ScanActivity;
 import uk.ac.horizon.aestheticodes.model.Experience;
 import uk.ac.horizon.aestheticodes.model.Marker;
+import uk.ac.horizon.aestheticodes.model.Scene;
+import uk.ac.horizon.aestheticodes.model.Thumbnail;
 
 public class AestheticodesActivity extends ScanActivity implements ExperienceListController.Listener
 {
@@ -55,6 +62,13 @@ public class AestheticodesActivity extends ScanActivity implements ExperienceLis
 	private boolean autoOpen = false;
 	private String currentCode = null;
 	private String experienceURL = null;
+
+	private Animation slideAnimation = null;
+	private final Object animationLock = new Object();
+	private enum AnimationState {offScreen, slidingIn, onScreen, slidingOut};
+	private AnimationState animationState = AnimationState.offScreen;
+
+	private static final Scalar thumbnailColour = new Scalar(255, 255, 0, 255);
 
 	@Override
 	public void experienceListChanged()
@@ -112,66 +126,159 @@ public class AestheticodesActivity extends ScanActivity implements ExperienceLis
 	}
 
 	@Override
-	public void markerChanged(final String markerCode)
+	public void markerChanged(final String markerCode, final List<Integer> newMarkerContourIndexes, final int historySize, final Scene scene)
 	{
-		Log.i("", "Marker changing from " + currentCode + " to " + markerCode);
+		Log.i(this.getClass().getName(), "Marker changing from " + currentCode + " to " + markerCode);
 		final String oldCode = currentCode;
 		currentCode = markerCode;
 
-		if (oldCode!=currentCode || (oldCode!=null && !oldCode.equals(currentCode))) {
-			final Marker marker = experience.get().getMarkers().get(markerCode);
-			if (marker != null) {
-				if (autoOpen) {
-					openMarker(marker);
-				} else {
-					runOnUiThread(new Runnable() {
-						@Override
-						public void run() {
-							if (marker.getTitle() != null && !marker.getTitle().isEmpty()) {
+		// create new thumbnails
+		final List<Thumbnail> newMarkerThumbnails = new ArrayList<>();
+		int thumbnailSizeInPixels = (int) TypedValue.applyDimension(TypedValue.COMPLEX_UNIT_DIP, 30, Resources.getSystem().getDisplayMetrics());
+		if (newMarkerContourIndexes!=null)
+		{
+			for (int newMarkerContourIndex : newMarkerContourIndexes)
+			{
+				newMarkerThumbnails.add(new Thumbnail(newMarkerContourIndex, scene, -1, thumbnailSizeInPixels, thumbnailColour));
+			}
+		}
+
+		// update thumbnails
+		final LinearLayout historyView = (LinearLayout) findViewById(R.id.historyThumbnails);
+		if (!newMarkerThumbnails.isEmpty() || historyView.getChildCount() != historySize)
+		{
+			runOnUiThread(new Runnable()
+			{
+				@Override
+				public void run()
+				{
+					for (Thumbnail thumbnail : newMarkerThumbnails)
+					{
+						ImageView thumbnailView = new ImageView(getApplicationContext());
+						thumbnailView.setImageBitmap(thumbnail.getBitmap());
+						thumbnailView.setPadding(1, 0, 1, 0);
+						historyView.addView(thumbnailView);
+					}
+					while (historySize>=0 && historyView.getChildCount()>=1 && historyView.getChildCount() > historySize) {
+						historyView.removeViewAt(0);
+					}
+				}
+			});
+		}
+
+		final Marker marker = experience.get().getMarkers().get(markerCode);
+		if (marker!=null && autoOpen)
+		{
+			openMarker(marker);
+		}
+		else
+		{
+			runOnUiThread(new Runnable()
+			{
+				@Override
+				public void run()
+				{
+					synchronized (animationLock)
+					{
+						// marker action
+						if (marker != null)
+						{
+							if (marker.getTitle() != null && !marker.getTitle().isEmpty())
+							{
 								markerButton.setText(getString(R.string.marker_open, marker.getTitle()));
-							} else {
+							}
+							else
+							{
 								markerButton.setText(getString(R.string.marker_open_code, marker.getCode()));
 							}
-							markerButton.setOnClickListener(new View.OnClickListener() {
+							markerButton.setOnClickListener(new View.OnClickListener()
+							{
 								@Override
-								public void onClick(View v) {
+								public void onClick(View v)
+								{
 									openMarker(marker);
 								}
 							});
 
-							if (markerButton.getVisibility() == View.INVISIBLE || markerButton.getAnimation() != null) {
-								Log.i("", "Slide in");
+							if (animationState==AnimationState.offScreen || animationState==AnimationState.slidingOut)
+							{
+								if (slideAnimation != null)
+								{
+									slideAnimation.cancel();
+									slideAnimation = null;
+								}
 								markerButton.setVisibility(View.VISIBLE);
-								markerButton.startAnimation(AnimationUtils.loadAnimation(AestheticodesActivity.this, R.anim.slide_in));
+								Animation animation = AnimationUtils.loadAnimation(AestheticodesActivity.this, R.anim.slide_in);
+								slideAnimation = animation;
+								animation.setAnimationListener(new Animation.AnimationListener()
+								{
+									@Override
+									public void onAnimationStart(Animation animation)
+									{
+									}
+
+									@Override
+									public void onAnimationEnd(Animation animation)
+									{
+										synchronized (animationLock)
+										{
+											if (animationState==AnimationState.slidingIn)
+											{
+												animationState = AnimationState.onScreen;
+											}
+										}
+									}
+
+									@Override
+									public void onAnimationRepeat(Animation animation)
+									{
+									}
+								});
+								animationState = AnimationState.slidingIn;
+								markerButton.startAnimation(animation);
 							}
 						}
-					});
-				}
-			} else if (markerButton.getVisibility() == View.VISIBLE) {
-				runOnUiThread(new Runnable() {
-					@Override
-					public void run() {
-						Animation animation = AnimationUtils.loadAnimation(AestheticodesActivity.this, R.anim.slide_out);
-						animation.setAnimationListener(new Animation.AnimationListener() {
-							@Override
-							public void onAnimationStart(Animation animation) {
-
+						else if (animationState==AnimationState.onScreen || animationState==AnimationState.slidingIn)
+						{
+							if (slideAnimation != null)
+							{
+								slideAnimation.cancel();
+								slideAnimation = null;
 							}
 
-							@Override
-							public void onAnimationEnd(Animation animation) {
-								markerButton.setVisibility(View.INVISIBLE);
-							}
+							Animation animation = AnimationUtils.loadAnimation(AestheticodesActivity.this, R.anim.slide_out);
+							slideAnimation = animation;
+							animation.setAnimationListener(new Animation.AnimationListener()
+							{
+								@Override
+								public void onAnimationStart(Animation animation)
+								{
+								}
 
-							@Override
-							public void onAnimationRepeat(Animation animation) {
+								@Override
+								public void onAnimationEnd(Animation animation)
+								{
+									synchronized (animationLock)
+									{
+										if (animationState==AnimationState.slidingOut)
+										{
+											markerButton.setVisibility(View.INVISIBLE);
+											animationState = AnimationState.offScreen;
+										}
+									}
+								}
 
-							}
-						});
-						markerButton.startAnimation(animation);
+								@Override
+								public void onAnimationRepeat(Animation animation)
+								{
+								}
+							});
+							animationState = AnimationState.slidingOut;
+							markerButton.startAnimation(animation);
+						}
 					}
-				});
-			}
+				}
+			});
 		}
 	}
 
@@ -217,7 +324,9 @@ public class AestheticodesActivity extends ScanActivity implements ExperienceLis
 				json += "{\"name\":\"1.1 Area Order\", \"UUID\":\"6dd56665-8523-43e8-925d-71d6d94be4be\", \"minRegions\":5, \"maxRegions\":5, \"checksum\":3, \"description\":\"This experience orders the regions of an Artcode by their size. (AREA4321)\", \"icon\":\"http://www.nottingham.ac.uk/~pszwp/extension.gif\", \"version\":2}," +
 								"{\"name\":\"1.2 Area Label/Orientation Order\", \"UUID\":\"ce4b84b6-6cfc-4969-a4e4-072334c337b8\", \"minRegions\":5, \"maxRegions\":5, \"checksum\":3, \"embeddedChecksum\":true, \"description\":\"This experience labels the regions of an Artcode by their size and then orders them by their orientation. (AO4321)\", \"icon\":\"http://www.nottingham.ac.uk/~pszwp/extension.gif\", \"version\":2}," +
 								"{\"name\":\"1.3 Orientation Label/Area Order\", \"UUID\":\"1d4bac87-e9e3-4e12-8208-34c168922e34\", \"minRegions\":5, \"maxRegions\":5, \"checksum\":3, \"embeddedChecksum\":true, \"description\":\"This experience labels the regions of an Artcode by their orientation and then orders them by their size. (OA4321)\", \"icon\":\"http://www.nottingham.ac.uk/~pszwp/extension.gif\", \"version\":2}," +
-								"{\"name\":\"1.4 Touching\", \"UUID\":\"069674f8-3a8b-49bd-aef6-5b0bc6196c67\", \"minRegions\":5, \"maxRegions\":5, \"checksum\":3, \"embeddedChecksum\":true, \"description\":\"This experience counts the number of other regions a region touches. This produces codes like 1-1:1-2:1-2:1-2:2-2 where 1-2 means a region with a value of 1 that is touching 2 other regions. The total of these touching numbers must be disiable by 3. (TOUCH4321)\", \"icon\":\"http://www.nottingham.ac.uk/~pszwp/extension.gif\", \"version\":2}";
+								"{\"name\":\"1.4 Touching\", \"UUID\":\"069674f8-3a8b-49bd-aef6-5b0bc6196c67\", \"minRegions\":5, \"maxRegions\":5, \"checksum\":3, \"embeddedChecksum\":true, \"description\":\"This experience counts the number of other regions a region touches. This produces codes like 1-1:1-2:1-2:1-2:2-2 where 1-2 means a region with a value of 1 that is touching 2 other regions. The total of these touching numbers must be disiable by 3. (TOUCH4321)\", \"icon\":\"http://www.nottingham.ac.uk/~pszwp/extension.gif\", \"version\":2},";
+			if (true) // use combined code defaults
+				json += "{\"name\":\"3.1 Numbers\",   \"UUID\":\"133759a3-ff7e-4f35-b545-ed641c109e0b\", \"minRegions\":5, \"maxRegions\":6, \"checksum\":3, \"embeddedChecksum\":true, \"icon\":\"http://www.nottingham.ac.uk/~pszwp/combined.gif\", \"codes\":[{\"code\":\"1:1:1:1:2\",\"title\":\"Hi\",\"action\":\"www.google.com\"},{\"code\":\"1:1:1:1:5\",\"title\":\"1\",\"action\":\"www.google.com\"},{\"code\":\"1:1:1:2:4\",\"title\":\"2\",\"action\":\"www.google.com\"},{\"code\":\"1:1:1:3:3\",\"title\":\"3\",\"action\":\"www.google.com\"},{\"code\":\"1:1:2:3:5\",\"title\":\"4\",\"action\":\"www.google.com\"},{\"code\":\"1:1:2:4:4\",\"title\":\"5\",\"action\":\"www.google.com\"},{\"code\":\"1:1:1:1:5+1:1:1:2:4\",\"title\":\"1+2\",\"action\":\"www.google.com\"},{\"code\":\"1:1:1:1:5+1:1:1:3:3\",\"title\":\"1+3\",\"action\":\"www.google.com\"},{\"code\":\"1:1:1:1:5+1:1:2:3:5\",\"title\":\"1+4\",\"action\":\"www.google.com\"},{\"code\":\"1:1:1:1:5+1:1:2:4:4\",\"title\":\"1+5\",\"action\":\"www.google.com\"},{\"code\":\"1:1:1:2:4+1:1:1:3:3\",\"title\":\"2+3\",\"action\":\"www.google.com\"},{\"code\":\"1:1:1:2:4+1:1:2:3:5\",\"title\":\"2+4\",\"action\":\"www.google.com\"},{\"code\":\"1:1:1:2:4+1:1:2:4:4\",\"title\":\"2+5\",\"action\":\"www.google.com\"},{\"code\":\"1:1:1:3:3+1:1:2:3:5\",\"title\":\"3+4\",\"action\":\"www.google.com\"},{\"code\":\"1:1:1:3:3+1:1:2:4:4\",\"title\":\"3+5\",\"action\":\"www.google.com\"},{\"code\":\"1:1:2:3:5+1:1:2:4:4\",\"title\":\"4+5\",\"action\":\"www.google.com\"},{\"code\":\"1:1:1:1:5>1:1:1:2:4>1:1:1:3:3>1:1:2:3:5>1:1:2:4:4\",\"title\":\"1, 2, 3, 4 and 5\",\"action\":\"www.google.com\"},{\"code\":\"1:1:2:4:4>1:1:2:3:5>1:1:1:3:3>1:1:1:2:4>1:1:1:1:5\",\"title\":\"5, 4, 3, 3 and 1\",\"action\":\"www.google.com\"}]},";
 			json += "]";
 			JSONArray arrayOfDefaultExperences = new JSONArray(json);
 
@@ -261,6 +370,23 @@ public class AestheticodesActivity extends ScanActivity implements ExperienceLis
 						experience.setInvertGreyscale(experienceDict.getBoolean("invertGreyscale"));
 					if (experienceDict.has("hueShift"))
 						experience.setHueShift(experienceDict.getDouble("hueShift"));
+
+					if (experienceDict.has("codes"))
+					{
+						JSONArray codesInJson = experienceDict.getJSONArray("codes");
+						for (int codeIndex=0; codeIndex<codesInJson.length(); ++codeIndex)
+						{
+							JSONObject codeInJson = codesInJson.getJSONObject(codeIndex);
+							Marker m = new Marker();
+							m.setCode(codeInJson.getString("code"));
+							if (codeInJson.has("title"))
+								m.setTitle(codeInJson.getString("title"));
+							if (codeInJson.has("action"))
+								m.setAction(codeInJson.getString("action"));
+							m.setShowDetail(true);
+							experience.add(m);
+						}
+					}
 
 					experienceListController.add(experience);
 				}
@@ -331,7 +457,7 @@ public class AestheticodesActivity extends ScanActivity implements ExperienceLis
 				{
 					String code = currentCode;
 					currentCode = null;
-					markerChanged(code);
+					markerChanged(code, null, -1, null);
 				}
 			}
 		});

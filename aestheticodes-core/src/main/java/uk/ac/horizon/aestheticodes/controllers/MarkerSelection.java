@@ -19,78 +19,15 @@
 
 package uk.ac.horizon.aestheticodes.controllers;
 
-import java.util.Collection;
-import java.util.HashMap;
-import java.util.HashSet;
 import java.util.List;
-import java.util.Map;
 
-public class MarkerSelection
+import uk.ac.horizon.aestheticodes.model.Experience;
+import uk.ac.horizon.aestheticodes.model.Scene;
+
+public interface MarkerSelection
 {
-	private static final int REQUIRED = 5;
-	private static final int MAX = REQUIRED * 4;
-	private final Map<String, MarkerCode> occurrences = new HashMap<>();
-	private String current = null;
-
-	public void reset(MarkerDetector.Listener callback)
-	{
-		occurrences.clear();
-		if(current != null)
-		{
-			current = null;
-			callback.markerChanged(null);
-		}
-	}
-
-	public void addMarkers(List<MarkerCode> markers, MarkerDetector.Listener callback)
-	{
-		final Collection<String> updated = new HashSet<>();
-
-		for (MarkerCode markerCode : markers)
-		{
-			//increase occurrence if this marker is already in the list.
-			MarkerCode existing = occurrences.get(markerCode.getCodeKey());
-			if (existing != null)
-			{
-				existing.setOccurrences(Math.min(MAX, markerCode.getOccurrences() + existing.getOccurrences()));
-			}
-			else
-			{
-				occurrences.put(markerCode.getCodeKey(), markerCode);
-			}
-			updated.add(markerCode.getCodeKey());
-		}
-
-		MarkerCode likely = null;
-		for(MarkerCode marker: occurrences.values())
-		{
-			if(!updated.contains(marker.getCodeKey()))
-			{
-				marker.setOccurrences(Math.max(marker.getOccurrences() - 1, 0));
-			}
-
-			if (marker.getOccurrences() > REQUIRED && (likely == null || marker.getOccurrences() > likely.getOccurrences()))
-			{
-				likely = marker;
-			}
-		}
-
-		if (likely == null)
-		{
-			if(current != null)
-			{
-				current = null;
-				callback.markerChanged(null);
-			}
-		}
-		else
-		{
-			String code = likely.getCodeKey();
-			if(current == null || !current.equals(code))
-			{
-				current = code;
-				callback.markerChanged(code);
-			}
-		}
-	}
+	void reset(MarkerDetector.Listener callback);
+	void addMarkers(List<MarkerCode> markers, MarkerDetector.Listener callback, Experience experience, Scene scene);
 }
+
+

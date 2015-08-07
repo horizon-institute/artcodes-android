@@ -716,4 +716,23 @@ public class Experience
 
 		return new MarkerCodeFactory();
 	}
+
+	/**
+	 * This method checks if this experience contains a code that starts with the given string.
+	 * This is useful for checking for partial recognition of sequential codes.
+	 * Note: The implementation is probably not suitable for experiences with LOTS of codes.
+	 * @param codeSubstring
+	 * @return
+	 */
+	public boolean hasCodeStartingWith(String codeSubstring)
+	{
+		for (String code : this.markers.keySet())
+		{
+			if (code.indexOf(codeSubstring) == 0)
+			{
+				return true;
+			}
+		}
+		return false;
+	}
 }

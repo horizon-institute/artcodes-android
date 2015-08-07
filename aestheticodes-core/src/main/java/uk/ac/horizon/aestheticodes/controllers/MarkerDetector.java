@@ -34,6 +34,7 @@ import org.opencv.core.Size;
 import org.opencv.imgproc.Imgproc;
 import uk.ac.horizon.aestheticodes.model.Experience;
 import uk.ac.horizon.aestheticodes.model.Greyscaler;
+import uk.ac.horizon.aestheticodes.model.Scene;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -54,7 +55,7 @@ public class MarkerDetector
 
 	public static interface Listener
 	{
-		void markerChanged(String markerCode);
+		void markerChanged(String markerCode, List<Integer> newMarkerContourIndexes, int historySize, Scene scene);
 
 		void resultUpdated(boolean detected, Bitmap image);
 	}
@@ -101,9 +102,11 @@ public class MarkerDetector
 								croppedImage = greyscaler.greyscaleImage(yuvImage, croppedImage);
 							}
 
-
+							Scene scene = new Scene();
+							scene.setRotated(true);
 							if (cameraDrawMode!=CameraDrawMode.normal || markerDrawMode != MarkerDrawMode.off)
 							{
+								scene.setRotated(false);
 								MatTranform.rotate(croppedImage, croppedImage, 360 + 90 - camera.getRotation(), camera.isFront());
 								if (drawImage == null || resetDrawImage)
 								{
@@ -144,7 +147,7 @@ public class MarkerDetector
 							}
 
 							// find markers.
-							List<MarkerCode> markers = findMarkers(croppedImage, drawImage);
+							List<MarkerCode> markers = findMarkers(croppedImage, drawImage, scene);
 							if (markers.size() == 0)
 							{
 								++framesSinceLastMarker;
@@ -168,9 +171,10 @@ public class MarkerDetector
 							}
 
 							listener.resultUpdated(!markers.isEmpty(), result);
-							markerSelection.addMarkers(markers, listener);
+							markerSelection.addMarkers(markers, listener, experience.get(), scene);
 
 							yuvImage.release();
+							scene.release();
 						}
 						else
 						{
@@ -221,73 +225,71 @@ public class MarkerDetector
 			Log.i(TAG, "Finishing processing thread");
 		}
 
-		private List<MarkerCode> findMarkers(Mat inputImage, Mat drawImage)
+		private List<MarkerCode> findMarkers(Mat inputImage, Mat drawImage, Scene scene)
 		{
 			final ArrayList<MatOfPoint> contours = new ArrayList<>();
 			final Mat hierarchy = new Mat();
-			try
+
+			// holds all the markers identified in the camera.
+			List<MarkerCode> foundMarkers = new ArrayList<>();
+			// Find blobs using connect component.
+			Imgproc.findContours(inputImage, contours, hierarchy, Imgproc.RETR_TREE, Imgproc.CHAIN_APPROX_NONE);
+			if (scene!=null)
 			{
-				// holds all the markers identified in the camera.
-				List<MarkerCode> foundMarkers = new ArrayList<>();
-				// Find blobs using connect component.
-				Imgproc.findContours(inputImage, contours, hierarchy, Imgproc.RETR_TREE, Imgproc.CHAIN_APPROX_NONE);
-				if (contours.size()==0)
-				{
-					return foundMarkers;
-				}
+				scene.setContours(contours).setHierarchy(hierarchy);
+			}
+			if (contours.size()==0)
+			{
+				return foundMarkers;
+			}
 
-				if (cameraDrawMode==CameraDrawMode.depth)
-				{
-					drawDepth(drawImage, contours, hierarchy);
-				}
+			if (cameraDrawMode==CameraDrawMode.depth)
+			{
+				drawDepth(drawImage, contours, hierarchy);
+			}
 
-				MarkerCodeFactory.DetectionStatus[] errors = new MarkerCodeFactory.DetectionStatus[contours.size()];
+			MarkerCodeFactory.DetectionStatus[] errors = new MarkerCodeFactory.DetectionStatus[contours.size()];
 
-				if (markerCodeFactory != null)
+			if (markerCodeFactory != null)
+			{
+				for (int i = 0; i < contours.size(); i++)
 				{
-					for (int i = 0; i < contours.size(); i++)
+					//final MarkerCode code = MarkerCode.findMarker(hierarchy, i, experience.get());
+					errors[i] = MarkerCodeFactory.DetectionStatus.unknown;
+					final MarkerCode code = markerCodeFactory.createMarkerForNode(i, contours, hierarchy, experience.get(), errors, i);
+					if (code != null)
 					{
-						//final MarkerCode code = MarkerCode.findMarker(hierarchy, i, experience.get());
-						errors[i] = MarkerCodeFactory.DetectionStatus.unknown;
-						final MarkerCode code = markerCodeFactory.createMarkerForNode(i, contours, hierarchy, experience.get(), errors, i);
-						if (code != null)
+						// if marker found then add in the list.
+						foundMarkers.add(code);
+
+						if (markerDrawMode != MarkerDrawMode.off && drawImage != null)
 						{
-							// if marker found then add in the list.
-							foundMarkers.add(code);
+							code.draw(drawImage, contours, hierarchy, detectedColour, outlineColour, (markerDrawMode == MarkerDrawMode.regions ? regionColour : null));
 
-							if (markerDrawMode != MarkerDrawMode.off && drawImage != null)
-							{
-								code.draw(drawImage, contours, hierarchy, detectedColour, outlineColour, (markerDrawMode == MarkerDrawMode.regions ? regionColour : null));
-
-							}
 						}
 					}
 				}
-
-				if (markerDrawMode == MarkerDrawMode.debug)
-				{
-					drawDebug(drawImage, contours, hierarchy, errors);
-				}
-
-				if (markerDrawMode != MarkerDrawMode.off && drawImage != null)
-				{
-					for (MarkerCode marker : foundMarkers)
-					{
-						Rect bounds = Imgproc.boundingRect(contours.get(marker.getComponentIndexs().get(0)));
-						String markerCode = marker.getCodeKey();
-
-						Core.putText(drawImage, markerCode, bounds.tl(), Core.FONT_HERSHEY_SIMPLEX, 1, outlineColour, 5);
-						Core.putText(drawImage, markerCode, bounds.tl(), Core.FONT_HERSHEY_SIMPLEX, 1, detectedColour, 3);
-					}
-				}
-
-				return foundMarkers;
 			}
-			finally
+
+			if (markerDrawMode == MarkerDrawMode.debug)
 			{
-				contours.clear();
-				hierarchy.release();
+				drawDebug(drawImage, contours, hierarchy, errors);
 			}
+
+			if (markerDrawMode != MarkerDrawMode.off && drawImage != null)
+			{
+				for (MarkerCode marker : foundMarkers)
+				{
+					Rect bounds = Imgproc.boundingRect(contours.get(marker.getComponentIndexs().get(0)));
+					String markerCode = marker.getCodeKey();
+
+					Core.putText(drawImage, markerCode, bounds.tl(), Core.FONT_HERSHEY_SIMPLEX, 1, outlineColour, 5);
+					Core.putText(drawImage, markerCode, bounds.tl(), Core.FONT_HERSHEY_SIMPLEX, 1, detectedColour, 3);
+				}
+			}
+
+			return foundMarkers;
+
 		}
 
 		private void labelDepthOfContourHierarchy(Mat hierarchy, int[] depthArray, int rootIndex, int rootValue)
@@ -515,7 +517,7 @@ public class MarkerDetector
 		}
 	}
 
-	private final MarkerSelection markerSelection = new MarkerSelection();
+	private final MarkerSelection markerSelection = new CombinedMarkerSelection();
 	private final CameraController camera;
 	private final Listener listener;
 	private final ExperienceController experience;

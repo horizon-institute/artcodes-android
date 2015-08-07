@@ -52,9 +52,11 @@ import uk.ac.horizon.aestheticodes.controllers.ExperienceParser;
 import uk.ac.horizon.aestheticodes.controllers.MarkerDetector;
 import uk.ac.horizon.aestheticodes.core.R;
 import uk.ac.horizon.aestheticodes.model.Experience;
+import uk.ac.horizon.aestheticodes.model.Scene;
 import uk.ac.horizon.aestheticodes.views.ViewfinderView;
 
 import java.net.URLDecoder;
+import java.util.List;
 
 public class ScanActivity extends ActionBarActivity implements ExperienceController.Listener, MarkerDetector.Listener
 {
@@ -148,7 +150,7 @@ public class ScanActivity extends ActionBarActivity implements ExperienceControl
 		}
 	}
 
-	public void markerChanged(final String markerCode)
+	public void markerChanged(final String markerCode, final List<Integer> newMarkerThumbnails, final int historySize, final Scene scene)
 	{
 		if (experience.get().getCallback() == null)
 		{

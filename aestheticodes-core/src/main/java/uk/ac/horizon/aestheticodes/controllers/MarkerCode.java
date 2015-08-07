@@ -74,6 +74,7 @@ public class MarkerCode
     private final List<MarkerDetails> markerDetails = new ArrayList<>();
     private final MarkerDrawer markerDrawer;
     private int occurrences = 1;
+    private long firstDetected=0, lastDetected=0;
 
     public MarkerCode(String codeKey, MarkerDetails markerDetails, MarkerDrawer markerDrawer)
     {
@@ -107,9 +108,27 @@ public class MarkerCode
         this.markerDrawer.draw(this, image, contours, hierarchy, markerColor, outlineColor, regionColor);
     }
 
+    public long getFirstDetected()
+    {
+        return firstDetected;
+    }
+
+    public void setFirstDetected(long value)
+    {
+        this.firstDetected = value;
+    }
+
+    public long getLastDetected()
+    {
+        return lastDetected;
+    }
+
+    public void setLastDetected(long value)
+    {
+        this.lastDetected = value;
+    }
 
     /// compatibility methods
-
 
     public int getOccurrences()
     {

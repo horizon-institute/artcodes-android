@@ -27,6 +27,7 @@ public class Marker
 	private String description;
 	private String image;
 	private boolean showDetail = false;
+	private boolean resetHistoryOnOpen = true;
 
 	public String getCode()
 	{
@@ -86,5 +87,15 @@ public class Marker
 	public void setDescription(String description)
 	{
 		this.description = description;
+	}
+
+	public boolean getResetHistoryOnOpen()
+	{
+		return resetHistoryOnOpen;
+	}
+
+	public void setResetHistoryOnOpen(boolean resetHistoryOnOpen)
+	{
+		this.resetHistoryOnOpen = resetHistoryOnOpen;
 	}
 }

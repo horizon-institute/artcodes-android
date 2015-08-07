@@ -51,7 +51,13 @@ public class MarkerFormat extends Format implements InputFilter
 			return sourceValue;
 		}
 
-		boolean resultValid = experience.isValidMarker(result, true);
+		String[] split = result.split("[+>]");
+		boolean resultValid = true;
+		for (int i=0; i<split.length; ++i)
+		{
+			resultValid &= experience.isValidMarker(split[i], i==split.length-1);
+		}
+
 		if (!resultValid && !sourceValue.startsWith(":"))
 		{
 			sourceValue = ":" + sourceValue;
@@ -94,10 +100,12 @@ public class MarkerFormat extends Format implements InputFilter
 		else if (value instanceof String)
 		{
 			String text = (String) value;
-			String error = experience.getMarkerError(text, false);
-			if(error != null)
-			{
-				return error;
+			String[] codes = text.split("[+>]");
+			for (String code : codes) {
+				String error = experience.getMarkerError(code, false);
+				if (error != null) {
+					return error;
+				}
 			}
 
 			if (experience.getMarkers().containsKey(text) && !text.equals(original))

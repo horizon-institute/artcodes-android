@@ -80,6 +80,8 @@ public class MarkerEditDialog extends DialogFragment
 		properties.get("showDetail").bindTo(R.id.markerShowDetail)
 				.bindTo(new VisibilityBinding(R.id.markerDetails));
 
+		properties.get("resetHistoryOnOpen").bindTo(R.id.resetHistoryOnOpen);
+
 		properties.get("action").formatAs(new URLFormat()).bindTo(R.id.markerAction);
 		properties.get("image").formatAs(new URLFormat()).bindTo(R.id.markerImage);
 		properties.get("title").bindTo(R.id.markerTitle);
