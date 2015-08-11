@@ -1,25 +1,25 @@
 package uk.ac.horizon.artcodes.adapter;
 
 import android.content.Context;
-import android.content.Intent;
 import android.support.v7.util.SortedList;
 import android.support.v7.widget.RecyclerView;
 import android.support.v7.widget.util.SortedListAdapterCallback;
 import android.text.TextUtils;
+import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
-
 import com.google.common.collect.Ordering;
-
+import uk.ac.horizon.artcodes.GoogleAnalytics;
 import uk.ac.horizon.artcodes.activity.ArtcodeActivity;
 import uk.ac.horizon.artcodes.activity.ExperienceActivity;
 import uk.ac.horizon.artcodes.databinding.ExperienceItemBinding;
-import uk.ac.horizon.artcodes.ExperienceParser;
 import uk.ac.horizon.artcodes.model.Experience;
-import uk.ac.horizon.artcodes.source.Target;
+import uk.ac.horizon.artcodes.request.RequestCallback;
+import uk.ac.horizon.artcodes.server.ArtcodeServer;
+import uk.ac.horizon.artcodes.ui.IntentBuilder;
 
-public class ExperienceAdapter extends RecyclerView.Adapter<ExperienceAdapter.ExperienceViewHolder> implements Target<Experience>
+public class ExperienceAdapter extends RecyclerView.Adapter<ExperienceAdapter.ExperienceViewHolder> implements RequestCallback<Experience>
 {
 	public static final Ordering<String> CASE_INSENSITIVE_NULL_SAFE_ORDER =
 			Ordering.from(String.CASE_INSENSITIVE_ORDER).nullsLast();
@@ -36,12 +36,14 @@ public class ExperienceAdapter extends RecyclerView.Adapter<ExperienceAdapter.Ex
 	}
 
 	private final SortedList<Experience> experiences;
+	private final ArtcodeServer server;
 	private final Context context;
 
-	public ExperienceAdapter(Context context)
+	public ExperienceAdapter(Context context, ArtcodeServer server)
 	{
 		super();
 		this.context = context;
+		this.server = server;
 		experiences = new SortedList<>(Experience.class, new SortedListAdapterCallback<Experience>(this)
 		{
 			@Override
@@ -60,7 +62,8 @@ public class ExperienceAdapter extends RecyclerView.Adapter<ExperienceAdapter.Ex
 			public int compare(Experience o1, Experience o2)
 			{
 				int result = CASE_INSENSITIVE_NULL_SAFE_ORDER.compare(o1.getName(), o2.getName());
-				if (result != 0) {
+				if (result != 0)
+				{
 					return result;
 				}
 				return CASE_INSENSITIVE_NULL_SAFE_ORDER.compare(o1.getId(), o2.getId());
@@ -84,7 +87,11 @@ public class ExperienceAdapter extends RecyclerView.Adapter<ExperienceAdapter.Ex
 			@Override
 			public void onClick(View v)
 			{
-				ExperienceActivity.start(context, experience);
+				IntentBuilder.with(context)
+						.target(ExperienceActivity.class)
+						.setServer(server)
+						.set("experience", experience)
+						.start();
 			}
 		});
 		holder.binding.scanButton.setOnClickListener(new View.OnClickListener()
@@ -92,7 +99,11 @@ public class ExperienceAdapter extends RecyclerView.Adapter<ExperienceAdapter.Ex
 			@Override
 			public void onClick(View v)
 			{
-				startActivity(ArtcodeActivity.class, experience);
+				IntentBuilder.with(context)
+						.target(ArtcodeActivity.class)
+						.setServer(server)
+						.set("experience", experience)
+						.start();
 			}
 		});
 	}
@@ -104,15 +115,14 @@ public class ExperienceAdapter extends RecyclerView.Adapter<ExperienceAdapter.Ex
 	}
 
 	@Override
-	public void onLoaded(Experience item)
+	public void onResponse(Experience item)
 	{
 		experiences.add(item);
 	}
 
-	private void startActivity(Class<?> activity, Experience experience)
+	@Override
+	public void onError(Exception e)
 	{
-		Intent intent = new Intent(context, activity);
-		intent.putExtra("experience", ExperienceParser.createGson(context).toJson(experience));
-		context.startActivity(intent);
+		GoogleAnalytics.trackException(e);
 	}
 }

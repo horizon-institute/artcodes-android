@@ -30,110 +30,131 @@
 		          type="uk.ac.horizon.artcodes.model.Availability" />
 	</data>
 
-	<LinearLayout android:orientation="horizontal"
-	              android:layout_width="fill_parent"
-	              android:layout_height="wrap_content"
-	              android:layout_margin="8dp">
+	<LinearLayout
+		android:layout_width="match_parent"
+		android:layout_height="wrap_content"
+		android:orientation="horizontal">
+	<LinearLayout
+		android:layout_width="0dp"
+		android:layout_height="wrap_content"
+		android:layout_margin="8dp"
+		android:layout_weight="1"
+		android:orientation="vertical">
+		<LinearLayout
+			android:layout_width="match_parent"
+			android:layout_height="wrap_content"
+			android:gravity="center_vertical"
+			android:background="?attr/selectableItemBackground"
+			android:orientation="horizontal">
 
-		<LinearLayout android:orientation="vertical"
-		              android:layout_width="0dp"
-		              android:layout_height="wrap_content"
-		              android:layout_weight="1">
+			<ImageView
+				android:layout_width="24dp"
+				android:layout_height="24dp"
+				android:layout_margin="8dp"
+				android:src="@drawable/ic_schedule_black_24dp"
+				android:tint="@color/ic_tint" />
 
-			<LinearLayout android:layout_width="fill_parent"
-			              android:layout_height="wrap_content"
-			              android:orientation="horizontal">
 
-				<ImageView
-						tools:ignore="ContentDescription"
+				<LinearLayout
+					android:layout_width="0dp"
+					android:layout_height="wrap_content"
+					android:orientation="vertical"
+					android:layout_weight="1"
+					android:id="@+id/editview">
+
+					<LinearLayout
 						android:layout_width="wrap_content"
 						android:layout_height="wrap_content"
-						android:layout_marginLeft="16dp"
-						android:layout_marginRight="16dp"
-						android:layout_gravity="center_vertical"
-						android:scaleType="fitCenter"
-						android:src="@drawable/ic_event_black_24dp"
-						android:tint="@color/ic_tint" />
+						android:gravity="center_vertical"
+						android:id="@+id/toggle_dates"
+						android:background="?attr/selectableItemBackground"
+						android:orientation="horizontal">
 
-				<TextView
-						android:layout_width="0dp"
+						<TextView
+							android:layout_width="match_parent"
+							android:layout_height="wrap_content"
+							android:layout_margin="8dp"
+							android:text="Always Available"
+							android:id="@+id/availability_desc"
+							android:textColor="#000"
+							android:textAppearance="@style/TextAppearance.AppCompat" />
+
+						<ImageView
+							android:layout_width="wrap_content"
+							android:layout_height="wrap_content"
+							android:layout_margin="8dp"
+							android:id="@+id/expand_image"
+							android:layout_gravity="center_vertical"
+							android:tint="@color/ic_tint"
+							android:src="@drawable/ic_expand_more_24dp" />
+
+					</LinearLayout>
+					<LinearLayout
+						android:layout_width="match_parent"
+						android:layout_height="wrap_content"
+						android:orientation="vertical"
+						android:id="@+id/date_expand"
+						android:visibility="gone">
+					<TextView
+						android:layout_width="match_parent"
 						android:layout_height="wrap_content"
 						android:layout_gravity="center_vertical"
-						android:gravity="center"
 						android:padding="8dp"
 						android:textAppearance="@style/TextAppearance.AppCompat"
 						android:background="?attr/selectableItemBackground"
-
-						android:layout_weight="1"
 						android:hint="@string/start_date"
 						app:date="@{availability.start}"
-						android:id="@+id/availabilityStart" />
+						android:id="@+id/availability_start" />
 
-			</LinearLayout>
 
-			<LinearLayout
-					android:layout_width="fill_parent"
-					android:layout_height="wrap_content"
-					android:orientation="horizontal">
 
-				<TextView android:layout_width="0dp"
-				          android:layout_height="wrap_content"
-				          android:layout_gravity="center_vertical"
-				          android:layout_marginLeft="56dp"
-				          android:layout_marginStart="56dp"
-				          android:gravity="center"
-				          android:padding="8dp"
-				          android:textAppearance="@style/TextAppearance.AppCompat"
-				          android:background="?attr/selectableItemBackground"
-				          android:layout_weight="1"
-				          android:hint="@string/end_date"
-				          app:date="@{availability.end}"
-				          android:id="@+id/availabilityEnd" />
+					<TextView android:layout_width="match_parent"
+							  android:layout_height="wrap_content"
+							  android:layout_gravity="center_vertical"
+							  android:padding="8dp"
+							  android:textAppearance="@style/TextAppearance.AppCompat"
+							  android:background="?attr/selectableItemBackground"
+							  android:hint="@string/end_date"
+							  app:date="@{availability.end}"
+							  android:id="@+id/availability_end" />
+					</LinearLayout>
 
-			</LinearLayout>
-
-			<LinearLayout
-					android:layout_width="fill_parent"
-					android:layout_height="wrap_content"
-					android:orientation="horizontal">
-
-				<ImageView
-						tools:ignore="ContentDescription"
-
-						android:layout_width="wrap_content"
-						android:layout_height="wrap_content"
-						android:layout_marginLeft="16dp"
-						android:layout_marginRight="16dp"
-						android:layout_gravity="center_vertical"
-						android:scaleType="fitCenter"
-						android:src="@drawable/ic_place_black_24dp"
-						android:tint="@color/ic_tint" />
-
-				<TextView
-						android:layout_width="0dp"
-						android:layout_height="wrap_content"
-						android:layout_gravity="center_vertical"
-						android:background="?attr/selectableItemBackground"
-						android:layout_weight="1"
-						android:gravity="center"
-						android:padding="8dp"
-						android:textAppearance="@style/TextAppearance.AppCompat"
-						android:text="@{availability.name}"
-						android:hint="@string/location"
-						android:id="@+id/availabilityLocation" />
-
-			</LinearLayout>
+				</LinearLayout>
 		</LinearLayout>
+	<LinearLayout
+		android:layout_width="match_parent"
+		android:layout_height="wrap_content"
+		android:gravity="center_vertical"
+		android:background="?attr/selectableItemBackground"
+		android:orientation="horizontal">
+		<ImageView
+			android:layout_width="24dp"
+			android:layout_height="24dp"
+			android:layout_margin="8dp"
+			android:src="@drawable/ic_place_black_24dp"
+			android:tint="@color/ic_tint" />
+
+		<TextView
+			android:layout_width="0dp"
+			android:layout_height="wrap_content"
+			android:layout_weight="1"
+			android:layout_gravity="center_vertical"
+			android:padding="8dp"
+			android:textAppearance="@style/TextAppearance.AppCompat"
+			android:text="@{availability.name ?? @string/anywhere}"
+			android:id="@+id/availability_location" />
+	</LinearLayout>
+	</LinearLayout>
 
 		<ImageView
-				android:layout_width="wrap_content"
-				android:layout_height="wrap_content"
-				android:padding="8dp"
-				android:layout_gravity="center_vertical"
-				android:src="@drawable/ic_close_black_18dp"
-				android:tint="@color/ic_tint"
-				tools:ignore="ContentDescription"
-				android:background="?attr/selectableItemBackground"
-				android:id="@+id/availabilityDelete" />
+			android:layout_width="wrap_content"
+			android:layout_height="wrap_content"
+			android:layout_gravity="center_vertical"
+			android:src="@drawable/ic_close_black_18dp"
+			android:tint="@color/ic_tint"
+			android:scaleType="fitCenter"
+			android:background="?attr/selectableItemBackground"
+			android:padding="8dp"
+			android:id="@+id/availability_delete" />
 	</LinearLayout>
 </layout>

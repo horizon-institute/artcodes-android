@@ -21,17 +21,18 @@ package uk.ac.horizon.artcodes.fragment;
 
 import android.os.Bundle;
 import android.support.v7.widget.LinearLayoutManager;
-import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 import org.jetbrains.annotations.Nullable;
 import uk.ac.horizon.artcodes.Feature;
+import uk.ac.horizon.artcodes.GoogleAnalytics;
 import uk.ac.horizon.artcodes.R;
+import uk.ac.horizon.artcodes.activity.NavigationActivity;
 import uk.ac.horizon.artcodes.adapter.SectionedExperienceAdapter;
 import uk.ac.horizon.artcodes.databinding.ExperienceRecommendBinding;
 import uk.ac.horizon.artcodes.model.Experience;
-import uk.ac.horizon.artcodes.source.Target;
+import uk.ac.horizon.artcodes.request.RequestCallbackBase;
 
 import java.util.List;
 import java.util.Map;
@@ -40,7 +41,6 @@ public class ExperienceRecommendFragment extends ArtcodeFragmentBase
 {
 	private static final int RECENT_MAX = 3;
 	private SectionedExperienceAdapter adapter;
-	private int progress = 0;
 	private ExperienceRecommendBinding binding;
 
 	@Nullable
@@ -49,7 +49,7 @@ public class ExperienceRecommendFragment extends ArtcodeFragmentBase
 	{
 		binding = ExperienceRecommendBinding.inflate(inflater, container, false);
 		binding.list.setLayoutManager(new LinearLayoutManager(getActivity()));
-		adapter = new SectionedExperienceAdapter(getActivity());
+		adapter = new SectionedExperienceAdapter(getActivity(), getServer());
 		binding.list.setAdapter(adapter);
 		adapter.setShowHeaderItem(Feature.get(getActivity(), R.bool.feature_show_welcome).isEnabled());
 		binding.progress.setEnabled(false);
@@ -59,48 +59,43 @@ public class ExperienceRecommendFragment extends ArtcodeFragmentBase
 		return binding.getRoot();
 	}
 
-	private void incrementProgress()
+	@Override
+	public void onResume()
 	{
-		progress += 1;
-		binding.progress.setRefreshing(true);
-	}
+		super.onResume();
+		GoogleAnalytics.trackScreen("View Recommended");
 
-	private void decrementProgress()
-	{
-		progress -= 1;
-		if (progress == 0)
-		{
-			binding.progress.setRefreshing(false);
-		}
 	}
 
 	private void loadExperiences()
 	{
-		incrementProgress();
-		getAccount().getRecent().loadInto(new Target<List<String>>()
+		binding.progress.addPending();
+		getServer().loadRecent(new RequestCallbackBase<List<String>>()
 		{
 			@Override
-			public void onLoaded(List<String> item)
+			public void onResponse(List<String> item)
 			{
 				updateGroup("recent", item.subList(0, Math.min(RECENT_MAX, item.size())));
-				decrementProgress();
+				binding.progress.removePending();
 			}
 		});
 
-		incrementProgress();
-		getAccount().getRecommended().loadInto(new Target<Map<String, List<String>>>()
+		binding.progress.addPending();
+		getServer().loadRecommended(new RequestCallbackBase<Map<String, List<String>>>()
 		{
 			@Override
-			public void onLoaded(Map<String, List<String>> item)
+			public void onResponse(Map<String, List<String>> item)
 			{
+				((NavigationActivity)getActivity()).updateAccounts();
 				for (String group : item.keySet())
 				{
 					updateGroup(group, item.get(group));
 				}
-				decrementProgress();
+				binding.progress.removePending();
 			}
 		});
 	}
+
 
 	private void updateGroup(final String group, List<String> ids)
 	{
@@ -108,13 +103,13 @@ public class ExperienceRecommendFragment extends ArtcodeFragmentBase
 		for (final String uri : ids)
 		{
 			final int experienceIndex = index;
-			incrementProgress();
-			getAccount().getExperience(uri).loadInto(new Target<Experience>()
+			binding.progress.addPending();
+			getServer().loadExperience(uri, new RequestCallbackBase<Experience>()
 			{
 				@Override
-				public void onLoaded(final Experience experience)
+				public void onResponse(final Experience experience)
 				{
-					decrementProgress();
+					binding.progress.removePending();
 					adapter.addExperience(experience, group, experienceIndex);
 				}
 			});

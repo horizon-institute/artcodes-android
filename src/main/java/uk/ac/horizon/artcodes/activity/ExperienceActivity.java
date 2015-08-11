@@ -19,7 +19,6 @@
 
 package uk.ac.horizon.artcodes.activity;
 
-import android.content.Context;
 import android.content.Intent;
 import android.databinding.DataBindingUtil;
 import android.os.Build;
@@ -27,34 +26,35 @@ import android.os.Bundle;
 import android.text.Layout;
 import android.view.View;
 import android.view.ViewTreeObserver;
+
+import java.util.List;
+
 import uk.ac.horizon.artcodes.Feature;
 import uk.ac.horizon.artcodes.GoogleAnalytics;
 import uk.ac.horizon.artcodes.R;
 import uk.ac.horizon.artcodes.databinding.ExperienceBinding;
-import uk.ac.horizon.artcodes.ExperienceParser;
 import uk.ac.horizon.artcodes.model.Experience;
-import uk.ac.horizon.artcodes.source.UriList;
+import uk.ac.horizon.artcodes.request.RequestCallbackBase;
+import uk.ac.horizon.artcodes.ui.IntentBuilder;
 
 public class ExperienceActivity extends ExperienceActivityBase
 {
-	public static void start(Context context, Experience experience)
-	{
-		Intent intent = new Intent(context, ExperienceActivity.class);
-		intent.putExtra("experience", ExperienceParser.createGson(context).toJson(experience));
-		context.startActivity(intent);
-	}
-
 	private ExperienceBinding binding;
 
 	public void editExperience(View view)
 	{
-		startActivity(ExperienceEditActivity.class);
+		IntentBuilder.with(this)
+				.target(ExperienceEditActivity.class)
+				.setServer(getServer())
+				.set("experience", getExperience())
+				.start();
 	}
 
 	@Override
-	public void onLoaded(Experience experience)
+	public void onResponse(Experience experience)
 	{
-		super.onLoaded(experience);
+		super.onResponse(experience);
+		GoogleAnalytics.trackScreen("View Experience", experience.getId());
 		binding.setExperience(experience);
 
 		if (Feature.get(this, R.bool.feature_history).isEnabled())
@@ -90,6 +90,8 @@ public class ExperienceActivity extends ExperienceActivityBase
 				}
 			}
 		});
+
+		updateStarred();
 	}
 
 	public void readDescription(View view)
@@ -102,7 +104,11 @@ public class ExperienceActivity extends ExperienceActivityBase
 
 	public void scanExperience(View view)
 	{
-		startActivity(ArtcodeActivity.class);
+		IntentBuilder.with(this)
+				.target(ArtcodeActivity.class)
+				.setServer(getServer())
+				.set("experience", getExperience())
+				.start();
 	}
 
 	public void shareExperience(View view)
@@ -117,26 +123,39 @@ public class ExperienceActivity extends ExperienceActivityBase
 		}
 		intent.putExtra(Intent.EXTRA_TEXT, getUri());
 		Intent openInChooser = Intent.createChooser(intent, "Share with...");
+		GoogleAnalytics.trackEvent("Experience", "Share", getUri());
 		startActivity(openInChooser);
 	}
 
 	public void starExperience(View view)
 	{
-		UriList<Experience> starred = getAccount().getStarred();
-		if (starred.contains(getUri()))
+		getServer().loadStarred(new RequestCallbackBase<List<String>>()
 		{
-			starred.remove(getUri());
-		}
-		else
-		{
-			starred.add(getUri());
-		}
-		updateStarred();
+			@Override
+			public void onResponse(List<String> starred)
+			{
+				if (starred.contains(getUri()))
+				{
+					GoogleAnalytics.trackEvent("Experience", "Unstar", getUri());
+					starred.remove(getUri());
+				}
+				else
+				{
+					GoogleAnalytics.trackEvent("Experience", "Star", getUri());
+					starred.add(getUri());
+				}
+				updateStarred();
+			}
+		});
 	}
 
 	public void startExperienceHistory(View view)
 	{
-		startActivity(ExperienceHistoryActivity.class);
+		IntentBuilder.with(this)
+				.target(ExperienceHistoryActivity.class)
+				.setServer(getServer())
+				.set("experience", getExperience())
+				.start();
 	}
 
 	@Override
@@ -151,8 +170,6 @@ public class ExperienceActivity extends ExperienceActivityBase
 
 		binding = DataBindingUtil.setContentView(this, R.layout.experience);
 
-		// TODO bindView(R.id.openExperience, new TintAdapter<Experience>("image"));
-
 		onNewIntent(getIntent());
 
 		setSupportActionBar(binding.toolbar);
@@ -160,28 +177,26 @@ public class ExperienceActivity extends ExperienceActivityBase
 		{
 			getSupportActionBar().setDisplayHomeAsUpEnabled(true);
 		}
-
-		updateStarred();
-	}
-
-	@Override
-	protected void onStart()
-	{
-		super.onStart();
-		GoogleAnalytics.trackScreen("Experience Screen");
 	}
 
 	private void updateStarred()
 	{
-		if (getAccount().getStarred().contains(getUri()))
+		getServer().loadStarred(new RequestCallbackBase<List<String>>()
 		{
-			binding.experienceFavouriteButton.setText(R.string.unstar);
-			binding.experienceFavouriteButton.setCompoundDrawablesWithIntrinsicBounds(0, R.drawable.ic_star_black_24dp, 0, 0);
-		}
-		else
-		{
-			binding.experienceFavouriteButton.setText(R.string.star);
-			binding.experienceFavouriteButton.setCompoundDrawablesWithIntrinsicBounds(0, R.drawable.ic_star_border_black_24dp, 0, 0);
-		}
+			@Override
+			public void onResponse(List<String> item)
+			{
+				if (item.contains(getUri()))
+				{
+					binding.experienceFavouriteButton.setText(R.string.unstar);
+					binding.experienceFavouriteButton.setCompoundDrawablesWithIntrinsicBounds(0, R.drawable.ic_star_black_24dp, 0, 0);
+				}
+				else
+				{
+					binding.experienceFavouriteButton.setText(R.string.star);
+					binding.experienceFavouriteButton.setCompoundDrawablesWithIntrinsicBounds(0, R.drawable.ic_star_border_black_24dp, 0, 0);
+				}
+			}
+		});
 	}
 }

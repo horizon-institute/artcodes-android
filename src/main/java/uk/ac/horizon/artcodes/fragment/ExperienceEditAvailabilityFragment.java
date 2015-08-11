@@ -15,13 +15,11 @@ import android.view.ViewGroup;
 import android.widget.DatePicker;
 import com.google.android.gms.location.places.Place;
 import com.google.android.gms.location.places.ui.PlacePicker;
+import uk.ac.horizon.artcodes.GoogleAnalytics;
 import uk.ac.horizon.artcodes.R;
-import uk.ac.horizon.artcodes.account.AccountInfo;
-import uk.ac.horizon.artcodes.databinding.AccountBinding;
 import uk.ac.horizon.artcodes.databinding.AvailabilityEditBinding;
 import uk.ac.horizon.artcodes.databinding.ExperienceEditAvailabilitiesBinding;
 import uk.ac.horizon.artcodes.model.Availability;
-import uk.ac.horizon.artcodes.ui.ExperienceEditor;
 
 import java.util.Calendar;
 import java.util.List;
@@ -101,6 +99,15 @@ public class ExperienceEditAvailabilityFragment extends ExperienceEditFragment
 					});
 				}
 			});
+			holder.binding.toggleDates.setOnClickListener(new View.OnClickListener()
+			{
+				@Override
+				public void onClick(View v)
+				{
+					holder.binding.toggleDates.setVisibility(View.GONE);
+					holder.binding.dateExpand.setVisibility(View.VISIBLE);
+				}
+			});
 			holder.binding.availabilityLocation.setOnClickListener(new View.OnClickListener()
 			{
 				@Override
@@ -115,7 +122,7 @@ public class ExperienceEditAvailabilityFragment extends ExperienceEditFragment
 					}
 					catch (Exception e)
 					{
-						Log.e("", e.getMessage(), e);
+						GoogleAnalytics.trackException(e);
 					}
 				}
 			});
@@ -133,8 +140,9 @@ public class ExperienceEditAvailabilityFragment extends ExperienceEditFragment
 								@Override
 								public void onClick(View v)
 								{
-									binding.getExperience().getAvailabilities().add(index, availability);
+									getExperience().getAvailabilities().add(index, availability);
 									notifyDataSetChanged();
+									updateAvailabilities();
 								}
 							}).show();
 				}
@@ -173,20 +181,25 @@ public class ExperienceEditAvailabilityFragment extends ExperienceEditFragment
 		}
 	}
 
+	private void updateAvailabilities()
+	{
+		if(getExperience().getAvailabilities().isEmpty())
+		{
+			binding.list.setVisibility(View.GONE);
+			binding.emptyView.setVisibility(View.VISIBLE);
+		}
+		else
+		{
+			binding.list.setVisibility(View.VISIBLE);
+			binding.emptyView.setVisibility(View.GONE);
+		}
+	}
+
 	@Nullable
 	@Override
 	public View onCreateView(LayoutInflater inflater, ViewGroup container, Bundle savedInstanceState)
 	{
 		binding = ExperienceEditAvailabilitiesBinding.inflate(inflater, container, false);
-		binding.setAccount(getAccount().getInfo());
-		binding.storeToggle.setOnClickListener(new View.OnClickListener()
-		{
-			@Override
-			public void onClick(View v)
-			{
-				binding.setShowAccounts(!binding.getShowAccounts());
-			}
-		});
 		binding.add.setOnClickListener(new View.OnClickListener()
 		{
 			@Override
@@ -194,14 +207,12 @@ public class ExperienceEditAvailabilityFragment extends ExperienceEditFragment
 			{
 				Log.i("", "Adding new availability");
 				getExperience().getAvailabilities().add(new Availability());
+				updateAvailabilities();
 				binding.list.getAdapter().notifyDataSetChanged();
 			}
 		});
 
 		binding.list.setLayoutManager(new LinearLayoutManager(getActivity()));
-		binding.accountList.setLayoutManager(new LinearLayoutManager(getActivity()));
-		//binding.accountList.setAdapter(new AccountAdapter());
-
 
 		return binding.getRoot();
 	}
@@ -210,10 +221,8 @@ public class ExperienceEditAvailabilityFragment extends ExperienceEditFragment
 	public void onResume()
 	{
 		super.onResume();
-		binding.setExperience(getExperience());
-		binding.setExperienceEditor(new ExperienceEditor(getExperience()));
 		binding.list.setAdapter(new AvailabilityAdapter(getExperience().getAvailabilities()));
-		updateAccounts();
+		updateAvailabilities();
 	}
 
 	@Override
@@ -233,26 +242,6 @@ public class ExperienceEditAvailabilityFragment extends ExperienceEditFragment
 		}
 	}
 
-	private AccountBinding createAccount(final AccountInfo account)
-	{
-		final AccountBinding accountBinding = AccountBinding.inflate(getActivity().getLayoutInflater(), binding.accountList, false);
-		accountBinding.setAccount(account);
-		accountBinding.getRoot().setOnClickListener(new View.OnClickListener()
-		{
-			@Override
-			public void onClick(View v)
-			{
-				binding.setAccount(account);
-				binding.setShowAccounts(false);
-				updateAccounts();
-			}
-		});
-
-		binding.accountList.addView(accountBinding.getRoot());
-
-		return accountBinding;
-	}
-
 	private void selectDate(Long timestamp, DatePickerDialog.OnDateSetListener listener)
 	{
 		final Calendar calendar = Calendar.getInstance();
@@ -270,17 +259,5 @@ public class ExperienceEditAvailabilityFragment extends ExperienceEditFragment
 
 		DatePickerDialog dialog = new DatePickerDialog(getActivity(), listener, mYear, mMonth, mDay);
 		dialog.show();
-	}
-
-	private void updateAccounts()
-	{
-		binding.accountList.removeAllViews();
-		for (AccountInfo account : getArtcodes().getAccounts())
-		{
-			if (account != binding.getAccount())
-			{
-				createAccount(account);
-			}
-		}
 	}
 }

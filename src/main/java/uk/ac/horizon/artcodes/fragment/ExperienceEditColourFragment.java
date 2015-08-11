@@ -30,6 +30,7 @@ import android.widget.CompoundButton;
 import android.widget.SeekBar;
 import org.opencv.android.OpenCVLoader;
 import org.opencv.core.Mat;
+import uk.ac.horizon.artcodes.GoogleAnalytics;
 import uk.ac.horizon.artcodes.R;
 import uk.ac.horizon.artcodes.databinding.ExperienceEditColourBinding;
 import uk.ac.horizon.artcodes.scanner.camera.CameraAdapter;
@@ -137,7 +138,7 @@ public class ExperienceEditColourFragment extends ExperienceEditFragment
 				}
 				catch (Exception e)
 				{
-					Log.e("", e.getMessage(), e);
+					GoogleAnalytics.trackException(e);
 				}
 			}
 		});

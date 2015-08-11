@@ -6,8 +6,7 @@ import android.util.AttributeSet;
 
 public class RefreshView extends SwipeRefreshLayout
 {
-	private boolean measured = false;
-	private boolean mPreMeasureRefreshing = false;
+	private int pending = 0;
 
 	public RefreshView(Context context)
 	{
@@ -23,24 +22,26 @@ public class RefreshView extends SwipeRefreshLayout
 	public void onMeasure(int widthMeasureSpec, int heightMeasureSpec)
 	{
 		super.onMeasure(widthMeasureSpec, heightMeasureSpec);
-		if (!measured)
-		{
-			measured = true;
-			setRefreshing(mPreMeasureRefreshing);
-		}
+		setRefreshing(hasPending());
 	}
 
-
-	@Override
-	public void setRefreshing(boolean refreshing)
+	public boolean hasPending()
 	{
-		if (measured)
+		return pending > 0;
+	}
+
+	public void addPending()
+	{
+		pending++;
+		setRefreshing(true);
+	}
+
+	public void removePending()
+	{
+		pending--;
+		if(pending == 0)
 		{
-			super.setRefreshing(refreshing);
-		}
-		else
-		{
-			mPreMeasureRefreshing = refreshing;
+			setRefreshing(false);
 		}
 	}
 }

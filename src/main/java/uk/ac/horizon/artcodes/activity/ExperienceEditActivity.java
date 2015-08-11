@@ -19,8 +19,8 @@
 
 package uk.ac.horizon.artcodes.activity;
 
-import android.content.Context;
 import android.content.Intent;
+import android.content.SharedPreferences;
 import android.databinding.DataBindingUtil;
 import android.net.Uri;
 import android.os.Bundle;
@@ -32,30 +32,26 @@ import android.util.Log;
 import android.view.Menu;
 import android.view.MenuItem;
 import android.view.View;
+import android.widget.AdapterView;
+import android.widget.ArrayAdapter;
 import uk.ac.horizon.artcodes.Feature;
 import uk.ac.horizon.artcodes.GoogleAnalytics;
 import uk.ac.horizon.artcodes.R;
+import uk.ac.horizon.artcodes.account.Account;
 import uk.ac.horizon.artcodes.databinding.ExperienceEditBinding;
 import uk.ac.horizon.artcodes.fragment.ExperienceEditActionFragment;
 import uk.ac.horizon.artcodes.fragment.ExperienceEditAvailabilityFragment;
+import uk.ac.horizon.artcodes.fragment.ExperienceEditColourFragment;
 import uk.ac.horizon.artcodes.fragment.ExperienceEditFragment;
 import uk.ac.horizon.artcodes.fragment.ExperienceEditInfoFragment;
-import uk.ac.horizon.artcodes.fragment.ExperienceEditColourFragment;
-import uk.ac.horizon.artcodes.ExperienceParser;
 import uk.ac.horizon.artcodes.model.Experience;
+import uk.ac.horizon.artcodes.ui.IntentBuilder;
 
 import java.util.ArrayList;
 import java.util.List;
 
 public class ExperienceEditActivity extends ExperienceActivityBase
 {
-	public static void start(Context context, Experience experience)
-	{
-		Intent intent = new Intent(context, ExperienceEditActivity.class);
-		intent.putExtra("experience", ExperienceParser.createGson(context).toJson(experience));
-		context.startActivity(intent);
-	}
-
 	public static final int IMAGE_PICKER_REQUEST = 121;
 	public static final int ICON_PICKER_REQUEST = 123;
 
@@ -70,7 +66,7 @@ public class ExperienceEditActivity extends ExperienceActivityBase
 			fragments.add(new ExperienceEditInfoFragment());
 			fragments.add(new ExperienceEditAvailabilityFragment());
 			fragments.add(new ExperienceEditActionFragment());
-			if(Feature.get(getApplicationContext(), R.bool.feature_edit_colour).isEnabled())
+			if (Feature.get(getApplicationContext(), R.bool.feature_edit_colour).isEnabled())
 			{
 				fragments.add(new ExperienceEditColourFragment());
 			}
@@ -97,6 +93,7 @@ public class ExperienceEditActivity extends ExperienceActivityBase
 	}
 
 	private ExperienceEditBinding binding;
+	private Account account;
 
 	public void editIcon(View view)
 	{
@@ -124,6 +121,13 @@ public class ExperienceEditActivity extends ExperienceActivityBase
 	}
 
 	@Override
+	public void onResponse(Experience experience)
+	{
+		super.onResponse(experience);
+		GoogleAnalytics.trackScreen("Edit Experience", experience.getId());
+	}
+
+	@Override
 	public boolean onOptionsItemSelected(MenuItem item)
 	{
 		switch (item.getItemId())
@@ -133,10 +137,19 @@ public class ExperienceEditActivity extends ExperienceActivityBase
 				return true;
 			case R.id.save:
 				getAccount().saveExperience(getExperience());
-				NavUtils.navigateUpTo(this, createIntent(ExperienceActivity.class));
+				NavUtils.navigateUpTo(this, IntentBuilder.with(this)
+						.target(ExperienceActivity.class)
+						.setServer(getServer())
+						.set("experience", getExperience())
+						.create());
 				return true;
 		}
 		return super.onOptionsItemSelected(item);
+	}
+
+	public void setAccount(Account account)
+	{
+		this.account = account;
 	}
 
 	protected void onActivityResult(int requestCode, int resultCode, Intent data)
@@ -177,9 +190,66 @@ public class ExperienceEditActivity extends ExperienceActivityBase
 		}
 
 		setSupportActionBar(binding.toolbar);
+		getSupportActionBar().setDisplayShowTitleEnabled(false);
+
+		List<Account> accounts = getServer().getAccounts();
+		binding.accountList.setAdapter(new ArrayAdapter<>(this, R.layout.account_item, accounts));
+		binding.accountList.setOnItemSelectedListener(new AdapterView.OnItemSelectedListener() {
+			@Override
+			public void onItemSelected(AdapterView<?> parent, View view, int position, long id)
+			{
+				Account account = (Account) binding.accountList.getAdapter().getItem(position);
+				if (account != null)
+				{
+					setAccount(account);
+				}
+			}
+
+			@Override
+			public void onNothingSelected(AdapterView<?> parent)
+			{
+
+			}
+		});
+
+		Account account = getAccount();
+		binding.accountList.setSelection(accounts.indexOf(account));
 
 		binding.toolbar.setNavigationIcon(R.drawable.ic_close_white_24dp);
-		binding.toolbar.setTitle("");
+
+	}
+
+	public Account getAccount()
+	{
+		if (account == null)
+		{
+			if (getIntent().hasExtra("account"))
+			{
+				String accountID = getIntent().getStringExtra("account");
+				Account account = getServer().getAccount(accountID);
+				if (account != null)
+				{
+					this.account = account;
+					return account;
+				}
+			}
+
+			SharedPreferences preferences = getSharedPreferences(Account.class.getName(), MODE_PRIVATE);
+			String accountID = preferences.getString(getUri(), null);
+			if (accountID != null)
+			{
+				Account account = getServer().getAccount(accountID);
+				if (account != null)
+				{
+					this.account = account;
+					return account;
+				}
+			}
+
+			account = getServer().getAccounts().get(0);
+		}
+
+		return account;
 	}
 
 	@Override
@@ -188,7 +258,7 @@ public class ExperienceEditActivity extends ExperienceActivityBase
 		super.onSaveInstanceState(outState);
 
 		outState.putInt("tab", binding.viewpager.getCurrentItem());
-		outState.putString("experience", getAccount().getGson().toJson(getExperience()));
+		outState.putString("experience", getServer().getGson().toJson(getExperience()));
 	}
 //
 //	private void updateSave()
@@ -207,13 +277,6 @@ public class ExperienceEditActivity extends ExperienceActivityBase
 //			saveItem.setTitle("Create Copy");
 //		}
 //	}
-
-	@Override
-	protected void onStart()
-	{
-		super.onStart();
-		GoogleAnalytics.trackScreen("Experience Edit Screen");
-	}
 
 	private void selectImage(int request_id)
 	{

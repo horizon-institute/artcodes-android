@@ -42,7 +42,7 @@ public class ScannerActivity extends AppCompatActivity
 {
 	protected ScannerBinding binding;
 	// TODO Use binding variables
-	private CameraAdapter camera;
+	protected CameraAdapter camera;
 	private Overlay overlay;
 	private VisibilityAnimator menuAnimator;
 	private Experience experience;

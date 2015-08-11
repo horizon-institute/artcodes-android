@@ -30,6 +30,7 @@ import android.widget.LinearLayout;
 import android.widget.TextView;
 import com.google.gson.Gson;
 import com.google.gson.GsonBuilder;
+import uk.ac.horizon.artcodes.GoogleAnalytics;
 import uk.ac.horizon.artcodes.R;
 import uk.ac.horizon.artcodes.model.Experience;
 
@@ -78,7 +79,7 @@ public class TestScanActivity extends Activity
 				}
 				catch (Exception e)
 				{
-					Log.e("", e.getMessage(), e);
+					GoogleAnalytics.trackException(e);
 				}
 			}
 		});
@@ -98,7 +99,7 @@ public class TestScanActivity extends Activity
 				}
 				catch (Exception e)
 				{
-					Log.e("", e.getMessage(), e);
+					GoogleAnalytics.trackException(e);
 				}
 			}
 		});

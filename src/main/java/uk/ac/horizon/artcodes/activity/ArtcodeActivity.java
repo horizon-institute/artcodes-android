@@ -25,22 +25,24 @@ import android.support.v4.app.NavUtils;
 import android.util.Log;
 import android.view.MenuItem;
 import android.view.View;
+
+import java.util.List;
+
 import uk.ac.horizon.artcodes.Artcodes;
-import uk.ac.horizon.artcodes.Feature;
 import uk.ac.horizon.artcodes.GoogleAnalytics;
-import uk.ac.horizon.artcodes.R;
-import uk.ac.horizon.artcodes.account.Account;
 import uk.ac.horizon.artcodes.databinding.ScannerActionBinding;
 import uk.ac.horizon.artcodes.model.Action;
 import uk.ac.horizon.artcodes.model.Experience;
+import uk.ac.horizon.artcodes.request.RequestCallbackBase;
 import uk.ac.horizon.artcodes.scanner.VisibilityAnimator;
 import uk.ac.horizon.artcodes.scanner.activity.ScannerActivity;
 import uk.ac.horizon.artcodes.scanner.detect.ActionDetectionHandler;
 import uk.ac.horizon.artcodes.scanner.detect.MarkerDetectionHandler;
-import uk.ac.horizon.artcodes.source.IntentSource;
-import uk.ac.horizon.artcodes.source.Target;
+import uk.ac.horizon.artcodes.request.IntentSource;
+import uk.ac.horizon.artcodes.server.ArtcodeServer;
+import uk.ac.horizon.artcodes.ui.IntentBuilder;
 
-public class ArtcodeActivity extends ScannerActivity implements Target<Experience>
+public class ArtcodeActivity extends ScannerActivity
 {
 	private static final String EXTRA_CUSTOM_TABS_SESSION_ID = "android.support.CUSTOM_TABS:session_id";
 
@@ -67,22 +69,9 @@ public class ArtcodeActivity extends ScannerActivity implements Target<Experienc
 		return (Artcodes) getApplication();
 	}
 
-	protected Account getAccount()
+	protected ArtcodeServer getServer()
 	{
-		return getArtcodes().getAccount();
-	}
-
-	@Override
-	public void onLoaded(Experience experience)
-	{
-		super.onLoaded(experience);
-
-		Log.i("", "Set experience " + experience);
-		if (experience != null)
-		{
-			GoogleAnalytics.trackEvent("Experience", "Loaded " + experience.getId());
-			getAccount().getRecent().add(experience.getId());
-		}
+		return getArtcodes().getServer();
 	}
 
 	@Override
@@ -91,7 +80,11 @@ public class ArtcodeActivity extends ScannerActivity implements Target<Experienc
 		switch (item.getItemId())
 		{
 			case android.R.id.home:
-				NavUtils.navigateUpTo(this, ExperienceActivityBase.createIntent(this, ExperienceActivity.class, getExperience()));
+				NavUtils.navigateUpTo(this, IntentBuilder.with(this)
+						.setServer(getServer())
+						.target(ExperienceActivity.class)
+						.set("experience", getExperience())
+						.create());
 				return true;
 		}
 		return super.onOptionsItemSelected(item);
@@ -101,7 +94,27 @@ public class ArtcodeActivity extends ScannerActivity implements Target<Experienc
 	protected void onPostCreate(Bundle savedInstanceState)
 	{
 		super.onPostCreate(savedInstanceState);
-		new IntentSource<Experience>(getAccount(), getIntent(), savedInstanceState, Experience.class).loadInto(this);
+		new IntentSource<Experience>(getServer(), getIntent(), savedInstanceState, Experience.class).loadInto(new RequestCallbackBase<Experience>()
+		{
+			@Override
+			public void onResponse(final Experience experience)
+			{
+				onLoaded(experience);
+				Log.i("", "Set experience " + experience);
+				if (experience != null)
+				{
+					GoogleAnalytics.trackScreen("Scan", getExperience().getId());
+					getServer().loadRecent(new RequestCallbackBase<List<String>>()
+					{
+						@Override
+						public void onResponse(List<String> item)
+						{
+							item.add(experience.getId());
+						}
+					});
+				}
+			}
+		});
 	}
 
 	@Override
@@ -114,19 +127,8 @@ public class ArtcodeActivity extends ScannerActivity implements Target<Experienc
 			{
 				if (action != null)
 				{
-					// TODO getAccount().scanned(experience.getId(), action, camera);
-					GoogleAnalytics.trackEvent("action", "Detected " + action);
-					if (Feature.get(ArtcodeActivity.this, R.bool.feature_log_scanned_images).isEnabled())
-					{
-						try
-						{
-							// TODO camera.saveImage(Artcodes.createImageLogFile());
-						}
-						catch (Exception e)
-						{
-							Log.w("", e.getMessage(), e);
-						}
-					}
+					getServer().logScan(experience.getId(), action, camera);
+					GoogleAnalytics.trackEvent("Action", "Scanned", experience.getId(), action.getName());
 
 					actionBinding.setAction(action);
 					actionBinding.getRoot().setOnClickListener(new View.OnClickListener()
@@ -134,9 +136,7 @@ public class ArtcodeActivity extends ScannerActivity implements Target<Experienc
 						@Override
 						public void onClick(View v)
 						{
-							GoogleAnalytics.trackEvent("action", "Opened " + action);
-							//camera.stop();
-							// TODO ExperienceLoaders.with(ArtcodeActivity.this).logAction(getRef());
+							GoogleAnalytics.trackEvent("Action", "Opened", experience.getId(), action.getName());
 							if (action.getShowDetail())
 							{
 								ActionActivity.start(ArtcodeActivity.this, action);
@@ -172,12 +172,5 @@ public class ArtcodeActivity extends ScannerActivity implements Target<Experienc
 				}
 			}
 		};
-	}
-
-	@Override
-	protected void onStart()
-	{
-		super.onStart();
-		GoogleAnalytics.trackScreen("Scan Screen");
 	}
 }

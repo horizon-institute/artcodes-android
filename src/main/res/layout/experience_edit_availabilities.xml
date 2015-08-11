@@ -25,122 +25,32 @@
         tools:context=".activities.ExperienceEditActivity">
 
 	<data>
-
-		<import type="android.view.View" />
-
-		<variable name="showAccounts"
-		          type="boolean" />
-
-		<variable name="account"
-		          type="uk.ac.horizon.artcodes.account.AccountInfo" />
-
-		<variable name="experience"
-		          type="uk.ac.horizon.artcodes.model.Experience" />
-
-		<variable name="experienceEditor"
-		          type="uk.ac.horizon.artcodes.ui.ExperienceEditor" />
 	</data>
 
 	<android.support.design.widget.CoordinatorLayout
 			android:layout_width="match_parent"
 			android:layout_height="match_parent">
 
-		<LinearLayout android:layout_width="match_parent"
-		              android:layout_height="match_parent"
-		              android:orientation="vertical">
+		<android.support.v7.widget.RecyclerView
+				android:layout_width="match_parent"
+				android:layout_height="match_parent"
+				android:id="@+id/list" />
 
-			<LinearLayout
-					android:layout_width="match_parent"
-					android:layout_height="wrap_content"
-					android:gravity="center_vertical"
-					android:id="@+id/storeToggle"
-					android:background="?attr/selectableItemBackground"
-					android:orientation="horizontal">
+		<TextView android:layout_width="match_parent"
+		          android:layout_height="match_parent"
+		          android:text="Private"
+		          android:id="@+id/emptyView"
+		          android:gravity="center" />
 
-				<ImageView
-						android:layout_width="24dp"
-						android:layout_height="24dp"
-						android:layout_margin="16dp"
-						tools:src="@drawable/ic_smartphone_black_36dp"
-						android:tint="@color/ic_tint"
-						android:src="@{account.icon}" />
-
-				<LinearLayout
-						android:layout_width="0dp"
-						android:layout_height="wrap_content"
-						android:layout_weight="1"
-						android:layout_margin="16dp"
-						android:orientation="vertical">
-
-					<TextView
-							android:layout_width="match_parent"
-							android:layout_height="wrap_content"
-							android:text="@{account.name}"
-							android:textAppearance="@style/TextAppearance.AppCompat"
-							tools:text="Save to Artcode Server" />
-
-					<TextView
-							android:layout_width="match_parent"
-							android:layout_height="wrap_content"
-							android:visibility="@{account.username == null ? View.GONE : View.VISIBLE}"
-							android:text="@{account.username}"
-							android:id="@+id/hint_text"
-							android:textAppearance="@style/TextAppearance.AppCompat.Small"
-							tools:text="kevin.glover@gmail.com" />
-
-				</LinearLayout>
-
-				<ImageView
-						android:layout_width="wrap_content"
-						android:layout_height="wrap_content"
-						android:layout_margin="8dp"
-						android:id="@+id/expand_image"
-						android:layout_gravity="center_vertical"
-						android:tint="@color/ic_tint"
-						android:src="@{showAccounts ? @drawable/ic_expand_less_24dp : @drawable/ic_expand_more_24dp}"
-						tools:src="@drawable/ic_expand_more_24dp" />
-			</LinearLayout>
-
-			<android.support.v7.widget.SwitchCompat
-					android:layout_width="match_parent"
-					android:layout_height="wrap_content"
-					android:layout_margin="16dp"
-					android:text="Available publicly"
-					android:checked="@{experience.published}"
-					app:onCheckedChangeListener="@{experienceEditor.publishedListener}" />
-
-			<FrameLayout android:layout_width="match_parent"
-			             android:layout_height="wrap_content">
-
-				<FrameLayout android:layout_width="match_parent"
-				             android:layout_height="wrap_content"
-				             android:orientation="vertical"
-				             android:visibility="@{showAccounts ? View.GONE : View.VISIBLE}">
-
-					<android.support.v7.widget.RecyclerView
-							android:layout_width="match_parent"
-							android:layout_height="match_parent"
-							android:id="@+id/list" />
-
-					<android.support.design.widget.FloatingActionButton
-							android:layout_width="wrap_content"
-							android:layout_height="wrap_content"
-							android:layout_margin="16dp"
-							android:src="@drawable/ic_add_white_24dp"
-							android:tint="#FFF"
-							android:id="@+id/add"
-							android:elevation="4dp"
-							app:pressedTranslationZ="8dp"
-							android:onClick="scanExperience"
-							android:layout_gravity="bottom|right|end" />
-				</FrameLayout>
-
-				<android.support.v7.widget.RecyclerView
-						android:layout_width="match_parent"
-						android:layout_height="wrap_content"
-						android:id="@+id/accountList"
-						android:visibility="@{showAccounts ? View.VISIBLE : View.GONE}" />
-			</FrameLayout>
-		</LinearLayout>
+		<android.support.design.widget.FloatingActionButton
+				android:layout_width="wrap_content"
+				android:layout_height="wrap_content"
+				android:layout_margin="16dp"
+				android:src="@drawable/ic_add_white_24dp"
+				android:tint="#FFF"
+				android:id="@+id/add"
+				android:elevation="4dp"
+				app:pressedTranslationZ="8dp"
+				android:layout_gravity="bottom|right|end" />
 	</android.support.design.widget.CoordinatorLayout>
 </layout>

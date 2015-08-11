@@ -2,7 +2,7 @@ package uk.ac.horizon.artcodes.fragment;
 
 import android.support.v4.app.Fragment;
 import uk.ac.horizon.artcodes.Artcodes;
-import uk.ac.horizon.artcodes.account.Account;
+import uk.ac.horizon.artcodes.server.ArtcodeServer;
 
 public class ArtcodeFragmentBase extends Fragment
 {
@@ -11,8 +11,8 @@ public class ArtcodeFragmentBase extends Fragment
 		return (Artcodes)getActivity().getApplication();
 	}
 
-	protected Account getAccount()
+	protected ArtcodeServer getServer()
 	{
-		return getArtcodes().getAccount();
+		return getArtcodes().getServer();
 	}
 }

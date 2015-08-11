@@ -9,6 +9,7 @@ import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 import uk.ac.horizon.artcodes.Feature;
+import uk.ac.horizon.artcodes.GoogleAnalytics;
 import uk.ac.horizon.artcodes.R;
 import uk.ac.horizon.artcodes.adapter.FeatureAdapter;
 import uk.ac.horizon.artcodes.databinding.FeatureListBinding;
@@ -66,5 +67,12 @@ public class FeatureListFragment extends Fragment
 		}
 
 		return binding.getRoot();
+	}
+
+	@Override
+	public void onResume()
+	{
+		super.onResume();
+		GoogleAnalytics.trackScreen("View Features");
 	}
 }

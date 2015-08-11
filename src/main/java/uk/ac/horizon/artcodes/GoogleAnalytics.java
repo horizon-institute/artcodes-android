@@ -20,14 +20,18 @@
 package uk.ac.horizon.artcodes;
 
 import android.content.Context;
+import android.util.Log;
 import com.google.android.gms.analytics.HitBuilders;
+import com.google.android.gms.analytics.Logger;
 import com.google.android.gms.analytics.Tracker;
+import com.google.common.base.Throwables;
 
 import java.util.HashMap;
 import java.util.Map;
 
 public final class GoogleAnalytics
 {
+	private static final String dimensionValue = "experience";
 
 	public enum Target
 	{
@@ -45,6 +49,11 @@ public final class GoogleAnalytics
 		}
 
 		googleAnalytics = new GoogleAnalytics(context);
+		if (BuildConfig.DEBUG)
+		{
+			com.google.android.gms.analytics.GoogleAnalytics.getInstance(context).setDryRun(true);
+			com.google.android.gms.analytics.GoogleAnalytics.getInstance(context).getLogger().setLogLevel(Logger.LogLevel.VERBOSE);
+		}
 	}
 
 	public static synchronized Tracker get(Target target)
@@ -68,6 +77,29 @@ public final class GoogleAnalytics
 				.build());
 	}
 
+	public static void trackException(Exception e)
+	{
+		Log.e("", e.getMessage(), e);
+		get(Target.APP).send(new HitBuilders.ExceptionBuilder()
+				.setDescription(Throwables.getStackTraceAsString(e))
+				.build());
+	}
+
+	public static void trackEvent(String category, String action, String uri)
+	{
+		get(Target.APP).send(new HitBuilders.EventBuilder(category, action)
+				.setCustomDimension(1, uri)
+				.build());
+	}
+
+	public static void trackEvent(String category, String action, String uri, String actionName)
+	{
+		get(Target.APP).send(new HitBuilders.EventBuilder(category, action)
+				.setCustomDimension(1, uri)
+				.setCustomDimension(2, actionName)
+				.build());
+	}
+
 	public static void trackScreen(String screen)
 	{
 		final Tracker tracker = get(Target.APP);
@@ -75,7 +107,15 @@ public final class GoogleAnalytics
 		tracker.send(new HitBuilders.ScreenViewBuilder().build());
 	}
 
-	private final Map<Target, Tracker> trackers = new HashMap<Target, Tracker>();
+	public static void trackScreen(String screen, String uri)
+	{
+		final Tracker tracker = get(Target.APP);
+		tracker.setScreenName(screen);
+		tracker.send(new HitBuilders.ScreenViewBuilder()
+				.setCustomDimension(1, uri).build());
+	}
+
+	private final Map<Target, Tracker> trackers = new HashMap<>();
 	private final Context context;
 
 	private GoogleAnalytics(Context context)

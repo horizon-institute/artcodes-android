@@ -9,16 +9,16 @@
 			android:layout_width="match_parent"
 			android:layout_height="match_parent">
 
-		<android.support.v4.widget.SwipeRefreshLayout
-				android:id="@+id/progress"
-				android:layout_width="match_parent"
-				android:layout_height="match_parent">
+		<uk.ac.horizon.artcodes.ui.RefreshView
+			android:id="@+id/progress"
+			android:layout_width="match_parent"
+			android:layout_height="match_parent">
 
 			<android.support.v7.widget.RecyclerView
 					android:layout_width="match_parent"
 					android:layout_height="match_parent"
 					android:id="@+id/list" />
 
-		</android.support.v4.widget.SwipeRefreshLayout>
+		</uk.ac.horizon.artcodes.ui.RefreshView>
 	</FrameLayout>
 </layout>

@@ -21,16 +21,6 @@
 <layout xmlns:android="http://schemas.android.com/apk/res/android"
         xmlns:tools="http://schemas.android.com/tools"
         tools:context="uk.ac.horizon.artcodes.activity.ExperienceSelectActivity">
-
-	<data>
-
-		<import type="android.view.View" />
-
-		<variable
-				name="account"
-				type="uk.ac.horizon.artcodes.account.AccountInfo" />
-	</data>
-
 	<LinearLayout
 			android:layout_width="match_parent"
 			android:layout_height="wrap_content"
@@ -42,9 +32,9 @@
 				android:layout_width="24dp"
 				android:layout_height="24dp"
 				android:layout_margin="16dp"
-				tools:src="@drawable/ic_smartphone_black_36dp"
-				android:tint="@color/ic_tint"
-				android:src="@{account.icon}" />
+				android:id="@+id/account_icon"
+				android:src="@drawable/ic_smartphone_black_24dp"
+				android:tint="@color/ic_tint" />
 
 		<LinearLayout
 				android:layout_width="0dp"
@@ -56,19 +46,9 @@
 			<TextView
 					android:layout_width="match_parent"
 					android:layout_height="wrap_content"
-					android:text="@{account.name}"
+					android:id="@+id/account_action"
 					android:textAppearance="@style/TextAppearance.AppCompat"
-					tools:text="Save to Artcode Server" />
-
-			<TextView
-					android:layout_width="match_parent"
-					android:layout_height="wrap_content"
-					android:visibility="@{account.username == null ? View.GONE : View.VISIBLE}"
-					android:text="@{account.username}"
-					android:id="@+id/hint_text"
-					android:textAppearance="@style/TextAppearance.AppCompat.Small"
-					tools:text="kevin.glover@gmail.com" />
-
+					tools:text="Server (kevin.glover@gmail.com)" />
 		</LinearLayout>
 	</LinearLayout>
 </layout>

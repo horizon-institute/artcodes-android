@@ -1,77 +1,63 @@
 package uk.ac.horizon.artcodes.account;
 
 import android.content.Context;
-import android.graphics.drawable.Drawable;
-import android.os.Handler;
-import android.os.Looper;
+import android.content.SharedPreferences;
 import android.util.Log;
-import uk.ac.horizon.artcodes.ExperienceParser;
+import uk.ac.horizon.artcodes.GoogleAnalytics;
 import uk.ac.horizon.artcodes.R;
 import uk.ac.horizon.artcodes.model.Experience;
-import uk.ac.horizon.artcodes.scanner.camera.CameraAdapter;
-import uk.ac.horizon.artcodes.source.Source;
-import uk.ac.horizon.artcodes.source.Target;
+import uk.ac.horizon.artcodes.request.RequestCallback;
+import uk.ac.horizon.artcodes.server.ArtcodeServer;
 
 import java.io.File;
 import java.io.FileWriter;
 import java.net.URI;
+import java.util.ArrayList;
+import java.util.List;
 import java.util.UUID;
 
-public class LocalAccount extends AccountBase
+public class LocalAccount implements Account
 {
-	public static class Info implements AccountInfo
+	private final ArtcodeServer server;
+
+	public LocalAccount(ArtcodeServer server)
 	{
-		private final Context context;
-
-		public Info(Context context)
-		{
-			this.context = context;
-		}
-
-		@Override
-		public String getId()
-		{
-			return "local";
-		}
-
-		@Override
-		public String getName()
-		{
-			return context.getString(R.string.device);
-		}
-
-		@Override
-		public String getUsername()
-		{
-			return null;
-		}
-
-		@Override
-		public Drawable getIcon()
-		{
-			return context.getResources().getDrawable(R.drawable.ic_smartphone_black_36dp);
-		}
-
-		@Override
-		public Account create()
-		{
-			return new LocalAccount(context);
-		}
-	}
-
-	public AccountInfo getInfo()
-	{
-		return new Info(context);
-	}
-
-	public LocalAccount(Context context)
-	{
-		super(context, ExperienceParser.createGson(context));
+		this.server = server;
 	}
 
 	private File getDirectory()
 	{
-		return context.getDir("experiences", Context.MODE_PRIVATE);
+		return server.getContext().getDir("experiences", Context.MODE_PRIVATE);
+	}
+
+	@Override
+	public String toString()
+	{
+		return getName();
+	}
+
+	@Override
+	public void loadLibrary(RequestCallback<List<String>> callback)
+	{
+		try
+		{
+			File directory = getDirectory();
+			Log.i("", "Listing " + directory.getAbsolutePath());
+			List<String> result = new ArrayList<>();
+			SharedPreferences.Editor editor = server.getContext().getSharedPreferences(Account.class.getName(), Context.MODE_PRIVATE).edit();
+			for (final File file : directory.listFiles())
+			{
+				String uri = file.toURI().toString();
+				result.add(uri);
+				editor.putString(uri, getId());
+			}
+			editor.apply();
+			callback.onResponse(result);
+		}
+		catch (Exception e)
+		{
+			callback.onError(e);
+		}
 	}
 
 	@Override
@@ -100,53 +86,30 @@ public class LocalAccount extends AccountBase
 					experience.setEditable(true);
 
 					FileWriter writer = new FileWriter(file);
-					getGson().toJson(experience, writer);
+					server.getGson().toJson(experience, writer);
 					writer.flush();
 					writer.close();
+
+					SharedPreferences.Editor editor = server.getContext().getSharedPreferences(Account.class.getName(), Context.MODE_PRIVATE).edit();
+					editor.putString(experience.getId(), getId()).apply();
 				}
 				catch (Exception e)
 				{
-					Log.e("", e.getMessage(), e);
+					GoogleAnalytics.trackException(e);
 				}
 			}
 		}).start();
 	}
 
 	@Override
-	public Source<Experience> getLibrary()
+	public String getId()
 	{
-		return new Source<Experience>()
-		{
-			@Override
-			public void loadInto(final Target<Experience> target)
-			{
-				new Thread(new Runnable()
-				{
-					@Override
-					public void run()
-					{
-						File directory = getDirectory();
-						Log.i("", "Listing " + directory.getAbsolutePath());
-						for (final File file : directory.listFiles())
-						{
-							new Handler(Looper.getMainLooper()).post(new Runnable()
-							{
-								@Override
-								public void run()
-								{
-									getSource(file.toURI().toString(), Experience.class).loadInto(target);
-								}
-							});
-						}
-					}
-				}).start();
-			}
-		};
+		return "local";
 	}
 
 	@Override
-	public void scanned(String uri, String marker, CameraAdapter adapter)
+	public String getName()
 	{
-
+		return server.getContext().getString(R.string.device);
 	}
 }

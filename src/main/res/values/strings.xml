@@ -18,6 +18,7 @@
   ~ along using this program.  If not, see <http://www.gnu.org/licenses/>.
   -->
 <resources>
+	<string name="anywhere">Anywhere</string>
 	<string name="app_name">Artcodes</string>
 	<string name="hint_near">Nearby</string>
 	<string name="hint_new">New</string>
@@ -59,6 +60,7 @@
 	<string name="experienceDeleteConfirmTitle">Delete %s?</string>
 	<string name="experienceDeleteConfirmMessage">%s will be permanently deleted</string>
 	<string name="save">Save</string>
+	<string name="save_to">Save to %s</string>
 	<string name="deleteConfirm">Delete</string>
 	<string name="deleteCancel">Cancel</string>
 
@@ -95,7 +97,7 @@
 	<string name="action_delete_undo">Undo</string>
 	<string name="marker_config">Marker Configuration</string>
 	<string name="close">close</string>
-	<string name="nav_home">Scan Now</string>
+	<string name="nav_home">Recommended</string>
 	<string name="nav_library">My Library</string>
 	<string name="favourites">Favourites</string>
 	<string name="favourite">Favourite</string>
@@ -117,4 +119,7 @@
 	<string name="fragment_action">Actions</string>
 	<string name="fragment_colour">Colour</string>
 	<string name="nav_features">Features</string>
+	<string name="nav_addaccount">Add Account</string>
+	<string name="navigation_libraries">Libraries</string>
+	<string name="server">Server (%s)</string>
 </resources>

@@ -5,8 +5,8 @@ import uk.ac.horizon.artcodes.model.Experience;
 public class ExperienceHistoryActivity extends ExperienceActivityBase
 {
 	@Override
-	public void onLoaded(Experience experience)
+	public void onResponse(Experience experience)
 	{
-		super.onLoaded(experience);
+		super.onResponse(experience);
 	}
 }

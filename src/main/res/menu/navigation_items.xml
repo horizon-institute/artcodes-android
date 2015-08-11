@@ -1,24 +1,33 @@
 <?xml version="1.0" encoding="utf-8"?>
 <menu xmlns:android="http://schemas.android.com/apk/res/android">
-	<group android:checkableBehavior="single">
-		<item
-				android:id="@+id/nav_home"
-				android:icon="@drawable/ic_photo_camera_black_24dp"
-				android:title="@string/nav_home" />
+	<item
+			android:id="@+id/nav_home"
+			android:icon="@drawable/ic_photo_camera_black_24dp"
+			android:title="@string/nav_home"
+			android:checkable="true" />
 
-		<item
-				android:id="@+id/nav_starred"
-				android:icon="@drawable/ic_star_black_24dp"
-				android:title="@string/nav_starred" />
+	<item
+			android:id="@+id/nav_starred"
+			android:icon="@drawable/ic_star_black_24dp"
+			android:title="@string/nav_starred"
+			android:checkable="true"/>
 
-		<item
-				android:id="@+id/nav_library"
-				android:icon="@drawable/ic_library_books_black_24dp"
-				android:title="@string/nav_library" />
+	<item
+			android:id="@+id/nav_features"
+			android:icon="@drawable/ic_subject_white_24dp"
+			android:title="@string/nav_features"
+			android:visible="false"
+			android:checkable="true" />
 
-		<item
-				android:id="@+id/nav_features"
-				android:title="@string/nav_features"
-				android:visible="false" />
-	</group>
+	<item
+			android:id="@+id/nav_libraries"
+			android:title="@string/navigation_libraries">
+		<menu>
+		</menu>
+	</item>
+
+	<item
+			android:id="@+id/nav_addaccount"
+			android:icon="@drawable/ic_add_white_24dp"
+			android:title="@string/nav_addaccount" />
 </menu>

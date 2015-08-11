@@ -21,7 +21,6 @@ package uk.ac.horizon.artcodes.model;
 import android.databinding.BaseObservable;
 import android.databinding.Bindable;
 import android.util.Log;
-import android.widget.CompoundButton;
 import uk.ac.horizon.artcodes.scanner.BR;
 import uk.ac.horizon.artcodes.scanner.process.ImageProcessor;
 
@@ -41,7 +40,6 @@ public class Experience extends BaseObservable
 	private String author;
 	private String callback;
 	private String originalID;
-	private Visibility visibility = Visibility.secret;
 
 	// Transient properties now calculated before use
 	private transient int minRegions = 5;
@@ -257,17 +255,6 @@ public class Experience extends BaseObservable
 		return processors;
 	}
 
-	public Visibility getVisibility()
-	{
-		return visibility;
-	}
-
-	@Bindable
-	public boolean isPublished()
-	{
-		return visibility == Visibility.published;
-	}
-
 	public boolean isValidCode(List<Integer> markerCodes, Integer embeddedChecksum)
 	{
 		if (markerCodes == null)
@@ -307,11 +294,6 @@ public class Experience extends BaseObservable
 		}
 
 		return true;
-	}
-
-	public void setVisibility(Visibility visibility)
-	{
-		this.visibility = visibility;
 	}
 
 	public void update()
@@ -453,10 +435,5 @@ public class Experience extends BaseObservable
 	public enum Status
 	{
 		loaded, modified, saving
-	}
-
-	public enum Visibility
-	{
-		personal, secret, published
 	}
 }

@@ -29,8 +29,8 @@ import uk.ac.horizon.artcodes.R;
 import uk.ac.horizon.artcodes.databinding.ActionBinding;
 import uk.ac.horizon.artcodes.ExperienceParser;
 import uk.ac.horizon.artcodes.model.Action;
-import uk.ac.horizon.artcodes.source.IntentSource;
-import uk.ac.horizon.artcodes.source.Target;
+import uk.ac.horizon.artcodes.request.IntentSource;
+import uk.ac.horizon.artcodes.request.RequestCallbackBase;
 
 public class ActionActivity extends ArtcodeActivityBase
 {
@@ -49,9 +49,9 @@ public class ActionActivity extends ArtcodeActivityBase
 		super.onCreate(savedInstanceState);
 
 		binding = DataBindingUtil.setContentView(this, R.layout.action);
-		new IntentSource<Action>(getAccount(), getIntent(), savedInstanceState, Action.class).loadInto(new Target<Action>() {
+		new IntentSource<Action>(getServer(), getIntent(), savedInstanceState, Action.class).loadInto(new RequestCallbackBase<Action>() {
 			@Override
-			public void onLoaded(Action item)
+			public void onResponse(Action item)
 			{
 				binding.setAction(item);
 			}

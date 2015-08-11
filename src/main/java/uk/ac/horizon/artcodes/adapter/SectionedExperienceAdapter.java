@@ -2,13 +2,12 @@ package uk.ac.horizon.artcodes.adapter;
 
 import android.content.Context;
 import android.content.Intent;
-import android.net.Uri;
+import android.os.Looper;
 import android.support.v7.widget.RecyclerView;
 import android.util.SparseArray;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
-import uk.ac.horizon.artcodes.ExperienceParser;
 import uk.ac.horizon.artcodes.Feature;
 import uk.ac.horizon.artcodes.R;
 import uk.ac.horizon.artcodes.activity.ArtcodeActivity;
@@ -17,6 +16,8 @@ import uk.ac.horizon.artcodes.databinding.SectionExperienceItemBinding;
 import uk.ac.horizon.artcodes.databinding.SectionHeaderBinding;
 import uk.ac.horizon.artcodes.databinding.WelcomeBinding;
 import uk.ac.horizon.artcodes.model.Experience;
+import uk.ac.horizon.artcodes.server.ArtcodeServer;
+import uk.ac.horizon.artcodes.ui.IntentBuilder;
 
 import java.util.HashMap;
 import java.util.Map;
@@ -60,7 +61,11 @@ public class SectionedExperienceAdapter extends RecyclerView.Adapter<SectionedEx
 				@Override
 				public void onClick(View v)
 				{
-					ExperienceActivity.start(context, experience);
+					IntentBuilder.with(context)
+							.target(ExperienceActivity.class)
+							.setServer(server)
+							.set("experience", experience)
+							.start();
 				}
 			});
 			binding.scanButton.setOnClickListener(new View.OnClickListener()
@@ -68,7 +73,11 @@ public class SectionedExperienceAdapter extends RecyclerView.Adapter<SectionedEx
 				@Override
 				public void onClick(View v)
 				{
-					startActivity(ArtcodeActivity.class, experience);
+					IntentBuilder.with(context)
+							.target(ArtcodeActivity.class)
+							.setServer(server)
+							.set("experience", experience)
+							.start();
 				}
 			});
 		}
@@ -88,7 +97,7 @@ public class SectionedExperienceAdapter extends RecyclerView.Adapter<SectionedEx
 				public void onClick(View v)
 				{
 					setShowHeaderItem(false);
-					Feature.get(context, R.bool.feature_show_welcome).setEnabled(false);
+					Feature.get(server.getContext(), R.bool.feature_show_welcome).setEnabled(false);
 				}
 			});
 			binding.moreButton.setOnClickListener(new View.OnClickListener()
@@ -96,7 +105,10 @@ public class SectionedExperienceAdapter extends RecyclerView.Adapter<SectionedEx
 				@Override
 				public void onClick(View v)
 				{
-					context.startActivity(new Intent(Intent.ACTION_VIEW, Uri.parse("http://aestheticodes.com/info/")));
+					IntentBuilder.with(context)
+							.setAction(Intent.ACTION_VIEW)
+							.setURI("http://aestheticodes.com/info/")
+							.start();
 				}
 			});
 		}
@@ -128,12 +140,14 @@ public class SectionedExperienceAdapter extends RecyclerView.Adapter<SectionedEx
 
 	private boolean hasHeaderItem = false;
 
+	private final ArtcodeServer server;
 	private final Context context;
 
-	public SectionedExperienceAdapter(Context context)
+	public SectionedExperienceAdapter(Context context, ArtcodeServer server)
 	{
 		super();
 		this.context = context;
+		this.server = server;
 	}
 
 	public void setShowHeaderItem(boolean showHeader)
@@ -228,6 +242,10 @@ public class SectionedExperienceAdapter extends RecyclerView.Adapter<SectionedEx
 
 	public void addExperience(Experience experience, String group, int index)
 	{
+		if (Looper.getMainLooper().getThread() != Thread.currentThread())
+		{
+			throw new RuntimeException("Not on UI thread");
+		}
 		SparseArray<Experience> experiences = experienceMap.get(group);
 		if (experiences == null)
 		{
@@ -296,13 +314,13 @@ public class SectionedExperienceAdapter extends RecyclerView.Adapter<SectionedEx
 
 	private String getStringResourceByName(String aString)
 	{
-		String packageName = context.getPackageName();
-		int resId = context.getResources().getIdentifier(aString, "string", packageName);
-		if(resId == 0)
+		String packageName = server.getContext().getPackageName();
+		int resId = server.getContext().getResources().getIdentifier(aString, "string", packageName);
+		if (resId == 0)
 		{
 			return aString.substring(0, 1).toUpperCase() + aString.substring(1);
 		}
-		return context.getString(resId);
+		return server.getContext().getString(resId);
 	}
 
 	@Override
@@ -328,12 +346,5 @@ public class SectionedExperienceAdapter extends RecyclerView.Adapter<SectionedEx
 		}
 
 		return null;
-	}
-
-	private void startActivity(Class<?> activity, Experience experience)
-	{
-		Intent intent = new Intent(context, activity);
-		intent.putExtra("experience", ExperienceParser.createGson(context).toJson(experience));
-		context.startActivity(intent);
 	}
 }

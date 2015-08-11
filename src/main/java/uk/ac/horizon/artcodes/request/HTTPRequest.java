@@ -1,47 +1,39 @@
-package uk.ac.horizon.artcodes.source;
+package uk.ac.horizon.artcodes.request;
 
 import android.content.Context;
 import android.util.Log;
 import com.android.volley.AuthFailureError;
 import com.android.volley.DefaultRetryPolicy;
-import com.android.volley.Request;
 import com.android.volley.RequestQueue;
 import com.android.volley.Response;
 import com.android.volley.VolleyError;
 import com.android.volley.toolbox.StringRequest;
 import com.android.volley.toolbox.Volley;
-import uk.ac.horizon.artcodes.account.Account;
+import uk.ac.horizon.artcodes.server.ArtcodeServer;
 
 import java.lang.reflect.Type;
 import java.util.Collections;
 import java.util.Map;
 
-public class HTTPSource<T> extends UriSource<T>
+public class HTTPRequest<T> extends UriSource<T>
 {
-	public static class Factory implements SourceFactory
+	public static final class Factory implements RequestFactory
 	{
+
+		@Override
+		public <T> Request<T> createRequest(ArtcodeServer server, String uri, Type type)
+		{
+			return new HTTPRequest<>(server, uri, type);
+		}
 
 		@Override
 		public String[] getPrefixes()
 		{
 			return new String[]{"http:", "https:"};
 		}
-
-		@Override
-		public <T> Source<T> createSource(Account account, String uri, Type type)
-		{
-			return new HTTPSource<>(account, uri, type);
-		}
 	}
-
-	private static RequestQueue requestQueue;
-
 	private static final int timeout = 10000;
-
-	public HTTPSource(Account account, String uri, Type type)
-	{
-		super(account, uri, type);
-	}
+	private static RequestQueue requestQueue;
 
 	public static RequestQueue getQueue(Context context)
 	{
@@ -52,25 +44,26 @@ public class HTTPSource<T> extends UriSource<T>
 		return requestQueue;
 	}
 
-	protected Map<String, String> getRequestHeaders()
+	public HTTPRequest(ArtcodeServer server, String uri, Type type)
 	{
-		return Collections.emptyMap();
+		super(server, uri, type);
 	}
 
 	@Override
-	public void loadInto(final Target<T> target)
+	public void loadInto(final RequestCallback<T> target)
 	{
-		Request<?> request = new StringRequest(Request.Method.GET, uri, new Response.Listener<String>()
+		com.android.volley.Request request = new StringRequest(com.android.volley.Request.Method.GET, uri, new Response.Listener<String>()
 		{
 			@Override
 			public void onResponse(String response)
 			{
-				try {
-					target.onLoaded(account.getGson().<T>fromJson(response, type));
+				try
+				{
+					target.onResponse(server.getGson().<T>fromJson(response, type));
 				}
 				catch (Exception e)
 				{
-					Log.e("HTTPSource", "Something went wrong while trying to parse response from the server. Most likely behind a wifi sign in page.", e);
+					target.onError(e);
 				}
 			}
 		}, new Response.ErrorListener()
@@ -78,7 +71,7 @@ public class HTTPSource<T> extends UriSource<T>
 			@Override
 			public void onErrorResponse(VolleyError error)
 			{
-				Log.e("", error.getMessage(), error);
+				onError(target, error);
 			}
 		})
 		{
@@ -89,12 +82,22 @@ public class HTTPSource<T> extends UriSource<T>
 			}
 		};
 
-		RequestQueue requestQueue = getQueue(account.getContext());
+		RequestQueue requestQueue = getQueue(server.getContext());
 		request.setRetryPolicy(new DefaultRetryPolicy(
 				timeout,
 				DefaultRetryPolicy.DEFAULT_MAX_RETRIES,
 				DefaultRetryPolicy.DEFAULT_BACKOFF_MULT));
 
 		requestQueue.add(request);
+	}
+
+	protected void onError(RequestCallback<T> target, VolleyError error)
+	{
+		target.onError(error);
+	}
+
+	protected Map<String, String> getRequestHeaders()
+	{
+		return Collections.emptyMap();
 	}
 }

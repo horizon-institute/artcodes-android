@@ -53,27 +53,6 @@ public class ExperienceEditor
 		};
 	}
 
-
-	public CompoundButton.OnCheckedChangeListener getPublishedListener()
-	{
-		return new CompoundButton.OnCheckedChangeListener()
-		{
-			@Override
-			public void onCheckedChanged(CompoundButton buttonView, boolean isChecked)
-			{
-				if (isChecked)
-				{
-					experience.setVisibility(Experience.Visibility.published);
-				}
-				else
-				{
-					experience.setVisibility(Experience.Visibility.secret);
-				}
-				experience.notifyPropertyChanged(BR.published);
-			}
-		};
-	}
-
 	public SimpleTextWatcher getNameWatcher()
 	{
 		return new SimpleTextWatcher()

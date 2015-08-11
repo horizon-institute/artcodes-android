@@ -18,8 +18,12 @@
   ~ along using this program.  If not, see <http://www.gnu.org/licenses/>.
   -->
 
-<resources>
-	<integer name="ga_sessionTimeout">300</integer>
-	<bool name="ga_autoActivityTracking">false</bool>
-	<string name="ga_trackingId">UA-62424974-1</string>
-</resources>
+<TextView
+		xmlns:android="http://schemas.android.com/apk/res/android"
+		android:layout_width="match_parent"
+		android:layout_height="wrap_content"
+        android:padding="8dp"
+        android:gravity="end"
+        android:textColor="#FFF"
+        android:background="@color/apptheme_primary"
+		android:textAppearance="@style/TextAppearance.AppCompat" />
