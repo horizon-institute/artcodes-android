@@ -94,6 +94,7 @@ public class ExperienceEditActivity extends ExperienceActivityBase
 
 	private ExperienceEditBinding binding;
 	private Account account;
+	private List<Account> accounts;
 
 	public void editIcon(View view)
 	{
@@ -105,26 +106,50 @@ public class ExperienceEditActivity extends ExperienceActivityBase
 		selectImage(IMAGE_PICKER_REQUEST);
 	}
 
+	public Account getAccount()
+	{
+		if (account == null)
+		{
+			if (getIntent().hasExtra("account"))
+			{
+				String accountID = getIntent().getStringExtra("account");
+				Account account = getServer().getAccount(accountID);
+				if (account != null)
+				{
+					this.account = account;
+					return account;
+				}
+			}
+
+			SharedPreferences preferences = getSharedPreferences(Account.class.getName(), MODE_PRIVATE);
+			String accountID = preferences.getString(getUri(), null);
+			if (accountID != null)
+			{
+				Account account = getServer().getAccount(accountID);
+				if (account != null)
+				{
+					this.account = account;
+					return account;
+				}
+			}
+
+			account = getServer().getAccounts().get(0);
+		}
+
+		return account;
+	}
+
+	public void setAccount(Account account)
+	{
+		this.account = account;
+	}
+
 	@Override
 	public boolean onCreateOptionsMenu(Menu menu)
 	{
 		getMenuInflater().inflate(R.menu.save_menu, menu);
 		//updateSave();
 		return super.onCreateOptionsMenu(menu);
-	}
-
-	private Intent createCancelIntent()
-	{
-		Intent intent = (Intent) getIntent().clone();
-		intent.setClass(this, ExperienceActivity.class);
-		return intent;
-	}
-
-	@Override
-	public void onResponse(Experience experience)
-	{
-		super.onResponse(experience);
-		GoogleAnalytics.trackScreen("Edit Experience", experience.getId());
 	}
 
 	@Override
@@ -147,9 +172,16 @@ public class ExperienceEditActivity extends ExperienceActivityBase
 		return super.onOptionsItemSelected(item);
 	}
 
-	public void setAccount(Account account)
+	@Override
+	public void onResponse(Experience experience)
 	{
-		this.account = account;
+		super.onResponse(experience);
+		GoogleAnalytics.trackScreen("Edit Experience", experience.getId());
+
+		Account account = getAccount();
+
+		int index = accounts.indexOf(account);
+		binding.accountList.setSelection(index);
 	}
 
 	protected void onActivityResult(int requestCode, int resultCode, Intent data)
@@ -192,9 +224,10 @@ public class ExperienceEditActivity extends ExperienceActivityBase
 		setSupportActionBar(binding.toolbar);
 		getSupportActionBar().setDisplayShowTitleEnabled(false);
 
-		List<Account> accounts = getServer().getAccounts();
+		accounts = getServer().getAccounts();
 		binding.accountList.setAdapter(new ArrayAdapter<>(this, R.layout.account_item, accounts));
-		binding.accountList.setOnItemSelectedListener(new AdapterView.OnItemSelectedListener() {
+		binding.accountList.setOnItemSelectedListener(new AdapterView.OnItemSelectedListener()
+		{
 			@Override
 			public void onItemSelected(AdapterView<?> parent, View view, int position, long id)
 			{
@@ -212,44 +245,7 @@ public class ExperienceEditActivity extends ExperienceActivityBase
 			}
 		});
 
-		Account account = getAccount();
-		binding.accountList.setSelection(accounts.indexOf(account));
-
 		binding.toolbar.setNavigationIcon(R.drawable.ic_close_white_24dp);
-
-	}
-
-	public Account getAccount()
-	{
-		if (account == null)
-		{
-			if (getIntent().hasExtra("account"))
-			{
-				String accountID = getIntent().getStringExtra("account");
-				Account account = getServer().getAccount(accountID);
-				if (account != null)
-				{
-					this.account = account;
-					return account;
-				}
-			}
-
-			SharedPreferences preferences = getSharedPreferences(Account.class.getName(), MODE_PRIVATE);
-			String accountID = preferences.getString(getUri(), null);
-			if (accountID != null)
-			{
-				Account account = getServer().getAccount(accountID);
-				if (account != null)
-				{
-					this.account = account;
-					return account;
-				}
-			}
-
-			account = getServer().getAccounts().get(0);
-		}
-
-		return account;
 	}
 
 	@Override
@@ -260,23 +256,13 @@ public class ExperienceEditActivity extends ExperienceActivityBase
 		outState.putInt("tab", binding.viewpager.getCurrentItem());
 		outState.putString("experience", getServer().getGson().toJson(getExperience()));
 	}
-//
-//	private void updateSave()
-//	{
-//		ExperienceListStore store = ExperienceListStore.with(this, "library");
-//		if(getUri() == null)
-//		{
-//			saveItem.setTitle("Create");
-//		}
-//		else if(store.contains(getUri()))
-//		{
-//			saveItem.setTitle(R.string.save);
-//		}
-//		else
-//		{
-//			saveItem.setTitle("Create Copy");
-//		}
-//	}
+
+	private Intent createCancelIntent()
+	{
+		Intent intent = (Intent) getIntent().clone();
+		intent.setClass(this, ExperienceActivity.class);
+		return intent;
+	}
 
 	private void selectImage(int request_id)
 	{

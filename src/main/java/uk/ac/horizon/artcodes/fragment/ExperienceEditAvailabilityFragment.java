@@ -8,6 +8,7 @@ import android.support.annotation.Nullable;
 import android.support.design.widget.Snackbar;
 import android.support.v7.widget.LinearLayoutManager;
 import android.support.v7.widget.RecyclerView;
+import android.support.v7.widget.helper.ItemTouchHelper;
 import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
@@ -20,6 +21,7 @@ import uk.ac.horizon.artcodes.R;
 import uk.ac.horizon.artcodes.databinding.AvailabilityEditBinding;
 import uk.ac.horizon.artcodes.databinding.ExperienceEditAvailabilitiesBinding;
 import uk.ac.horizon.artcodes.model.Availability;
+import uk.ac.horizon.artcodes.ui.Bindings;
 
 import java.util.Calendar;
 import java.util.List;
@@ -65,6 +67,30 @@ public class ExperienceEditAvailabilityFragment extends ExperienceEditFragment
 		{
 			final Availability availability = availabilities.get(position);
 			holder.binding.setAvailability(availability);
+			if (availability.getEnd() == null)
+			{
+				if (availability.getStart() == null)
+				{
+					holder.binding.availabilityDesc.setText("Always Available");
+				}
+				else
+				{
+					holder.binding.availabilityDesc.setText("Available from " + Bindings.getDate(availability.getStart()));
+				}
+			}
+			else
+			{
+				if (availability.getStart() == null)
+				{
+					holder.binding.availabilityDesc.setText("Available until " + Bindings.getDate(availability.getEnd()));
+				}
+				else
+				{
+
+					holder.binding.availabilityDesc.setText("Available " + Bindings.getDate(availability.getStart(), availability.getEnd()));
+				}
+			}
+
 			holder.binding.availabilityStart.setOnClickListener(new View.OnClickListener()
 			{
 				@Override
@@ -126,25 +152,12 @@ public class ExperienceEditAvailabilityFragment extends ExperienceEditFragment
 					}
 				}
 			});
-			holder.binding.availabilityDelete.setOnClickListener(new View.OnClickListener()
+			holder.binding.delete.setOnClickListener(new View.OnClickListener()
 			{
 				@Override
 				public void onClick(View v)
 				{
-					final int index = getExperience().getAvailabilities().indexOf(availability);
-					getExperience().getAvailabilities().remove(availability);
-					notifyDataSetChanged();
-					Snackbar.make(binding.getRoot(), R.string.action_deleted, Snackbar.LENGTH_LONG)
-							.setAction(R.string.action_delete_undo, new View.OnClickListener()
-							{
-								@Override
-								public void onClick(View v)
-								{
-									getExperience().getAvailabilities().add(index, availability);
-									notifyDataSetChanged();
-									updateAvailabilities();
-								}
-							}).show();
+					delete(availability);
 				}
 			});
 		}
@@ -157,6 +170,25 @@ public class ExperienceEditAvailabilityFragment extends ExperienceEditFragment
 	}
 
 	private ExperienceEditAvailabilitiesBinding binding;
+
+	private void delete(final Availability availability)
+	{
+		final int index = getExperience().getAvailabilities().indexOf(availability);
+		getExperience().getAvailabilities().remove(availability);
+		binding.list.getAdapter().notifyItemRemoved(index);
+		updateAvailabilities();
+		Snackbar.make(binding.getRoot(), R.string.action_deleted, Snackbar.LENGTH_LONG)
+				.setAction(R.string.action_delete_undo, new View.OnClickListener()
+				{
+					@Override
+					public void onClick(View v)
+					{
+						getExperience().getAvailabilities().add(index, availability);
+						binding.list.getAdapter().notifyItemInserted(index);
+						updateAvailabilities();
+					}
+				}).show();
+	}
 
 	@Override
 	public void onActivityResult(int requestCode, int resultCode, Intent data)
@@ -183,7 +215,7 @@ public class ExperienceEditAvailabilityFragment extends ExperienceEditFragment
 
 	private void updateAvailabilities()
 	{
-		if(getExperience().getAvailabilities().isEmpty())
+		if (getExperience().getAvailabilities().isEmpty())
 		{
 			binding.list.setVisibility(View.GONE);
 			binding.emptyView.setVisibility(View.VISIBLE);
@@ -206,13 +238,33 @@ public class ExperienceEditAvailabilityFragment extends ExperienceEditFragment
 			public void onClick(View v)
 			{
 				Log.i("", "Adding new availability");
-				getExperience().getAvailabilities().add(new Availability());
-				updateAvailabilities();
-				binding.list.getAdapter().notifyDataSetChanged();
+				if(getExperience().getAvailabilities().add(new Availability()))
+				{
+					updateAvailabilities();
+					binding.list.getAdapter().notifyItemInserted(getExperience().getAvailabilities().size()-1);
+				}
 			}
 		});
 
 		binding.list.setLayoutManager(new LinearLayoutManager(getActivity()));
+
+		ItemTouchHelper.SimpleCallback simpleItemTouchCallback = new ItemTouchHelper.SimpleCallback(0, ItemTouchHelper.LEFT | ItemTouchHelper.RIGHT)
+		{
+			@Override
+			public boolean onMove(RecyclerView recyclerView, RecyclerView.ViewHolder viewHolder, RecyclerView.ViewHolder viewHolder1)
+			{
+				return false;
+			}
+
+			@Override
+			public void onSwiped(RecyclerView.ViewHolder viewHolder, int swipeDir)
+			{
+				int position =viewHolder.getAdapterPosition();
+				delete(getExperience().getAvailabilities().get(position));
+			}
+		};
+		ItemTouchHelper itemTouchHelper = new ItemTouchHelper(simpleItemTouchCallback);
+		itemTouchHelper.attachToRecyclerView(binding.list);
 
 		return binding.getRoot();
 	}

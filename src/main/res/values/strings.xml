@@ -48,10 +48,10 @@
 	<string name="maxRegionValue">Max Items per Region</string>
 	<string name="maxRegionValue_desc">The maximum number of items that can be in a region in a valid Artcode.</string>
 	<string name="checksumModulo">Checksum</string>
-	<string name="checksumModulo_off">Disabled</string>
-	<string name="checksumModulo_desc">The Artcode checksum: the sum of all regions
-		must be divisible by this value to be valid.
-	</string>
+	<string name="checksumModulo_off">Checksum Disabled</string>
+	<string name="checksumModulo_value">Checksum %d</string>
+	<string name="checksumModulo_embedded_value">Embedded Checksum %d</string>
+	<string name="checksumModulo_desc">A code is only valid if the total of all its values are divisible by the checksum.</string>
     <string name="embeddedChecksum">Embedded Checksum</string>
 
 	<string name="markerDeleteConfirmTitle">Delete Marker %s?</string>

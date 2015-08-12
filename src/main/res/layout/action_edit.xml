@@ -49,11 +49,13 @@
 				android:orientation="horizontal">
 
 			<ImageView
-					android:layout_width="24dp"
-					android:layout_height="24dp"
+					android:layout_width="wrap_content"
+					android:layout_height="wrap_content"
 					android:layout_margin="16dp"
-					android:src="@drawable/ic_smartphone_black_36dp"
-					android:tint="@color/ic_tint" />
+					android:layout_gravity="top"
+					android:id="@+id/expand_image"
+					android:tint="@color/ic_tint"
+					android:src="@drawable/ic_expand_more_24dp" />
 
 			<FrameLayout android:layout_width="0dp"
 			             android:layout_height="wrap_content"
@@ -68,7 +70,7 @@
 					<TextView
 							android:layout_width="match_parent"
 							android:layout_height="wrap_content"
-							android:text="@{action.name}"
+							android:text="@{action.name ?? action.displayUrl}"
 							android:hint="@string/action_name"
 							android:textColor="#000"
 							android:textAppearance="@style/TextAppearance.AppCompat" />
@@ -77,6 +79,7 @@
 							android:layout_width="match_parent"
 							android:layout_height="wrap_content"
 							android:text="@{action.displayUrl}"
+							android:visibility="@{action.name != null ? View.VISIBLE : View.GONE}"
 							android:id="@+id/hint_text"
 							android:textAppearance="@style/TextAppearance.AppCompat.Small"
 							tools:text="www.cs.nott.ac.uk" />
@@ -88,15 +91,15 @@
 						android:layout_height="wrap_content"
 						android:orientation="horizontal"
 						android:id="@+id/editview"
-						android:visibility="gone">
+						android:visibility="gone"
+						tools:visibility="visible">
 
 					<LinearLayout
 							android:layout_width="0dp"
 							android:layout_weight="1"
-							android:layout_marginLeft="12dp"
-							android:layout_marginRight="12dp"
 							android:layout_marginTop="6dp"
 							android:layout_marginBottom="6dp"
+							android:layout_marginLeft="12dp"
 							android:layout_height="wrap_content"
 							android:orientation="vertical">
 
@@ -149,25 +152,14 @@
 					<ImageView
 							android:layout_width="wrap_content"
 							android:layout_height="wrap_content"
-							android:layout_gravity="center_vertical"
 							android:src="@drawable/ic_close_black_18dp"
 							android:tint="@color/ic_tint"
 							android:scaleType="fitCenter"
 							android:background="?attr/selectableItemBackground"
-							android:padding="8dp"
+							android:padding="16dp"
 							android:id="@+id/action_delete" />
 				</LinearLayout>
 			</FrameLayout>
-
-			<ImageView
-					android:layout_width="wrap_content"
-					android:layout_height="wrap_content"
-					android:layout_margin="8dp"
-					android:id="@+id/expand_image"
-					android:layout_gravity="center_vertical"
-					android:tint="@color/ic_tint"
-					android:src="@drawable/ic_expand_more_24dp" />
 		</LinearLayout>
-
 	</LinearLayout>
 </layout>

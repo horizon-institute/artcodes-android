@@ -245,8 +245,6 @@ public class NavigationActivity extends ArtcodeActivityBase implements
 		for (int index = 0; index < accounts.size(); index++)
 		{
 			Account account = accounts.get(index);
-			Log.i("", "Add account " + account.getName() + " to menu");
-
 			MenuItem menuItem = subMenu.add(R.id.navigation, index, Menu.NONE, account.getName());
 			if(account instanceof LocalAccount)
 			{

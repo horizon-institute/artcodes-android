@@ -80,6 +80,7 @@ public class Experience extends BaseObservable
 		this.callback = callback;
 	}
 
+	@Bindable
 	public int getChecksumModulo()
 	{
 		return checksumModulo;
@@ -88,11 +89,6 @@ public class Experience extends BaseObservable
 	public void setChecksumModulo(int checksumModulo)
 	{
 		this.checksumModulo = checksumModulo;
-	}
-
-	public String getChecksumText()
-	{
-		return Integer.toString(checksumModulo);
 	}
 
 	@Bindable

@@ -91,6 +91,7 @@ public class LocalAccount implements Account
 					writer.close();
 
 					SharedPreferences.Editor editor = server.getContext().getSharedPreferences(Account.class.getName(), Context.MODE_PRIVATE).edit();
+					Log.i("", experience.getId() + " = " + getId());
 					editor.putString(experience.getId(), getId()).apply();
 				}
 				catch (Exception e)
@@ -99,6 +100,12 @@ public class LocalAccount implements Account
 				}
 			}
 		}).start();
+	}
+
+	@Override
+	public boolean equals(Object o)
+	{
+		return o instanceof Account && ((Account) o).getId().equals(getId());
 	}
 
 	@Override

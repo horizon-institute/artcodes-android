@@ -26,7 +26,15 @@ public class ActionEditor
 			@Override
 			public void onTextChanged(String value)
 			{
-				if (!value.equals(action.getName()))
+				if(value.trim().isEmpty())
+				{
+					if(action.getName() != null)
+					{
+						action.setName(null);
+						action.notifyPropertyChanged(BR.name);
+					}
+				}
+				else if (!value.equals(action.getName()))
 				{
 					action.setName(value);
 					action.notifyPropertyChanged(BR.name);
@@ -48,17 +56,29 @@ public class ActionEditor
 			@Override
 			public void onTextChanged(String value)
 			{
-				Uri uri = Uri.parse(value);
-				String urlValue = value;
-				if(uri.getScheme() == null)
+				if(value.trim().isEmpty())
 				{
-					urlValue = Action.HTTP_PREFIX + value;
+					if(action.getUrl() != null)
+					{
+						action.setUrl(null);
+						action.notifyPropertyChanged(BR.url);
+						action.notifyPropertyChanged(BR.displayUrl);
+					}
 				}
-				if (!urlValue.equals(action.getUrl()))
+				else
 				{
-					action.setUrl(urlValue);
-					action.notifyPropertyChanged(BR.url);
-					action.notifyPropertyChanged(BR.displayUrl);
+					Uri uri = Uri.parse(value);
+					String urlValue = value;
+					if (uri.getScheme() == null)
+					{
+						urlValue = Action.HTTP_PREFIX + value;
+					}
+					if (!urlValue.equals(action.getUrl()))
+					{
+						action.setUrl(urlValue);
+						action.notifyPropertyChanged(BR.url);
+						action.notifyPropertyChanged(BR.displayUrl);
+					}
 				}
 			}
 		};

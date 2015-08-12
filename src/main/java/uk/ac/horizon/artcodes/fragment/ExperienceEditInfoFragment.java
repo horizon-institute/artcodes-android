@@ -32,6 +32,6 @@ public class ExperienceEditInfoFragment extends ExperienceEditFragment
 	{
 		super.onResume();
 		binding.setExperience(getExperience());
-		binding.setExperienceEditor(new ExperienceEditor(getExperience()));
+		binding.setExperienceEditor(new ExperienceEditor(getActivity(), getExperience()));
 	}
 }

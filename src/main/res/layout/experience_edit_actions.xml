@@ -44,10 +44,9 @@
 				android:layout_margin="16dp"
 				android:src="@drawable/ic_add_white_24dp"
 				android:tint="#FFF"
-				app:fabSize="mini"
 				android:elevation="4dp"
 				app:pressedTranslationZ="8dp"
 				android:id="@+id/add"
-				android:layout_gravity="bottom|start|left" />
+				android:layout_gravity="bottom|end|right" />
 	</FrameLayout>
 </layout>

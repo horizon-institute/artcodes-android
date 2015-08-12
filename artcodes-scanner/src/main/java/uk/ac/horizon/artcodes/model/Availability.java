@@ -23,6 +23,8 @@ import android.databinding.BaseObservable;
 import android.databinding.Bindable;
 import uk.ac.horizon.artcodes.scanner.BR;
 
+import java.text.SimpleDateFormat;
+
 public class Availability extends BaseObservable
 {
 	private Double lat;

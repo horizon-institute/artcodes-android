@@ -3,10 +3,12 @@ package uk.ac.horizon.artcodes.ui;
 import android.content.Context;
 import android.support.v4.widget.SwipeRefreshLayout;
 import android.util.AttributeSet;
+import uk.ac.horizon.artcodes.R;
 
 public class RefreshView extends SwipeRefreshLayout
 {
 	private int pending = 0;
+	private boolean measured = false;
 
 	public RefreshView(Context context)
 	{
@@ -22,7 +24,20 @@ public class RefreshView extends SwipeRefreshLayout
 	public void onMeasure(int widthMeasureSpec, int heightMeasureSpec)
 	{
 		super.onMeasure(widthMeasureSpec, heightMeasureSpec);
-		setRefreshing(hasPending());
+		if(!measured)
+		{
+			measured = true;
+			setRefreshing(hasPending());
+		}
+	}
+
+	@Override
+	public void setRefreshing(boolean refreshing)
+	{
+		if(measured)
+		{
+			super.setRefreshing(refreshing);
+		}
 	}
 
 	public boolean hasPending()

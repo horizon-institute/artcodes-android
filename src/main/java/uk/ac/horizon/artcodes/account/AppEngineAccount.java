@@ -148,8 +148,7 @@ public class AppEngineAccount implements Account
 					SharedPreferences.Editor editor = server.getContext().getSharedPreferences(Account.class.getName(), Context.MODE_PRIVATE).edit();
 					editor.putString(saved.getId(), getId()).apply();
 
-					Cache.Entry entry = HttpHeaderParser.parseCacheHeaders(new NetworkResponse(connection.getResponseCode(), bytes, headers, false));
-					HTTPRequest.getQueue(server.getContext()).getCache().put(saved.getId(), entry);
+					HTTPRequest.getQueue(server.getContext()).getCache().remove(saved.getId());
 				}
 				catch (Exception e)
 				{
@@ -342,6 +341,12 @@ public class AppEngineAccount implements Account
 				return connection;
 			}
 		}).start();
+	}
+
+	@Override
+	public boolean equals(Object o)
+	{
+		return o instanceof Account && ((Account) o).getId().equals(getId());
 	}
 
 	@Override

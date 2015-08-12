@@ -108,25 +108,83 @@ public final class Bindings
 		}
 	}
 
-	@BindingAdapter("date")
-	public static void bindDate(TextView view, Long timestamp)
+	public static String getDate(Long start, Long end)
+	{
+		Calendar now = Calendar.getInstance();
+		now.setTimeInMillis(System.currentTimeMillis());
+
+		Calendar startCal = Calendar.getInstance();
+		startCal.setTimeInMillis(start);
+
+		Calendar endCal = Calendar.getInstance();
+		endCal.setTimeInMillis(end);
+
+		if (startCal.get(Calendar.YEAR) == endCal.get(Calendar.YEAR))
+		{
+			if (startCal.get(Calendar.MONTH) == endCal.get(Calendar.MONTH))
+			{
+				if (startCal.get(Calendar.DAY_OF_MONTH) == endCal.get(Calendar.DAY_OF_MONTH))
+				{
+					if (endCal.get(Calendar.YEAR) == now.get(Calendar.YEAR))
+					{
+						return dateFormat.format(new Date(end));
+					}
+					else
+					{
+						return dateFormatYear.format(new Date(end));
+					}
+				}
+				else if (endCal.get(Calendar.YEAR) == now.get(Calendar.YEAR))
+				{
+					return startCal.get(Calendar.DAY_OF_MONTH) + " – " + dateFormat.format(new Date(end));
+				}
+				else
+				{
+					return startCal.get(Calendar.DAY_OF_MONTH) + " – " + dateFormatYear.format(new Date(end));
+				}
+			}
+			if (endCal.get(Calendar.YEAR) == now.get(Calendar.YEAR))
+			{
+				return dateFormat.format(new Date(start)) + " – " + dateFormat.format(new Date(end));
+			}
+			else
+			{
+				return dateFormat.format(new Date(start)) + " – " + dateFormatYear.format(new Date(end));
+			}
+		}
+		else
+		{
+			return dateFormatYear.format(new Date(start)) + " – " + dateFormatYear.format(new Date(end));
+		}
+	}
+
+	public static String getDate(Long timestamp)
 	{
 		if (timestamp != null)
 		{
 			Calendar now = Calendar.getInstance();
 			now.setTimeInMillis(System.currentTimeMillis());
 
-
 			Calendar calendar = Calendar.getInstance();
 			calendar.setTimeInMillis(timestamp);
 			if (calendar.get(Calendar.YEAR) == now.get(Calendar.YEAR))
 			{
-				view.setText(dateFormat.format(new Date(timestamp)));
+				return dateFormat.format(new Date(timestamp));
 			}
 			else
 			{
-				view.setText(dateFormatYear.format(new Date(timestamp)));
+				return dateFormatYear.format(new Date(timestamp));
 			}
+		}
+		return null;
+	}
+
+	@BindingAdapter("date")
+	public static void bindDate(TextView view, Long timestamp)
+	{
+		if (timestamp != null)
+		{
+			view.setText(getDate(timestamp));
 		}
 	}
 }
