@@ -190,7 +190,7 @@ public abstract class Greyscaler
             colorImage.get(0,0,this.colorPixelBuffer);
             for (int i=0; i<this.colorPixelBuffer.length; i+=colorImage.channels())
             {
-                this.colorPixelBuffer[i] = (byte) ((this.colorPixelBuffer[i] + this.hueShift) % 181);
+                this.colorPixelBuffer[i] = (byte) (((this.colorPixelBuffer[i] & 0xFF) + this.hueShift) % 181);
             }
             colorImage.put(0,0,this.colorPixelBuffer);
 
@@ -418,31 +418,36 @@ public abstract class Greyscaler
             float k, r, g, b;
             if (this.singleChannel==-1) {
                 for (int i = 0, j = 0; i < desiredBufferSize; i += 3, ++j) {
-                    b = this.colorPixelBuffer[i] / 255.0f;
-                    g = this.colorPixelBuffer[i + 1] / 255.0f;
-                    r = this.colorPixelBuffer[i + 2] / 255.0f;
+                    b = (this.colorPixelBuffer[i] & 0xFF) / 255.0f;
+                    g = (this.colorPixelBuffer[i + 1] & 0xFF) / 255.0f;
+                    r = (this.colorPixelBuffer[i + 2] & 0xFF) / 255.0f;
                     k = Math.min(1 - r, Math.min(1 - g, 1 - b));
                     this.colorPixelBuffer[j] = (byte) (k * kMultiplier * 255);
-                    this.colorPixelBuffer[j] += (byte) (255 * cMultiplier * ((1 - r - k) / (1 - k)));
-                    this.colorPixelBuffer[j] += (byte) (255 * mMultiplier * ((1 - g - k) / (1 - k)));
-                    this.colorPixelBuffer[j] += (byte) (255 * yMultiplier * ((1 - b - k) / (1 - k)));
+                    if (k!=1)
+                    {
+                        this.colorPixelBuffer[j] += (byte) (255 * cMultiplier * Math.min((1 - r - k) / (1 - k), 1 - k));
+                        this.colorPixelBuffer[j] += (byte) (255 * mMultiplier * Math.min((1 - g - k) / (1 - k), 1 - k));
+                        this.colorPixelBuffer[j] += (byte) (255 * yMultiplier * Math.min((1 - b - k) / (1 - k), 1 - k));
+                    }
                 }
             }
             else if (this.singleChannel==3) // k only
             {
                 for (int i = 0, j = 0; i < desiredBufferSize; i += 3, ++j) {
-                    this.colorPixelBuffer[j] = (byte) Math.min(255 - this.colorPixelBuffer[i], Math.min(255 - this.colorPixelBuffer[i+1], 255 - this.colorPixelBuffer[i+2]));
+                    this.colorPixelBuffer[j] = (byte) Math.min(255 - (this.colorPixelBuffer[i] & 0xFF), Math.min(255 - (this.colorPixelBuffer[i+1] & 0xFF), 255 - (this.colorPixelBuffer[i+2] & 0xFF)));
                 }
             }
             else // c, y or m only
             {
                 float[] bgr = new float[3];
                 for (int i = 0, j = 0; i < desiredBufferSize; i += 3, ++j) {
-                    bgr[0] = this.colorPixelBuffer[i] / 255.0f;
-                    bgr[1] = this.colorPixelBuffer[i + 1] / 255.0f;
-                    bgr[2] = this.colorPixelBuffer[i + 2] / 255.0f;
-                    k = Math.min(1 - bgr[0], Math.min(1 - bgr[1], 1 - bgr[2]));
-                    this.colorPixelBuffer[j] = (byte) (255 * ((1 - bgr[this.singleChannel] - k) / (1 - k)));
+                    bgr[0] = (this.colorPixelBuffer[i] & 0xFF) / 255f;
+                    bgr[1] = (this.colorPixelBuffer[i + 1] & 0xFF) / 255f;
+                    bgr[2] = (this.colorPixelBuffer[i + 2] & 0xFF) / 255f;
+
+                    k = Math.min(1f - bgr[0], Math.min(1f - bgr[1], 1f - bgr[2]));
+                    float result = k==1 ? 0 : Math.min((1f - bgr[this.singleChannel] - k) / (1f - k), 1f - k);
+                    this.colorPixelBuffer[j] = (byte) (result*255f);
                 }
             }
             greyscaleImage.put(0, 0, this.colorPixelBuffer);
@@ -506,7 +511,7 @@ public abstract class Greyscaler
             if (this.singleChannel==-1)
             {
                 for (int c = 0, g = 0; c < desiredBufferSize; c += 3, ++g) {
-                    this.colorPixelBuffer[g] = (byte) ((1-this.colorPixelBuffer[c+2]/255.0f)*this.cMultiplier*255 + (1-this.colorPixelBuffer[c+1]/255.0f)*this.mMultiplier*255 + (1-this.colorPixelBuffer[c]/255.0f)*this.yMultiplier*255);
+                    this.colorPixelBuffer[g] = (byte) ((1-(this.colorPixelBuffer[c+2] & 0xFF)/255.0f)*this.cMultiplier*255 + (1-(this.colorPixelBuffer[c+1] & 0xFF)/255.0f)*this.mMultiplier*255 + (1-(this.colorPixelBuffer[c] & 0xFF)/255.0f)*this.yMultiplier*255);
                 }
             }
             else

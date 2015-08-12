@@ -18,6 +18,7 @@
  */
 package uk.ac.horizon.aestheticodes.activities;
 
+import android.app.AlertDialog;
 import android.content.Context;
 import android.content.Intent;
 import android.content.res.Resources;
@@ -475,18 +476,27 @@ public class AestheticodesActivity extends ScanActivity implements ExperienceLis
 
 	private void openMarker(Marker marker)
 	{
-		camera.stop();
 		if (marker.getShowDetail())
 		{
+			camera.stop();
 			Intent intent = new Intent(this, MarkerActivity.class);
 			intent.putExtra("experience", experience.get().getId());
 			intent.putExtra("marker", marker.getCode());
 
 			startActivity(intent);
 		}
+		else if (marker.getAction() != null && marker.getAction().contains("://"))
+		{
+			camera.stop();
+			startActivity(new Intent(Intent.ACTION_VIEW, Uri.parse(marker.getAction())));
+		}
 		else
 		{
-			startActivity(new Intent(Intent.ACTION_VIEW, Uri.parse(marker.getAction())));
+			new AlertDialog.Builder(this)
+					.setTitle("No action")
+					.setMessage("There is no valid action associated with this marker.")
+					.setPositiveButton("OK", null)
+					.show();
 		}
 	}
 }
