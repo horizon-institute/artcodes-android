@@ -30,13 +30,16 @@ import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.WindowManager;
+
+import java.util.Arrays;
+
 import uk.ac.horizon.aestheticodes.R;
 import uk.ac.horizon.aestheticodes.activities.ExperienceEditActivity;
 import uk.ac.horizon.aestheticodes.model.Marker;
-import uk.ac.horizon.aestheticodes.properties.bindings.VisibilityBinding;
 import uk.ac.horizon.aestheticodes.properties.MarkerFormat;
 import uk.ac.horizon.aestheticodes.properties.Properties;
 import uk.ac.horizon.aestheticodes.properties.URLFormat;
+import uk.ac.horizon.aestheticodes.properties.bindings.VisibilityBinding;
 
 public class MarkerEditDialog extends DialogFragment
 {
@@ -96,6 +99,28 @@ public class MarkerEditDialog extends DialogFragment
 				if (properties.isValid())
 				{
 					Marker marker = (Marker) properties.save();
+
+					// sort code if it is a pattern group
+					String code = marker.getCode();
+					if (code!=null && code.contains("+"))
+					{
+						String[] codes = code.split("\\+");
+						if (codes!=null && codes.length>0)
+						{
+							Arrays.sort(codes);
+							StringBuilder stringBuilder = new StringBuilder();
+							for (int i = 0; i < codes.length; ++i)
+							{
+								if (i > 0)
+								{
+									stringBuilder.append("+");
+								}
+								stringBuilder.append(codes[i]);
+							}
+							marker.setCode(stringBuilder.toString());
+						}
+					}
+
 					ExperienceEditActivity activity = (ExperienceEditActivity) getActivity();
 					if(originalCode != null)
 					{
