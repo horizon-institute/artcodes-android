@@ -109,7 +109,8 @@ public class ArtcodeActivity extends ScannerActivity
 						@Override
 						public void onResponse(List<String> item)
 						{
-							item.add(experience.getId());
+							item.remove(experience.getId());
+							item.add(0, experience.getId());
 						}
 					});
 				}

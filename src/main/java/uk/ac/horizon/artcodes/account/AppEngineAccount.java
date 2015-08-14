@@ -6,8 +6,6 @@ import android.graphics.Bitmap;
 import android.graphics.BitmapFactory;
 import android.net.Uri;
 import android.util.Log;
-import com.android.volley.Cache;
-import com.android.volley.NetworkResponse;
 import com.android.volley.toolbox.HttpHeaderParser;
 import com.google.android.gms.auth.GoogleAuthUtil;
 import com.google.common.hash.Hashing;
@@ -366,5 +364,11 @@ public class AppEngineAccount implements Account
 	{
 		return name;
 		//return server.getContext().getString(R.string.server, name);
+	}
+
+	@Override
+	public boolean willCreateCopy(String uri)
+	{
+		return false;
 	}
 }

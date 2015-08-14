@@ -53,7 +53,7 @@ public class VisibilityAnimator
 		else if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.HONEYCOMB)
 		{
 			animator = ObjectAnimator.ofFloat(view, "alpha", 1f, 0f);
-			animator.setDuration(250);
+			animator.setDuration(500);
 			animator.addListener(new AnimatorListenerAdapter()
 			{
 				@Override
@@ -94,7 +94,7 @@ public class VisibilityAnimator
 		else if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.HONEYCOMB)
 		{
 			animator = ObjectAnimator.ofFloat(view, "alpha", 1f, 0f);
-			animator.setDuration(250);
+			animator.setDuration(500);
 			animator.addListener(listener);
 			animator.start();
 		}

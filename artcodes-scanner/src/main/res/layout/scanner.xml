@@ -60,13 +60,13 @@
 					android:id="@+id/toolbar"
 					android:layout_width="fill_parent"
 					android:layout_height="100dp"
+					android:layout_gravity="top"
 					android:fitsSystemWindows="true"
 					android:background="@color/viewfinder_mask"
 					android:title="@{experience.name}"
-					android:theme="@style/ThemeOverlay.AppCompat.Dark.ActionBar"
 					app:height="@{overlay.viewfinderSize}" />
 
-			<RelativeLayout
+			<android.support.design.widget.CoordinatorLayout
 					android:layout_width="fill_parent"
 					android:layout_height="0dp"
 					android:layout_weight="1"
@@ -81,14 +81,10 @@
 
 				<LinearLayout
 						android:id="@+id/settingsMenu"
-						android:layout_width="wrap_content"
+						android:layout_width="match_parent"
 						android:layout_height="wrap_content"
-						android:layout_alignParentBottom="true"
-						android:layout_alignParentEnd="true"
-						android:layout_alignParentLeft="true"
-						android:layout_alignParentRight="true"
-						android:layout_alignParentStart="true"
-						android:background="#3000"
+						android:background="@color/settings_mask"
+						android:layout_gravity="bottom"
 						android:gravity="center"
 						android:orientation="horizontal"
 						android:paddingLeft="48dp"
@@ -101,7 +97,6 @@
 							android:layout_width="wrap_content"
 							android:layout_height="wrap_content"
 							android:layout_weight="1"
-							android:contentDescription="Blah"
 							android:onClick="nextThresholdDrawMode"
 							app:imageResource="@{overlay.thresholdIcon}"
 							tools:src="@drawable/ic_filter_b_and_w_off_white_24dp" />
@@ -111,7 +106,6 @@
 							android:layout_width="wrap_content"
 							android:layout_height="wrap_content"
 							android:layout_weight="1"
-							android:contentDescription="Blah"
 							android:onClick="nextCodeDrawMode"
 							app:imageResource="@{overlay.codeIcon}"
 							tools:src="@drawable/ic_filter_b_and_w_off_white_24dp" />
@@ -141,10 +135,7 @@
 						android:id="@+id/settingsMenuButton"
 						android:layout_width="48dp"
 						android:layout_height="48dp"
-						android:layout_alignParentBottom="true"
-						android:layout_alignParentEnd="true"
-						android:layout_alignParentRight="true"
-						android:layout_gravity="end"
+						android:layout_gravity="bottom|end"
 						android:layout_marginBottom="8dp"
 						android:layout_marginEnd="8dp"
 						android:layout_marginRight="8dp"
@@ -158,26 +149,21 @@
 						android:layout_width="match_parent"
 						android:layout_height="wrap_content"
 						android:layout_marginBottom="-8dp"
+						android:layout_gravity="bottom"
 						android:id="@+id/progressBar"
-						android:indeterminateOnly="true"
-						android:layout_alignParentBottom="true" />
-			</RelativeLayout>
+						android:indeterminateOnly="true"/>
+			</android.support.design.widget.CoordinatorLayout>
 
-			<RelativeLayout
+			<TextView
 					android:id="@+id/bottomView"
+					android:textAppearance="@style/TextAppearance.AppCompat.Medium"
 					android:layout_width="match_parent"
 					android:layout_height="100dp"
 					android:background="@color/viewfinder_mask"
-					android:fitsSystemWindows="true"
-					app:height="@{overlay.viewfinderSize}">
-
-				<TextView
-						android:textAppearance="@style/TextAppearance.AppCompat.Medium"
-						android:layout_width="wrap_content"
-						android:layout_height="wrap_content"
-						android:text="@string/status_searching"
-						android:layout_centerInParent="true" />
-			</RelativeLayout>
+					android:paddingBottom="@dimen/nav_padding"
+					android:gravity="center"
+					app:height="@{overlay.viewfinderSize}"
+					android:text="@string/status_searching" />
 		</LinearLayout>
 	</FrameLayout>
 </layout>

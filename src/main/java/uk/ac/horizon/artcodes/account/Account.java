@@ -13,4 +13,6 @@ public interface Account
 
 	String getId();
 	String getName();
+
+	boolean willCreateCopy(String uri);
 }

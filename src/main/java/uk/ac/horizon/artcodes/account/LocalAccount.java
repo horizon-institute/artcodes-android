@@ -70,14 +70,20 @@ public class LocalAccount implements Account
 			{
 				try
 				{
-					final File directory = getDirectory();
-					final String directoryURI = directory.toURI().toString();
 					File file;
-					if (experience.getId() == null || !experience.getId().startsWith(directoryURI))
+					if(experience.getId() == null || willCreateCopy(experience.getId()))
 					{
-						String id = UUID.randomUUID().toString();
-						file = new File(directory, id);
-						experience.setId(file.toURI().toString());
+						if(!willCreateCopy(experience.getOriginalID()))
+						{
+							file = new File(URI.create(experience.getOriginalID()));
+							experience.setId(file.toURI().toString());
+							experience.setOriginalID(null);
+						}
+						else
+						{
+							file = new File(getDirectory(), UUID.randomUUID().toString());
+							experience.setId(file.toURI().toString());
+						}
 					}
 					else
 					{
@@ -118,5 +124,13 @@ public class LocalAccount implements Account
 	public String getName()
 	{
 		return server.getContext().getString(R.string.device);
+	}
+
+	@Override
+	public boolean willCreateCopy(String uri)
+	{
+		final File directory = getDirectory();
+		final String directoryURI = directory.toURI().toString();
+		return uri != null && !uri.startsWith(directoryURI);
 	}
 }

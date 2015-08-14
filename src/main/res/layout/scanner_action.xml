@@ -38,10 +38,9 @@
 			android:padding="16dp"
 			android:visibility="invisible"
 			android:textAppearance="@style/TextAppearance.AppCompat.Title"
-            android:onClick="openAction"
-			style="@style/Widget.AppCompat.Button"
-			android:text="@{action.name}"
+			android:text="@{action.name ?? action.displayUrl}"
 			tools:text="Marker Blah"
 			tools:visibility="visible"
-			android:backgroundTint="@color/apptheme_primary" />
+            style="@style/Widget.AppCompat.Button"
+            android:theme="@style/ButtonDark" />
 </layout>

@@ -22,4 +22,5 @@
 	<integer name="ga_sessionTimeout">300</integer>
 	<bool name="ga_autoActivityTracking">false</bool>
 	<string name="ga_trackingId">UA-62424974-1</string>
+	<bool name="ga_reportUncaughtExceptions">true</bool>
 </resources>

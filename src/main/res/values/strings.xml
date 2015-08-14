@@ -122,4 +122,7 @@
 	<string name="nav_addaccount">Add Account</string>
 	<string name="navigation_libraries">Libraries</string>
 	<string name="server">Server (%s)</string>
+	<string name="availability_private">Private</string>
+	<string name="read_more">Read More</string>
+	<string name="scan_history">Scan History</string>
 </resources>

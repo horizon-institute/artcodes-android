@@ -19,10 +19,10 @@
 
 package uk.ac.horizon.artcodes.activity;
 
-import android.content.Intent;
 import android.databinding.DataBindingUtil;
 import android.os.Build;
 import android.os.Bundle;
+import android.support.v4.app.ShareCompat;
 import android.text.Layout;
 import android.view.View;
 import android.view.ViewTreeObserver;
@@ -113,18 +113,12 @@ public class ExperienceActivity extends ExperienceActivityBase
 
 	public void shareExperience(View view)
 	{
-		Intent intent = new Intent(Intent.ACTION_SEND);
-		intent.setType("text/plain");
-		intent.addFlags(Intent.FLAG_ACTIVITY_CLEAR_WHEN_TASK_RESET);
-
-		if (isLoaded())
-		{
-			intent.putExtra(Intent.EXTRA_SUBJECT, getExperience().getName());
-		}
-		intent.putExtra(Intent.EXTRA_TEXT, getUri());
-		Intent openInChooser = Intent.createChooser(intent, "Share with...");
 		GoogleAnalytics.trackEvent("Experience", "Share", getUri());
-		startActivity(openInChooser);
+		startActivity(ShareCompat.IntentBuilder.from(this)
+				.setType("text/plain")
+				.setText(getUri())
+				.setSubject(getExperience().getName())
+				.createChooserIntent());
 	}
 
 	public void starExperience(View view)

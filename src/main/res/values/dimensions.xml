@@ -24,6 +24,8 @@
 
 	<integer name="experience_description_max_lines">8</integer>
 
+	<dimen name="nav_padding">0dp</dimen>
+
 	<dimen name="detail_edge_margin">0dp</dimen>
 	<dimen name="detail_backdrop_height">@integer/custom_wrap_content</dimen>
 

@@ -40,26 +40,26 @@ public class TileThresholder implements ImageProcessor
 		final int tileWidth = (int) image.size().width / tiles;
 
 		// Split image into tiles and apply process on each image tile separately.
-		for (int tileRowCount = 0; tileRowCount < tiles; tileRowCount++)
+		for (int tileRow = 0; tileRow < tiles; tileRow++)
 		{
-			final int startRow = tileRowCount * tileHeight;
+			final int startRow = tileRow * tileHeight;
 			int endRow;
-			if (tileRowCount < tiles - 1)
+			if (tileRow < tiles - 1)
 			{
-				endRow = (tileRowCount + 1) * tileHeight;
+				endRow = (tileRow + 1) * tileHeight;
 			}
 			else
 			{
 				endRow = (int) image.size().height;
 			}
 
-			for (int tileColCount = 0; tileColCount < tiles; tileColCount++)
+			for (int tileCol = 0; tileCol < tiles; tileCol++)
 			{
-				final int startCol = tileColCount * tileWidth;
+				final int startCol = tileCol * tileWidth;
 				int endCol;
-				if (tileColCount < tiles - 1)
+				if (tileCol < tiles - 1)
 				{
-					endCol = (tileColCount + 1) * tileWidth;
+					endCol = (tileCol + 1) * tileWidth;
 				}
 				else
 				{
@@ -72,7 +72,6 @@ public class TileThresholder implements ImageProcessor
 			}
 		}
 
-		Imgproc.threshold(image, image, 127, 255, Imgproc.THRESH_OTSU);
 		return image;
 	}
 }
