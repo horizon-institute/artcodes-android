@@ -425,9 +425,9 @@ public abstract class Greyscaler
                     this.colorPixelBuffer[j] = (byte) (k * kMultiplier * 255);
                     if (k!=1)
                     {
-                        this.colorPixelBuffer[j] += (byte) (255 * cMultiplier * Math.min((1 - r - k) / (1 - k), 1 - k));
-                        this.colorPixelBuffer[j] += (byte) (255 * mMultiplier * Math.min((1 - g - k) / (1 - k), 1 - k));
-                        this.colorPixelBuffer[j] += (byte) (255 * yMultiplier * Math.min((1 - b - k) / (1 - k), 1 - k));
+                        this.colorPixelBuffer[j] += (byte) (255 * cMultiplier * (1 - r - k));
+                        this.colorPixelBuffer[j] += (byte) (255 * mMultiplier * (1 - g - k));
+                        this.colorPixelBuffer[j] += (byte) (255 * yMultiplier * (1 - b - k));
                     }
                 }
             }
@@ -446,7 +446,7 @@ public abstract class Greyscaler
                     bgr[2] = (this.colorPixelBuffer[i + 2] & 0xFF) / 255f;
 
                     k = Math.min(1f - bgr[0], Math.min(1f - bgr[1], 1f - bgr[2]));
-                    float result = k==1 ? 0 : Math.min((1f - bgr[this.singleChannel] - k) / (1f - k), 1f - k);
+                    float result = k==1 ? 0 : (1f - bgr[this.singleChannel] - k);
                     this.colorPixelBuffer[j] = (byte) (result*255f);
                 }
             }
