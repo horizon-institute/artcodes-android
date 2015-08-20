@@ -85,11 +85,24 @@ public class AestheticodesActivity extends ScanActivity implements ExperienceLis
 				}
 			}
 		}
+		this.loadSelectExperienceFromPreferences();
+	}
+
+	public void loadSelectExperienceFromPreferences()
+	{
 		String selectedID = getPreferences(Context.MODE_PRIVATE).getString("experience", experience.get().getId());
 		Experience newSelected = experiences.getSelected(selectedID);
 		if (newSelected != null && newSelected != experience.get())
 		{
 			experience.set(newSelected);
+		}
+	}
+
+	public void saveSelectedExperienceToPreferences()
+	{
+		if(experience.get() != null)
+		{
+			getPreferences(Context.MODE_PRIVATE).edit().putString("experience", experience.get().getId()).commit();
 		}
 	}
 
@@ -103,6 +116,8 @@ public class AestheticodesActivity extends ScanActivity implements ExperienceLis
 		List<Experience> experienceList = experiences.getExperiences();
 		int index = experienceList.indexOf(experience);
 		getSupportActionBar().setSelectedNavigationItem(index);
+
+		this.saveSelectedExperienceToPreferences();
 
 		addDefaultExperiences(Aestheticodes.getExperiences());
 	}
@@ -427,6 +442,7 @@ public class AestheticodesActivity extends ScanActivity implements ExperienceLis
 		super.onResume();
 		experiences.addListener(this);
 		experiences.update(experienceURL);
+		loadSelectExperienceFromPreferences();
 	}
 
 	@Override
@@ -434,10 +450,6 @@ public class AestheticodesActivity extends ScanActivity implements ExperienceLis
 	{
 		super.onPause();
 		experiences.removeListener(this);
-		if(experience.get() != null)
-		{
-			getPreferences(Context.MODE_PRIVATE).edit().putString("experience", experience.get().getId()).commit();
-		}
 	}
 
 	@Override
