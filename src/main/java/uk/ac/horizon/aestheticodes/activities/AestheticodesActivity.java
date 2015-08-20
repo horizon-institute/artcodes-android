@@ -333,16 +333,16 @@ public class AestheticodesActivity extends ScanActivity implements ExperienceLis
 		{
 			String json = "[";
 			if (true) // use colour defaults
-				json += "{\"name\":\"2.1 Red\",   \"UUID\":\"5a5d7329-a73a-45ac-9066-bdc922c93a66\", \"colourPreset\":[\"RGB\",1,0,0], \"minRegions\":5, \"maxRegions\":5, \"checksum\":3, \"icon\":\"http://www.nottingham.ac.uk/~pszwp/red.gif\",   \"embeddedChecksum\":true}," +
-						"{\"name\":\"2.2 Green\", \"UUID\":\"f988f134-780e-4760-8b65-516663c5fab8\", \"colourPreset\":[\"RGB\",0,1,0], \"minRegions\":5, \"maxRegions\":5, \"checksum\":3, \"icon\":\"http://www.nottingham.ac.uk/~pszwp/green.gif\", \"embeddedChecksum\":true}," +
-						"{\"name\":\"2.3 Blue\",  \"UUID\":\"3c9833bb-46df-406d-bae6-8d4c0410d02a\", \"colourPreset\":[\"RGB\",0,0,1], \"minRegions\":5, \"maxRegions\":5, \"checksum\":3, \"icon\":\"http://www.nottingham.ac.uk/~pszwp/blue.gif\",  \"embeddedChecksum\":true},";
+				json += "{\"name\":\"2.1 Red\",   \"id\":\"5a5d7329-a73a-45ac-9066-bdc922c93a66\", \"colourPreset\":[\"RGB\",1,0,0], \"minRegions\":5, \"maxRegions\":5, \"checksumModulo\":3, \"icon\":\"http://www.nottingham.ac.uk/~pszwp/red.gif\",   \"embeddedChecksum\":true, \"codes\":[{\"code\":\"1:1:1:1:2\", \"title\":\"Switch to green\", \"showDetail\":true, \"changeToExperienceWithIdOnOpen\":\"f988f134-780e-4760-8b65-516663c5fab8\"}]}," +
+						"{\"name\":\"2.2 Green\", \"id\":\"f988f134-780e-4760-8b65-516663c5fab8\", \"colourPreset\":[\"RGB\",0,1,0], \"minRegions\":5, \"maxRegions\":5, \"checksumModulo\":3, \"icon\":\"http://www.nottingham.ac.uk/~pszwp/green.gif\", \"embeddedChecksum\":true, \"codes\":[{\"code\":\"1:1:1:1:2\", \"title\":\"Switch to blue\", \"showDetail\":true, \"changeToExperienceWithIdOnOpen\":\"3c9833bb-46df-406d-bae6-8d4c0410d02a\"}]}," +
+						"{\"name\":\"2.3 Blue\",  \"id\":\"3c9833bb-46df-406d-bae6-8d4c0410d02a\", \"colourPreset\":[\"RGB\",0,0,1], \"minRegions\":5, \"maxRegions\":5, \"checksumModulo\":3, \"icon\":\"http://www.nottingham.ac.uk/~pszwp/blue.gif\",  \"embeddedChecksum\":true, \"codes\":[{\"code\":\"1:1:1:1:2\", \"title\":\"Switch to red\", \"showDetail\":true, \"changeToExperienceWithIdOnOpen\":\"5a5d7329-a73a-45ac-9066-bdc922c93a66\"}]},";
 			if (true) // use extension defaults
-				json += "{\"name\":\"1.1 Area Order\", \"UUID\":\"6dd56665-8523-43e8-925d-71d6d94be4be\", \"minRegions\":5, \"maxRegions\":5, \"checksum\":3, \"description\":\"This experience orders the regions of an Artcode by their size. (AREA4321)\", \"icon\":\"http://www.nottingham.ac.uk/~pszwp/extension.gif\", \"version\":2}," +
-								"{\"name\":\"1.2 Area Label/Orientation Order\", \"UUID\":\"ce4b84b6-6cfc-4969-a4e4-072334c337b8\", \"minRegions\":5, \"maxRegions\":5, \"checksum\":3, \"embeddedChecksum\":true, \"description\":\"This experience labels the regions of an Artcode by their size and then orders them by their orientation. (AO4321)\", \"icon\":\"http://www.nottingham.ac.uk/~pszwp/extension.gif\", \"version\":2}," +
-								"{\"name\":\"1.3 Orientation Label/Area Order\", \"UUID\":\"1d4bac87-e9e3-4e12-8208-34c168922e34\", \"minRegions\":5, \"maxRegions\":5, \"checksum\":3, \"embeddedChecksum\":true, \"description\":\"This experience labels the regions of an Artcode by their orientation and then orders them by their size. (OA4321)\", \"icon\":\"http://www.nottingham.ac.uk/~pszwp/extension.gif\", \"version\":2}," +
-								"{\"name\":\"1.4 Touching\", \"UUID\":\"069674f8-3a8b-49bd-aef6-5b0bc6196c67\", \"minRegions\":5, \"maxRegions\":5, \"checksum\":3, \"embeddedChecksum\":true, \"description\":\"This experience counts the number of other regions a region touches. This produces codes like 1-1:1-2:1-2:1-2:2-2 where 1-2 means a region with a value of 1 that is touching 2 other regions. The total of these touching numbers must be disiable by 3. (TOUCH4321)\", \"icon\":\"http://www.nottingham.ac.uk/~pszwp/extension.gif\", \"version\":2},";
+				json += "{\"name\":\"1.1 Area Order\", \"id\":\"6dd56665-8523-43e8-925d-71d6d94be4be\", \"minRegions\":5, \"maxRegions\":5, \"checksumModulo\":3, \"description\":\"This experience orders the regions of an Artcode by their size. (AREA4321)\", \"icon\":\"http://www.nottingham.ac.uk/~pszwp/extension.gif\", \"version\":2}," +
+								"{\"name\":\"1.2 Area Label/Orientation Order\", \"id\":\"ce4b84b6-6cfc-4969-a4e4-072334c337b8\", \"minRegions\":5, \"maxRegions\":5, \"checksumModulo\":3, \"embeddedChecksum\":true, \"description\":\"This experience labels the regions of an Artcode by their size and then orders them by their orientation. (AO4321)\", \"icon\":\"http://www.nottingham.ac.uk/~pszwp/extension.gif\", \"version\":2}," +
+								"{\"name\":\"1.3 Orientation Label/Area Order\", \"id\":\"1d4bac87-e9e3-4e12-8208-34c168922e34\", \"minRegions\":5, \"maxRegions\":5, \"checksumModulo\":3, \"embeddedChecksum\":true, \"description\":\"This experience labels the regions of an Artcode by their orientation and then orders them by their size. (OA4321)\", \"icon\":\"http://www.nottingham.ac.uk/~pszwp/extension.gif\", \"version\":2}," +
+								"{\"name\":\"1.4 Touching\", \"id\":\"069674f8-3a8b-49bd-aef6-5b0bc6196c67\", \"minRegions\":5, \"maxRegions\":5, \"checksumModulo\":3, \"embeddedChecksum\":true, \"description\":\"This experience counts the number of other regions a region touches. This produces codes like 1-1:1-2:1-2:1-2:2-2 where 1-2 means a region with a value of 1 that is touching 2 other regions. The total of these touching numbers must be disiable by 3. (TOUCH4321)\", \"icon\":\"http://www.nottingham.ac.uk/~pszwp/extension.gif\", \"version\":2},";
 			if (true) // use combined code defaults
-				json += "{\"name\":\"3.1 Numbers\",   \"UUID\":\"133759a3-ff7e-4f35-b545-ed641c109e0b\", \"minRegions\":5, \"maxRegions\":6, \"checksum\":3, \"embeddedChecksum\":true, \"icon\":\"http://www.nottingham.ac.uk/~pszwp/combined.gif\", \"codes\":[{\"code\":\"1:1:1:1:2\",\"title\":\"Hi\",\"action\":\"www.google.com\"},{\"code\":\"1:1:1:1:5\",\"title\":\"1\",\"action\":\"www.google.com\"},{\"code\":\"1:1:1:2:4\",\"title\":\"2\",\"action\":\"www.google.com\"},{\"code\":\"1:1:1:3:3\",\"title\":\"3\",\"action\":\"www.google.com\"},{\"code\":\"1:1:2:3:5\",\"title\":\"4\",\"action\":\"www.google.com\"},{\"code\":\"1:1:2:4:4\",\"title\":\"5\",\"action\":\"www.google.com\"},{\"code\":\"1:1:1:1:5+1:1:1:2:4\",\"title\":\"1+2\",\"action\":\"www.google.com\"},{\"code\":\"1:1:1:1:5+1:1:1:3:3\",\"title\":\"1+3\",\"action\":\"www.google.com\"},{\"code\":\"1:1:1:1:5+1:1:2:3:5\",\"title\":\"1+4\",\"action\":\"www.google.com\"},{\"code\":\"1:1:1:1:5+1:1:2:4:4\",\"title\":\"1+5\",\"action\":\"www.google.com\"},{\"code\":\"1:1:1:2:4+1:1:1:3:3\",\"title\":\"2+3\",\"action\":\"www.google.com\"},{\"code\":\"1:1:1:2:4+1:1:2:3:5\",\"title\":\"2+4\",\"action\":\"www.google.com\"},{\"code\":\"1:1:1:2:4+1:1:2:4:4\",\"title\":\"2+5\",\"action\":\"www.google.com\"},{\"code\":\"1:1:1:3:3+1:1:2:3:5\",\"title\":\"3+4\",\"action\":\"www.google.com\"},{\"code\":\"1:1:1:3:3+1:1:2:4:4\",\"title\":\"3+5\",\"action\":\"www.google.com\"},{\"code\":\"1:1:2:3:5+1:1:2:4:4\",\"title\":\"4+5\",\"action\":\"www.google.com\"},{\"code\":\"1:1:1:1:5>1:1:1:2:4>1:1:1:3:3>1:1:2:3:5>1:1:2:4:4\",\"title\":\"1, 2, 3, 4 and 5\",\"action\":\"www.google.com\"},{\"code\":\"1:1:2:4:4>1:1:2:3:5>1:1:1:3:3>1:1:1:2:4>1:1:1:1:5\",\"title\":\"5, 4, 3, 3 and 1\",\"action\":\"www.google.com\"}]},";
+				json += "{\"name\":\"3.1 Numbers\",   \"id\":\"133759a3-ff7e-4f35-b545-ed641c109e0b\", \"minRegions\":5, \"maxRegions\":6, \"checksumModulo\":3, \"embeddedChecksum\":true, \"icon\":\"http://www.nottingham.ac.uk/~pszwp/combined.gif\", \"codes\":[{\"code\":\"1:1:1:1:2\",\"title\":\"Hi\",\"action\":\"http://www.google.com\"},{\"code\":\"1:1:1:1:5\",\"title\":\"1\",\"action\":\"http://www.google.com\"},{\"code\":\"1:1:1:2:4\",\"title\":\"2\",\"action\":\"http://www.google.com\"},{\"code\":\"1:1:1:3:3\",\"title\":\"3\",\"action\":\"http://www.google.com\"},{\"code\":\"1:1:2:3:5\",\"title\":\"4\",\"action\":\"http://www.google.com\"},{\"code\":\"1:1:2:4:4\",\"title\":\"5\",\"action\":\"http://www.google.com\"},{\"code\":\"1:1:1:1:5+1:1:1:2:4\",\"title\":\"1+2\",\"action\":\"http://www.google.com\"},{\"code\":\"1:1:1:1:5+1:1:1:3:3\",\"title\":\"1+3\",\"action\":\"http://www.google.com\"},{\"code\":\"1:1:1:1:5+1:1:2:3:5\",\"title\":\"1+4\",\"action\":\"http://www.google.com\"},{\"code\":\"1:1:1:1:5+1:1:2:4:4\",\"title\":\"1+5\",\"action\":\"http://www.google.com\"},{\"code\":\"1:1:1:2:4+1:1:1:3:3\",\"title\":\"2+3\",\"action\":\"http://www.google.com\"},{\"code\":\"1:1:1:2:4+1:1:2:3:5\",\"title\":\"2+4\",\"action\":\"http://www.google.com\"},{\"code\":\"1:1:1:2:4+1:1:2:4:4\",\"title\":\"2+5\",\"action\":\"http://www.google.com\"},{\"code\":\"1:1:1:3:3+1:1:2:3:5\",\"title\":\"3+4\",\"action\":\"http://www.google.com\"},{\"code\":\"1:1:1:3:3+1:1:2:4:4\",\"title\":\"3+5\",\"action\":\"http://www.google.com\"},{\"code\":\"1:1:2:3:5+1:1:2:4:4\",\"title\":\"4+5\",\"action\":\"http://www.google.com\"},{\"code\":\"1:1:1:1:5>1:1:1:2:4>1:1:1:3:3>1:1:2:3:5>1:1:2:4:4\",\"title\":\"1, 2, 3, 4 and 5\",\"action\":\"http://www.google.com\"},{\"code\":\"1:1:2:4:4>1:1:2:3:5>1:1:1:3:3>1:1:1:2:4>1:1:1:1:5\",\"title\":\"5, 4, 3, 3 and 1\",\"action\":\"http://www.google.com\"}]}";
 			json += "]";
 			JSONArray arrayOfDefaultExperences = new JSONArray(json);
 
@@ -350,7 +350,7 @@ public class AestheticodesActivity extends ScanActivity implements ExperienceLis
 			{
 				JSONObject experienceDict = arrayOfDefaultExperences.getJSONObject(i);
 				Experience experience = new Experience();
-				experience.setId(experienceDict.getString("UUID"));
+				experience.setId(experienceDict.getString("id"));
 				experience.setOp(Experience.Operation.create);
 				experience.setName(experienceDict.getString("name"));
 				if (experienceDict.has("version"))
@@ -361,6 +361,8 @@ public class AestheticodesActivity extends ScanActivity implements ExperienceLis
 				{
 					if (experienceDict.has("icon"))
 						experience.setIcon(experienceDict.getString("icon"));
+					if (experienceDict.has("image"))
+						experience.setImage(experienceDict.getString("image"));
 					if (experienceDict.has("description"))
 						experience.setDescription(experienceDict.getString("description"));
 
@@ -370,6 +372,8 @@ public class AestheticodesActivity extends ScanActivity implements ExperienceLis
 						experience.setMaxRegions(experienceDict.getInt("maxRegions"));
 					if (experienceDict.has("checksum"))
 						experience.setChecksumModulo(experienceDict.getInt("checksum"));
+					if (experienceDict.has("checksumModulo"))
+						experience.setChecksumModulo(experienceDict.getInt("checksumModulo"));
 					if (experienceDict.has("embeddedChecksum"))
 						experience.setEmbeddedChecksum(experienceDict.getBoolean("embeddedChecksum"));
 
@@ -399,7 +403,12 @@ public class AestheticodesActivity extends ScanActivity implements ExperienceLis
 								m.setTitle(codeInJson.getString("title"));
 							if (codeInJson.has("action"))
 								m.setAction(codeInJson.getString("action"));
-							m.setShowDetail(true);
+							if (codeInJson.has("showDetail"))
+								m.setShowDetail(codeInJson.getBoolean("showDetail"));
+							else
+								m.setShowDetail(true);
+							if (codeInJson.has("changeToExperienceWithIdOnOpen"))
+								m.setChangeToExperienceWithIdOnOpen(codeInJson.getString("changeToExperienceWithIdOnOpen"));
 							experience.add(m);
 						}
 					}
