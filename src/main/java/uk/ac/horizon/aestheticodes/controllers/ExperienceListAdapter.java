@@ -134,6 +134,11 @@ public class ExperienceListAdapter extends BaseAdapter implements ExperienceList
 		return experiences.get(position).getId().hashCode();
 	}
 
+	/**
+	 * Get an experience by its ID string.
+	 * @param preferred The desired experiences ID string.
+	 * @return The requested experience, or the default experience if not found.
+	 */
 	public Experience getSelected(String preferred)
 	{
 		Log.i("", "Looking for " + preferred);
@@ -216,4 +221,5 @@ public class ExperienceListAdapter extends BaseAdapter implements ExperienceList
 			updater.execute(uris);
 		}
 	}
+
 }

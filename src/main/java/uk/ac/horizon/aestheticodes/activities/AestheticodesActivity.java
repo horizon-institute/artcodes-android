@@ -488,27 +488,36 @@ public class AestheticodesActivity extends ScanActivity implements ExperienceLis
 
 	private void openMarker(Marker marker)
 	{
-		if (marker.getShowDetail())
+		if (marker != null)
 		{
-			camera.stop();
-			Intent intent = new Intent(this, MarkerActivity.class);
-			intent.putExtra("experience", experience.get().getId());
-			intent.putExtra("marker", marker.getCode());
+			if (marker.getShowDetail())
+			{
+				camera.stop();
+				Intent intent = new Intent(this, MarkerActivity.class);
+				intent.putExtra("experience", experience.get().getId());
+				intent.putExtra("marker", marker.getCode());
 
-			startActivity(intent);
-		}
-		else if (marker.getAction() != null && marker.getAction().contains("://"))
-		{
-			camera.stop();
-			startActivity(new Intent(Intent.ACTION_VIEW, Uri.parse(marker.getAction())));
-		}
-		else
-		{
-			new AlertDialog.Builder(this)
-					.setTitle("No action")
-					.setMessage("There is no valid action associated with this marker.")
-					.setPositiveButton("OK", null)
-					.show();
+				startActivity(intent);
+			}
+			else if (marker.getAction() != null && marker.getAction().contains("://"))
+			{
+				camera.stop();
+				startActivity(new Intent(Intent.ACTION_VIEW, Uri.parse(marker.getAction())));
+			}
+			else
+			{
+				new AlertDialog.Builder(this)
+						.setTitle("No action")
+						.setMessage("There is no valid action associated with this marker.")
+						.setPositiveButton("OK", null)
+						.show();
+			}
+
+			Experience experienceToChangeTo = this.experiences.getSelected(marker.getChangeToExperienceWithIdOnOpen());
+			if (experienceToChangeTo != null)
+			{
+				this.experience.set(experienceToChangeTo);
+			}
 		}
 	}
 }
