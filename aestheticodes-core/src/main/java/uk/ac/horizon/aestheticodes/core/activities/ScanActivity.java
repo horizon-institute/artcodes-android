@@ -299,7 +299,7 @@ public class ScanActivity extends ActionBarActivity implements ExperienceControl
 			{
 				Gson gson = ExperienceParser.createParser();
 				Experience intentExperience = gson.fromJson(intent.getStringExtra("experience"), Experience.class);
-				experience.set(intentExperience);
+				experienceController.set(intentExperience);
 			}
 			catch (Exception e)
 			{
