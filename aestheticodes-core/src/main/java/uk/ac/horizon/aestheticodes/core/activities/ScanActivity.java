@@ -85,7 +85,7 @@ public class ScanActivity extends ActionBarActivity implements ExperienceControl
 		return !hasBackKey && !hasMenuKey;
 	}
 
-	protected final ExperienceController experience = new ExperienceController();
+	protected final ExperienceController experienceController = new ExperienceController();
 	protected CameraController camera;
 	protected MarkerDetector detector;
 	protected ViewfinderView viewfinder;
@@ -152,7 +152,7 @@ public class ScanActivity extends ActionBarActivity implements ExperienceControl
 
 	public void markerChanged(final String markerCode, final List<Integer> newMarkerThumbnails, final int historySize, final Scene scene)
 	{
-		if (experience.get().getCallback() == null)
+		if (experienceController.get().getCallback() == null)
 		{
 			Intent intent = getIntent();
 			intent.putExtra("marker", markerCode);
@@ -161,7 +161,7 @@ public class ScanActivity extends ActionBarActivity implements ExperienceControl
 		}
 		else
 		{
-			startActivity(new Intent(Intent.ACTION_VIEW, Uri.parse(experience.get().getCallback().replace("{code}", markerCode))));
+			startActivity(new Intent(Intent.ACTION_VIEW, Uri.parse(experienceController.get().getCallback().replace("{code}", markerCode))));
 		}
 	}
 
@@ -176,7 +176,7 @@ public class ScanActivity extends ActionBarActivity implements ExperienceControl
 
 		camera = new CameraController(this);
 
-		detector = new MarkerDetector(camera, this, experience);
+		detector = new MarkerDetector(camera, this, experienceController);
 
 		viewfinder = (ViewfinderView) findViewById(R.id.viewfinder);
 		viewfinder.setCamera(camera);
@@ -211,7 +211,7 @@ public class ScanActivity extends ActionBarActivity implements ExperienceControl
 	{
 		super.onResume();
 		startCamera();
-		experience.addListener(this);
+		experienceController.addListener(this);
 	}
 
 	@Override
@@ -326,7 +326,7 @@ public class ScanActivity extends ActionBarActivity implements ExperienceControl
 				data = URLDecoder.decode(data, "UTF-8");
 				Gson gson = ExperienceParser.createParser();
 				Experience intentExperience = gson.fromJson(data, Experience.class);
-				experience.set(intentExperience);
+				experienceController.set(intentExperience);
 			}
 			catch (Exception e)
 			{
@@ -341,7 +341,7 @@ public class ScanActivity extends ActionBarActivity implements ExperienceControl
 	{
 		super.onPause();
 		stopCamera();
-		experience.removeListener(this);
+		experienceController.removeListener(this);
 	}
 
 	protected void updateMenu()

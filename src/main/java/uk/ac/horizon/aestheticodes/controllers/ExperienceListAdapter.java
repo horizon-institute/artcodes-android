@@ -145,7 +145,7 @@ public class ExperienceListAdapter extends BaseAdapter implements ExperienceList
 		String id = preferred;
 		if(id == null)
 		{
-			id = DEFAULT_ID;
+			return null;
 		}
 
 		for (Experience experience : experiences)
@@ -157,11 +157,6 @@ public class ExperienceListAdapter extends BaseAdapter implements ExperienceList
 			}
 		}
 
-		if (!experiences.isEmpty())
-		{
-			Log.i("", "Not found " + preferred + ", returning " + experiences.get(0).getId());
-			return experiences.get(0);
-		}
 		return null;
 	}
 

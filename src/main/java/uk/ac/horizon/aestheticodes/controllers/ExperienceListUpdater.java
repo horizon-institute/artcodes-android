@@ -144,6 +144,8 @@ class ExperienceListUpdater extends AsyncTask<String, Experience, Collection<Str
 				}
 			}
 
+			/*
+
 			for(String experienceURL: experienceURLs)
 			{
 				try
@@ -242,6 +244,9 @@ class ExperienceListUpdater extends AsyncTask<String, Experience, Collection<Str
 					}
 				}
 			}
+
+			*/
+
 		}
 		catch (Exception e)
 		{

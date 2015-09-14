@@ -19,11 +19,12 @@
 package uk.ac.horizon.aestheticodes.activities;
 
 import android.app.AlertDialog;
-import android.content.Context;
 import android.content.Intent;
+import android.content.SharedPreferences;
 import android.content.res.Resources;
 import android.net.Uri;
 import android.os.Bundle;
+import android.preference.PreferenceManager;
 import android.support.v7.app.ActionBar;
 import android.util.Log;
 import android.util.TypedValue;
@@ -38,9 +39,6 @@ import android.widget.Button;
 import android.widget.ImageView;
 import android.widget.LinearLayout;
 
-import org.json.JSONArray;
-import org.json.JSONException;
-import org.json.JSONObject;
 import org.opencv.core.Scalar;
 
 import java.util.ArrayList;
@@ -80,7 +78,7 @@ public class AestheticodesActivity extends ScanActivity implements ExperienceLis
 			{
 				if(experienceURL.equals(experience.getOrigin()))
 				{
-					this.experience.set(experience);
+					this.experienceController.set(experience);
 					return;
 				}
 			}
@@ -88,21 +86,29 @@ public class AestheticodesActivity extends ScanActivity implements ExperienceLis
 		this.loadSelectExperienceFromPreferences();
 	}
 
-	public void loadSelectExperienceFromPreferences()
+	private void loadSelectExperienceFromPreferences()
 	{
-		String selectedID = getPreferences(Context.MODE_PRIVATE).getString("experience", experience.get().getId());
+		SharedPreferences sharedPreferences = PreferenceManager.getDefaultSharedPreferences(getApplicationContext());
+		String selectedID = sharedPreferences.getString("experience", experienceController.get().getId());
+		Log.i("EXPERIENCE_PREF", "Loading experience from prefs... "+selectedID);
 		Experience newSelected = experiences.getSelected(selectedID);
-		if (newSelected != null && newSelected != experience.get())
+		if (newSelected != null && newSelected != experienceController.get())
 		{
-			experience.set(newSelected);
+			Log.i("EXPERIENCE_PREF", "...found "+newSelected.getName());
+			experienceController.set(newSelected);
 		}
 	}
 
-	public void saveSelectedExperienceToPreferences()
+	private void saveSelectedExperienceToPreferences()
 	{
-		if(experience.get() != null)
+		if(this.experienceController.get() != null && this.experienceController.get().getId() != null)
 		{
-			getPreferences(Context.MODE_PRIVATE).edit().putString("experience", experience.get().getId()).commit();
+			String experienceId = this.experienceController.get().getId();
+			Log.i("EXPERIENCE_PREF", "Setting experience id " + experienceId);
+			SharedPreferences sharedPreferences = PreferenceManager.getDefaultSharedPreferences(getApplicationContext());
+			SharedPreferences.Editor editor = sharedPreferences.edit();
+			editor.putString("experience", experienceController.get().getId());
+			editor.apply();
 		}
 	}
 
@@ -118,8 +124,6 @@ public class AestheticodesActivity extends ScanActivity implements ExperienceLis
 		getSupportActionBar().setSelectedNavigationItem(index);
 
 		this.saveSelectedExperienceToPreferences();
-
-		addDefaultExperiences(Aestheticodes.getExperiences());
 	}
 
 
@@ -182,7 +186,7 @@ public class AestheticodesActivity extends ScanActivity implements ExperienceLis
 			});
 		}
 
-		final Marker marker = experience.get().getMarkers().get(markerCode);
+		final Marker marker = experienceController.get().getMarkers().get(markerCode);
 		if (marker!=null && autoOpen)
 		{
 			openMarker(marker);
@@ -318,109 +322,13 @@ public class AestheticodesActivity extends ScanActivity implements ExperienceLis
 			{
 				final Experience selected = (Experience) experiences.getItem(position);
 				Log.i("", "User selected " + selected.getId() + ": " + l);
-				if (selected != experience.get())
+				if (selected != experienceController.get())
 				{
-					experience.set(selected);
+					experienceController.set(selected);
 				}
 				return true;
 			}
 		});
-	}
-
-	private void addDefaultExperiences(ExperienceListController experienceListController)
-	{
-		try
-		{
-			String json = "[";
-			if (true) // use colour defaults
-				json += "{\"name\":\"2.1 Red\",   \"id\":\"5a5d7329-a73a-45ac-9066-bdc922c93a66\", \"colourPreset\":[\"RGB\",1,0,0], \"minRegions\":5, \"maxRegions\":5, \"checksumModulo\":3, \"icon\":\"http://www.nottingham.ac.uk/~pszwp/red.gif\",   \"embeddedChecksum\":true, \"codes\":[{\"code\":\"1:1:1:1:2\", \"title\":\"Switch to green\", \"showDetail\":true, \"changeToExperienceWithIdOnOpen\":\"f988f134-780e-4760-8b65-516663c5fab8\"}]}," +
-						"{\"name\":\"2.2 Green\", \"id\":\"f988f134-780e-4760-8b65-516663c5fab8\", \"colourPreset\":[\"RGB\",0,1,0], \"minRegions\":5, \"maxRegions\":5, \"checksumModulo\":3, \"icon\":\"http://www.nottingham.ac.uk/~pszwp/green.gif\", \"embeddedChecksum\":true, \"codes\":[{\"code\":\"1:1:1:1:2\", \"title\":\"Switch to blue\", \"showDetail\":true, \"changeToExperienceWithIdOnOpen\":\"3c9833bb-46df-406d-bae6-8d4c0410d02a\"}]}," +
-						"{\"name\":\"2.3 Blue\",  \"id\":\"3c9833bb-46df-406d-bae6-8d4c0410d02a\", \"colourPreset\":[\"RGB\",0,0,1], \"minRegions\":5, \"maxRegions\":5, \"checksumModulo\":3, \"icon\":\"http://www.nottingham.ac.uk/~pszwp/blue.gif\",  \"embeddedChecksum\":true, \"codes\":[{\"code\":\"1:1:1:1:2\", \"title\":\"Switch to red\", \"showDetail\":true, \"changeToExperienceWithIdOnOpen\":\"5a5d7329-a73a-45ac-9066-bdc922c93a66\"}]},";
-			if (true) // use extension defaults
-				json += "{\"name\":\"1.1 Area Order\", \"id\":\"6dd56665-8523-43e8-925d-71d6d94be4be\", \"minRegions\":5, \"maxRegions\":5, \"checksumModulo\":3, \"description\":\"This experience orders the regions of an Artcode by their size. (AREA4321)\", \"icon\":\"http://www.nottingham.ac.uk/~pszwp/extension.gif\", \"version\":2}," +
-								"{\"name\":\"1.2 Area Label/Orientation Order\", \"id\":\"ce4b84b6-6cfc-4969-a4e4-072334c337b8\", \"minRegions\":5, \"maxRegions\":5, \"checksumModulo\":3, \"embeddedChecksum\":true, \"description\":\"This experience labels the regions of an Artcode by their size and then orders them by their orientation. (AO4321)\", \"icon\":\"http://www.nottingham.ac.uk/~pszwp/extension.gif\", \"version\":2}," +
-								"{\"name\":\"1.3 Orientation Label/Area Order\", \"id\":\"1d4bac87-e9e3-4e12-8208-34c168922e34\", \"minRegions\":5, \"maxRegions\":5, \"checksumModulo\":3, \"embeddedChecksum\":true, \"description\":\"This experience labels the regions of an Artcode by their orientation and then orders them by their size. (OA4321)\", \"icon\":\"http://www.nottingham.ac.uk/~pszwp/extension.gif\", \"version\":2}," +
-								"{\"name\":\"1.4 Touching\", \"id\":\"069674f8-3a8b-49bd-aef6-5b0bc6196c67\", \"minRegions\":5, \"maxRegions\":5, \"checksumModulo\":3, \"embeddedChecksum\":true, \"description\":\"This experience counts the number of other regions a region touches. This produces codes like 1-1:1-2:1-2:1-2:2-2 where 1-2 means a region with a value of 1 that is touching 2 other regions. The total of these touching numbers must be disiable by 3. (TOUCH4321)\", \"icon\":\"http://www.nottingham.ac.uk/~pszwp/extension.gif\", \"version\":2},";
-			if (true) // use combined code defaults
-				json += "{\"name\":\"3.1 Numbers\",   \"id\":\"133759a3-ff7e-4f35-b545-ed641c109e0b\", \"minRegions\":5, \"maxRegions\":6, \"checksumModulo\":3, \"embeddedChecksum\":true, \"icon\":\"http://www.nottingham.ac.uk/~pszwp/combined.gif\", \"codes\":[{\"code\":\"1:1:1:1:2\",\"title\":\"Hi\",\"action\":\"http://www.google.com\"},{\"code\":\"1:1:1:1:5\",\"title\":\"1\",\"action\":\"http://www.google.com\"},{\"code\":\"1:1:1:2:4\",\"title\":\"2\",\"action\":\"http://www.google.com\"},{\"code\":\"1:1:1:3:3\",\"title\":\"3\",\"action\":\"http://www.google.com\"},{\"code\":\"1:1:2:3:5\",\"title\":\"4\",\"action\":\"http://www.google.com\"},{\"code\":\"1:1:2:4:4\",\"title\":\"5\",\"action\":\"http://www.google.com\"},{\"code\":\"1:1:1:1:5+1:1:1:2:4\",\"title\":\"1+2\",\"action\":\"http://www.google.com\"},{\"code\":\"1:1:1:1:5+1:1:1:3:3\",\"title\":\"1+3\",\"action\":\"http://www.google.com\"},{\"code\":\"1:1:1:1:5+1:1:2:3:5\",\"title\":\"1+4\",\"action\":\"http://www.google.com\"},{\"code\":\"1:1:1:1:5+1:1:2:4:4\",\"title\":\"1+5\",\"action\":\"http://www.google.com\"},{\"code\":\"1:1:1:2:4+1:1:1:3:3\",\"title\":\"2+3\",\"action\":\"http://www.google.com\"},{\"code\":\"1:1:1:2:4+1:1:2:3:5\",\"title\":\"2+4\",\"action\":\"http://www.google.com\"},{\"code\":\"1:1:1:2:4+1:1:2:4:4\",\"title\":\"2+5\",\"action\":\"http://www.google.com\"},{\"code\":\"1:1:1:3:3+1:1:2:3:5\",\"title\":\"3+4\",\"action\":\"http://www.google.com\"},{\"code\":\"1:1:1:3:3+1:1:2:4:4\",\"title\":\"3+5\",\"action\":\"http://www.google.com\"},{\"code\":\"1:1:2:3:5+1:1:2:4:4\",\"title\":\"4+5\",\"action\":\"http://www.google.com\"},{\"code\":\"1:1:1:1:5>1:1:1:2:4>1:1:1:3:3>1:1:2:3:5>1:1:2:4:4\",\"title\":\"1, 2, 3, 4 and 5\",\"action\":\"http://www.google.com\"},{\"code\":\"1:1:2:4:4>1:1:2:3:5>1:1:1:3:3>1:1:1:2:4>1:1:1:1:5\",\"title\":\"5, 4, 3, 3 and 1\",\"action\":\"http://www.google.com\"}]}";
-			json += "]";
-			JSONArray arrayOfDefaultExperences = new JSONArray(json);
-
-			for (int i=0; i<arrayOfDefaultExperences.length(); ++i)
-			{
-				JSONObject experienceDict = arrayOfDefaultExperences.getJSONObject(i);
-				Experience experience = new Experience();
-				experience.setId(experienceDict.getString("id"));
-				experience.setOp(Experience.Operation.create);
-				experience.setName(experienceDict.getString("name"));
-				if (experienceDict.has("version"))
-					experience.setVersion(experienceDict.getInt("version"));
-
-				Experience existingExperience = experienceListController.get(experience.getId());
-				if (existingExperience == null || existingExperience.getVersion() < experience.getVersion())
-				{
-					if (experienceDict.has("icon"))
-						experience.setIcon(experienceDict.getString("icon"));
-					if (experienceDict.has("image"))
-						experience.setImage(experienceDict.getString("image"));
-					if (experienceDict.has("description"))
-						experience.setDescription(experienceDict.getString("description"));
-
-					if (experienceDict.has("minRegions"))
-						experience.setMinRegions(experienceDict.getInt("minRegions"));
-					if (experienceDict.has("maxRegions"))
-						experience.setMaxRegions(experienceDict.getInt("maxRegions"));
-					if (experienceDict.has("checksum"))
-						experience.setChecksumModulo(experienceDict.getInt("checksum"));
-					if (experienceDict.has("checksumModulo"))
-						experience.setChecksumModulo(experienceDict.getInt("checksumModulo"));
-					if (experienceDict.has("embeddedChecksum"))
-						experience.setEmbeddedChecksum(experienceDict.getBoolean("embeddedChecksum"));
-
-					if (experienceDict.has("colourPreset"))
-					{
-						List<Object> preset = new ArrayList<>();
-						JSONArray presetInJson = experienceDict.getJSONArray("colourPreset");
-						preset.add(presetInJson.getString(0));
-						for (int j = 1; j < presetInJson.length(); ++j)
-							preset.add(presetInJson.getDouble(j));
-						experience.setGreyscaleOptions(preset);
-					}
-					if (experienceDict.has("invertGreyscale"))
-						experience.setInvertGreyscale(experienceDict.getBoolean("invertGreyscale"));
-					if (experienceDict.has("hueShift"))
-						experience.setHueShift(experienceDict.getDouble("hueShift"));
-
-					if (experienceDict.has("codes"))
-					{
-						JSONArray codesInJson = experienceDict.getJSONArray("codes");
-						for (int codeIndex=0; codeIndex<codesInJson.length(); ++codeIndex)
-						{
-							JSONObject codeInJson = codesInJson.getJSONObject(codeIndex);
-							Marker m = new Marker();
-							m.setCode(codeInJson.getString("code"));
-							if (codeInJson.has("title"))
-								m.setTitle(codeInJson.getString("title"));
-							if (codeInJson.has("action"))
-								m.setAction(codeInJson.getString("action"));
-							if (codeInJson.has("showDetail"))
-								m.setShowDetail(codeInJson.getBoolean("showDetail"));
-							else
-								m.setShowDetail(true);
-							if (codeInJson.has("changeToExperienceWithIdOnOpen"))
-								m.setChangeToExperienceWithIdOnOpen(codeInJson.getString("changeToExperienceWithIdOnOpen"));
-							experience.add(m);
-						}
-					}
-
-					experienceListController.add(experience);
-				}
-			}
-
-		} catch (JSONException e)
-		{
-			e.printStackTrace();
-		}
 	}
 
 	@Override
@@ -450,7 +358,6 @@ public class AestheticodesActivity extends ScanActivity implements ExperienceLis
 	{
 		super.onResume();
 		experiences.addListener(this);
-		experiences.update(experienceURL);
 		loadSelectExperienceFromPreferences();
 	}
 
@@ -511,7 +418,11 @@ public class AestheticodesActivity extends ScanActivity implements ExperienceLis
 			else if (marker.getAction() != null && marker.getAction().contains("://"))
 			{
 				camera.stop();
-				startActivity(new Intent(Intent.ACTION_VIEW, Uri.parse(marker.getAction())));
+				Intent intent = new Intent();
+				intent.putExtra("caller", this.getClass().getCanonicalName());
+				intent.setClass(this, WebActivity.class);
+				intent.putExtra("URL", marker.getAction());
+				this.startActivity(intent);
 			}
 			else
 			{
@@ -522,10 +433,23 @@ public class AestheticodesActivity extends ScanActivity implements ExperienceLis
 						.show();
 			}
 
-			Experience experienceToChangeTo = this.experiences.getSelected(marker.getChangeToExperienceWithIdOnOpen());
-			if (experienceToChangeTo != null)
+			if (marker.getChangeToExperienceOnOpen() != null)
 			{
-				this.experience.set(experienceToChangeTo);
+				Log.i("EXPERIENCE_PREF", "Changing to experience "+marker.getChangeToExperienceOnOpen());
+				Experience experienceToChangeTo = this.experiences.getSelected(marker.getChangeToExperienceOnOpen());
+				if (experienceToChangeTo != null)
+				{
+					Log.i("EXPERIENCE_PREF", "..."+experienceToChangeTo.getName());
+					this.experienceController.set(experienceToChangeTo);
+				}
+				else
+				{
+					Log.i("EXPERIENCE_PREF", "...but it was not found!");
+				}
+			}
+			else
+			{
+				Log.i("EXPERIENCE_PREF", "getChangeToExperienceOnOpen is null");
 			}
 		}
 	}

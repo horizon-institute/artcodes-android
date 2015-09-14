@@ -20,7 +20,6 @@
 package uk.ac.horizon.aestheticodes.activities;
 
 import android.content.Intent;
-import android.net.Uri;
 import android.os.Bundle;
 import android.support.v7.app.ActionBarActivity;
 import android.view.View;
@@ -70,7 +69,11 @@ public class MarkerActivity extends ActionBarActivity
 	{
 		if(marker != null && marker.getAction() != null && !marker.getAction().isEmpty())
 		{
-			startActivity(new Intent(Intent.ACTION_VIEW, Uri.parse(marker.getAction())));
+			Intent intent = new Intent();
+			intent.putExtra("caller", this.getClass().getCanonicalName());
+			intent.setClass(this, WebActivity.class);
+			intent.putExtra("URL", marker.getAction());
+			this.startActivity(intent);
 		}
 	}
 }

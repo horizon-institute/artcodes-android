@@ -120,4 +120,6 @@
     <string name="hello_world">Hello world!</string>
     <string name="action_settings">Settings</string>
 	<string name="resetHistoryOnOpen">Reset history on open</string>
+    <string name="title_activity_selector">Storicodes</string>
+    <string name="title_activity_web">Web Activity</string>
 </resources>

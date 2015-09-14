@@ -28,7 +28,7 @@ public class Marker
 	private String image;
 	private boolean showDetail = false;
 	private boolean resetHistoryOnOpen = true;
-	private String changeToExperienceWithIdOnOpen;
+	private String changeToExperienceOnOpen;
 
 	public String getCode()
 	{
@@ -100,13 +100,13 @@ public class Marker
 		this.resetHistoryOnOpen = resetHistoryOnOpen;
 	}
 
-	public String getChangeToExperienceWithIdOnOpen()
+	public String getChangeToExperienceOnOpen()
 	{
-		return changeToExperienceWithIdOnOpen;
+		return changeToExperienceOnOpen;
 	}
 
-	public void setChangeToExperienceWithIdOnOpen(String id)
+	public void setChangeToExperienceOnOpen(String id)
 	{
-		this.changeToExperienceWithIdOnOpen = id;
+		this.changeToExperienceOnOpen = id;
 	}
 }
