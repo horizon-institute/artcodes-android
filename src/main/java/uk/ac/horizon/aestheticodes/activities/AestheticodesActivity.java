@@ -410,7 +410,7 @@ public class AestheticodesActivity extends ScanActivity implements ExperienceLis
 			{
 				camera.stop();
 				Intent intent = new Intent(this, MarkerActivity.class);
-				intent.putExtra("experience", experience.get().getId());
+				intent.putExtra("experience", experienceController.get().getId());
 				intent.putExtra("marker", marker.getCode());
 
 				startActivity(intent);
