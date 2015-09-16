@@ -33,6 +33,7 @@ import android.os.Build;
 import android.os.Bundle;
 import android.preference.PreferenceManager;
 import android.support.v7.app.ActionBarActivity;
+import android.util.DisplayMetrics;
 import android.util.Log;
 import android.view.KeyCharacterMap;
 import android.view.KeyEvent;
@@ -447,7 +448,8 @@ public class ScanActivity extends ActionBarActivity implements ExperienceControl
 		SharedPreferences sharedPreferences = PreferenceManager.getDefaultSharedPreferences(getApplicationContext());
 		boolean fullscreen = sharedPreferences.getBoolean("fullscreen", false);
 
-		p.height = fullscreen ? 250 : surfaceView.getHeight() - frame.bottom;
+		DisplayMetrics displayMetrics = getResources().getDisplayMetrics();
+		p.height = fullscreen ? ((int)(150 * displayMetrics.density)) : surfaceView.getHeight() - frame.bottom;
 		p.width = frame.width();
 		bottomView.setLayoutParams(p);
 
