@@ -30,7 +30,7 @@ import android.widget.Button;
 import android.widget.LinearLayout;
 import android.widget.TextView;
 import com.google.gson.Gson;
-import uk.ac.horizon.aestheticodes.R;
+import uk.ac.horizon.storicodes.R;
 import uk.ac.horizon.aestheticodes.controllers.ExperienceParser;
 import uk.ac.horizon.aestheticodes.model.Experience;
 

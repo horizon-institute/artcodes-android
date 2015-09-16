@@ -30,7 +30,7 @@ import android.util.Log;
 import android.view.View;
 import com.squareup.picasso.Picasso;
 import com.squareup.picasso.Target;
-import uk.ac.horizon.aestheticodes.R;
+import uk.ac.horizon.storicodes.R;
 import uk.ac.horizon.aestheticodes.properties.Format;
 
 public class ColorImageBinding extends ViewBinding implements Target

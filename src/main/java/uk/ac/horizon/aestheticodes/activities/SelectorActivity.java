@@ -37,7 +37,7 @@ import android.view.Window;
 import android.widget.CompoundButton;
 
 import uk.ac.horizon.aestheticodes.Aestheticodes;
-import uk.ac.horizon.aestheticodes.R;
+import uk.ac.horizon.storicodes.R;
 import uk.ac.horizon.aestheticodes.controllers.ExperienceListAdapter;
 import uk.ac.horizon.aestheticodes.model.Experience;
 

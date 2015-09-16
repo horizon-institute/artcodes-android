@@ -24,7 +24,7 @@ import android.os.Bundle;
 import android.support.v7.app.ActionBarActivity;
 import android.view.View;
 import uk.ac.horizon.aestheticodes.Aestheticodes;
-import uk.ac.horizon.aestheticodes.R;
+import uk.ac.horizon.storicodes.R;
 import uk.ac.horizon.aestheticodes.controllers.ExperienceListController;
 import uk.ac.horizon.aestheticodes.model.Marker;
 import uk.ac.horizon.aestheticodes.properties.bindings.ColorImageBinding;

@@ -45,7 +45,7 @@ import java.util.ArrayList;
 import java.util.List;
 
 import uk.ac.horizon.aestheticodes.Aestheticodes;
-import uk.ac.horizon.aestheticodes.R;
+import uk.ac.horizon.storicodes.R;
 import uk.ac.horizon.aestheticodes.controllers.ExperienceListAdapter;
 import uk.ac.horizon.aestheticodes.controllers.ExperienceListController;
 import uk.ac.horizon.aestheticodes.core.activities.ScanActivity;

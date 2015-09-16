@@ -32,7 +32,7 @@ import android.view.View;
 import android.widget.AdapterView;
 import android.widget.ListView;
 import uk.ac.horizon.aestheticodes.Aestheticodes;
-import uk.ac.horizon.aestheticodes.R;
+import uk.ac.horizon.storicodes.R;
 import uk.ac.horizon.aestheticodes.controllers.ExperienceListAdapter;
 import uk.ac.horizon.aestheticodes.model.Experience;
 

@@ -42,7 +42,7 @@ import android.widget.TextView;
 import com.google.android.gms.location.places.Place;
 import com.google.android.gms.location.places.ui.PlacePicker;
 import uk.ac.horizon.aestheticodes.Aestheticodes;
-import uk.ac.horizon.aestheticodes.R;
+import uk.ac.horizon.storicodes.R;
 import uk.ac.horizon.aestheticodes.controllers.ExperienceFileController;
 import uk.ac.horizon.aestheticodes.controllers.ExperienceListController;
 import uk.ac.horizon.aestheticodes.dialogs.IntDialogFragment;

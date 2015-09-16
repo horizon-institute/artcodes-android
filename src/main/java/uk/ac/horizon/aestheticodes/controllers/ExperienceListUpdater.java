@@ -31,7 +31,7 @@ import android.preference.PreferenceManager;
 import android.util.Log;
 import com.google.android.gms.auth.GoogleAuthUtil;
 import com.google.gson.Gson;
-import uk.ac.horizon.aestheticodes.R;
+import uk.ac.horizon.storicodes.R;
 import uk.ac.horizon.aestheticodes.model.Experience;
 import uk.ac.horizon.aestheticodes.model.ExperienceUpdate;
 

@@ -30,7 +30,7 @@ import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.WindowManager;
-import uk.ac.horizon.aestheticodes.R;
+import uk.ac.horizon.storicodes.R;
 import uk.ac.horizon.aestheticodes.activities.ExperienceEditActivity;
 import uk.ac.horizon.aestheticodes.model.Marker;
 import uk.ac.horizon.aestheticodes.properties.MarkerFormat;

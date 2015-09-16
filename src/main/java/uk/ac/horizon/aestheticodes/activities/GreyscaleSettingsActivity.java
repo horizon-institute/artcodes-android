@@ -55,7 +55,7 @@ import java.util.List;
 import java.util.UUID;
 
 import uk.ac.horizon.aestheticodes.Aestheticodes;
-import uk.ac.horizon.aestheticodes.R;
+import uk.ac.horizon.storicodes.R;
 import uk.ac.horizon.aestheticodes.controllers.CameraController;
 import uk.ac.horizon.aestheticodes.controllers.ExperienceFileController;
 import uk.ac.horizon.aestheticodes.controllers.ExperienceListController;

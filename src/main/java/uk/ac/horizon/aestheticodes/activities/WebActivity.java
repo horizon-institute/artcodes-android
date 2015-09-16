@@ -25,7 +25,7 @@ import java.io.InputStreamReader;
 import java.util.Scanner;
 
 import uk.ac.horizon.aestheticodes.Aestheticodes;
-import uk.ac.horizon.aestheticodes.R;
+import uk.ac.horizon.storicodes.R;
 import uk.ac.horizon.aestheticodes.model.Experience;
 
 public class WebActivity extends Activity
