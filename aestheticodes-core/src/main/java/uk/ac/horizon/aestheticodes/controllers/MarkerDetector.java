@@ -58,7 +58,7 @@ public class MarkerDetector
 
 	public static interface Listener
 	{
-		void markerChanged(String markerCode, List<Integer> newMarkerContourIndexes, int historySize, Scene scene);
+		void markerChanged(String markerCode, List<Integer> newMarkerContourIndexes, int historySize, Scene scene, boolean detectionInProgress);
 
 		void resultUpdated(boolean detected, Bitmap image);
 	}

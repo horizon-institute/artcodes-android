@@ -153,7 +153,7 @@ public class ScanActivity extends ActionBarActivity implements ExperienceControl
 		}
 	}
 
-	public void markerChanged(final String markerCode, final List<Integer> newMarkerThumbnails, final int historySize, final Scene scene)
+	public void markerChanged(final String markerCode, final List<Integer> newMarkerThumbnails, final int historySize, final Scene scene, boolean detectionInProgress)
 	{
 		if (experienceController.get().getCallback() == null)
 		{

@@ -25,7 +25,6 @@ import android.content.res.Resources;
 import android.net.Uri;
 import android.os.Bundle;
 import android.preference.PreferenceManager;
-import android.support.v7.app.ActionBar;
 import android.util.Log;
 import android.util.TypedValue;
 import android.view.Menu;
@@ -154,7 +153,7 @@ public class AestheticodesActivity extends ScanActivity implements ExperienceLis
 	}
 
 	@Override
-	public void markerChanged(final String markerCode, final List<Integer> newMarkerContourIndexes, final int historySize, final Scene scene)
+	public void markerChanged(final String markerCode, final List<Integer> newMarkerContourIndexes, final int historySize, final Scene scene, boolean detectionInProgress)
 	{
 		Log.i(this.getClass().getName(), "Marker changing from " + currentCode + " to " + markerCode);
 		final String oldCode = currentCode;
@@ -193,6 +192,59 @@ public class AestheticodesActivity extends ScanActivity implements ExperienceLis
 				}
 			});
 		}
+
+		//
+		String hint = null;
+		if (historySize > 0)
+		{
+			hint = "This code is part of a sequence, find the next!";
+		}
+		else if (markerCode!=null)
+		{
+			int numberOfCodes = markerCode.split("\\+").length;
+			switch (numberOfCodes)
+			{
+				case 1:
+					if (experienceController.get()!=null && experienceController.get().getMarkers().containsKey(markerCode))
+					{
+						hint = "Found one!";
+					}
+					else
+					{
+						hint = "Found one... but not one you were looking for...";
+					}
+					break;
+				case 2:
+					hint = "Found two!";
+					break;
+				case 3:
+					hint = "Found three!";
+					break;
+				default:
+					hint = "Found "+numberOfCodes+"!";
+					break;
+			}
+		}
+		else if (detectionInProgress)
+		{
+			hint = "Hold it there!";
+		}
+		else
+		{
+			hint = "Place an Artcode in the camera view";
+		}
+		final String finalHint = new String(hint);
+		runOnUiThread(new Runnable()
+		{
+			@Override
+			public void run()
+			{
+				modeText.setText(finalHint);
+			}
+		});
+
+
+
 
 		final Marker marker = experienceController.get().getMarkers().get(markerCode);
 		if (marker!=null && ((autoOpen && experienceController.get().getOpenMode()==null) || (experienceController.get().getOpenMode()!=null && experienceController.get().getOpenMode().equals("autoOpen"))))
@@ -403,7 +455,7 @@ public class AestheticodesActivity extends ScanActivity implements ExperienceLis
 				{
 					String code = currentCode;
 					currentCode = null;
-					markerChanged(code, null, -1, null);
+					markerChanged(code, null, -1, null, false);
 				}
 			}
 		});

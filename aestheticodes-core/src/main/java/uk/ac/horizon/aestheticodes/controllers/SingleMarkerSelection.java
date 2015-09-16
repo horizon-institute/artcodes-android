@@ -41,7 +41,7 @@ public class SingleMarkerSelection implements MarkerSelection
         if(current != null)
         {
             current = null;
-            callback.markerChanged(null, null, 0, null);
+            callback.markerChanged(null, null, 0, null, false);
         }
     }
 
@@ -83,7 +83,7 @@ public class SingleMarkerSelection implements MarkerSelection
             if(current != null)
             {
                 current = null;
-                callback.markerChanged(null, null, 0, null);
+                callback.markerChanged(null, null, 0, null, !occurrences.isEmpty());
             }
         }
         else
@@ -92,7 +92,7 @@ public class SingleMarkerSelection implements MarkerSelection
             if(current == null || !current.equals(code))
             {
                 current = code;
-                callback.markerChanged(code, null, 0, null);
+                callback.markerChanged(code, null, 0, null, !occurrences.isEmpty());
             }
         }
     }

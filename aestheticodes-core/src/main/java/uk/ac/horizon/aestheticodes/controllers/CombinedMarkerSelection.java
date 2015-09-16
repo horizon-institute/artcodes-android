@@ -36,6 +36,7 @@ public class CombinedMarkerSelection implements MarkerSelection
 
     private final Map<String, MarkerCode> occurrences = new HashMap<>();
     private String current = null;
+    private boolean currentOccurrencesIsEmpty = true;
 
     private final List<String> history = new ArrayList<>();
     private long lastAddedToHistory = 0;
@@ -51,7 +52,7 @@ public class CombinedMarkerSelection implements MarkerSelection
         if(current != null)
         {
             current = null;
-            callback.markerChanged(null, null, this.historySize(), null);
+            callback.markerChanged(null, null, this.historySize(), null, false);
         }
     }
 
@@ -139,20 +140,22 @@ public class CombinedMarkerSelection implements MarkerSelection
 
         if (found == null)
         {
-            if(current != null || historyHasChanged || !thumbnails.isEmpty())
+            if(current != null || historyHasChanged || !thumbnails.isEmpty() || currentOccurrencesIsEmpty!=occurrences.isEmpty())
             {
                 current = null;
-                callback.markerChanged(null, thumbnails, this.historySize(), scene);
+                currentOccurrencesIsEmpty = occurrences.isEmpty();
+                callback.markerChanged(null, thumbnails, this.historySize(), scene, !occurrences.isEmpty());
             }
         }
         else
         {
-            if(current == null || !current.equals(found) || historyHasChanged || !thumbnails.isEmpty())
+            if(current == null || !current.equals(found) || historyHasChanged || !thumbnails.isEmpty() || currentOccurrencesIsEmpty!=occurrences.isEmpty())
             {
                 current = found;
+                currentOccurrencesIsEmpty = occurrences.isEmpty();
                 if (experience.getMarkers().get(current)!=null)
                     shouldClearHistoryOnReset = experience.getMarkers().get(current).getResetHistoryOnOpen();
-                callback.markerChanged(found, thumbnails, this.historySize(), scene);
+                callback.markerChanged(found, thumbnails, this.historySize(), scene, !occurrences.isEmpty());
             }
         }
     }
