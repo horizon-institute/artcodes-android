@@ -85,6 +85,8 @@
 	"thresholdBehaviour": "temporalTile",
 	"openMode": "autoOpen",
 	"ignoreEmptyRegions":true,
+	"relaxedEmbeddedChecksumIgnoreMultipleHollowSegments": true,
+	"relaxedEmbeddedChecksumIgnoreNonHollowDots": true,
 	"markers": [
 	  {
 		"code": "1:2:3:3:4>1:1:3:4:6",
@@ -129,6 +131,7 @@
 	"id": "a564fe42-da31-4544-b317-143637bc9c85",
 	"version": 3,
 	"greyscaleOptions": ["CMYK",1,0,0,0],
+	"invertGreyscale": true,
 	"minRegions": 5,
 	"maxRegions": 5,
 	"checksumModulo": 500,
@@ -220,7 +223,7 @@
 	]
   },
   {
-	"name": "Stalkers (R)",
+	"name": "Stalkers",
 	"id": "053197ac-eedc-4a3f-a248-4ae21b8fb77a",
 	"greyscaleOptions": ["RGB",1,0,0],
 	"minRegions": 5,
@@ -242,7 +245,7 @@
 	]
   },
   {
-	"name": "Stalkers (I)",
+	"name": "Stalkers",
 	"id": "11066c08-5396-4f1e-9caa-65074e1610d4",
 	"minRegions": 5,
 	"maxRegions": 5,
@@ -262,7 +265,7 @@
 	]
   },
   {
-	"name": "Stalkers (Yk)",
+	"name": "Stalkers",
 	"id": "bfba3046-3707-4ce7-a201-3764fdf528e6",
 	"greyscaleOptions": ["CMYK",0,0,1,0],
 	"minRegions": 5,
@@ -283,7 +286,7 @@
 	]
   },
   {
-	"name": "Stalkers (K)",
+	"name": "Stalkers",
 	"id": "6de1d9cf-c1c9-44bb-9c3f-ba34a525a895",
 	"greyscaleOptions": ["CMYK",0,0,0,1],
 	"minRegions": 5,
@@ -304,9 +307,9 @@
 	]
   },
   {
-	"name": "Stalkers (C)",
+	"name": "Stalkers",
 	"id": "de41cdd6-0cc2-4736-b716-3dc346281ca1",
-	"greyscaleOptions": ["CMYK",1,0,0,0],
+	"greyscaleOptions": ["CMY",1,0,0],
 	"minRegions": 5,
 	"maxRegions": 5,
 	"checksumModulo": 500,
@@ -325,9 +328,9 @@
 	]
   },
   {
-	"name": "Stalkers (C2)",
+	"name": "Stalkers",
 	"id": "bf510b9c-4478-4d03-b0b0-ed6aec6103d9",
-	"greyscaleOptions": ["CMYK",1,0,0,0],
+	"greyscaleOptions": ["CMY",1,0,0],
 	"minRegions": 5,
 	"maxRegions": 5,
 	"checksumModulo": 500,

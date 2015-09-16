@@ -121,7 +121,8 @@ public class AestheticodesActivity extends ScanActivity implements ExperienceLis
 
 		List<Experience> experienceList = experiences.getExperiences();
 		int index = experienceList.indexOf(experience);
-		getSupportActionBar().setSelectedNavigationItem(index);
+		//getSupportActionBar().setSelectedNavigationItem(index);
+		getSupportActionBar().setTitle(experience.getName());
 
 		this.saveSelectedExperienceToPreferences();
 	}
@@ -312,6 +313,9 @@ public class AestheticodesActivity extends ScanActivity implements ExperienceLis
 		markerButton = (Button) view.findViewById(R.id.markerButton);
 		
 		experiences = new ExperienceListAdapter(getSupportActionBar().getThemedContext(), Aestheticodes.getExperiences());
+
+		getSupportActionBar().setDisplayShowTitleEnabled(true);
+		/*
 		//noinspection deprecation
 		getSupportActionBar().setNavigationMode(ActionBar.NAVIGATION_MODE_LIST);
 		//noinspection deprecation
@@ -329,6 +333,7 @@ public class AestheticodesActivity extends ScanActivity implements ExperienceLis
 				return true;
 			}
 		});
+		*/
 	}
 
 	@Override
@@ -345,8 +350,13 @@ public class AestheticodesActivity extends ScanActivity implements ExperienceLis
 	{
 		switch (item.getItemId())
 		{
-			case R.id.experiences:
-				startActivity(new Intent(this, ExperienceListActivity.class));
+			case R.id.about:
+				Intent intent = new Intent();
+				intent.putExtra("caller", this.getClass().getCanonicalName());
+				intent.setClass(this, WebActivity.class);
+				intent.putExtra("URL", "ABOUT");
+				intent.putExtra("experience", experienceController.get().getId());
+				this.startActivity(intent);
 				return true;
 			default:
 				return super.onOptionsItemSelected(item);

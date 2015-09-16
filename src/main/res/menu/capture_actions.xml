@@ -19,8 +19,7 @@
 
 <menu xmlns:tools="http://schemas.android.com/tools" xmlns:android="http://schemas.android.com/apk/res/android"
       tools:context=".activities.CameraActivity" xmlns:app="http://schemas.android.com/apk/res-auto">
-	<item android:id="@+id/experiences"
-	      android:title="@string/action_experiences"
-	      android:icon="@drawable/ic_apps_white_36dp"
+	<item android:id="@+id/about"
+	      android:title="@string/action_about"
 	      app:showAsAction="ifRoom" />
 </menu>

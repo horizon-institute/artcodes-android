@@ -24,6 +24,7 @@
 	<string name="marker_open">Open %s</string>
 	<string name="marker_open_code">Open Marker %s</string>
 	<string name="action_experiences">Experiences</string>
+	<string name="action_about">About</string>
 	<string name="marker_add">Add Marker</string>
 	<string name="dialog_action_set">Set</string>
 	<string name="dialog_action_cancel">Cancel</string>
