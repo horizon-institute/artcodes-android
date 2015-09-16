@@ -98,6 +98,12 @@ public class MarkerDetector
 							// 'image' is only big enough to fit the Y values which is a hack for an easy greyscale image.
 							//image.put(0, 0, data);
 
+							if (size==null)
+							{
+								size = camera.getSize();
+								continue;
+							}
+
 
 							SharedPreferences sharedPreferences = PreferenceManager.getDefaultSharedPreferences(context.getApplicationContext());
 							boolean fullscreen = sharedPreferences.getBoolean("fullscreen", false);
@@ -148,7 +154,7 @@ public class MarkerDetector
 									Imgproc.cvtColor(croppedImage, drawImage, Imgproc.COLOR_GRAY2BGRA);
 									printFps();
 								}
-								else if (cameraDrawMode==CameraDrawMode.normal)
+								else if (cameraDrawMode==CameraDrawMode.normal && drawImage!=null)
 								{
 									drawImage.setTo(new Scalar(0, 0, 0));
 								}

@@ -35,10 +35,11 @@ import android.view.Surface;
 import android.view.SurfaceHolder;
 import android.view.ViewConfiguration;
 import android.view.WindowManager;
-import uk.ac.horizon.aestheticodes.core.R;
 
 import java.io.IOException;
 import java.util.List;
+
+import uk.ac.horizon.aestheticodes.core.R;
 
 @SuppressWarnings("deprecation")
 public class CameraController implements Camera.PreviewCallback, SurfaceHolder.Callback
@@ -115,10 +116,18 @@ public class CameraController implements Camera.PreviewCallback, SurfaceHolder.C
 		return 0;
 	}
 
+	private Camera.Parameters afterParameters;
 	public Camera.Size getSize()
 	{
-		Camera.Parameters afterParameters = camera.getParameters();
-		return afterParameters.getPreviewSize();
+		try
+		{
+			this.afterParameters = camera.getParameters();
+		}
+		catch (Exception e)
+		{
+			Log.w(this.getClass().getName(), e.getMessage(), e);
+		}
+		return afterParameters!=null ? afterParameters.getPreviewSize() : null;
 	}
 
 	public boolean isFront()
@@ -183,8 +192,11 @@ public class CameraController implements Camera.PreviewCallback, SurfaceHolder.C
 
 	public void stop()
 	{
-		camera.stopPreview();
-		camera.setPreviewCallback(null);
+		if (camera!=null)
+		{
+			camera.stopPreview();
+			camera.setPreviewCallback(null);
+		}
 	}
 
 	public void surfaceChanged(SurfaceHolder holder, int format, int w, int h)
@@ -361,6 +373,11 @@ public class CameraController implements Camera.PreviewCallback, SurfaceHolder.C
 		}
 
 		Camera.Size camera = getSize();
+		if (camera==null)
+		{
+			Log.e(this.getClass().getName(), "Something went wrong getting the camera preview size!");
+			return;
+		}
 		int degrees = getRotation();
 		if (degrees == 0 || degrees == 180)
 		{

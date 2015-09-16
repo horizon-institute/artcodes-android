@@ -99,21 +99,21 @@ public class AestheticodesActivity extends ScanActivity implements ExperienceLis
 		}
 	}
 
-	private void saveSelectedExperienceToPreferences()
+	private void saveSelectedExperienceToPreferences(Experience experience)
 	{
-		if(this.experienceController.get() != null && this.experienceController.get().getId() != null)
+		if(experience != null && experience.getId() != null)
 		{
-			String experienceId = this.experienceController.get().getId();
+			String experienceId = experience.getId();
 			Log.i("EXPERIENCE_PREF", "Setting experience id " + experienceId);
 			SharedPreferences sharedPreferences = PreferenceManager.getDefaultSharedPreferences(getApplicationContext());
 			SharedPreferences.Editor editor = sharedPreferences.edit();
-			editor.putString("experience", experienceController.get().getId());
+			editor.putString("experience", experience.getId());
 			editor.apply();
 		}
 	}
 
 	@Override
-	public void experienceSelected(Experience experience)
+	public void experienceSelected(final Experience experience)
 	{
 		super.experienceSelected(experience);
 
@@ -122,9 +122,16 @@ public class AestheticodesActivity extends ScanActivity implements ExperienceLis
 		List<Experience> experienceList = experiences.getExperiences();
 		int index = experienceList.indexOf(experience);
 		//getSupportActionBar().setSelectedNavigationItem(index);
-		getSupportActionBar().setTitle(experience.getName());
+		runOnUiThread(new Runnable()
+		{
+			@Override
+			public void run()
+			{
+				getSupportActionBar().setTitle(experience.getName());
+			}
+		});
 
-		this.saveSelectedExperienceToPreferences();
+		this.saveSelectedExperienceToPreferences(experience);
 	}
 
 
@@ -445,12 +452,12 @@ public class AestheticodesActivity extends ScanActivity implements ExperienceLis
 
 			if (marker.getChangeToExperienceOnOpen() != null)
 			{
-				Log.i("EXPERIENCE_PREF", "Changing to experience "+marker.getChangeToExperienceOnOpen());
+				Log.i("EXPERIENCE_PREF", "Changing to experience "+marker.getChangeToExperienceOnOpen() + "(from marker.getChangeToExperienceOnOpen)");
 				Experience experienceToChangeTo = this.experiences.getSelected(marker.getChangeToExperienceOnOpen());
 				if (experienceToChangeTo != null)
 				{
-					Log.i("EXPERIENCE_PREF", "..."+experienceToChangeTo.getName());
-					this.experienceController.set(experienceToChangeTo);
+					Log.i("EXPERIENCE_PREF", "..." + experienceToChangeTo.getName());
+					saveSelectedExperienceToPreferences(experienceToChangeTo);
 				}
 				else
 				{

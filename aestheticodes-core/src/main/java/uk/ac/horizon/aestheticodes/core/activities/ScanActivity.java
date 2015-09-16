@@ -493,6 +493,7 @@ public class ScanActivity extends ActionBarActivity implements ExperienceControl
 		if (camera != null)
 		{
 			detector.stop();
+			camera.stop();
 			camera.release();
 		}
 	}
