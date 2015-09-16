@@ -22,15 +22,18 @@ package uk.ac.horizon.aestheticodes.controllers;
 import android.accounts.Account;
 import android.accounts.AccountManager;
 import android.content.Context;
+import android.content.SharedPreferences;
 import android.net.ConnectivityManager;
 import android.net.NetworkInfo;
 import android.net.Uri;
 import android.os.AsyncTask;
+import android.preference.PreferenceManager;
 import android.util.Log;
 import com.google.android.gms.auth.GoogleAuthUtil;
 import com.google.gson.Gson;
 import uk.ac.horizon.aestheticodes.R;
 import uk.ac.horizon.aestheticodes.model.Experience;
+import uk.ac.horizon.aestheticodes.model.ExperienceUpdate;
 
 import java.io.File;
 import java.io.FileReader;
@@ -108,6 +111,7 @@ class ExperienceListUpdater extends AsyncTask<String, Experience, Collection<Str
 				Log.i("", "Loading...");
 				try
 				{
+					// try to load experience from file
 					Experience[] experiencesLoaded = null;
 					File experienceFile = new File(context.getFilesDir(), "experiences.json");
 					if (experienceFile.exists())
@@ -123,6 +127,7 @@ class ExperienceListUpdater extends AsyncTask<String, Experience, Collection<Str
 						}
 					}
 
+					// if that failed try to load experiences from app assets
 					if (experiencesLoaded == null)
 					{
 						Log.i("", "Loading default.json");
@@ -144,48 +149,53 @@ class ExperienceListUpdater extends AsyncTask<String, Experience, Collection<Str
 				}
 			}
 
-			/*
-
-			for(String experienceURL: experienceURLs)
+			while (true)
 			{
+				SharedPreferences sharedPreferences = PreferenceManager.getDefaultSharedPreferences(context.getApplicationContext());
+				String updateURL = sharedPreferences.getString("updateURL", "http://www.nottingham.ac.uk/~pszwp/storicodes/update.json");
+				Log.i("UPDATE","Attempting to update from "+updateURL);
 				try
 				{
-					if(experienceURL != null)
+					if (updateURL != null)
 					{
-						if (experienceURL.startsWith("http:") || experienceURL.startsWith("https:"))
+						if (updateURL.startsWith("http:") || updateURL.startsWith("https:"))
 						{
 							ConnectivityManager cm = (ConnectivityManager) context.getSystemService(Context.CONNECTIVITY_SERVICE);
 							NetworkInfo netInfo = cm.getActiveNetworkInfo();
 							if (netInfo != null && netInfo.isConnectedOrConnecting())
 							{
-								HttpURLConnection connection = get(experienceURL);
+								HttpURLConnection connection = get(updateURL);
 								if (connection.getResponseCode() == 200)
 								{
-									Experience experience = gson.fromJson(new InputStreamReader(connection.getInputStream()), Experience.class);
-									experience.setOp(Experience.Operation.add);
-									experience.setOrigin(experienceURL);
+									Log.i("UPDATE","Received update file.");
+									ExperienceUpdate experienceUpdate = gson.fromJson(new InputStreamReader(connection.getInputStream()), ExperienceUpdate.class);
 
-									publishProgress(experience);
+									if (experienceUpdate.getUpdateURL() != null && !experienceUpdate.getUpdateURL().equals(updateURL))
+									{
+										Log.i("UPDATE","Update contains different update URL...");
+										SharedPreferences.Editor editor = sharedPreferences.edit();
+										editor.putString("updateURL", experienceUpdate.getUpdateURL());
+										editor.apply();
+										continue;
+									}
+									else if (experienceUpdate.getExperiences() != null)
+									{
+										Log.i("UPDATE",experienceUpdate.getExperiences().length + " experiences in update file.");
+										publishProgress(experienceUpdate.getExperiences());
+										break;
+									}
 								}
 							}
 						}
-						else if (experienceURL.startsWith("content:"))
-						{
-							final InputStream inputStream = context.getContentResolver().openInputStream(Uri.parse(experienceURL));
-							final Experience intentExperience = gson.fromJson(new InputStreamReader(inputStream, "UTF-8"), Experience.class);
-							intentExperience.setOp(Experience.Operation.add);
-							intentExperience.setOrigin(experienceURL);
-
-							publishProgress(intentExperience);
-						}
 					}
 				}
-				catch(Exception e)
+				catch (Exception e)
 				{
-					Log.e("", e.getMessage(), e);
+					Log.e("UPDATE", e.getMessage(), e);
+					break;
 				}
 			}
-
+			/*
 			Log.i(TAG, "Updating...");
 			ConnectivityManager cm = (ConnectivityManager) context.getSystemService(Context.CONNECTIVITY_SERVICE);
 			NetworkInfo netInfo = cm.getActiveNetworkInfo();

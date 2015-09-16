@@ -47,7 +47,11 @@ public class ExperienceListController
 
 			synchronized (this.experiences)
 			{
-				this.experiences.put(experience.getId(), experience);
+				Experience prevExperience = this.experiences.get(experience.getId());
+				if (prevExperience==null || prevExperience.getVersion() < experience.getVersion())
+				{
+					this.experiences.put(experience.getId(), experience);
+				}
 			}
 		}
 
