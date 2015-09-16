@@ -188,7 +188,7 @@ public class AestheticodesActivity extends ScanActivity implements ExperienceLis
 		}
 
 		final Marker marker = experienceController.get().getMarkers().get(markerCode);
-		if (marker!=null && autoOpen)
+		if (marker!=null && ((autoOpen && experienceController.get().getOpenMode()==null) || (experienceController.get().getOpenMode()!=null && experienceController.get().getOpenMode().equals("autoOpen"))))
 		{
 			openMarker(marker);
 		}

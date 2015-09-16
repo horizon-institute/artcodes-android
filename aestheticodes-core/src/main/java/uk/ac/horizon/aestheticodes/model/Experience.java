@@ -77,6 +77,17 @@ public class Experience
     private String startUpURL = null;
     private boolean relaxedEmbeddedChecksumIgnoreMultipleHollowSegments = false;
     private boolean relaxedEmbeddedChecksumIgnoreNonHollowDots = false;
+    private String openMode = null;
+
+    public String getOpenMode()
+    {
+        return this.openMode;
+    }
+
+    public void setOpenMode(String openMode)
+    {
+        this.openMode = openMode;
+    }
 
     public String getStartUpURL()
     {
