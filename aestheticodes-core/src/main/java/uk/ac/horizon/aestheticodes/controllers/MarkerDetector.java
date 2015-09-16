@@ -19,8 +19,11 @@
 
 package uk.ac.horizon.aestheticodes.controllers;
 
+import android.content.Context;
+import android.content.SharedPreferences;
 import android.graphics.Bitmap;
 import android.hardware.Camera;
+import android.preference.PreferenceManager;
 import android.util.Log;
 import org.opencv.android.Utils;
 import org.opencv.core.Core;
@@ -95,7 +98,19 @@ public class MarkerDetector
 							// 'image' is only big enough to fit the Y values which is a hack for an easy greyscale image.
 							//image.put(0, 0, data);
 
-							Mat yuvImage = MatTranform.cropNV12Data(data, size.height, size.width);
+
+							SharedPreferences sharedPreferences = PreferenceManager.getDefaultSharedPreferences(context.getApplicationContext());
+							boolean fullscreen = sharedPreferences.getBoolean("fullscreen", false);
+							Mat yuvImage;
+							if (fullscreen)
+							{
+								yuvImage = new Mat(size.height+size.height/2, size.width, CvType.CV_8UC1);
+								yuvImage.put(0,0, data);
+							}
+							else
+							{
+								yuvImage = MatTranform.cropNV12Data(data, size.height, size.width);
+							}
 
 							synchronized (greyscalerLock)
 							{
@@ -521,6 +536,7 @@ public class MarkerDetector
 	private final CameraController camera;
 	private final Listener listener;
 	private final ExperienceController experience;
+	private Context context;
 	private DetectionThread thread = null;
 	private boolean running = true;
 	private boolean resetDrawImage = false;
@@ -534,11 +550,13 @@ public class MarkerDetector
 
 	private MarkerCodeFactory markerCodeFactory = null;
 
-	public MarkerDetector(CameraController camera, Listener listener, ExperienceController experience)
+
+	public MarkerDetector(CameraController camera, Listener listener, ExperienceController experience, Context context)
 	{
 		this.camera = camera;
 		this.listener = listener;
 		this.experience = experience;
+		this.context = context;
 	}
 
 	public MarkerDrawMode getMarkerDrawMode()

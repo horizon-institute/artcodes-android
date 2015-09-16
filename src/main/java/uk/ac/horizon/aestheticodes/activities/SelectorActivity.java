@@ -9,11 +9,13 @@ import android.content.SharedPreferences;
 import android.preference.PreferenceManager;
 import android.support.v7.app.ActionBarActivity;
 import android.os.Bundle;
+import android.support.v7.widget.SwitchCompat;
 import android.util.Log;
 import android.view.Menu;
 import android.view.MenuItem;
 import android.view.View;
 import android.view.Window;
+import android.widget.CompoundButton;
 
 import uk.ac.horizon.aestheticodes.Aestheticodes;
 import uk.ac.horizon.aestheticodes.R;
@@ -36,6 +38,23 @@ public class SelectorActivity extends Activity
         experienceList = new ExperienceListAdapter(this, Aestheticodes.getExperiences());
 
         experienceList.update();
+
+        SwitchCompat fullscreenSwitch = (SwitchCompat) findViewById(R.id.fullscreen_switch);
+        SharedPreferences sharedPreferences = PreferenceManager.getDefaultSharedPreferences(getApplicationContext());
+        boolean fullscreen = sharedPreferences.getBoolean("fullscreen", false);
+        fullscreenSwitch.setChecked(fullscreen);
+
+        fullscreenSwitch.setOnCheckedChangeListener(new CompoundButton.OnCheckedChangeListener()
+        {
+            @Override
+            public void onCheckedChanged(CompoundButton compoundButton, boolean b)
+            {
+                SharedPreferences sharedPreferences = PreferenceManager.getDefaultSharedPreferences(getApplicationContext());
+                SharedPreferences.Editor editor = sharedPreferences.edit();
+                editor.putBoolean("fullscreen", b);
+                editor.apply();
+            }
+        });
     }
 
     @Override

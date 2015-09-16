@@ -22,9 +22,11 @@ package uk.ac.horizon.aestheticodes.controllers;
 import android.annotation.TargetApi;
 import android.app.AlertDialog;
 import android.content.Context;
+import android.content.SharedPreferences;
 import android.graphics.Rect;
 import android.hardware.Camera;
 import android.os.Build;
+import android.preference.PreferenceManager;
 import android.util.DisplayMetrics;
 import android.util.Log;
 import android.view.KeyCharacterMap;
@@ -373,7 +375,20 @@ public class CameraController implements Camera.PreviewCallback, SurfaceHolder.C
 		final int height = (size * viewHeight / camera.height);
 		final int leftOffset = (viewWidth - width) / 2;
 		final int topOffset = (viewHeight - height) / 2;
-		framingRect = new Rect(leftOffset, topOffset, leftOffset + width, topOffset + height);
+
+
+		SharedPreferences sharedPreferences = PreferenceManager.getDefaultSharedPreferences(context.getApplicationContext());
+		boolean fullscreen = sharedPreferences.getBoolean("fullscreen", false);
+		if (fullscreen)
+		{
+			framingRect = new Rect(0, 0, viewWidth, viewHeight);
+		}
+		else
+		{
+			framingRect = new Rect(leftOffset, topOffset, leftOffset + width, topOffset + height);
+		}
+
+
 		Log.d(TAG, "Calculated framing rect: " + framingRect);
 	}
 

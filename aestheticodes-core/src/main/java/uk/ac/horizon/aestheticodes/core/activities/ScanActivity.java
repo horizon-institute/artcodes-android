@@ -23,6 +23,7 @@ import android.animation.AnimatorListenerAdapter;
 import android.annotation.TargetApi;
 import android.content.Context;
 import android.content.Intent;
+import android.content.SharedPreferences;
 import android.content.res.Resources;
 import android.graphics.Bitmap;
 import android.graphics.Color;
@@ -30,6 +31,7 @@ import android.graphics.Rect;
 import android.net.Uri;
 import android.os.Build;
 import android.os.Bundle;
+import android.preference.PreferenceManager;
 import android.support.v7.app.ActionBarActivity;
 import android.util.Log;
 import android.view.KeyCharacterMap;
@@ -176,7 +178,7 @@ public class ScanActivity extends ActionBarActivity implements ExperienceControl
 
 		camera = new CameraController(this);
 
-		detector = new MarkerDetector(camera, this, experienceController);
+		detector = new MarkerDetector(camera, this, experienceController, this);
 
 		viewfinder = (ViewfinderView) findViewById(R.id.viewfinder);
 		viewfinder.setCamera(camera);
@@ -441,7 +443,11 @@ public class ScanActivity extends ActionBarActivity implements ExperienceControl
 		Log.i(TAG, "Frame = " + frame + ", " + viewfinder.getWidth());
 		ViewGroup.LayoutParams p = bottomView.getLayoutParams();
 		SurfaceView surfaceView = (SurfaceView) findViewById(R.id.preview);
-		p.height = surfaceView.getHeight() - frame.bottom;
+
+		SharedPreferences sharedPreferences = PreferenceManager.getDefaultSharedPreferences(getApplicationContext());
+		boolean fullscreen = sharedPreferences.getBoolean("fullscreen", false);
+
+		p.height = fullscreen ? 250 : surfaceView.getHeight() - frame.bottom;
 		p.width = frame.width();
 		bottomView.setLayoutParams(p);
 
