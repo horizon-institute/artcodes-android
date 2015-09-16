@@ -75,8 +75,8 @@ public class Experience
 
     // addition values
     private String startUpURL = null;
-    private boolean relaxedEmbeddedChecksum1 = false;
-    private boolean relaxedEmbeddedChecksum2 = false;
+    private boolean relaxedEmbeddedChecksumIgnoreMultipleHollowSegments = false;
+    private boolean relaxedEmbeddedChecksumIgnoreNonHollowDots = false;
 
     public String getStartUpURL()
     {
@@ -88,24 +88,24 @@ public class Experience
         this.startUpURL = startUpURL;
     }
 
-    public boolean isRelaxedEmbeddedChecksum1()
+    public boolean isRelaxedEmbeddedChecksumIgnoreMultipleHollowSegments()
     {
-        return this.relaxedEmbeddedChecksum1;
+        return this.relaxedEmbeddedChecksumIgnoreMultipleHollowSegments;
     }
 
-    public boolean isRelaxedEmbeddedChecksum2()
+    public boolean isRelaxedEmbeddedChecksumIgnoreNonHollowDots()
     {
-        return this.relaxedEmbeddedChecksum2;
+        return this.relaxedEmbeddedChecksumIgnoreNonHollowDots;
     }
 
-    public void setRelaxedEmbeddedChecksum1(boolean b)
+    public void setRelaxedEmbeddedChecksumIgnoreMultipleHollowSegments(boolean b)
     {
-        this.relaxedEmbeddedChecksum1 = b;
+        this.relaxedEmbeddedChecksumIgnoreMultipleHollowSegments = b;
     }
 
-    public void setRelaxedEmbeddedChecksum2(boolean b)
+    public void setRelaxedEmbeddedChecksumIgnoreNonHollowDots(boolean b)
     {
-        this.relaxedEmbeddedChecksum2 = b;
+        this.relaxedEmbeddedChecksumIgnoreNonHollowDots = b;
     }
 
     public Experience()

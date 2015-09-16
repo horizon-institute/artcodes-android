@@ -144,7 +144,7 @@ public class MarkerCodeFactory implements MarkerCode.MarkerDrawer {
                 // Not a normal region so look for embedded checksum:
                 if (experience.getEmbeddedChecksum() && embeddedChecksumValue == null) // if we've not found it yet:
                 {
-                    embeddedChecksumValue = getEmbeddedChecksumValueForRegion(currentRegionIndex, hierarchy);
+                    embeddedChecksumValue = getEmbeddedChecksumValueForRegion(currentRegionIndex, hierarchy, experience);
                     if (embeddedChecksumValue != null)
                     {
                         embeddedChecksumRegionIndex = currentRegionIndex;
@@ -245,7 +245,7 @@ public class MarkerCodeFactory implements MarkerCode.MarkerDrawer {
         return nodes[FIRST_NODE] < 0;
     }
 
-    private static Integer getEmbeddedChecksumValueForRegion(int regionIndex, Mat hierarchy)
+    private static Integer getEmbeddedChecksumValueForRegion(int regionIndex, Mat hierarchy, Experience experience)
     {
         // Find the first dot index:
         double[] nodes = hierarchy.get(0, regionIndex);
@@ -259,27 +259,27 @@ public class MarkerCodeFactory implements MarkerCode.MarkerDrawer {
         int dotCount = 0;
         while (currentDotIndex >= 0)
         {
-            if (verifyAsDoubleLeaf(currentDotIndex, hierarchy))
+            if (verifyAsDoubleLeaf(currentDotIndex, hierarchy, experience))
             {
                 dotCount++;
-                // Get next dot node:
-                nodes = hierarchy.get(0, currentDotIndex);
-                currentDotIndex = (int) nodes[NEXT_NODE];
             }
-            else
+            else if (!experience.isRelaxedEmbeddedChecksumIgnoreNonHollowDots())
             {
-                return null; // Dot is not a leaf in the hierarchy.
+                return -1; // Wrong number of levels.
             }
+            // Get next dot node:
+            nodes = hierarchy.get(0, currentDotIndex);
+            currentDotIndex = (int) nodes[NEXT_NODE];
         }
 
         return dotCount;
     }
 
-    private static Boolean verifyAsDoubleLeaf(int nodeIndex, Mat hierarchy)
+    private static Boolean verifyAsDoubleLeaf(int nodeIndex, Mat hierarchy, Experience experience)
     {
         double[] nodes = hierarchy.get(0, nodeIndex);
         return nodes[FIRST_NODE] >= 0 && // has a child node, and
-                hierarchy.get(0,(int)nodes[FIRST_NODE])[NEXT_NODE] < 0 && //the child has no siblings, and
+                (hierarchy.get(0,(int)nodes[FIRST_NODE])[NEXT_NODE] < 0 || experience.isRelaxedEmbeddedChecksumIgnoreMultipleHollowSegments()) && //the child has no siblings, and
                 verifyAsLeaf((int)nodes[FIRST_NODE], hierarchy);// the child is a leaf
     }
 
