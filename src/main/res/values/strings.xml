@@ -4,125 +4,125 @@
   ~ creation of aesthetically pleasing, even beautiful, codes.
   ~ Copyright (C) 2013-2015  The University of Nottingham
   ~
-  ~ This program is free software: you can redistribute it and/or modify
-  ~ it under the terms of the GNU Affero General Public License as published
-  ~ by the Free Software Foundation, either version 3 of the License, or
-  ~ (at your option) any later version.
+  ~     This program is free software: you can redistribute it and/or modify
+  ~     it under the terms of the GNU Affero General Public License as published
+  ~     by the Free Software Foundation, either version 3 of the License, or
+  ~     (at your option) any later version.
   ~
-  ~ This program is distributed in the hope that it will be useful,
-  ~ but WITHOUT ANY WARRANTY; without even the implied warranty of
-  ~ MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
-  ~ GNU Affero General Public License for more details.
+  ~     This program is distributed in the hope that it will be useful,
+  ~     but WITHOUT ANY WARRANTY; without even the implied warranty of
+  ~     MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+  ~     GNU Affero General Public License for more details.
   ~
-  ~ You should have received a copy of the GNU Affero General Public License
-  ~ along using this program.  If not, see <http://www.gnu.org/licenses/>.
+  ~     You should have received a copy of the GNU Affero General Public License
+  ~     along with this program.  If not, see <http://www.gnu.org/licenses/>.
   -->
 <resources>
-	<string name="anywhere">Anywhere</string>
-	<string name="app_name">Artcodes</string>
-	<string name="hint_near">Nearby</string>
-	<string name="hint_new">New</string>
-	<string name="hint_popular">Popular</string>
-	<string name="property_set">Set %s</string>
-	<string name="code_text">Marker %s</string>
-	<string name="marker_open">Open %s</string>
-	<string name="found">Found %s</string>
-	<string name="marker_open_code">Open Marker %s</string>
-	<string name="action_experiences">Experiences</string>
-	<string name="action_add">Add Action</string>
-	<string name="dialog_action_set">Set</string>
-	<string name="dialog_action_cancel">Cancel</string>
-	<string name="dialog_action_delete">Delete</string>
-	<string name="markerCode">Marker Code</string>
-	<string name="recommended">Recommended</string>
-	<string name="recent">Recent</string>
-	<string name="welcome_title">Create beautiful codes with Artcodes</string>
-	<string name="welcome_text">Artcodes uses a different marker scheme that allows us to create aesthetically pleasing, even beautiful, codes. \n\nThese codes are designed and can be made part of the patterns and designs we see on everyday objects in our lives.</string>
-	<string name="more">More</string>
-	<string name="gotit">Got It</string>
-	<!-- Default WebSites -->
-	<string name="URL">URL</string>
-	<string name="regions">Regions</string>
-	<string name="regions_desc">The number of regions in a valid Artcode.</string>
-	<string name="regions_value">%s Regions</string>
-	<string name="maxRegionValue">Max Items per Region</string>
-	<string name="maxRegionValue_desc">The maximum number of items that can be in a region in a valid Artcode.</string>
-	<string name="checksumModulo">Checksum</string>
-	<string name="checksumModulo_off">Checksum Disabled</string>
-	<string name="checksumModulo_value">Checksum %d</string>
-	<string name="checksumModulo_embedded_value">Embedded Checksum %d</string>
-	<string name="checksumModulo_desc">A code is only valid if the total of all its values are divisible by the checksum.</string>
+    <string name="anywhere">Anywhere</string>
+    <string name="app_name">Artcodes</string>
+    <string name="hint_near">Nearby</string>
+    <string name="hint_new">New</string>
+    <string name="hint_popular">Popular</string>
+    <string name="property_set">Set %s</string>
+    <string name="code_text">Marker %s</string>
+    <string name="marker_open">Open %s</string>
+    <string name="found">Found %s</string>
+    <string name="marker_open_code">Open Marker %s</string>
+    <string name="action_experiences">Experiences</string>
+    <string name="action_add">Add Action</string>
+    <string name="dialog_action_set">Set</string>
+    <string name="dialog_action_cancel">Cancel</string>
+    <string name="dialog_action_delete">Delete</string>
+    <string name="markerCode">Marker Code</string>
+    <string name="recommended">Recommended</string>
+    <string name="recent">Recent</string>
+    <string name="welcome_title">Create beautiful codes with Artcodes</string>
+    <string name="welcome_text">Artcodes uses a different marker scheme that allows us to create aesthetically pleasing, even beautiful, codes. \n\nThese codes are designed and can be made part of the patterns and designs we see on everyday objects in our lives.</string>
+    <string name="more">More</string>
+    <string name="gotit">Got It</string>
+    <!-- Default WebSites -->
+    <string name="URL">URL</string>
+    <string name="regions">Regions</string>
+    <string name="regions_desc">The number of regions in a valid Artcode.</string>
+    <string name="regions_value">%s Regions</string>
+    <string name="maxRegionValue">Max Items per Region</string>
+    <string name="maxRegionValue_desc">The maximum number of items that can be in a region in a valid Artcode.</string>
+    <string name="checksumModulo">Checksum</string>
+    <string name="checksumModulo_off">Checksum Disabled</string>
+    <string name="checksumModulo_value">Checksum %d</string>
+    <string name="checksumModulo_embedded_value">Embedded Checksum %d</string>
+    <string name="checksumModulo_desc">A code is only valid if the total of all its values are divisible by the checksum.</string>
     <string name="embeddedChecksum">Embedded Checksum</string>
 
-	<string name="markerDeleteConfirmTitle">Delete Marker %s?</string>
-	<string name="markerDeleteConfirmMessage">Marker %s will be permanently deleted</string>
+    <string name="markerDeleteConfirmTitle">Delete Marker %s?</string>
+    <string name="markerDeleteConfirmMessage">Marker %s will be permanently deleted</string>
 
-	<string name="experienceDeleteConfirmTitle">Delete %s?</string>
-	<string name="experienceDeleteConfirmMessage">%s will be permanently deleted</string>
-	<string name="save">Save</string>
-	<string name="save_to">Save to %s</string>
-	<string name="deleteConfirm">Delete</string>
-	<string name="deleteCancel">Cancel</string>
+    <string name="experienceDeleteConfirmTitle">Delete %s?</string>
+    <string name="experienceDeleteConfirmMessage">%s will be permanently deleted</string>
+    <string name="save">Save</string>
+    <string name="save_to">Save to %s</string>
+    <string name="deleteConfirm">Delete</string>
+    <string name="deleteCancel">Cancel</string>
 
-	<string name="open_in_browser">Open in Browser</string>
-	<string name="experience_add">Add Experience</string>
-	<string name="experiences">Experiences</string>
-	<string name="experience_edit">Edit Experience</string>
-	<string name="markerTitle">Title</string>
-	<string name="markerDescription">Description</string>
-	<string name="markerSettings">Marker Settings</string>
-	<string name="markerImage">Image</string>
-	<string name="experienceTitle">Title</string>
-	<string name="experienceDescription">Description</string>
-	<string name="experienceIcon">Icon</string>
-	<string name="experienceImage">Image</string>
-	<string name="actions">Actions</string>
-	<string name="markerShowDetail">Show Detail Screen</string>
-	<string name="delete">Delete</string>
-	<string name="minimum">Minimum</string>
-	<string name="maximum">Maximum</string>
-	<string name="share">Share</string>
-	<string name="download">Download</string>
-	<string name="open">Open</string>
-	<string name="edit">Edit</string>
-	<string name="location">Location</string>
-	<string name="start_date">Start Date</string>
-	<string name="end_date">End Date</string>
-	<string name="scan">Scan</string>
-	<string name="events">Events</string>
-	<string name="availability">Availability</string>
-	<string name="availability_add">Add Availability</string>
-	<string name="action_name">Name</string>
-	<string name="action_deleted">Deleted</string>
-	<string name="action_delete_undo">Undo</string>
-	<string name="marker_config">Marker Configuration</string>
-	<string name="close">close</string>
-	<string name="nav_home">Recommended</string>
-	<string name="nav_library">My Library</string>
-	<string name="favourites">Favourites</string>
-	<string name="favourite">Favourite</string>
-	<string name="device">Device</string>
-	<string name="artcodeServer">Artcode Server</string>
-	<string name="save_google">Save to Artcode Server</string>
-	<string name="save_local">Save to Device</string>
-	<string name="nearby">Nearby</string>
-	<string name="unstar">Unstar</string>
-	<string name="star">Star</string>
-	<string name="nav_starred">Starred</string>
-	<string name="edit_copy">Edit Copy</string>
-	<string name="invert">Invert</string>
-	<string name="presets">Presets</string>
-	<string name="hue">Hue</string>
+    <string name="open_in_browser">Open in Browser</string>
+    <string name="experience_add">Add Experience</string>
+    <string name="experiences">Experiences</string>
+    <string name="experience_edit">Edit Experience</string>
+    <string name="markerTitle">Title</string>
+    <string name="markerDescription">Description</string>
+    <string name="markerSettings">Marker Settings</string>
+    <string name="markerImage">Image</string>
+    <string name="experienceTitle">Title</string>
+    <string name="experienceDescription">Description</string>
+    <string name="experienceIcon">Icon</string>
+    <string name="experienceImage">Image</string>
+    <string name="actions">Actions</string>
+    <string name="markerShowDetail">Show Detail Screen</string>
+    <string name="delete">Delete</string>
+    <string name="minimum">Minimum</string>
+    <string name="maximum">Maximum</string>
+    <string name="share">Share</string>
+    <string name="download">Download</string>
+    <string name="open">Open</string>
+    <string name="edit">Edit</string>
+    <string name="location">Location</string>
+    <string name="start_date">Start Date</string>
+    <string name="end_date">End Date</string>
+    <string name="scan">Scan</string>
+    <string name="events">Events</string>
+    <string name="availability">Availability</string>
+    <string name="availability_add">Add Availability</string>
+    <string name="action_name">Name</string>
+    <string name="action_deleted">Deleted</string>
+    <string name="action_delete_undo">Undo</string>
+    <string name="marker_config">Marker Configuration</string>
+    <string name="close">close</string>
+    <string name="nav_home">Recommended</string>
+    <string name="nav_library">My Library</string>
+    <string name="favourites">Favourites</string>
+    <string name="favourite">Favourite</string>
+    <string name="device">Device</string>
+    <string name="artcodeServer">Artcode Server</string>
+    <string name="save_google">Save to Artcode Server</string>
+    <string name="save_local">Save to Device</string>
+    <string name="nearby">Nearby</string>
+    <string name="unstar">Unstar</string>
+    <string name="star">Star</string>
+    <string name="nav_starred">Starred</string>
+    <string name="edit_copy">Edit Copy</string>
+    <string name="invert">Invert</string>
+    <string name="presets">Presets</string>
+    <string name="hue">Hue</string>
 
-	<string name="fragment_info">Info</string>
-	<string name="fragment_availability">Availability</string>
-	<string name="fragment_action">Actions</string>
-	<string name="fragment_colour">Colour</string>
-	<string name="nav_features">Features</string>
-	<string name="nav_addaccount">Add Account</string>
-	<string name="navigation_libraries">Libraries</string>
-	<string name="server">Server (%s)</string>
-	<string name="availability_private">Private</string>
-	<string name="read_more">Read More</string>
-	<string name="scan_history">Scan History</string>
+    <string name="fragment_info">Info</string>
+    <string name="fragment_availability">Availability</string>
+    <string name="fragment_action">Actions</string>
+    <string name="fragment_colour">Colour</string>
+    <string name="nav_features">Features</string>
+    <string name="nav_addaccount">Add Account</string>
+    <string name="navigation_libraries">Libraries</string>
+    <string name="server">Server (%s)</string>
+    <string name="availability_private">Private</string>
+    <string name="read_more">Read More</string>
+    <string name="scan_history">Scan History</string>
 </resources>

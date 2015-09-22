@@ -4,52 +4,52 @@
   ~ creation of aesthetically pleasing, even beautiful, codes.
   ~ Copyright (C) 2013-2015  The University of Nottingham
   ~
-  ~ This program is free software: you can redistribute it and/or modify
-  ~ it under the terms of the GNU Affero General Public License as published
-  ~ by the Free Software Foundation, either version 3 of the License, or
-  ~ (at your option) any later version.
+  ~     This program is free software: you can redistribute it and/or modify
+  ~     it under the terms of the GNU Affero General Public License as published
+  ~     by the Free Software Foundation, either version 3 of the License, or
+  ~     (at your option) any later version.
   ~
-  ~ This program is distributed in the hope that it will be useful,
-  ~ but WITHOUT ANY WARRANTY; without even the implied warranty of
-  ~ MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
-  ~ GNU Affero General Public License for more details.
+  ~     This program is distributed in the hope that it will be useful,
+  ~     but WITHOUT ANY WARRANTY; without even the implied warranty of
+  ~     MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+  ~     GNU Affero General Public License for more details.
   ~
-  ~ You should have received a copy of the GNU Affero General Public License
-  ~ along using this program.  If not, see <http://www.gnu.org/licenses/>.
+  ~     You should have received a copy of the GNU Affero General Public License
+  ~     along with this program.  If not, see <http://www.gnu.org/licenses/>.
   -->
 
 <resources>
-	<string name="noCameraTitle">Camera Unavailable</string>
-	<string name="noCameraMessage">Please try restarting your device.</string>
-	<string name="noCameraButton">OK</string>
+    <string name="noCameraTitle">Camera Unavailable</string>
+    <string name="noCameraMessage">Please try restarting your device.</string>
+    <string name="noCameraButton">OK</string>
 
-	<string name="action_switch_camera">Switch Camera</string>
+    <string name="action_switch_camera">Switch Camera</string>
 
-	<string name="status_searching">Looking for Artcodes…</string>
-	<string name="status_reading">Reading Artcodes…</string>
-	<string name="status_lost">Lost Artcodes</string>
-	<string name="status_found">Found %s</string>
+    <string name="status_searching">Looking for Artcodes…</string>
+    <string name="status_reading">Reading Artcodes…</string>
+    <string name="status_lost">Lost Artcodes</string>
+    <string name="status_found">Found %s</string>
 
-	<string name="auto_open">Open</string>
-	<string name="auto_open_off">Popup</string>
+    <string name="auto_open">Open</string>
+    <string name="auto_open_off">Popup</string>
 
-	<string name="camera_front">Front</string>
-	<string name="camera_rear">Rear</string>
+    <string name="camera_front">Front</string>
+    <string name="camera_rear">Rear</string>
 
-	<string name="draw_threshold_on">Display thresholding</string>
-	<string name="draw_threshold_off">Hide thresholding</string>
+    <string name="draw_threshold_on">Display thresholding</string>
+    <string name="draw_threshold_off">Hide thresholding</string>
 
-	<string name="draw_code">Display marker codes</string>
-	<string name="draw_code_off">Hide marker codes</string>
+    <string name="draw_code">Display marker codes</string>
+    <string name="draw_code_off">Hide marker codes</string>
 
-	<string name="checksum_off">Disabled</string>
+    <string name="checksum_off">Disabled</string>
 
-	<string name="draw_marker_off">Hide marker outlines</string>
-	<string name="draw_marker_outline">Display marker outlines</string>
-	<string name="draw_marker_regions">Display marker outlines and region outlines</string>
-	<string name="display_menu">Display Menu</string>
+    <string name="draw_marker_off">Hide marker outlines</string>
+    <string name="draw_marker_outline">Display marker outlines</string>
+    <string name="draw_marker_regions">Display marker outlines and region outlines</string>
+    <string name="display_menu">Display Menu</string>
 
-	<string name="loading">Loading…</string>
+    <string name="loading">Loading…</string>
 
-	<string name="artcode_scan_scheme">x-artcode-scan</string>
+    <string name="artcode_scan_scheme">x-artcode-scan</string>
 </resources>

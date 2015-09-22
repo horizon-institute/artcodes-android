@@ -1,7 +1,27 @@
+/*
+ * Artcodes recognises a different marker scheme that allows the
+ * creation of aesthetically pleasing, even beautiful, codes.
+ * Copyright (C) 2013-2015  The University of Nottingham
+ *
+ *     This program is free software: you can redistribute it and/or modify
+ *     it under the terms of the GNU Affero General Public License as published
+ *     by the Free Software Foundation, either version 3 of the License, or
+ *     (at your option) any later version.
+ *
+ *     This program is distributed in the hope that it will be useful,
+ *     but WITHOUT ANY WARRANTY; without even the implied warranty of
+ *     MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+ *     GNU Affero General Public License for more details.
+ *
+ *     You should have received a copy of the GNU Affero General Public License
+ *     along with this program.  If not, see <http://www.gnu.org/licenses/>.
+ */
+
 package uk.ac.horizon.artcodes;
 
 
 import android.content.Context;
+
 import com.google.gson.Gson;
 import com.google.gson.GsonBuilder;
 import com.google.gson.JsonArray;
@@ -13,7 +33,9 @@ import com.google.gson.reflect.TypeToken;
 import com.google.gson.stream.JsonReader;
 import com.google.gson.stream.JsonWriter;
 import com.google.gson.typeadapters.RuntimeTypeAdapterFactory;
-import uk.ac.horizon.artcodes.Feature;
+
+import java.io.IOException;
+
 import uk.ac.horizon.artcodes.model.Experience;
 import uk.ac.horizon.artcodes.scanner.R;
 import uk.ac.horizon.artcodes.scanner.process.HueShifter;
@@ -21,8 +43,6 @@ import uk.ac.horizon.artcodes.scanner.process.ImageProcessor;
 import uk.ac.horizon.artcodes.scanner.process.Inverter;
 import uk.ac.horizon.artcodes.scanner.process.ResizeThresholder;
 import uk.ac.horizon.artcodes.scanner.process.TileThresholder;
-
-import java.io.IOException;
 
 public class ExperienceParser
 {
@@ -49,7 +69,8 @@ public class ExperienceParser
 
 	private static class ExperienceTypeAdapterFactor implements TypeAdapterFactory
 	{
-		@SuppressWarnings("unchecked") // we use a runtime check to guarantee that 'C' and 'T' are equal
+		@SuppressWarnings("unchecked")
+		// we use a runtime check to guarantee that 'C' and 'T' are equal
 		public final <T> TypeAdapter<T> create(Gson gson, TypeToken<T> type)
 		{
 			return type.getRawType() == Experience.class ? (TypeAdapter<T>) customizeMyClassAdapter(gson, (TypeToken<Experience>) type) : null;

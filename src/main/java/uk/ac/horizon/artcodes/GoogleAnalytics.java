@@ -3,24 +3,25 @@
  * creation of aesthetically pleasing, even beautiful, codes.
  * Copyright (C) 2013-2015  The University of Nottingham
  *
- * This program is free software: you can redistribute it and/or modify
- * it under the terms of the GNU Affero General Public License as published
- * by the Free Software Foundation, either version 3 of the License, or
- * (at your option) any later version.
+ *     This program is free software: you can redistribute it and/or modify
+ *     it under the terms of the GNU Affero General Public License as published
+ *     by the Free Software Foundation, either version 3 of the License, or
+ *     (at your option) any later version.
  *
- * This program is distributed in the hope that it will be useful,
- * but WITHOUT ANY WARRANTY; without even the implied warranty of
- * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
- * GNU Affero General Public License for more details.
+ *     This program is distributed in the hope that it will be useful,
+ *     but WITHOUT ANY WARRANTY; without even the implied warranty of
+ *     MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+ *     GNU Affero General Public License for more details.
  *
- * You should have received a copy of the GNU Affero General Public License
- * along with this program.  If not, see <http://www.gnu.org/licenses/>.
+ *     You should have received a copy of the GNU Affero General Public License
+ *     along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
 package uk.ac.horizon.artcodes;
 
 import android.content.Context;
 import android.util.Log;
+
 import com.google.android.gms.analytics.HitBuilders;
 import com.google.android.gms.analytics.Logger;
 import com.google.android.gms.analytics.Tracker;
@@ -32,14 +33,14 @@ import java.util.Map;
 public final class GoogleAnalytics
 {
 	private static final String dimensionValue = "experience";
-
-	public enum Target
-	{
-		APP,
-		// Add more trackers here if you need, and update the code in #get(Target) below
-	}
-
 	private static GoogleAnalytics googleAnalytics;
+	private final Map<Target, Tracker> trackers = new HashMap<>();
+	private final Context context;
+
+	private GoogleAnalytics(Context context)
+	{
+		this.context = context.getApplicationContext();
+	}
 
 	public static synchronized void initialize(Context context)
 	{
@@ -115,14 +116,6 @@ public final class GoogleAnalytics
 				.setCustomDimension(1, uri).build());
 	}
 
-	private final Map<Target, Tracker> trackers = new HashMap<>();
-	private final Context context;
-
-	private GoogleAnalytics(Context context)
-	{
-		this.context = context.getApplicationContext();
-	}
-
 	public synchronized Tracker getTracker(Target target)
 	{
 		if (!trackers.containsKey(target))
@@ -140,5 +133,11 @@ public final class GoogleAnalytics
 		}
 
 		return trackers.get(target);
+	}
+
+	public enum Target
+	{
+		APP,
+		// Add more trackers here if you need, and update the code in #get(Target) below
 	}
 }

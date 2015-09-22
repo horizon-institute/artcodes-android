@@ -1,20 +1,20 @@
 /*
- * Artcodes recognises a different action scheme that allows the
+ * Artcodes recognises a different marker scheme that allows the
  * creation of aesthetically pleasing, even beautiful, codes.
  * Copyright (C) 2013-2015  The University of Nottingham
  *
- * This program is free software: you can redistribute it and/or modify
- * it under the terms of the GNU Affero General Public License as published
- * by the Free Software Foundation, either version 3 of the License, or
- * (at your option) any later version.
+ *     This program is free software: you can redistribute it and/or modify
+ *     it under the terms of the GNU Affero General Public License as published
+ *     by the Free Software Foundation, either version 3 of the License, or
+ *     (at your option) any later version.
  *
- * This program is distributed in the hope that it will be useful,
- * but WITHOUT ANY WARRANTY; without even the implied warranty of
- * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
- * GNU Affero General Public License for more details.
+ *     This program is distributed in the hope that it will be useful,
+ *     but WITHOUT ANY WARRANTY; without even the implied warranty of
+ *     MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+ *     GNU Affero General Public License for more details.
  *
- * You should have received a copy of the GNU Affero General Public License
- * along with this program.  If not, see <http://www.gnu.org/licenses/>.
+ *     You should have received a copy of the GNU Affero General Public License
+ *     along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 package uk.ac.horizon.artcodes.activity;
 
@@ -33,12 +33,12 @@ import uk.ac.horizon.artcodes.GoogleAnalytics;
 import uk.ac.horizon.artcodes.databinding.ScannerActionBinding;
 import uk.ac.horizon.artcodes.model.Action;
 import uk.ac.horizon.artcodes.model.Experience;
+import uk.ac.horizon.artcodes.request.IntentSource;
 import uk.ac.horizon.artcodes.request.RequestCallbackBase;
 import uk.ac.horizon.artcodes.scanner.VisibilityAnimator;
 import uk.ac.horizon.artcodes.scanner.activity.ScannerActivity;
 import uk.ac.horizon.artcodes.scanner.detect.ActionDetectionHandler;
 import uk.ac.horizon.artcodes.scanner.detect.MarkerDetectionHandler;
-import uk.ac.horizon.artcodes.request.IntentSource;
 import uk.ac.horizon.artcodes.server.ArtcodeServer;
 import uk.ac.horizon.artcodes.ui.IntentBuilder;
 
@@ -141,8 +141,7 @@ public class ArtcodeActivity extends ScannerActivity
 							if (action.getShowDetail())
 							{
 								ActionActivity.start(ArtcodeActivity.this, action);
-							}
-							else
+							} else
 							{
 								Intent intent = new Intent(Intent.ACTION_VIEW, Uri.parse(action.getUrl()));
 								intent.putExtra(EXTRA_CUSTOM_TABS_SESSION_ID, -1); // -1 or any valid session id returned from newSession() call
@@ -159,8 +158,7 @@ public class ArtcodeActivity extends ScannerActivity
 							actionAnimator.showView();
 						}
 					});
-				}
-				else
+				} else
 				{
 					runOnUiThread(new Runnable()
 					{

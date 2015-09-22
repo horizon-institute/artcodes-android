@@ -1,3 +1,22 @@
+/*
+ * Artcodes recognises a different marker scheme that allows the
+ * creation of aesthetically pleasing, even beautiful, codes.
+ * Copyright (C) 2013-2015  The University of Nottingham
+ *
+ *     This program is free software: you can redistribute it and/or modify
+ *     it under the terms of the GNU Affero General Public License as published
+ *     by the Free Software Foundation, either version 3 of the License, or
+ *     (at your option) any later version.
+ *
+ *     This program is distributed in the hope that it will be useful,
+ *     but WITHOUT ANY WARRANTY; without even the implied warranty of
+ *     MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+ *     GNU Affero General Public License for more details.
+ *
+ *     You should have received a copy of the GNU Affero General Public License
+ *     along with this program.  If not, see <http://www.gnu.org/licenses/>.
+ */
+
 package uk.ac.horizon.artcodes.account;
 
 import android.content.Context;
@@ -6,6 +25,7 @@ import android.graphics.Bitmap;
 import android.graphics.BitmapFactory;
 import android.net.Uri;
 import android.util.Log;
+
 import com.android.volley.toolbox.HttpHeaderParser;
 import com.google.android.gms.auth.GoogleAuthUtil;
 import com.google.common.hash.Hashing;
@@ -13,12 +33,6 @@ import com.google.common.hash.HashingInputStream;
 import com.google.common.hash.HashingOutputStream;
 import com.google.common.io.ByteStreams;
 import com.google.common.reflect.TypeToken;
-import uk.ac.horizon.artcodes.GoogleAnalytics;
-import uk.ac.horizon.artcodes.model.Experience;
-import uk.ac.horizon.artcodes.request.HTTPRequest;
-import uk.ac.horizon.artcodes.request.RequestCallback;
-import uk.ac.horizon.artcodes.request.RequestCallbackBase;
-import uk.ac.horizon.artcodes.server.ArtcodeServer;
 
 import java.io.ByteArrayInputStream;
 import java.io.File;
@@ -34,6 +48,13 @@ import java.util.HashSet;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
+
+import uk.ac.horizon.artcodes.GoogleAnalytics;
+import uk.ac.horizon.artcodes.model.Experience;
+import uk.ac.horizon.artcodes.request.HTTPRequest;
+import uk.ac.horizon.artcodes.request.RequestCallback;
+import uk.ac.horizon.artcodes.request.RequestCallbackBase;
+import uk.ac.horizon.artcodes.server.ArtcodeServer;
 
 public class AppEngineAccount implements Account
 {
@@ -52,8 +73,7 @@ public class AppEngineAccount implements Account
 		try
 		{
 			return GoogleAuthUtil.getToken(server.getContext(), name, "oauth2:email");
-		}
-		catch (Exception e)
+		} catch (Exception e)
 		{
 			GoogleAnalytics.trackException(e);
 		}
@@ -63,7 +83,9 @@ public class AppEngineAccount implements Account
 	@Override
 	public void loadLibrary(final RequestCallback<List<String>> callback)
 	{
-		server.load("https://aestheticodes.appspot.com/experiences", new TypeToken<List<String>>() {}.getType(), new RequestCallbackBase<List<String>>()
+		server.load("https://aestheticodes.appspot.com/experiences", new TypeToken<List<String>>()
+		{
+		}.getType(), new RequestCallbackBase<List<String>>()
 		{
 			@Override
 			public void onResponse(List<String> item)
@@ -147,8 +169,7 @@ public class AppEngineAccount implements Account
 					editor.putString(saved.getId(), getId()).apply();
 
 					HTTPRequest.getQueue(server.getContext()).getCache().remove(saved.getId());
-				}
-				catch (Exception e)
+				} catch (Exception e)
 				{
 					GoogleAnalytics.trackException(e);
 				}
@@ -178,8 +199,7 @@ public class AppEngineAccount implements Account
 					ByteStreams.copy(inputStream, ByteStreams.nullOutputStream());
 					inputStream.close();
 					return inputStream.hash().toString();
-				}
-				else
+				} else
 				{
 					HashingOutputStream outputStream = new HashingOutputStream(Hashing.sha256(), ByteStreams.nullOutputStream());
 					bitmap.compress(Bitmap.CompressFormat.JPEG, 90, outputStream);
@@ -193,8 +213,7 @@ public class AppEngineAccount implements Account
 				if (uri.getScheme().equals("content"))
 				{
 					return server.getContext().getContentResolver().openInputStream(uri);
-				}
-				else if (uri.getScheme().equals("file"))
+				} else if (uri.getScheme().equals("file"))
 				{
 					return new FileInputStream(new File(uri.getPath()));
 				}
@@ -239,8 +258,7 @@ public class AppEngineAccount implements Account
 				{
 					token = getToken();
 					connection.setRequestProperty("Authorization", "Bearer " + token);
-				}
-				catch (Exception e)
+				} catch (Exception e)
 				{
 					GoogleAnalytics.trackException(e);
 				}
@@ -249,8 +267,7 @@ public class AppEngineAccount implements Account
 				{
 					InputStream inputStream = getInputStream(Uri.parse(imageURI));
 					ByteStreams.copy(inputStream, connection.getOutputStream());
-				}
-				else
+				} else
 				{
 					bitmap.compress(Bitmap.CompressFormat.JPEG, 90, connection.getOutputStream());
 				}
@@ -263,8 +280,7 @@ public class AppEngineAccount implements Account
 					{
 						GoogleAuthUtil.invalidateToken(server.getContext(), token);
 					}
-				}
-				else if (connection.getResponseCode() != 200)
+				} else if (connection.getResponseCode() != 200)
 				{
 					Log.w("", "Response " + connection.getResponseCode() + ": " + connection.getResponseMessage());
 				}
@@ -279,20 +295,18 @@ public class AppEngineAccount implements Account
 
 				Log.i("", "Saving id = " + url);
 
-				if(url == null)
+				if (url == null)
 				{
 					url = rootHTTPS;
 					method = "POST";
-				}
-				else
+				} else
 				{
 					url = url.toLowerCase();
-					if(url.startsWith(rootHTTP))
+					if (url.startsWith(rootHTTP))
 					{
 						Log.i("", "== http:// :" + url);
 						url = url.replace("http://", "https://");
-					}
-					else if(!url.startsWith(rootHTTPS))
+					} else if (!url.startsWith(rootHTTPS))
 					{
 						Log.i("", "!= https:// :" + url);
 						url = rootHTTPS;
@@ -310,8 +324,7 @@ public class AppEngineAccount implements Account
 				{
 					token = getToken();
 					connection.setRequestProperty("Authorization", "Bearer " + token);
-				}
-				catch (Exception e)
+				} catch (Exception e)
 				{
 					GoogleAnalytics.trackException(e);
 				}
@@ -330,8 +343,7 @@ public class AppEngineAccount implements Account
 					{
 						GoogleAuthUtil.invalidateToken(server.getContext(), token);
 					}
-				}
-				else if (connection.getResponseCode() != 200)
+				} else if (connection.getResponseCode() != 200)
 				{
 					Log.w("", "Response " + connection.getResponseCode() + ": " + connection.getResponseMessage());
 				}

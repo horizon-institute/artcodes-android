@@ -1,5 +1,5 @@
 /*
- * Aestheticodes recognises a different marker scheme that allows the
+ * Artcodes recognises a different marker scheme that allows the
  * creation of aesthetically pleasing, even beautiful, codes.
  * Copyright (C) 2013-2015  The University of Nottingham
  *
@@ -31,6 +31,16 @@ import java.util.List;
 public abstract class Greyscaler
 {
 	protected static final String KEY = "GREY";
+	/**
+	 * This is a buffer that can be used by sub-classes for storing intermediate color data.
+	 * If the array is not long enough (or null) recreate it at the desired length but never make it smaller.
+	 * Data in this buffer may be overwritten.
+	 */
+	protected byte[] colorPixelBuffer = null;
+
+	public Greyscaler()
+	{
+	}
 
 	public static Greyscaler getGreyscaler(double hueShift, List<Object> greyscaleOptions, boolean invert)
 	{
@@ -76,8 +86,7 @@ public abstract class Greyscaler
 				{
 					return new WeightedChannelRgbGreyscaler(((Number) greyscaleOptions.get(1)).doubleValue(), ((Number) greyscaleOptions.get(2)).doubleValue(), ((Number) greyscaleOptions.get(3)).doubleValue());
 				}
-			}
-			else if (greyscaleOptions.size() == 5 && greyscaleOptions.get(0).equals("CMYK"))
+			} else if (greyscaleOptions.size() == 5 && greyscaleOptions.get(0).equals("CMYK"))
 			{
 				List<Greyscaler> greyscalers = new ArrayList<>();
 				while (greyscalers.size() < threadCount)
@@ -85,8 +94,7 @@ public abstract class Greyscaler
 					greyscalers.add(new CmykGreyscaler(hueShift, ((Number) greyscaleOptions.get(1)).doubleValue(), ((Number) greyscaleOptions.get(2)).doubleValue(), ((Number) greyscaleOptions.get(3)).doubleValue(), ((Number) greyscaleOptions.get(4)).doubleValue(), invert));
 				}
 				return new ThreadedGreyscaler(greyscalers);
-			}
-			else if (greyscaleOptions.size() == 4 && greyscaleOptions.get(0).equals("CMY"))
+			} else if (greyscaleOptions.size() == 4 && greyscaleOptions.get(0).equals("CMY"))
 			{
 				List<Greyscaler> greyscalers = new ArrayList<>();
 				while (greyscalers.size() < threadCount)
@@ -97,17 +105,6 @@ public abstract class Greyscaler
 			}
 		}
 		return null; //new IntensityGreyscaler(hueShift, invert);
-	}
-
-	/**
-	 * This is a buffer that can be used by sub-classes for storing intermediate color data.
-	 * If the array is not long enough (or null) recreate it at the desired length but never make it smaller.
-	 * Data in this buffer may be overwritten.
-	 */
-	protected byte[] colorPixelBuffer = null;
-
-	public Greyscaler()
-	{
 	}
 
 	/**

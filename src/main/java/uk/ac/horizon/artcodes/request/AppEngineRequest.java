@@ -1,22 +1,41 @@
+/*
+ * Artcodes recognises a different marker scheme that allows the
+ * creation of aesthetically pleasing, even beautiful, codes.
+ * Copyright (C) 2013-2015  The University of Nottingham
+ *
+ *     This program is free software: you can redistribute it and/or modify
+ *     it under the terms of the GNU Affero General Public License as published
+ *     by the Free Software Foundation, either version 3 of the License, or
+ *     (at your option) any later version.
+ *
+ *     This program is distributed in the hope that it will be useful,
+ *     but WITHOUT ANY WARRANTY; without even the implied warranty of
+ *     MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+ *     GNU Affero General Public License for more details.
+ *
+ *     You should have received a copy of the GNU Affero General Public License
+ *     along with this program.  If not, see <http://www.gnu.org/licenses/>.
+ */
+
 package uk.ac.horizon.artcodes.request;
 
 import android.accounts.AccountManager;
 import android.content.Context;
 import android.content.SharedPreferences;
-import android.util.Log;
+
 import com.android.volley.NetworkResponse;
 import com.android.volley.VolleyError;
 import com.google.android.gms.auth.GoogleAuthUtil;
-import org.apache.http.HttpStatus;
-import uk.ac.horizon.artcodes.GoogleAnalytics;
-import uk.ac.horizon.artcodes.account.Account;
-import uk.ac.horizon.artcodes.account.AppEngineAccount;
-import uk.ac.horizon.artcodes.server.ArtcodeServer;
 
 import java.lang.reflect.Type;
 import java.util.Collections;
 import java.util.HashMap;
 import java.util.Map;
+
+import uk.ac.horizon.artcodes.GoogleAnalytics;
+import uk.ac.horizon.artcodes.account.Account;
+import uk.ac.horizon.artcodes.account.AppEngineAccount;
+import uk.ac.horizon.artcodes.server.ArtcodeServer;
 
 public class AppEngineRequest<T> extends HTTPRequest<T>
 {
@@ -76,10 +95,10 @@ public class AppEngineRequest<T> extends HTTPRequest<T>
 	protected void onError(RequestCallback<T> target, VolleyError error)
 	{
 		NetworkResponse networkResponse = error.networkResponse;
-		if (networkResponse != null && networkResponse.statusCode == HttpStatus.SC_UNAUTHORIZED)
+		if (networkResponse != null && networkResponse.statusCode == 403)// TODO HttpStatus.SC_UNAUTHORIZED)
 		{
 			String token = getToken();
-			if(token != null)
+			if (token != null)
 			{
 				GoogleAuthUtil.invalidateToken(server.getContext(), token);
 			}
@@ -99,8 +118,7 @@ public class AppEngineRequest<T> extends HTTPRequest<T>
 				headers.put("Authorization", "Bearer " + token);
 				return headers;
 			}
-		}
-		catch (Exception e)
+		} catch (Exception e)
 		{
 			GoogleAnalytics.trackException(e);
 		}
@@ -114,8 +132,8 @@ public class AppEngineRequest<T> extends HTTPRequest<T>
 		public String[] getPrefixes()
 		{
 			return new String[]{"http://aestheticodes.appspot.com/",
-			                    "https://aestheticodes.appspot.com/",
-			                    "https://www.googleapis.com/plus/v1/people/me"};
+					"https://aestheticodes.appspot.com/",
+					"https://www.googleapis.com/plus/v1/people/me"};
 		}
 
 		@Override

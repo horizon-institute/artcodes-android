@@ -1,17 +1,20 @@
 /*
- * Copyright (C) 2011 Google Inc.
+ * Artcodes recognises a different marker scheme that allows the
+ * creation of aesthetically pleasing, even beautiful, codes.
+ * Copyright (C) 2013-2015  The University of Nottingham
  *
- * Licensed under the Apache License, Version 2.0 (the "License");
- * you may not use this file except in compliance with the License.
- * You may obtain a copy of the License at
+ *     This program is free software: you can redistribute it and/or modify
+ *     it under the terms of the GNU Affero General Public License as published
+ *     by the Free Software Foundation, either version 3 of the License, or
+ *     (at your option) any later version.
  *
- *      http://www.apache.org/licenses/LICENSE-2.0
+ *     This program is distributed in the hope that it will be useful,
+ *     but WITHOUT ANY WARRANTY; without even the implied warranty of
+ *     MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+ *     GNU Affero General Public License for more details.
  *
- * Unless required by applicable law or agreed to in writing, software
- * distributed under the License is distributed on an "AS IS" BASIS,
- * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
- * See the License for the specific language governing permissions and
- * limitations under the License.
+ *     You should have received a copy of the GNU Affero General Public License
+ *     along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
 package com.google.gson.typeadapters;
@@ -92,7 +95,7 @@ import java.util.Map;
  *   }}</pre>
  * Both the type field name ({@code "type"}) and the type labels ({@code
  * "Rectangle"}) are configurable.
- * <p/>
+ * <p>
  * <h3>Registering Types</h3>
  * Create a {@code RuntimeTypeAdapter} by passing the base type and type field
  * name to the {@link #of} factory method. If you don't supply an explicit type
@@ -123,6 +126,20 @@ import java.util.Map;
  */
 public final class RuntimeTypeAdapterFactory<T> implements TypeAdapterFactory
 {
+	private final Class<?> baseType;
+	private final String typeFieldName;
+	private final Map<String, Class<?>> labelToSubtype = new LinkedHashMap<>();
+	private final Map<Class<?>, String> subtypeToLabel = new LinkedHashMap<>();
+	private RuntimeTypeAdapterFactory(Class<?> baseType, String typeFieldName)
+	{
+		if (typeFieldName == null || baseType == null)
+		{
+			throw new NullPointerException();
+		}
+		this.baseType = baseType;
+		this.typeFieldName = typeFieldName;
+	}
+
 	/**
 	 * Creates a new runtime type adapter using for {@code baseType} using {@code
 	 * typeFieldName} as the type field name. Type field names are case sensitive.
@@ -139,21 +156,6 @@ public final class RuntimeTypeAdapterFactory<T> implements TypeAdapterFactory
 	public static <T> RuntimeTypeAdapterFactory<T> of(Class<T> baseType)
 	{
 		return new RuntimeTypeAdapterFactory<>(baseType, "type");
-	}
-
-	private final Class<?> baseType;
-	private final String typeFieldName;
-	private final Map<String, Class<?>> labelToSubtype = new LinkedHashMap<>();
-	private final Map<Class<?>, String> subtypeToLabel = new LinkedHashMap<>();
-
-	private RuntimeTypeAdapterFactory(Class<?> baseType, String typeFieldName)
-	{
-		if (typeFieldName == null || baseType == null)
-		{
-			throw new NullPointerException();
-		}
-		this.baseType = baseType;
-		this.typeFieldName = typeFieldName;
 	}
 
 	public <R> TypeAdapter<R> create(Gson gson, TypeToken<R> type)

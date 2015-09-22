@@ -1,3 +1,22 @@
+/*
+ * Artcodes recognises a different marker scheme that allows the
+ * creation of aesthetically pleasing, even beautiful, codes.
+ * Copyright (C) 2013-2015  The University of Nottingham
+ *
+ *     This program is free software: you can redistribute it and/or modify
+ *     it under the terms of the GNU Affero General Public License as published
+ *     by the Free Software Foundation, either version 3 of the License, or
+ *     (at your option) any later version.
+ *
+ *     This program is distributed in the hope that it will be useful,
+ *     but WITHOUT ANY WARRANTY; without even the implied warranty of
+ *     MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+ *     GNU Affero General Public License for more details.
+ *
+ *     You should have received a copy of the GNU Affero General Public License
+ *     along with this program.  If not, see <http://www.gnu.org/licenses/>.
+ */
+
 package uk.ac.horizon.artcodes.server;
 
 import android.content.Context;
@@ -5,8 +24,18 @@ import android.content.SharedPreferences;
 import android.location.Criteria;
 import android.location.Location;
 import android.location.LocationManager;
+
 import com.google.common.reflect.TypeToken;
 import com.google.gson.Gson;
+
+import java.lang.reflect.Type;
+import java.util.ArrayList;
+import java.util.Comparator;
+import java.util.List;
+import java.util.Map;
+import java.util.SortedMap;
+import java.util.TreeMap;
+
 import uk.ac.horizon.artcodes.ExperienceParser;
 import uk.ac.horizon.artcodes.account.Account;
 import uk.ac.horizon.artcodes.account.AppEngineAccount;
@@ -23,14 +52,6 @@ import uk.ac.horizon.artcodes.request.RequestCallback;
 import uk.ac.horizon.artcodes.request.RequestCallbackBase;
 import uk.ac.horizon.artcodes.request.RequestFactory;
 import uk.ac.horizon.artcodes.scanner.camera.CameraAdapter;
-
-import java.lang.reflect.Type;
-import java.util.ArrayList;
-import java.util.Comparator;
-import java.util.List;
-import java.util.Map;
-import java.util.SortedMap;
-import java.util.TreeMap;
 
 public class AppEngineServer implements ArtcodeServer
 {
@@ -82,8 +103,7 @@ public class AppEngineServer implements ArtcodeServer
 			{
 				list.add(account.getId());
 				list.add("local");
-			}
-			else
+			} else
 			{
 				list.add(localIndex, account.getId());
 			}
@@ -97,8 +117,7 @@ public class AppEngineServer implements ArtcodeServer
 		if (id.startsWith(prefix))
 		{
 			return new AppEngineAccount(this, id.substring(prefix.length()));
-		}
-		else if (id.equals("local"))
+		} else if (id.equals("local"))
 		{
 			return new LocalAccount(this);
 		}
@@ -110,11 +129,10 @@ public class AppEngineServer implements ArtcodeServer
 	{
 		final IDList ids = new IDList(context, Account.class.getName(), "accounts");
 		final List<Account> accounts = new ArrayList<>();
-		if(ids.isEmpty())
+		if (ids.isEmpty())
 		{
 			accounts.add(new LocalAccount(this));
-		}
-		else
+		} else
 		{
 			for (String id : ids)
 			{
@@ -159,18 +177,19 @@ public class AppEngineServer implements ArtcodeServer
 	@Override
 	public void loadExperience(final String id, final RequestCallback<Experience> callback)
 	{
-		load(id, Experience.class, new RequestCallbackBase<Experience>() {
+		load(id, Experience.class, new RequestCallbackBase<Experience>()
+		{
 			@Override
 			public void onResponse(Experience item)
 			{
-				if(!item.isEditable())
+				if (!item.isEditable())
 				{
 					SharedPreferences preferences = context.getSharedPreferences(Account.class.getName(), Context.MODE_PRIVATE);
 					String account = preferences.getString(id, null);
-					if(account != null)
+					if (account != null)
 					{
 						String accounts = preferences.getString("accounts", "[]");
-						if(accounts.contains(account))
+						if (accounts.contains(account))
 						{
 							item.setEditable(true);
 						}
@@ -198,7 +217,9 @@ public class AppEngineServer implements ArtcodeServer
 			url = url + "?lat=" + location.getLatitude() + "&lon=" + location.getLongitude();
 		}
 
-		load(url, new TypeToken<Map<String, List<String>>>() {}.getType(), callback);
+		load(url, new TypeToken<Map<String, List<String>>>()
+		{
+		}.getType(), callback);
 	}
 
 	@Override

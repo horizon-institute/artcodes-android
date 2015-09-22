@@ -1,5 +1,5 @@
 /*
- * Aestheticodes recognises a different marker scheme that allows the
+ * Artcodes recognises a different marker scheme that allows the
  * creation of aesthetically pleasing, even beautiful, codes.
  * Copyright (C) 2013-2015  The University of Nottingham
  *
@@ -28,8 +28,13 @@ import android.view.ViewGroup;
 import android.widget.AdapterView;
 import android.widget.CompoundButton;
 import android.widget.SeekBar;
+
 import org.opencv.android.OpenCVLoader;
 import org.opencv.core.Mat;
+
+import java.util.ArrayList;
+import java.util.List;
+
 import uk.ac.horizon.artcodes.GoogleAnalytics;
 import uk.ac.horizon.artcodes.R;
 import uk.ac.horizon.artcodes.databinding.ExperienceEditColourBinding;
@@ -44,9 +49,6 @@ import uk.ac.horizon.artcodes.scanner.process.Inverter;
 import uk.ac.horizon.artcodes.scanner.process.RGBGreyscaler;
 import uk.ac.horizon.artcodes.scanner.process.TileThresholder;
 
-import java.util.ArrayList;
-import java.util.List;
-
 public class ExperienceEditColourFragment extends ExperienceEditFragment
 {
 	static
@@ -59,9 +61,12 @@ public class ExperienceEditColourFragment extends ExperienceEditFragment
 
 	private final Object lockObject = new Object();
 	private final List<ImageProcessor> presets = new ArrayList<>();
+	private final HueShifter hueShifter = new HueShifter();
 	private ExperienceEditColourBinding binding;
 	private CameraAdapter camera;
 	private Overlay overlay;
+	private Inverter inverter;
+	private ImageProcessor preset;
 
 	@Override
 	public int getTitleResource()
@@ -86,10 +91,6 @@ public class ExperienceEditColourFragment extends ExperienceEditFragment
 		}
 		getExperience().getProcessors().add(new TileThresholder());
 	}
-
-	private Inverter inverter;
-	private final HueShifter hueShifter = new HueShifter();
-	private ImageProcessor preset;
 
 	@Nullable
 	@Override
@@ -116,15 +117,15 @@ public class ExperienceEditColourFragment extends ExperienceEditFragment
 			{
 				try
 				{
-					if(hueShifter.getHueShift() != 0)
+					if (hueShifter.getHueShift() != 0)
 					{
 						image = hueShifter.process(image, false);
 					}
-					if(preset != null)
+					if (preset != null)
 					{
 						image = preset.process(image, false);
 					}
-					if(inverter != null)
+					if (inverter != null)
 					{
 						image = inverter.process(image, false);
 					}
@@ -135,8 +136,7 @@ public class ExperienceEditColourFragment extends ExperienceEditFragment
 					}
 
 					overlay.drawThreshold(image);
-				}
-				catch (Exception e)
+				} catch (Exception e)
 				{
 					GoogleAnalytics.trackException(e);
 				}
@@ -154,8 +154,7 @@ public class ExperienceEditColourFragment extends ExperienceEditFragment
 					if (b)
 					{
 						inverter = new Inverter();
-					}
-					else
+					} else
 					{
 						inverter = null;
 					}

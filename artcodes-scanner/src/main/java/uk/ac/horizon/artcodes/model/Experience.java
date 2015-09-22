@@ -3,29 +3,30 @@
  * creation of aesthetically pleasing, even beautiful, codes.
  * Copyright (C) 2013-2015  The University of Nottingham
  *
- * This program is free software: you can redistribute it and/or modify
- * it under the terms of the GNU Affero General Public License as published
- * by the Free Software Foundation, either version 3 of the License, or
- * (at your option) any later version.
+ *     This program is free software: you can redistribute it and/or modify
+ *     it under the terms of the GNU Affero General Public License as published
+ *     by the Free Software Foundation, either version 3 of the License, or
+ *     (at your option) any later version.
  *
- * This program is distributed in the hope that it will be useful,
- * but WITHOUT ANY WARRANTY; without even the implied warranty of
- * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
- * GNU Affero General Public License for more details.
+ *     This program is distributed in the hope that it will be useful,
+ *     but WITHOUT ANY WARRANTY; without even the implied warranty of
+ *     MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+ *     GNU Affero General Public License for more details.
  *
- * You should have received a copy of the GNU Affero General Public License
- * along with this program.  If not, see <http://www.gnu.org/licenses/>.
+ *     You should have received a copy of the GNU Affero General Public License
+ *     along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 package uk.ac.horizon.artcodes.model;
 
 import android.databinding.BaseObservable;
 import android.databinding.Bindable;
 import android.util.Log;
-import uk.ac.horizon.artcodes.scanner.BR;
-import uk.ac.horizon.artcodes.scanner.process.ImageProcessor;
 
 import java.util.ArrayList;
 import java.util.List;
+
+import uk.ac.horizon.artcodes.scanner.BR;
+import uk.ac.horizon.artcodes.scanner.process.ImageProcessor;
 
 public class Experience extends BaseObservable
 {
@@ -63,6 +64,11 @@ public class Experience extends BaseObservable
 	public boolean isEditable()
 	{
 		return editable;
+	}
+
+	public void setEditable(boolean editable)
+	{
+		this.editable = editable;
 	}
 
 	public List<Availability> getAvailabilities()
@@ -110,11 +116,6 @@ public class Experience extends BaseObservable
 	public boolean getEmbeddedChecksum()
 	{
 		return embeddedChecksum;
-	}
-
-	public void setEditable(boolean editable)
-	{
-		this.editable = editable;
 	}
 
 	public void setEmbeddedChecksum(boolean embeddedChecksum)
@@ -256,12 +257,10 @@ public class Experience extends BaseObservable
 		if (markerCodes == null)
 		{
 			return false; // No Code
-		}
-		else if (markerCodes.size() < minRegions)
+		} else if (markerCodes.size() < minRegions)
 		{
 			return false; // Too Short
-		}
-		else if (markerCodes.size() > maxRegions)
+		} else if (markerCodes.size() > maxRegions)
 		{
 			return false; // Too long
 		}
@@ -278,12 +277,10 @@ public class Experience extends BaseObservable
 		if (embeddedChecksum == null && !hasValidChecksum(markerCodes))
 		{
 			return false; // Region Total not Divisable by checksumModulo
-		}
-		else if (this.embeddedChecksum && embeddedChecksum != null && !hasValidEmbeddedChecksum(markerCodes, embeddedChecksum))
+		} else if (this.embeddedChecksum && embeddedChecksum != null && !hasValidEmbeddedChecksum(markerCodes, embeddedChecksum))
 		{
 			return false; // Region Total not Divisable by embeddedChecksum
-		}
-		else if (!this.embeddedChecksum && embeddedChecksum != null)
+		} else if (!this.embeddedChecksum && embeddedChecksum != null)
 		{
 			// Embedded checksum is turned off yet one was provided to this function (this should never happen unless the settings are changed in the middle of detection)
 			return false; // Embedded checksum markers are not valid.
@@ -310,8 +307,7 @@ public class Experience extends BaseObservable
 					{
 						int codeValue = Integer.parseInt(value);
 						maxValue = Math.max(maxValue, codeValue);
-					}
-					catch (Exception e)
+					} catch (Exception e)
 					{
 						Log.w("", e.getMessage(), e);
 					}
@@ -349,14 +345,12 @@ public class Experience extends BaseObservable
 			if (value <= maxRegionValue)
 			{
 				break;
-			}
-			else if (i == 0)
+			} else if (i == 0)
 			{
 				if (size == maxRegions)
 				{
 					return null;
-				}
-				else
+				} else
 				{
 					size++;
 					code = new ArrayList<>();
@@ -366,8 +360,7 @@ public class Experience extends BaseObservable
 					}
 					return code;
 				}
-			}
-			else
+			} else
 			{
 				number = code.get(i - 1);
 				value = number + 1;

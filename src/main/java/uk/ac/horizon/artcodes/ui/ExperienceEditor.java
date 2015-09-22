@@ -1,3 +1,22 @@
+/*
+ * Artcodes recognises a different marker scheme that allows the
+ * creation of aesthetically pleasing, even beautiful, codes.
+ * Copyright (C) 2013-2015  The University of Nottingham
+ *
+ *     This program is free software: you can redistribute it and/or modify
+ *     it under the terms of the GNU Affero General Public License as published
+ *     by the Free Software Foundation, either version 3 of the License, or
+ *     (at your option) any later version.
+ *
+ *     This program is distributed in the hope that it will be useful,
+ *     but WITHOUT ANY WARRANTY; without even the implied warranty of
+ *     MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+ *     GNU Affero General Public License for more details.
+ *
+ *     You should have received a copy of the GNU Affero General Public License
+ *     along with this program.  If not, see <http://www.gnu.org/licenses/>.
+ */
+
 package uk.ac.horizon.artcodes.ui;
 
 import android.content.Context;
@@ -5,6 +24,7 @@ import android.databinding.BaseObservable;
 import android.databinding.Bindable;
 import android.widget.CompoundButton;
 import android.widget.SeekBar;
+
 import uk.ac.horizon.artcodes.R;
 import uk.ac.horizon.artcodes.model.Experience;
 import uk.ac.horizon.artcodes.scanner.BR;
@@ -55,7 +75,8 @@ public class ExperienceEditor extends BaseObservable
 
 	public CompoundButton.OnCheckedChangeListener getEmbeddedListener()
 	{
-		return new CompoundButton.OnCheckedChangeListener() {
+		return new CompoundButton.OnCheckedChangeListener()
+		{
 			@Override
 			public void onCheckedChanged(CompoundButton buttonView, boolean isChecked)
 			{
@@ -101,12 +122,10 @@ public class ExperienceEditor extends BaseObservable
 		if (experience.getChecksumModulo() <= 1)
 		{
 			return context.getString(R.string.checksumModulo_off);
-		}
-		else if (experience.getEmbeddedChecksum())
+		} else if (experience.getEmbeddedChecksum())
 		{
 			return context.getString(R.string.checksumModulo_embedded_value, experience.getChecksumModulo());
-		}
-		else
+		} else
 		{
 			return context.getString(R.string.checksumModulo_value, experience.getChecksumModulo());
 		}

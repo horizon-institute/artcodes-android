@@ -3,18 +3,18 @@
  * creation of aesthetically pleasing, even beautiful, codes.
  * Copyright (C) 2013-2015  The University of Nottingham
  *
- * This program is free software: you can redistribute it and/or modify
- * it under the terms of the GNU Affero General Public License as published
- * by the Free Software Foundation, either version 3 of the License, or
- * (at your option) any later version.
+ *     This program is free software: you can redistribute it and/or modify
+ *     it under the terms of the GNU Affero General Public License as published
+ *     by the Free Software Foundation, either version 3 of the License, or
+ *     (at your option) any later version.
  *
- * This program is distributed in the hope that it will be useful,
- * but WITHOUT ANY WARRANTY; without even the implied warranty of
- * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
- * GNU Affero General Public License for more details.
+ *     This program is distributed in the hope that it will be useful,
+ *     but WITHOUT ANY WARRANTY; without even the implied warranty of
+ *     MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+ *     GNU Affero General Public License for more details.
  *
- * You should have received a copy of the GNU Affero General Public License
- * along with this program.  If not, see <http://www.gnu.org/licenses/>.
+ *     You should have received a copy of the GNU Affero General Public License
+ *     along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
 package uk.ac.horizon.artcodes.activity;
@@ -34,6 +34,10 @@ import android.view.MenuItem;
 import android.view.View;
 import android.widget.AdapterView;
 import android.widget.ArrayAdapter;
+
+import java.util.ArrayList;
+import java.util.List;
+
 import uk.ac.horizon.artcodes.Feature;
 import uk.ac.horizon.artcodes.GoogleAnalytics;
 import uk.ac.horizon.artcodes.R;
@@ -47,51 +51,10 @@ import uk.ac.horizon.artcodes.fragment.ExperienceEditInfoFragment;
 import uk.ac.horizon.artcodes.model.Experience;
 import uk.ac.horizon.artcodes.ui.IntentBuilder;
 
-import java.util.ArrayList;
-import java.util.List;
-
 public class ExperienceEditActivity extends ExperienceActivityBase
 {
 	public static final int IMAGE_PICKER_REQUEST = 121;
 	public static final int ICON_PICKER_REQUEST = 123;
-
-	public class ExperienceEditPagerAdapter extends FragmentPagerAdapter
-	{
-		private final List<ExperienceEditFragment> fragments = new ArrayList<>();
-
-		public ExperienceEditPagerAdapter(FragmentManager fm)
-		{
-			super(fm);
-
-			fragments.add(new ExperienceEditInfoFragment());
-			fragments.add(new ExperienceEditAvailabilityFragment());
-			fragments.add(new ExperienceEditActionFragment());
-			if (Feature.get(getApplicationContext(), R.bool.feature_edit_colour).isEnabled())
-			{
-				fragments.add(new ExperienceEditColourFragment());
-			}
-		}
-
-		@Override
-		public int getCount()
-		{
-			return fragments.size();
-		}
-
-		@Override
-		public Fragment getItem(int position)
-		{
-			return fragments.get(position);
-		}
-
-		@Override
-		public CharSequence getPageTitle(int position)
-		{
-			// Generate title based on item position
-			return getString(fragments.get(position).getTitleResource());
-		}
-	}
-
 	private ExperienceEditBinding binding;
 	private Account account;
 	private List<Account> accounts;
@@ -195,8 +158,7 @@ public class ExperienceEditActivity extends ExperienceActivityBase
 				Uri fullPhotoUri = data.getData();
 				getExperience().setImage(fullPhotoUri.toString());
 			}
-		}
-		else if (requestCode == ICON_PICKER_REQUEST)
+		} else if (requestCode == ICON_PICKER_REQUEST)
 		{
 			if (resultCode == RESULT_OK)
 			{
@@ -271,6 +233,43 @@ public class ExperienceEditActivity extends ExperienceActivityBase
 		if (intent.resolveActivity(getPackageManager()) != null)
 		{
 			startActivityForResult(intent, request_id);
+		}
+	}
+
+	public class ExperienceEditPagerAdapter extends FragmentPagerAdapter
+	{
+		private final List<ExperienceEditFragment> fragments = new ArrayList<>();
+
+		public ExperienceEditPagerAdapter(FragmentManager fm)
+		{
+			super(fm);
+
+			fragments.add(new ExperienceEditInfoFragment());
+			fragments.add(new ExperienceEditAvailabilityFragment());
+			fragments.add(new ExperienceEditActionFragment());
+			if (Feature.get(getApplicationContext(), R.bool.feature_edit_colour).isEnabled())
+			{
+				fragments.add(new ExperienceEditColourFragment());
+			}
+		}
+
+		@Override
+		public int getCount()
+		{
+			return fragments.size();
+		}
+
+		@Override
+		public Fragment getItem(int position)
+		{
+			return fragments.get(position);
+		}
+
+		@Override
+		public CharSequence getPageTitle(int position)
+		{
+			// Generate title based on item position
+			return getString(fragments.get(position).getTitleResource());
 		}
 	}
 }

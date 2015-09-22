@@ -3,18 +3,18 @@
  * creation of aesthetically pleasing, even beautiful, codes.
  * Copyright (C) 2013-2015  The University of Nottingham
  *
- * This program is free software: you can redistribute it and/or modify
- * it under the terms of the GNU Affero General Public License as published
- * by the Free Software Foundation, either version 3 of the License, or
- * (at your option) any later version.
+ *     This program is free software: you can redistribute it and/or modify
+ *     it under the terms of the GNU Affero General Public License as published
+ *     by the Free Software Foundation, either version 3 of the License, or
+ *     (at your option) any later version.
  *
- * This program is distributed in the hope that it will be useful,
- * but WITHOUT ANY WARRANTY; without even the implied warranty of
- * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
- * GNU Affero General Public License for more details.
+ *     This program is distributed in the hope that it will be useful,
+ *     but WITHOUT ANY WARRANTY; without even the implied warranty of
+ *     MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+ *     GNU Affero General Public License for more details.
  *
- * You should have received a copy of the GNU Affero General Public License
- * along with this program.  If not, see <http://www.gnu.org/licenses/>.
+ *     You should have received a copy of the GNU Affero General Public License
+ *     along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
 package uk.ac.horizon.artcodes.scanner.detect;
@@ -22,8 +22,6 @@ package uk.ac.horizon.artcodes.scanner.detect;
 import org.opencv.core.Mat;
 import org.opencv.core.MatOfPoint;
 import org.opencv.imgproc.Imgproc;
-import uk.ac.horizon.artcodes.model.Experience;
-import uk.ac.horizon.artcodes.scanner.overlay.Overlay;
 
 import java.util.ArrayList;
 import java.util.Collections;
@@ -31,6 +29,9 @@ import java.util.Comparator;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+
+import uk.ac.horizon.artcodes.model.Experience;
+import uk.ac.horizon.artcodes.scanner.overlay.Overlay;
 
 public class MarkerDetector
 {
@@ -73,8 +74,7 @@ public class MarkerDetector
 				{
 					return REGION_INVALID; // Too many dots.
 				}
-			}
-			else
+			} else
 			{
 				return REGION_INVALID; // Dot is not a leaf in the hierarchy.
 			}
@@ -112,8 +112,7 @@ public class MarkerDetector
 				// Get next dot node:
 				nodes = hierarchy.get(0, currentDotIndex);
 				currentDotIndex = (int) nodes[NEXT_NODE];
-			}
-			else
+			} else
 			{
 				return null; // Dot is not a leaf in the hierarchy.
 			}
@@ -136,8 +135,7 @@ public class MarkerDetector
 		if (markerDetails != null)
 		{
 			return new Marker(this.getCodeFor(markerDetails), markerDetails);
-		}
-		else
+		} else
 		{
 			return null;
 		}
@@ -167,8 +165,7 @@ public class MarkerDetector
 			overlay.drawMarkers(foundMarkers, contours);
 
 			return foundMarkers;
-		}
-		finally
+		} finally
 		{
 			contours.clear();
 			hierarchy.release();

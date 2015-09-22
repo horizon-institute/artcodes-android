@@ -1,3 +1,22 @@
+/*
+ * Artcodes recognises a different marker scheme that allows the
+ * creation of aesthetically pleasing, even beautiful, codes.
+ * Copyright (C) 2013-2015  The University of Nottingham
+ *
+ *     This program is free software: you can redistribute it and/or modify
+ *     it under the terms of the GNU Affero General Public License as published
+ *     by the Free Software Foundation, either version 3 of the License, or
+ *     (at your option) any later version.
+ *
+ *     This program is distributed in the hope that it will be useful,
+ *     but WITHOUT ANY WARRANTY; without even the implied warranty of
+ *     MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+ *     GNU Affero General Public License for more details.
+ *
+ *     You should have received a copy of the GNU Affero General Public License
+ *     along with this program.  If not, see <http://www.gnu.org/licenses/>.
+ */
+
 package uk.ac.horizon.artcodes.ui;
 
 import android.databinding.BindingAdapter;
@@ -9,6 +28,7 @@ import android.widget.Button;
 import android.widget.EditText;
 import android.widget.ImageView;
 import android.widget.TextView;
+
 import com.android.volley.RequestQueue;
 import com.android.volley.VolleyError;
 import com.android.volley.toolbox.ImageLoader;
@@ -33,8 +53,7 @@ public final class Bindings
 			if (url.startsWith("content:") || url.startsWith("file:"))
 			{
 				view.setImageURI(Uri.parse(url));
-			}
-			else
+			} else
 			{
 				if (imageLoader == null)
 				{
@@ -101,8 +120,7 @@ public final class Bindings
 		if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.JELLY_BEAN_MR1)
 		{
 			view.setCompoundDrawablesRelativeWithIntrinsicBounds(icon, 0, 0, 0);
-		}
-		else
+		} else
 		{
 			view.setCompoundDrawablesWithIntrinsicBounds(icon, 0, 0, 0);
 		}
@@ -128,17 +146,14 @@ public final class Bindings
 					if (endCal.get(Calendar.YEAR) == now.get(Calendar.YEAR))
 					{
 						return dateFormat.format(new Date(end));
-					}
-					else
+					} else
 					{
 						return dateFormatYear.format(new Date(end));
 					}
-				}
-				else if (endCal.get(Calendar.YEAR) == now.get(Calendar.YEAR))
+				} else if (endCal.get(Calendar.YEAR) == now.get(Calendar.YEAR))
 				{
 					return startCal.get(Calendar.DAY_OF_MONTH) + " – " + dateFormat.format(new Date(end));
-				}
-				else
+				} else
 				{
 					return startCal.get(Calendar.DAY_OF_MONTH) + " – " + dateFormatYear.format(new Date(end));
 				}
@@ -146,13 +161,11 @@ public final class Bindings
 			if (endCal.get(Calendar.YEAR) == now.get(Calendar.YEAR))
 			{
 				return dateFormat.format(new Date(start)) + " – " + dateFormat.format(new Date(end));
-			}
-			else
+			} else
 			{
 				return dateFormat.format(new Date(start)) + " – " + dateFormatYear.format(new Date(end));
 			}
-		}
-		else
+		} else
 		{
 			return dateFormatYear.format(new Date(start)) + " – " + dateFormatYear.format(new Date(end));
 		}
@@ -170,8 +183,7 @@ public final class Bindings
 			if (calendar.get(Calendar.YEAR) == now.get(Calendar.YEAR))
 			{
 				return dateFormat.format(new Date(timestamp));
-			}
-			else
+			} else
 			{
 				return dateFormatYear.format(new Date(timestamp));
 			}

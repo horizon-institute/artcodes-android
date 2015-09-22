@@ -1,3 +1,22 @@
+/*
+ * Artcodes recognises a different marker scheme that allows the
+ * creation of aesthetically pleasing, even beautiful, codes.
+ * Copyright (C) 2013-2015  The University of Nottingham
+ *
+ *     This program is free software: you can redistribute it and/or modify
+ *     it under the terms of the GNU Affero General Public License as published
+ *     by the Free Software Foundation, either version 3 of the License, or
+ *     (at your option) any later version.
+ *
+ *     This program is distributed in the hope that it will be useful,
+ *     but WITHOUT ANY WARRANTY; without even the implied warranty of
+ *     MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+ *     GNU Affero General Public License for more details.
+ *
+ *     You should have received a copy of the GNU Affero General Public License
+ *     along with this program.  If not, see <http://www.gnu.org/licenses/>.
+ */
+
 package uk.ac.horizon.artcodes.fragment;
 
 import android.app.Activity;
@@ -14,8 +33,13 @@ import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.DatePicker;
+
 import com.google.android.gms.location.places.Place;
 import com.google.android.gms.location.places.ui.PlacePicker;
+
+import java.util.Calendar;
+import java.util.List;
+
 import uk.ac.horizon.artcodes.GoogleAnalytics;
 import uk.ac.horizon.artcodes.R;
 import uk.ac.horizon.artcodes.databinding.AvailabilityEditBinding;
@@ -23,12 +47,10 @@ import uk.ac.horizon.artcodes.databinding.ExperienceEditAvailabilitiesBinding;
 import uk.ac.horizon.artcodes.model.Availability;
 import uk.ac.horizon.artcodes.ui.Bindings;
 
-import java.util.Calendar;
-import java.util.List;
-
 public class ExperienceEditAvailabilityFragment extends ExperienceEditFragment
 {
 	private static final int PLACE_PICKER_REQUEST = 119;
+	private ExperienceEditAvailabilitiesBinding binding;
 
 	@Override
 	public int getTitleResource()
@@ -36,19 +58,147 @@ public class ExperienceEditAvailabilityFragment extends ExperienceEditFragment
 		return R.string.fragment_availability;
 	}
 
-	private class AvailabilityAdapter extends RecyclerView.Adapter<AvailabilityAdapter.ViewHolder>
+	private void delete(final Availability availability)
 	{
-		public class ViewHolder extends RecyclerView.ViewHolder
-		{
-			private AvailabilityEditBinding binding;
+		final int index = getExperience().getAvailabilities().indexOf(availability);
+		getExperience().getAvailabilities().remove(availability);
+		binding.list.getAdapter().notifyItemRemoved(index);
+		updateAvailabilities();
+		Snackbar.make(binding.getRoot(), R.string.action_deleted, Snackbar.LENGTH_LONG)
+				.setAction(R.string.action_delete_undo, new View.OnClickListener()
+				{
+					@Override
+					public void onClick(View v)
+					{
+						getExperience().getAvailabilities().add(index, availability);
+						binding.list.getAdapter().notifyItemInserted(index);
+						updateAvailabilities();
+					}
+				}).show();
+	}
 
-			public ViewHolder(AvailabilityEditBinding binding)
+	@Override
+	public void onActivityResult(int requestCode, int resultCode, Intent data)
+	{
+		if (requestCode == PLACE_PICKER_REQUEST)
+		{
+			if (resultCode == Activity.RESULT_OK)
 			{
-				super(binding.getRoot());
-				this.binding = binding;
+				final Place place = PlacePicker.getPlace(data, getActivity());
+				Log.i("", place.getName().toString());
+				Log.i("", place.getAddress().toString());
+				final int index = data.getIntExtra("availIndex", 0);
+				if (index >= 0)
+				{
+					final Availability availability = getExperience().getAvailabilities().get(index);
+					availability.setName(place.getName().toString());
+					availability.setAddress(place.getAddress().toString());
+					availability.setLat(place.getLatLng().latitude);
+					availability.setLon(place.getLatLng().longitude);
+				}
 			}
 		}
+	}
 
+	private void updateAvailabilities()
+	{
+		if (getExperience().getAvailabilities().isEmpty())
+		{
+			binding.list.setVisibility(View.GONE);
+			binding.emptyView.setVisibility(View.VISIBLE);
+		} else
+		{
+			binding.list.setVisibility(View.VISIBLE);
+			binding.emptyView.setVisibility(View.GONE);
+		}
+	}
+
+	@Nullable
+	@Override
+	public View onCreateView(LayoutInflater inflater, ViewGroup container, Bundle savedInstanceState)
+	{
+		binding = ExperienceEditAvailabilitiesBinding.inflate(inflater, container, false);
+		binding.add.setOnClickListener(new View.OnClickListener()
+		{
+			@Override
+			public void onClick(View v)
+			{
+				Log.i("", "Adding new availability");
+				if (getExperience().getAvailabilities().add(new Availability()))
+				{
+					updateAvailabilities();
+					binding.list.getAdapter().notifyItemInserted(getExperience().getAvailabilities().size() - 1);
+				}
+			}
+		});
+
+		binding.list.setLayoutManager(new LinearLayoutManager(getActivity()));
+
+		ItemTouchHelper.SimpleCallback simpleItemTouchCallback = new ItemTouchHelper.SimpleCallback(0, ItemTouchHelper.LEFT | ItemTouchHelper.RIGHT)
+		{
+			@Override
+			public boolean onMove(RecyclerView recyclerView, RecyclerView.ViewHolder viewHolder, RecyclerView.ViewHolder viewHolder1)
+			{
+				return false;
+			}
+
+			@Override
+			public void onSwiped(RecyclerView.ViewHolder viewHolder, int swipeDir)
+			{
+				int position = viewHolder.getAdapterPosition();
+				delete(getExperience().getAvailabilities().get(position));
+			}
+		};
+		ItemTouchHelper itemTouchHelper = new ItemTouchHelper(simpleItemTouchCallback);
+		itemTouchHelper.attachToRecyclerView(binding.list);
+
+		return binding.getRoot();
+	}
+
+	@Override
+	public void onResume()
+	{
+		super.onResume();
+		binding.list.setAdapter(new AvailabilityAdapter(getExperience().getAvailabilities()));
+		updateAvailabilities();
+	}
+
+	@Override
+	public void setUserVisibleHint(boolean isVisibleToUser)
+	{
+		super.setUserVisibleHint(isVisibleToUser);
+		if (isInLayout())
+		{
+			if (isVisibleToUser)
+			{
+				binding.add.show();
+			} else
+			{
+				binding.add.hide();
+			}
+		}
+	}
+
+	private void selectDate(Long timestamp, DatePickerDialog.OnDateSetListener listener)
+	{
+		final Calendar calendar = Calendar.getInstance();
+		if (timestamp != null)
+		{
+			calendar.setTimeInMillis(timestamp);
+		} else
+		{
+			calendar.setTimeInMillis(System.currentTimeMillis());
+		}
+		int mYear = calendar.get(Calendar.YEAR);
+		int mMonth = calendar.get(Calendar.MONTH);
+		int mDay = calendar.get(Calendar.DAY_OF_MONTH);
+
+		DatePickerDialog dialog = new DatePickerDialog(getActivity(), listener, mYear, mMonth, mDay);
+		dialog.show();
+	}
+
+	private class AvailabilityAdapter extends RecyclerView.Adapter<AvailabilityAdapter.ViewHolder>
+	{
 		private List<Availability> availabilities;
 
 		public AvailabilityAdapter(List<Availability> availabilities)
@@ -72,19 +222,16 @@ public class ExperienceEditAvailabilityFragment extends ExperienceEditFragment
 				if (availability.getStart() == null)
 				{
 					holder.binding.availabilityDesc.setText("Always Available");
-				}
-				else
+				} else
 				{
 					holder.binding.availabilityDesc.setText("Available from " + Bindings.getDate(availability.getStart()));
 				}
-			}
-			else
+			} else
 			{
 				if (availability.getStart() == null)
 				{
 					holder.binding.availabilityDesc.setText("Available until " + Bindings.getDate(availability.getEnd()));
-				}
-				else
+				} else
 				{
 
 					holder.binding.availabilityDesc.setText("Available " + Bindings.getDate(availability.getStart(), availability.getEnd()));
@@ -145,8 +292,7 @@ public class ExperienceEditAvailabilityFragment extends ExperienceEditFragment
 						Intent intent = builder.build(getActivity());
 						intent.putExtra("availIndex", getExperience().getAvailabilities().indexOf(availability));
 						startActivityForResult(intent, PLACE_PICKER_REQUEST);
-					}
-					catch (Exception e)
+					} catch (Exception e)
 					{
 						GoogleAnalytics.trackException(e);
 					}
@@ -167,149 +313,16 @@ public class ExperienceEditAvailabilityFragment extends ExperienceEditFragment
 		{
 			return new ViewHolder(AvailabilityEditBinding.inflate(LayoutInflater.from(parent.getContext()), parent, false));
 		}
-	}
 
-	private ExperienceEditAvailabilitiesBinding binding;
-
-	private void delete(final Availability availability)
-	{
-		final int index = getExperience().getAvailabilities().indexOf(availability);
-		getExperience().getAvailabilities().remove(availability);
-		binding.list.getAdapter().notifyItemRemoved(index);
-		updateAvailabilities();
-		Snackbar.make(binding.getRoot(), R.string.action_deleted, Snackbar.LENGTH_LONG)
-				.setAction(R.string.action_delete_undo, new View.OnClickListener()
-				{
-					@Override
-					public void onClick(View v)
-					{
-						getExperience().getAvailabilities().add(index, availability);
-						binding.list.getAdapter().notifyItemInserted(index);
-						updateAvailabilities();
-					}
-				}).show();
-	}
-
-	@Override
-	public void onActivityResult(int requestCode, int resultCode, Intent data)
-	{
-		if (requestCode == PLACE_PICKER_REQUEST)
+		public class ViewHolder extends RecyclerView.ViewHolder
 		{
-			if (resultCode == Activity.RESULT_OK)
+			private AvailabilityEditBinding binding;
+
+			public ViewHolder(AvailabilityEditBinding binding)
 			{
-				final Place place = PlacePicker.getPlace(data, getActivity());
-				Log.i("", place.getName().toString());
-				Log.i("", place.getAddress().toString());
-				final int index = data.getIntExtra("availIndex", 0);
-				if (index >= 0)
-				{
-					final Availability availability = getExperience().getAvailabilities().get(index);
-					availability.setName(place.getName().toString());
-					availability.setAddress(place.getAddress().toString());
-					availability.setLat(place.getLatLng().latitude);
-					availability.setLon(place.getLatLng().longitude);
-				}
+				super(binding.getRoot());
+				this.binding = binding;
 			}
 		}
-	}
-
-	private void updateAvailabilities()
-	{
-		if (getExperience().getAvailabilities().isEmpty())
-		{
-			binding.list.setVisibility(View.GONE);
-			binding.emptyView.setVisibility(View.VISIBLE);
-		}
-		else
-		{
-			binding.list.setVisibility(View.VISIBLE);
-			binding.emptyView.setVisibility(View.GONE);
-		}
-	}
-
-	@Nullable
-	@Override
-	public View onCreateView(LayoutInflater inflater, ViewGroup container, Bundle savedInstanceState)
-	{
-		binding = ExperienceEditAvailabilitiesBinding.inflate(inflater, container, false);
-		binding.add.setOnClickListener(new View.OnClickListener()
-		{
-			@Override
-			public void onClick(View v)
-			{
-				Log.i("", "Adding new availability");
-				if(getExperience().getAvailabilities().add(new Availability()))
-				{
-					updateAvailabilities();
-					binding.list.getAdapter().notifyItemInserted(getExperience().getAvailabilities().size()-1);
-				}
-			}
-		});
-
-		binding.list.setLayoutManager(new LinearLayoutManager(getActivity()));
-
-		ItemTouchHelper.SimpleCallback simpleItemTouchCallback = new ItemTouchHelper.SimpleCallback(0, ItemTouchHelper.LEFT | ItemTouchHelper.RIGHT)
-		{
-			@Override
-			public boolean onMove(RecyclerView recyclerView, RecyclerView.ViewHolder viewHolder, RecyclerView.ViewHolder viewHolder1)
-			{
-				return false;
-			}
-
-			@Override
-			public void onSwiped(RecyclerView.ViewHolder viewHolder, int swipeDir)
-			{
-				int position =viewHolder.getAdapterPosition();
-				delete(getExperience().getAvailabilities().get(position));
-			}
-		};
-		ItemTouchHelper itemTouchHelper = new ItemTouchHelper(simpleItemTouchCallback);
-		itemTouchHelper.attachToRecyclerView(binding.list);
-
-		return binding.getRoot();
-	}
-
-	@Override
-	public void onResume()
-	{
-		super.onResume();
-		binding.list.setAdapter(new AvailabilityAdapter(getExperience().getAvailabilities()));
-		updateAvailabilities();
-	}
-
-	@Override
-	public void setUserVisibleHint(boolean isVisibleToUser)
-	{
-		super.setUserVisibleHint(isVisibleToUser);
-		if (isInLayout())
-		{
-			if (isVisibleToUser)
-			{
-				binding.add.show();
-			}
-			else
-			{
-				binding.add.hide();
-			}
-		}
-	}
-
-	private void selectDate(Long timestamp, DatePickerDialog.OnDateSetListener listener)
-	{
-		final Calendar calendar = Calendar.getInstance();
-		if (timestamp != null)
-		{
-			calendar.setTimeInMillis(timestamp);
-		}
-		else
-		{
-			calendar.setTimeInMillis(System.currentTimeMillis());
-		}
-		int mYear = calendar.get(Calendar.YEAR);
-		int mMonth = calendar.get(Calendar.MONTH);
-		int mDay = calendar.get(Calendar.DAY_OF_MONTH);
-
-		DatePickerDialog dialog = new DatePickerDialog(getActivity(), listener, mYear, mMonth, mDay);
-		dialog.show();
 	}
 }

@@ -1,3 +1,22 @@
+/*
+ * Artcodes recognises a different marker scheme that allows the
+ * creation of aesthetically pleasing, even beautiful, codes.
+ * Copyright (C) 2013-2015  The University of Nottingham
+ *
+ *     This program is free software: you can redistribute it and/or modify
+ *     it under the terms of the GNU Affero General Public License as published
+ *     by the Free Software Foundation, either version 3 of the License, or
+ *     (at your option) any later version.
+ *
+ *     This program is distributed in the hope that it will be useful,
+ *     but WITHOUT ANY WARRANTY; without even the implied warranty of
+ *     MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+ *     GNU Affero General Public License for more details.
+ *
+ *     You should have received a copy of the GNU Affero General Public License
+ *     along with this program.  If not, see <http://www.gnu.org/licenses/>.
+ */
+
 package uk.ac.horizon.artcodes.scanner.process;
 
 import org.opencv.core.Mat;
@@ -12,57 +31,8 @@ import java.util.concurrent.Executors;
 public class ThreadedGreyscaler extends Greyscaler
 {
 
-	/**
-	 * This class takes a Greyscaler object and a sub region of an image (e.g.
-	 * <code>Mat topHalf = mat.submat(0,mat.rows(),0,mat.cols()/2)</code>) so that the whole
-	 * image can be processed over many threads. Greyscaler objects are not thread safe so
-	 * don't use the same Greyscaler object in a different GreyscalerTask!
-	 */
-	protected static class GreyscalerTask implements Runnable
-	{
-		private Greyscaler greyscaler;
-		private Mat rgbImage, greyscaleImage;
-
-		private boolean done = false;
-
-		public GreyscalerTask(Greyscaler greyscaler, Mat rgbImage, Mat greyscaleImage)
-		{
-			this.greyscaler = greyscaler;
-			this.rgbImage = rgbImage;
-			this.greyscaleImage = greyscaleImage;
-		}
-
-		public void run()
-		{
-			//greyscaler.justHueShiftImage(rgbImage, rgbImage);
-			greyscaleImage = greyscaler.justGreyscaleImage(rgbImage, greyscaleImage);
-
-			synchronized (this)
-			{
-				this.done = true;
-
-				this.notifyAll();
-			}
-		}
-
-		public synchronized void waitForTask()
-		{
-			while (!this.done)
-			{
-				try
-				{
-					this.wait();
-				}
-				catch (InterruptedException e)
-				{
-				}
-			}
-		}
-	}
-
 	private List<Greyscaler> greyscalers;
 	private ExecutorService threadPool;
-
 	/**
 	 * As Greyscaler objects are not thread safe the number given in the List is also the
 	 * maximum number of threads that can concurrently process an image.
@@ -146,5 +116,52 @@ public class ThreadedGreyscaler extends Greyscaler
 	protected boolean useIntensityShortcut()
 	{
 		return false;
+	}
+
+	/**
+	 * This class takes a Greyscaler object and a sub region of an image (e.g.
+	 * <code>Mat topHalf = mat.submat(0,mat.rows(),0,mat.cols()/2)</code>) so that the whole
+	 * image can be processed over many threads. Greyscaler objects are not thread safe so
+	 * don't use the same Greyscaler object in a different GreyscalerTask!
+	 */
+	protected static class GreyscalerTask implements Runnable
+	{
+		private Greyscaler greyscaler;
+		private Mat rgbImage, greyscaleImage;
+
+		private boolean done = false;
+
+		public GreyscalerTask(Greyscaler greyscaler, Mat rgbImage, Mat greyscaleImage)
+		{
+			this.greyscaler = greyscaler;
+			this.rgbImage = rgbImage;
+			this.greyscaleImage = greyscaleImage;
+		}
+
+		public void run()
+		{
+			//greyscaler.justHueShiftImage(rgbImage, rgbImage);
+			greyscaleImage = greyscaler.justGreyscaleImage(rgbImage, greyscaleImage);
+
+			synchronized (this)
+			{
+				this.done = true;
+
+				this.notifyAll();
+			}
+		}
+
+		public synchronized void waitForTask()
+		{
+			while (!this.done)
+			{
+				try
+				{
+					this.wait();
+				} catch (InterruptedException e)
+				{
+				}
+			}
+		}
 	}
 }

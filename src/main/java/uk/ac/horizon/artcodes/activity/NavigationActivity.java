@@ -1,3 +1,22 @@
+/*
+ * Artcodes recognises a different marker scheme that allows the
+ * creation of aesthetically pleasing, even beautiful, codes.
+ * Copyright (C) 2013-2015  The University of Nottingham
+ *
+ *     This program is free software: you can redistribute it and/or modify
+ *     it under the terms of the GNU Affero General Public License as published
+ *     by the Free Software Foundation, either version 3 of the License, or
+ *     (at your option) any later version.
+ *
+ *     This program is distributed in the hope that it will be useful,
+ *     but WITHOUT ANY WARRANTY; without even the implied warranty of
+ *     MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+ *     GNU Affero General Public License for more details.
+ *
+ *     You should have received a copy of the GNU Affero General Public License
+ *     along with this program.  If not, see <http://www.gnu.org/licenses/>.
+ */
+
 package uk.ac.horizon.artcodes.activity;
 
 import android.accounts.AccountManager;
@@ -19,9 +38,13 @@ import android.view.View;
 import android.widget.BaseAdapter;
 import android.widget.HeaderViewListAdapter;
 import android.widget.ListView;
+
 import com.google.android.gms.auth.GoogleAuthUtil;
 import com.google.android.gms.auth.UserRecoverableAuthException;
 import com.google.android.gms.common.AccountPicker;
+
+import java.util.List;
+
 import uk.ac.horizon.artcodes.Feature;
 import uk.ac.horizon.artcodes.R;
 import uk.ac.horizon.artcodes.account.Account;
@@ -32,8 +55,6 @@ import uk.ac.horizon.artcodes.fragment.ExperienceLibraryFragment;
 import uk.ac.horizon.artcodes.fragment.ExperienceRecommendFragment;
 import uk.ac.horizon.artcodes.fragment.ExperienceStarFragment;
 import uk.ac.horizon.artcodes.fragment.FeatureListFragment;
-
-import java.util.List;
 
 public class NavigationActivity extends ArtcodeActivityBase implements
 		NavigationView.OnNavigationItemSelectedListener
@@ -55,8 +76,7 @@ public class NavigationActivity extends ArtcodeActivityBase implements
 		if (binding.drawer.isDrawerOpen(GravityCompat.START))
 		{
 			binding.drawer.closeDrawer(GravityCompat.START);
-		}
-		else
+		} else
 		{
 			super.onBackPressed();
 		}
@@ -91,8 +111,7 @@ public class NavigationActivity extends ArtcodeActivityBase implements
 						navigate(menuItem);
 					}
 				}, DRAWER_CLOSE_DELAY_MS);
-			}
-			else if (menuItem.getItemId() == R.id.nav_addaccount)
+			} else if (menuItem.getItemId() == R.id.nav_addaccount)
 			{
 				// TODO Replace
 				startActivityForResult(AccountPicker.newChooseAccountIntent(null, null, new String[]{GoogleAuthUtil.GOOGLE_ACCOUNT_TYPE}, true, null, null, null, null), REQUEST_CODE_PICK_ACCOUNT);
@@ -116,7 +135,7 @@ public class NavigationActivity extends ArtcodeActivityBase implements
 			}
 
 			Log.i("", "Account = " + accountName);
-			if(accountName != null)
+			if (accountName != null)
 			{
 				tryGoogleAccount(accountName);
 			}
@@ -149,8 +168,7 @@ public class NavigationActivity extends ArtcodeActivityBase implements
 		if (Feature.get(this, R.bool.feature_edit_features).isEnabled())
 		{
 			featureItem.setVisible(true);
-		}
-		else
+		} else
 		{
 			headerView.setLongClickable(true);
 			headerView.setOnLongClickListener(new View.OnLongClickListener()
@@ -204,7 +222,7 @@ public class NavigationActivity extends ArtcodeActivityBase implements
 				{
 					String token = GoogleAuthUtil.getToken(getBaseContext(), name, "oauth2:email");
 					Log.i("", token);
-					if(token != null)
+					if (token != null)
 					{
 						getServer().add(new AppEngineAccount(getServer(), name));
 						new Handler(Looper.getMainLooper()).post(new Runnable()
@@ -216,13 +234,11 @@ public class NavigationActivity extends ArtcodeActivityBase implements
 							}
 						});
 					}
-				}
-				catch (UserRecoverableAuthException userRecoverableException)
+				} catch (UserRecoverableAuthException userRecoverableException)
 				{
 					Log.i("", "Itent = " + userRecoverableException.getIntent());
 					startActivityForResult(userRecoverableException.getIntent(), REQUEST_CODE_PICK_ACCOUNT);
-				}
-				catch (Exception e)
+				} catch (Exception e)
 				{
 					e.printStackTrace();
 				}
@@ -236,7 +252,7 @@ public class NavigationActivity extends ArtcodeActivityBase implements
 		final MenuItem libraries = menu.findItem(R.id.nav_libraries);
 		final SubMenu subMenu = libraries.getSubMenu();
 
-		while(subMenu.size() > 0)
+		while (subMenu.size() > 0)
 		{
 			subMenu.removeItem(subMenu.getItem(0).getItemId());
 		}
@@ -246,11 +262,10 @@ public class NavigationActivity extends ArtcodeActivityBase implements
 		{
 			Account account = accounts.get(index);
 			MenuItem menuItem = subMenu.add(R.id.navigation, index, Menu.NONE, account.getName());
-			if(account instanceof LocalAccount)
+			if (account instanceof LocalAccount)
 			{
 				menuItem.setIcon(R.drawable.ic_smartphone_black_24dp);
-			}
-			else
+			} else
 			{
 				menuItem.setIcon(R.drawable.ic_cloud_black_24dp);
 			}
