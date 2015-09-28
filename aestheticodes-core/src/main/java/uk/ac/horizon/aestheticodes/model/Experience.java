@@ -32,6 +32,16 @@ import uk.ac.horizon.aestheticodes.controllers.MarkerCodeFactoryTouchingExtensio
 
 public class Experience
 {
+    public boolean isIgnoreEmptyRegions()
+    {
+        return ignoreEmptyRegions;
+    }
+
+    public void setIgnoreEmptyRegions(boolean ignoreEmptyRegions)
+    {
+        this.ignoreEmptyRegions = ignoreEmptyRegions;
+    }
+
     public enum Operation
     {
         create, retrieve, update, deleted, add, remove
@@ -78,6 +88,7 @@ public class Experience
     private boolean relaxedEmbeddedChecksumIgnoreMultipleHollowSegments = false;
     private boolean relaxedEmbeddedChecksumIgnoreNonHollowDots = false;
     private String openMode = null;
+    private boolean ignoreEmptyRegions = false;
 
     public String getOpenMode()
     {

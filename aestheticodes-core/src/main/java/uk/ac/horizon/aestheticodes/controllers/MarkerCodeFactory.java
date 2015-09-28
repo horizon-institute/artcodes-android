@@ -132,6 +132,11 @@ public class MarkerCodeFactory implements MarkerCode.MarkerDrawer {
             final int regionValue = getRegionValue(currentRegionIndex, hierarchy, experience.getMaxRegionValue());
             if (regionValue == REGION_EMPTY)
             {
+                if (experience!=null && experience.isIgnoreEmptyRegions())
+                {
+                    continue;
+                }
+
                 if (++emptyRegions > experience.getMaxEmptyRegions())
                 {
                     error[errorIndex] = DetectionStatus.tooManyEmptyRegions;
