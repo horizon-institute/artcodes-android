@@ -110,9 +110,9 @@ public class CameraAdapter extends BaseObservable
 	{
 		if (facing == Camera.CameraInfo.CAMERA_FACING_FRONT)
 		{
-			return R.drawable.ic_camera_front_white_24dp;
+			return R.drawable.ic_camera_front_24dp;
 		}
-		return R.drawable.ic_camera_rear_white_24dp;
+		return R.drawable.ic_camera_rear_24dp;
 	}
 
 	public SurfaceHolder.Callback getSurfaceCallback()

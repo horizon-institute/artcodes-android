@@ -62,7 +62,7 @@ public class MarkerRegionLayer extends Layer
 	@Override
 	public int getIcon()
 	{
-		return R.drawable.ic_border_all_white_24dp;
+		return R.drawable.ic_border_all_24dp;
 	}
 
 	@Override

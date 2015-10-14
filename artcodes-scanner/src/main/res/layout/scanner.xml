@@ -99,7 +99,8 @@
                         android:layout_weight="1"
                         android:onClick="nextThresholdDrawMode"
                         app:imageResource="@{overlay.thresholdIcon}"
-                        tools:src="@drawable/ic_filter_b_and_w_off_white_24dp"/>
+                        tools:src="@drawable/ic_filter_b_and_w_off_white_24dp"
+                        android:tint="#FFF"/>
 
                     <ImageButton
                         style="@style/Widget.AppCompat.ActionButton"
@@ -108,7 +109,8 @@
                         android:layout_weight="1"
                         android:onClick="nextCodeDrawMode"
                         app:imageResource="@{overlay.codeIcon}"
-                        tools:src="@drawable/ic_filter_b_and_w_off_white_24dp"/>
+                        tools:src="@drawable/ic_filter_b_and_w_off_white_24dp"
+                        android:tint="#FFF"/>
 
                     <ImageButton
                         style="@style/Widget.AppCompat.ActionButton"
@@ -117,7 +119,8 @@
                         android:layout_weight="1"
                         android:onClick="nextMarkerDrawMode"
                         app:imageResource="@{overlay.markerIcon}"
-                        tools:src="@drawable/ic_border_clear_white_24dp"/>
+                        tools:src="@drawable/ic_border_clear_24dp"
+                        android:tint="#FFF"/>
 
                     <ImageButton
                         style="@style/Widget.AppCompat.ActionButton"
@@ -127,7 +130,8 @@
                         android:onClick="flipCamera"
                         android:visibility="@{camera.cameraCount > 1 ? View.VISIBLE : View.GONE}"
                         app:imageResource="@{camera.cameraFacingIcon}"
-                        tools:src="@drawable/ic_camera_rear_white_24dp"/>
+                        tools:src="@drawable/ic_camera_rear_24dp"
+                        android:tint="#FFF"/>
 
                 </LinearLayout>
 
@@ -142,7 +146,8 @@
                     android:background="@drawable/camera_floating_action_button"
                     android:contentDescription="@string/display_menu"
                     android:onClick="showMenu"
-                    android:src="@drawable/ic_more_horiz_white_24dp"/>
+                    android:tint="#FFF"
+                    android:src="@drawable/ic_more_horiz_24dp"/>
 
                 <ProgressBar
                     android:id="@+id/progressBar"

@@ -50,7 +50,7 @@ public class MarkerOutlineLayer extends Layer
 	@Override
 	public int getIcon()
 	{
-		return R.drawable.ic_border_outer_white_24dp;
+		return R.drawable.ic_border_outer_24dp;
 	}
 
 	@Override

@@ -26,7 +26,7 @@ public class MarkerNullLayer extends Layer
 	@Override
 	public int getIcon()
 	{
-		return R.drawable.ic_border_clear_white_24dp;
+		return R.drawable.ic_border_clear_24dp;
 	}
 
 	@Override

@@ -29,7 +29,7 @@ public class ThresholdLayer extends Layer
 	@Override
 	public int getIcon()
 	{
-		return R.drawable.ic_filter_b_and_w_white_24dp;
+		return R.drawable.ic_filter_b_and_w_24dp;
 	}
 
 	@Override
