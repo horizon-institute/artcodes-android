@@ -599,6 +599,8 @@ public abstract class Greyscaler
             for (GreyscalerTask task : tasks)
             {
                 task.waitForTask();
+                task.rgbImage.release();
+                task.greyscaleImage.release();
             }
 
             if (this.invert)
