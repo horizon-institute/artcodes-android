@@ -51,9 +51,11 @@ public class MatTranform
 
 		if (rowStart==0) // landscape
 		{
-			Mat o = new Mat(oRows+oRows/2, oCols, CvType.CV_8UC1);
-			o.put(0,0, data);
-			return o.submat(0, o.rows(), colStart, colStart + size);
+			Mat fullImage = new Mat(oRows+oRows/2, oCols, CvType.CV_8UC1);
+			fullImage.put(0, 0, data);
+			Mat imageSegment = fullImage.submat(0, fullImage.rows(), colStart, colStart + size);
+			fullImage.release();
+			return imageSegment;
 		}
 		else if (colStart==0) // portrait
 		{

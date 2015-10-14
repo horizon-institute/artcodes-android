@@ -522,8 +522,6 @@ public class MarkerDetector
 						tileMat.release();
 					}
 				}
-
-				Imgproc.threshold(image, image, 127, 255, Imgproc.THRESH_OTSU);
 			}
 			else if (threshold == Experience.Threshold.resize)
 			{
