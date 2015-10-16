@@ -268,7 +268,7 @@ public class MarkerCodeFactory implements MarkerCode.MarkerDrawer {
             {
                 dotCount++;
             }
-            else if (!experience.isRelaxedEmbeddedChecksumIgnoreNonHollowDots())
+            else if (!(experience.isRelaxedEmbeddedChecksumIgnoreNonHollowDots() && verifyAsLeaf(currentDotIndex, hierarchy)))
             {
                 return -1; // Wrong number of levels.
             }
