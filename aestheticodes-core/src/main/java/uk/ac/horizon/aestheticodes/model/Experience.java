@@ -90,6 +90,28 @@ public class Experience
     private String openMode = null;
     private boolean ignoreEmptyRegions = false;
 
+    // cached values
+    private List<String> cachedAcceptableMarkerCodes = null;
+
+    public List<String> getAcceptableMarkerCodes()
+    {
+        if (this.cachedAcceptableMarkerCodes==null)
+        {
+            List<String> acceptableMarkerCodes = new ArrayList<>();
+
+            for (Marker marker : this.getMarkers().values())
+            {
+                for (String code : marker.getCode().split("[+>]"))
+                {
+                    acceptableMarkerCodes.add(code);
+                }
+            }
+
+            this.cachedAcceptableMarkerCodes = acceptableMarkerCodes;
+        }
+        return this.cachedAcceptableMarkerCodes;
+    }
+
     public String getOpenMode()
     {
         return this.openMode;

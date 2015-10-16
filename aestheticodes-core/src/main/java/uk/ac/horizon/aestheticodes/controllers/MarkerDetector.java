@@ -278,7 +278,7 @@ public class MarkerDetector
 					//final MarkerCode code = MarkerCode.findMarker(hierarchy, i, experience.get());
 					errors[i] = MarkerCodeFactory.DetectionStatus.unknown;
 					final MarkerCode code = markerCodeFactory.createMarkerForNode(i, contours, hierarchy, experience.get(), errors, i);
-					if (code != null)
+					if (code != null && (experience.get()==null || experience.get().getAcceptableMarkerCodes().contains(code.getCodeKey())))
 					{
 						// if marker found then add in the list.
 						foundMarkers.add(code);
