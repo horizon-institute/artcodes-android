@@ -98,7 +98,7 @@
                         android:layout_height="wrap_content"
                         android:layout_weight="1"
                         android:onClick="nextThresholdDrawMode"
-                        app:imageResource="@{overlay.thresholdIcon}"
+                        app:image="@{overlay.thresholdIcon}"
                         tools:src="@drawable/ic_filter_b_and_w_off_white_24dp"
                         android:tint="#FFF"/>
 
@@ -108,7 +108,7 @@
                         android:layout_height="wrap_content"
                         android:layout_weight="1"
                         android:onClick="nextCodeDrawMode"
-                        app:imageResource="@{overlay.codeIcon}"
+                        app:image="@{overlay.codeIcon}"
                         tools:src="@drawable/ic_filter_b_and_w_off_white_24dp"
                         android:tint="#FFF"/>
 
@@ -118,7 +118,7 @@
                         android:layout_height="wrap_content"
                         android:layout_weight="1"
                         android:onClick="nextMarkerDrawMode"
-                        app:imageResource="@{overlay.markerIcon}"
+                        app:image="@{overlay.markerIcon}"
                         tools:src="@drawable/ic_border_clear_24dp"
                         android:tint="#FFF"/>
 
@@ -129,7 +129,7 @@
                         android:layout_weight="1"
                         android:onClick="flipCamera"
                         android:visibility="@{camera.cameraCount > 1 ? View.VISIBLE : View.GONE}"
-                        app:imageResource="@{camera.cameraFacingIcon}"
+                        app:image="@{camera.cameraFacingIcon}"
                         tools:src="@drawable/ic_camera_rear_24dp"
                         android:tint="#FFF"/>
 

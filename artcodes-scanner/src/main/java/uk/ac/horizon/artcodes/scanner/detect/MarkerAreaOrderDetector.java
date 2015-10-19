@@ -29,16 +29,22 @@ import java.util.List;
 import java.util.Map;
 
 import uk.ac.horizon.artcodes.model.Experience;
+import uk.ac.horizon.artcodes.model.MarkerSettings;
 
 public class MarkerAreaOrderDetector extends MarkerDetector
 {
 
 	private static final String REGION_AREA = "area";
 
-	@Override
-	protected Marker.MarkerDetails parseRegionsAt(int nodeIndex, List<MatOfPoint> contours, Mat hierarchy, Experience experience)
+	public MarkerAreaOrderDetector(MarkerSettings settings)
 	{
-		Marker.MarkerDetails details = super.parseRegionsAt(nodeIndex, contours, hierarchy, experience);
+		super(settings);
+	}
+
+	@Override
+	protected Marker.MarkerDetails parseRegionsAt(int nodeIndex, List<MatOfPoint> contours, Mat hierarchy, MarkerSettings settings)
+	{
+		Marker.MarkerDetails details = super.parseRegionsAt(nodeIndex, contours, hierarchy, settings);
 
 		if (details != null)
 		{

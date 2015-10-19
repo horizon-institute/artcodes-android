@@ -23,49 +23,20 @@ import android.util.Log;
 
 import org.opencv.core.Mat;
 
-import java.util.List;
-
-import uk.ac.horizon.artcodes.model.Experience;
+import uk.ac.horizon.artcodes.model.MarkerSettings;
 import uk.ac.horizon.artcodes.scanner.camera.FrameProcessor;
-import uk.ac.horizon.artcodes.scanner.detect.Marker;
-import uk.ac.horizon.artcodes.scanner.detect.MarkerDetectionHandler;
-import uk.ac.horizon.artcodes.scanner.detect.MarkerDetector;
 import uk.ac.horizon.artcodes.scanner.overlay.Overlay;
 import uk.ac.horizon.artcodes.scanner.process.ImageProcessor;
-import uk.ac.horizon.artcodes.scanner.process.TileThresholder;
 
 public class ExperienceFrameProcessor extends FrameProcessor
 {
-	private final MarkerDetector detector;
-	private final MarkerDetectionHandler handler;
 	private final Overlay overlay;
-	private final Experience experience;
-	private boolean detected = false;
-	public ExperienceFrameProcessor(Experience experience, MarkerDetectionHandler handler, Overlay overlay)
+	private final MarkerSettings settings;
+
+	public ExperienceFrameProcessor(MarkerSettings settings, Overlay overlay)
 	{
-		this.experience = experience;
-		this.handler = handler;
 		this.overlay = overlay;
-
-		experience.update();
-		Log.i("", "Regions " + experience.getMinRegions() + "-" + experience.getMaxRegions() + " using max of " + experience.getMaxRegionValue() + " and checksum of " + experience.getChecksumModulo());
-		if (experience.getProcessors().isEmpty())
-		{
-			experience.getProcessors().add(new TileThresholder());
-		}
-		detector = createMarkerDetector(experience);
-	}
-
-	private static MarkerDetector createMarkerDetector(Experience experience)
-	{
-		try
-		{
-			Class<?> clazz = Class.forName(experience.getDetector());
-			return (MarkerDetector) clazz.newInstance();
-		} catch (Exception e)
-		{
-			return new MarkerDetector();
-		}
+		this.settings = settings;
 	}
 
 	@Override
@@ -73,21 +44,17 @@ public class ExperienceFrameProcessor extends FrameProcessor
 	{
 		try
 		{
-			for (ImageProcessor imageProcessor : experience.getProcessors())
+			for (ImageProcessor imageProcessor : settings.pipeline)
 			{
-				frame = imageProcessor.process(frame, detected);
+				frame = imageProcessor.process(frame);
 			}
 
-			if (overlay.hasOutput(frame))
-			{
-				rotate(frame, frame);
-			}
-
-			final List<Marker> markers = detector.findMarkers(frame, overlay, experience);
-			detected = !markers.isEmpty();
-
-			handler.onMarkersDetected(markers);
-		} catch (Exception e)
+			//if (overlay.hasOutput(frame))
+			//{
+			//	rotate(frame, frame);
+			//}
+		}
+		catch (Exception e)
 		{
 			Log.e("", e.getMessage(), e);
 		}

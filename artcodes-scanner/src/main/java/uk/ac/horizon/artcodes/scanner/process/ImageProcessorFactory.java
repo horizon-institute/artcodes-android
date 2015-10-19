@@ -17,20 +17,11 @@
  *     along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-package uk.ac.horizon.artcodes.model;
+package uk.ac.horizon.artcodes.scanner.process;
 
-import org.junit.Test;
+import uk.ac.horizon.artcodes.model.MarkerSettings;
 
-public class ExperienceTests
+public interface ImageProcessorFactory
 {
-	@Test
-	public void test()
-	{
-		Experience experience = new Experience();
-		experience.setChecksumModulo(3);
-		// TODO
-		//experience.setMinRegions(4);
-		//experience.setMaxRegions(4);
-		//experience.setMaxRegionValue(6);
-	}
+	ImageProcessor create(String id);
 }

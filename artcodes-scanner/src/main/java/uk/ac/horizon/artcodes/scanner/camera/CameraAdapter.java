@@ -33,6 +33,7 @@ import android.view.SurfaceHolder;
 import android.view.SurfaceView;
 import android.view.View;
 import android.view.WindowManager;
+import android.widget.ImageButton;
 
 import java.io.IOException;
 import java.util.List;
@@ -67,6 +68,15 @@ public class CameraAdapter extends BaseObservable
 		{
 			view.getLayoutParams().height = height;
 			view.getParent().requestLayout();
+		}
+	}
+
+	@BindingAdapter("image")
+	public static void bindSnackText(ImageButton view, int imageRes)
+	{
+		if (imageRes != 0)
+		{
+			view.setImageResource(imageRes);
 		}
 	}
 

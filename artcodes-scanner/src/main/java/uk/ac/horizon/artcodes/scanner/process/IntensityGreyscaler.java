@@ -31,7 +31,7 @@ public class IntensityGreyscaler implements ImageProcessor
 	}
 
 	@Override
-	public Mat process(Mat image, boolean detected)
+	public Mat process(Mat image)
 	{
 //		if (image == null || image.rows() != colorImage.rows() || image.cols() != colorImage.cols())
 //		{

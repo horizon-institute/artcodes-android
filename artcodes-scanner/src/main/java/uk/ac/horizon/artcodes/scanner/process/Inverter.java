@@ -24,8 +24,13 @@ import org.opencv.core.Mat;
 
 public class Inverter implements ImageProcessor
 {
+	public String getPrefix()
+	{
+		return "invert";
+	}
+
 	@Override
-	public Mat process(Mat image, boolean detected)
+	public Mat process(Mat image)
 	{
 		Core.bitwise_not(image, image);
 		return image;

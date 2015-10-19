@@ -23,5 +23,5 @@ import org.opencv.core.Mat;
 
 public interface ImageProcessor
 {
-	Mat process(Mat image, boolean detected);
+	Mat process(Mat image);
 }

@@ -89,7 +89,7 @@ public class ExperienceEditColourFragment extends ExperienceEditFragment
 		{
 			getExperience().getProcessors().add(inverter);
 		}
-		getExperience().getProcessors().add(new TileThresholder());
+		// TODO getExperience().getProcessors().add(new TileThresholder());
 	}
 
 	@Nullable
@@ -119,15 +119,15 @@ public class ExperienceEditColourFragment extends ExperienceEditFragment
 				{
 					if (hueShifter.getHueShift() != 0)
 					{
-						image = hueShifter.process(image, false);
+						image = hueShifter.process(image);
 					}
 					if (preset != null)
 					{
-						image = preset.process(image, false);
+						image = preset.process(image);
 					}
 					if (inverter != null)
 					{
-						image = inverter.process(image, false);
+						image = inverter.process(image);
 					}
 
 					if (overlay.hasOutput(image))

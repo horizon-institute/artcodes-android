@@ -31,6 +31,7 @@ import android.view.WindowManager;
 import org.opencv.android.OpenCVLoader;
 
 import uk.ac.horizon.artcodes.model.Experience;
+import uk.ac.horizon.artcodes.model.MarkerSettings;
 import uk.ac.horizon.artcodes.scanner.ExperienceFrameProcessor;
 import uk.ac.horizon.artcodes.scanner.R;
 import uk.ac.horizon.artcodes.scanner.VisibilityAnimator;
@@ -113,7 +114,7 @@ public class ScannerActivity extends AppCompatActivity
 		binding.setExperience(experience);
 		if (experience != null)
 		{
-			camera.setFrameProcessor(new ExperienceFrameProcessor(experience, createMarkerHandler(experience), overlay));
+			camera.setFrameProcessor(new ExperienceFrameProcessor(new MarkerSettings(experience, createMarkerHandler(experience)), overlay));
 		} else
 		{
 			camera.setFrameProcessor(null);

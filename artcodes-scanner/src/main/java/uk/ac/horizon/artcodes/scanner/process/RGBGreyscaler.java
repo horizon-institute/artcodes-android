@@ -31,7 +31,7 @@ public class RGBGreyscaler implements ImageProcessor
 	}
 
 	@Override
-	public Mat process(Mat image, boolean detected)
+	public Mat process(Mat image)
 	{
 //	        /*
 //	        // This method is much simpler (and a little faster) but randomly crashes :(

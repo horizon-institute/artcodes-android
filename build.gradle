@@ -22,7 +22,7 @@ buildscript {
     }
     dependencies {
         classpath 'com.android.tools.build:gradle:1.4.0-beta6'
-        classpath 'com.android.databinding:dataBinder:1.0-rc3'
+        classpath 'com.android.databinding:dataBinder:1.0-rc4'
     }
 }
 
@@ -37,9 +37,9 @@ repositories {
 
 dependencies {
     compile project(':artcodes-scanner')
-    compile 'com.android.support:appcompat-v7:23.0.1'
-    compile 'com.android.support:cardview-v7:23.0.1'
-    compile 'com.android.support:recyclerview-v7:23.0.1'
+    compile 'com.android.support:appcompat-v7:23.1.0'
+    compile 'com.android.support:cardview-v7:23.1.0'
+    compile 'com.android.support:recyclerview-v7:23.1.0'
     //compile 'com.android.support:customtabs:23.0.1'
     compile 'com.google.android.gms:play-services-base:8.1.0'
     compile 'com.google.android.gms:play-services-location:8.1.0'

@@ -28,16 +28,16 @@ public class ResizeThresholder implements ImageProcessor
 	private transient int neighbourhood = 5;
 
 	@Override
-	public Mat process(Mat image, boolean detected)
+	public Mat process(Mat image)
 	{
 		Imgproc.resize(image, image, new Size(540, 540));
 
 		Imgproc.GaussianBlur(image, image, new Size(5, 5), 0);
 
-		if (!detected)
-		{
+		// TODO if (!detected)
+		//{
 			neighbourhood = (neighbourhood % 50) + 5;
-		}
+		//}
 		//Log.i(TAG, "Neighbourhood = " + neighbourhood);
 		Imgproc.adaptiveThreshold(image, image, 255, Imgproc.ADAPTIVE_THRESH_MEAN_C, Imgproc.THRESH_BINARY, neighbourhood, 2);
 		return image;

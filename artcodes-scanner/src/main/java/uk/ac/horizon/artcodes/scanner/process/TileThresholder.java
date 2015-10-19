@@ -23,16 +23,24 @@ import org.opencv.core.Mat;
 import org.opencv.core.Size;
 import org.opencv.imgproc.Imgproc;
 
+import uk.ac.horizon.artcodes.model.MarkerSettings;
+
 public class TileThresholder implements ImageProcessor
 {
 	private transient int tiles = 1;
+	private final MarkerSettings settings;
+
+	public TileThresholder(MarkerSettings settings)
+	{
+		this.settings = settings;
+	}
 
 	@Override
-	public Mat process(Mat image, boolean detected)
+	public Mat process(Mat image)
 	{
 		Imgproc.GaussianBlur(image, image, new Size(5, 5), 0);
 
-		if (!detected)
+		if (!settings.detected)
 		{
 			tiles = (tiles % 9) + 1;
 		}

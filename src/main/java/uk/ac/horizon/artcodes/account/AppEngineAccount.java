@@ -117,9 +117,6 @@ public class AppEngineAccount implements Account
 				{
 					// TODO Save temp file, notify starting
 
-					// If auto upload
-					experience.update();
-
 					final Set<String> images = new HashSet<>();
 					conditionalAdd(images, experience.getImage());
 					conditionalAdd(images, experience.getIcon());

@@ -32,17 +32,11 @@ import com.google.gson.TypeAdapterFactory;
 import com.google.gson.reflect.TypeToken;
 import com.google.gson.stream.JsonReader;
 import com.google.gson.stream.JsonWriter;
-import com.google.gson.typeadapters.RuntimeTypeAdapterFactory;
 
 import java.io.IOException;
 
 import uk.ac.horizon.artcodes.model.Experience;
 import uk.ac.horizon.artcodes.scanner.R;
-import uk.ac.horizon.artcodes.scanner.process.HueShifter;
-import uk.ac.horizon.artcodes.scanner.process.ImageProcessor;
-import uk.ac.horizon.artcodes.scanner.process.Inverter;
-import uk.ac.horizon.artcodes.scanner.process.ResizeThresholder;
-import uk.ac.horizon.artcodes.scanner.process.TileThresholder;
 
 public class ExperienceParser
 {
@@ -57,11 +51,11 @@ public class ExperienceParser
 			{
 				builder.registerTypeAdapterFactory(new ExperienceTypeAdapterFactor());
 			}
-			builder.registerTypeAdapterFactory(RuntimeTypeAdapterFactory.of(ImageProcessor.class)
-					.registerSubtype(TileThresholder.class, "tile")
-					.registerSubtype(ResizeThresholder.class, "resize")
-					.registerSubtype(HueShifter.class, "hue")
-					.registerSubtype(Inverter.class, "invert"));
+//			builder.registerTypeAdapterFactory(RuntimeTypeAdapterFactory.of(ImageProcessor.class)
+//					.registerSubtype(TileThresholder.class, "tile")
+//					.registerSubtype(ResizeThresholder.class, "resize")
+//					.registerSubtype(HueShifter.class, "hue")
+//					.registerSubtype(Inverter.class, "invert"));
 			gson = builder.create();
 		}
 		return gson;

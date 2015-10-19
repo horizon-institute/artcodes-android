@@ -30,16 +30,24 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
-import uk.ac.horizon.artcodes.model.Experience;
+import uk.ac.horizon.artcodes.model.MarkerSettings;
 import uk.ac.horizon.artcodes.scanner.overlay.Overlay;
+import uk.ac.horizon.artcodes.scanner.process.ImageProcessor;
 
-public class MarkerDetector
+public class MarkerDetector implements ImageProcessor
 {
 	protected static final int REGION_INVALID = -1;
 	protected static final int REGION_EMPTY = 0;
 	//indexes of leaf nodes in contour tree hierarchy.
 	protected static final int NEXT_NODE = 0;
 	protected static final int FIRST_NODE = 2;
+
+	private final MarkerSettings settings;
+
+	public MarkerDetector(MarkerSettings settings)
+	{
+		this.settings = settings;
+	}
 
 	/**
 	 * This function determines whether the input node is a valid region. It is a valid region if it contains zero or more dots.
@@ -129,19 +137,20 @@ public class MarkerDetector
 				verifyAsLeaf((int) nodes[FIRST_NODE], hierarchy);// the child is a leaf
 	}
 
-	public Marker createMarkerForNode(int nodeIndex, List<MatOfPoint> contours, Mat hierarchy, Experience experience)
+	public Marker createMarkerForNode(int nodeIndex, List<MatOfPoint> contours, Mat hierarchy, MarkerSettings settings)
 	{
-		Marker.MarkerDetails markerDetails = createMarkerDetailsForNode(nodeIndex, contours, hierarchy, experience);
+		Marker.MarkerDetails markerDetails = createMarkerDetailsForNode(nodeIndex, contours, hierarchy, settings);
 		if (markerDetails != null)
 		{
 			return new Marker(this.getCodeFor(markerDetails), markerDetails);
-		} else
+		}
+		else
 		{
 			return null;
 		}
 	}
 
-	public List<Marker> findMarkers(Mat image, Overlay overlay, Experience experience)
+	public List<Marker> findMarkers(Mat image, Overlay overlay, MarkerSettings settings)
 	{
 		final ArrayList<MatOfPoint> contours = new ArrayList<>();
 		final Mat hierarchy = new Mat();
@@ -155,7 +164,7 @@ public class MarkerDetector
 			Imgproc.findContours(image, contours, hierarchy, Imgproc.RETR_TREE, Imgproc.CHAIN_APPROX_NONE);
 			for (int i = 0; i < contours.size(); i++)
 			{
-				final Marker code = createMarkerForNode(i, contours, hierarchy, experience);
+				final Marker code = createMarkerForNode(i, contours, hierarchy, settings);
 				if (code != null)
 				{
 					foundMarkers.add(code);
@@ -172,13 +181,13 @@ public class MarkerDetector
 		}
 	}
 
-	protected Marker.MarkerDetails createMarkerDetailsForNode(int nodeIndex, List<MatOfPoint> contours, Mat hierarchy, Experience experience)
+	protected Marker.MarkerDetails createMarkerDetailsForNode(int nodeIndex, List<MatOfPoint> contours, Mat hierarchy, MarkerSettings settings)
 	{
-		Marker.MarkerDetails markerDetails = parseRegionsAt(nodeIndex, contours, hierarchy, experience);
+		Marker.MarkerDetails markerDetails = parseRegionsAt(nodeIndex, contours, hierarchy, settings);
 		if (markerDetails != null)
 		{
 			this.sortCode(markerDetails);
-			if (!validate(markerDetails, experience))
+			if (!validate(markerDetails, settings))
 			{
 				markerDetails = null;
 			}
@@ -201,7 +210,7 @@ public class MarkerDetector
 		return builder.toString();
 	}
 
-	protected Marker.MarkerDetails parseRegionsAt(int nodeIndex, List<MatOfPoint> contours, Mat hierarchy, Experience experience)
+	protected Marker.MarkerDetails parseRegionsAt(int nodeIndex, List<MatOfPoint> contours, Mat hierarchy, MarkerSettings settings)
 	{
 		int currentRegionIndex = (int) hierarchy.get(0, nodeIndex)[FIRST_NODE];
 		if (currentRegionIndex < 0)
@@ -218,7 +227,7 @@ public class MarkerDetector
 		// Loop through the regions, verifing the value of each:
 		for (; currentRegionIndex >= 0; currentRegionIndex = (int) hierarchy.get(0, currentRegionIndex)[NEXT_NODE])
 		{
-			final int regionValue = getRegionValue(currentRegionIndex, hierarchy, experience.getMaxRegionValue());
+			final int regionValue = getRegionValue(currentRegionIndex, hierarchy, settings.maxRegionValue);
 			if (regionValue == REGION_EMPTY)
 			{
 				// Too many empty regions.
@@ -228,7 +237,7 @@ public class MarkerDetector
 			if (regionValue == REGION_INVALID)
 			{
 				// Not a normal region so look for embedded checksum:
-				if (experience.getEmbeddedChecksum() && embeddedChecksumValue == null) // if we've not found it yet:
+				if (settings.embeddedChecksum && embeddedChecksumValue == null) // if we've not found it yet:
 				{
 					embeddedChecksumValue = getEmbeddedChecksumValueForRegion(currentRegionIndex, hierarchy);
 					if (embeddedChecksumValue != null)
@@ -242,7 +251,7 @@ public class MarkerDetector
 				return null;
 			}
 
-			if (++regionCount > experience.getMaxRegions())
+			if (++regionCount > settings.maxRegions)
 			{
 				// Too many regions.
 				return null;
@@ -296,7 +305,7 @@ public class MarkerDetector
 	/**
 	 * Override this method to change validation method.
 	 */
-	protected boolean validate(Marker.MarkerDetails details, Experience experience)
+	protected boolean validate(Marker.MarkerDetails details, MarkerSettings settings)
 	{
 		List<Integer> code = new ArrayList<>();
 		for (Map<String, Object> region : details.regions)
@@ -304,6 +313,39 @@ public class MarkerDetector
 			code.add((Integer) region.get(Marker.MarkerDetails.REGION_VALUE));
 		}
 
-		return experience.isValidCode(code, details.embeddedChecksum);
+		return settings.isValidCode(code, details.embeddedChecksum);
+	}
+
+	@Override
+	public Mat process(Mat image)
+	{
+		final ArrayList<MatOfPoint> contours = new ArrayList<>();
+		final Mat hierarchy = new Mat();
+		try
+		{
+			// TODO Move to thresholder? overlay.drawThreshold(image);
+
+			final List<Marker> foundMarkers = new ArrayList<>();
+			Imgproc.findContours(image, contours, hierarchy, Imgproc.RETR_TREE, Imgproc.CHAIN_APPROX_NONE);
+			for (int i = 0; i < contours.size(); i++)
+			{
+				final Marker code = createMarkerForNode(i, contours, hierarchy, settings);
+				if (code != null && settings.validCodes.contains(code.getCodeKey()))
+				{
+					foundMarkers.add(code);
+				}
+			}
+
+			settings.markersFound(foundMarkers);
+
+			// TODO overlay.drawMarkers(foundMarkers, contours);
+
+			return image;
+		}
+		finally
+		{
+			contours.clear();
+			hierarchy.release();
+		}
 	}
 }

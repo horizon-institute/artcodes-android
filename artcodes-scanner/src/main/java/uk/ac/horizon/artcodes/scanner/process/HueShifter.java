@@ -36,6 +36,11 @@ public class HueShifter implements ImageProcessor
 	{
 	}
 
+	public String getPrefix()
+	{
+		return "hue";
+	}
+
 	public HueShifter(int hueShift)
 	{
 		this.hueShift = hueShift;
@@ -52,7 +57,7 @@ public class HueShifter implements ImageProcessor
 	}
 
 	@Override
-	public Mat process(Mat image, boolean detected)
+	public Mat process(Mat image)
 	{
 		int desiredRows = (image.rows() / 3) * 2, desiredCols = image.cols();
 		if (threeChannelBuffer == null || threeChannelBuffer.rows() != desiredRows || threeChannelBuffer.cols() != desiredCols)

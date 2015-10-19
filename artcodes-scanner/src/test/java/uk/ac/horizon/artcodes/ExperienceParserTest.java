@@ -77,7 +77,7 @@ public class ExperienceParserTest
 	{
 		Experience experience = new Experience();
 		experience.getProcessors().clear();
-		experience.getProcessors().add(new TileThresholder());
+		//experience.getProcessors().add(new TileThresholder());
 
 		final Gson gson = ExperienceParser.createGson(null);
 
