@@ -156,37 +156,54 @@ class ExperienceListUpdater extends AsyncTask<String, Experience, Collection<Str
 				Log.i("UPDATE","Attempting to update from "+updateURL);
 				try
 				{
-					if (updateURL != null)
+					if (updateURL != null && (updateURL.startsWith("http:") || updateURL.startsWith("https:")))
 					{
-						if (updateURL.startsWith("http:") || updateURL.startsWith("https:"))
+						ConnectivityManager cm = (ConnectivityManager) context.getSystemService(Context.CONNECTIVITY_SERVICE);
+						NetworkInfo netInfo = cm.getActiveNetworkInfo();
+						if (netInfo != null && netInfo.isConnectedOrConnecting())
 						{
-							ConnectivityManager cm = (ConnectivityManager) context.getSystemService(Context.CONNECTIVITY_SERVICE);
-							NetworkInfo netInfo = cm.getActiveNetworkInfo();
-							if (netInfo != null && netInfo.isConnectedOrConnecting())
+							HttpURLConnection connection = get(updateURL);
+							if (connection.getResponseCode() == 200)
 							{
-								HttpURLConnection connection = get(updateURL);
-								if (connection.getResponseCode() == 200)
-								{
-									Log.i("UPDATE","Received update file.");
-									ExperienceUpdate experienceUpdate = gson.fromJson(new InputStreamReader(connection.getInputStream()), ExperienceUpdate.class);
+								Log.i("UPDATE", "Received update file.");
+								ExperienceUpdate experienceUpdate = gson.fromJson(new InputStreamReader(connection.getInputStream()), ExperienceUpdate.class);
 
-									if (experienceUpdate.getUpdateURL() != null && !experienceUpdate.getUpdateURL().equals(updateURL))
-									{
-										Log.i("UPDATE","Update contains different update URL...");
-										SharedPreferences.Editor editor = sharedPreferences.edit();
-										editor.putString("updateURL", experienceUpdate.getUpdateURL());
-										editor.apply();
-										continue;
-									}
-									else if (experienceUpdate.getExperiences() != null)
-									{
-										Log.i("UPDATE",experienceUpdate.getExperiences().length + " experiences in update file.");
-										publishProgress(experienceUpdate.getExperiences());
-										break;
-									}
+								if (experienceUpdate.getUpdateURL() != null && !experienceUpdate.getUpdateURL().equals(updateURL))
+								{
+									Log.i("UPDATE", "Update contains different update URL...");
+									SharedPreferences.Editor editor = sharedPreferences.edit();
+									editor.putString("updateURL", experienceUpdate.getUpdateURL());
+									editor.apply();
+									continue;
+								}
+								else if (experienceUpdate.getExperiences() != null)
+								{
+									Log.i("UPDATE", experienceUpdate.getExperiences().length + " experiences in update file.");
+									publishProgress(experienceUpdate.getExperiences());
+									break;
+								}
+								else
+								{
+									Log.e("UPDATE", "Something went wrong when updating experiences.");
+									break;
 								}
 							}
+							else
+							{
+								Log.i("UPDATE", "Connection issue (response " + connection.getResponseCode() + ").");
+								break;
+							}
 						}
+						else
+						{
+							Log.i("UPDATE", "Connection issue.");
+							break;
+						}
+					}
+					else
+					{
+						Log.i("UPDATE", "Invalid update URL.");
+						break;
 					}
 				}
 				catch (Exception e)
