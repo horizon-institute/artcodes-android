@@ -25,10 +25,6 @@ import java.util.List;
 import java.util.Map;
 
 import uk.ac.horizon.aestheticodes.controllers.MarkerCodeFactory;
-import uk.ac.horizon.aestheticodes.controllers.MarkerCodeFactoryAreaOrderExtension;
-import uk.ac.horizon.aestheticodes.controllers.MarkerCodeFactoryAreaOrientationExtension;
-import uk.ac.horizon.aestheticodes.controllers.MarkerCodeFactoryOrientationAreaExtension;
-import uk.ac.horizon.aestheticodes.controllers.MarkerCodeFactoryTouchingExtension;
 
 public class Experience
 {
@@ -748,26 +744,6 @@ public class Experience
 
     public MarkerCodeFactory getMarkerCodeFactory()
     {
-        if (this.description != null)
-        {
-            if (this.description.contains("AREA4321"))
-            {
-                return new MarkerCodeFactoryAreaOrderExtension();
-            }
-            else if (this.description.contains("AO4321"))
-            {
-                return new MarkerCodeFactoryAreaOrientationExtension();
-            }
-            else if (this.description.contains("OA4321"))
-            {
-                return new MarkerCodeFactoryOrientationAreaExtension();
-            }
-            else if (this.description.contains("TOUCH4321"))
-            {
-                return new MarkerCodeFactoryTouchingExtension();
-            }
-        }
-
         return new MarkerCodeFactory();
     }
 
