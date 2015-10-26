@@ -82,6 +82,7 @@ public class Experience
     private int checksumModulo = 3;
     private boolean embeddedChecksum = false;
     private Threshold threshold = Threshold.temporalTile;
+    private List<String> imageProcessingComponents = null;
 
     // addition values
     private String startUpURL = null;
@@ -594,6 +595,16 @@ public class Experience
         this.version = version;
     }
 
+    public List<String> getImageProcessingComponents()
+    {
+        return imageProcessingComponents;
+    }
+
+    public void setImageProcessingComponents(List<String> imageProcessingComponents)
+    {
+        this.imageProcessingComponents = imageProcessingComponents;
+    }
+
     public boolean isValidMarker(List<Integer> markerCodes, Integer embeddedChecksum)
     {
         return isValidMarker(markerCodes, embeddedChecksum, new MarkerCodeFactory.DetectionStatus[1], 0);
@@ -733,45 +744,6 @@ public class Experience
             }
         }
         return validationRegionCount >= validationRegions;
-    }
-
-    private double hueShift = 0;
-    private List<Object> greyscaleOptions = null;
-    private boolean invertGreyscale = false;
-
-    public double getHueShift()
-    {
-        return this.hueShift;
-    }
-
-    public void setHueShift(double hueShift)
-    {
-        this.hueShift = hueShift;
-    }
-
-    public boolean getInvertGreyscale()
-    {
-        return this.invertGreyscale;
-    }
-
-    public void setInvertGreyscale(boolean invertGreyscale)
-    {
-        this.invertGreyscale = invertGreyscale;
-    }
-
-    public List<Object> getGreyscaleOptions()
-    {
-        return this.greyscaleOptions;
-    }
-
-    public void setGreyscaleOptions(List<Object> greyscaleOptions)
-    {
-        this.greyscaleOptions = greyscaleOptions;
-    }
-
-    public Greyscaler getGreyscaler()
-    {
-        return Greyscaler.getGreyscaler(this.getHueShift(), this.getGreyscaleOptions(), this.getInvertGreyscale());
     }
 
     public MarkerCodeFactory getMarkerCodeFactory()

@@ -25,6 +25,7 @@ import android.graphics.Bitmap;
 import android.hardware.Camera;
 import android.preference.PreferenceManager;
 import android.util.Log;
+
 import org.opencv.android.Utils;
 import org.opencv.core.Core;
 import org.opencv.core.CvType;
@@ -35,12 +36,14 @@ import org.opencv.core.Rect;
 import org.opencv.core.Scalar;
 import org.opencv.core.Size;
 import org.opencv.imgproc.Imgproc;
-import uk.ac.horizon.aestheticodes.model.Experience;
-import uk.ac.horizon.aestheticodes.model.Greyscaler;
-import uk.ac.horizon.aestheticodes.model.Scene;
 
 import java.util.ArrayList;
 import java.util.List;
+
+import uk.ac.horizon.aestheticodes.grey.BufferManager;
+import uk.ac.horizon.aestheticodes.grey.ImageProcessor;
+import uk.ac.horizon.aestheticodes.model.Experience;
+import uk.ac.horizon.aestheticodes.model.Scene;
 
 public class MarkerDetector
 {
@@ -87,6 +90,8 @@ public class MarkerDetector
 
 				Mat croppedImage = null;
 
+				BufferManager bufferManager = new BufferManager();
+
 				while (running)
 				{
 					try
@@ -120,7 +125,9 @@ public class MarkerDetector
 
 							synchronized (greyscalerLock)
 							{
-								croppedImage = greyscaler.greyscaleImage(yuvImage, croppedImage);
+								bufferManager.setupWithYuvSourceAndGreyResultBuffer(yuvImage, croppedImage);
+								imageProcessor.process(bufferManager);
+								croppedImage = bufferManager.getMostRecentDataInGrey();
 							}
 
 							Scene scene = new Scene();
@@ -227,6 +234,7 @@ public class MarkerDetector
 				}
 
 
+				bufferManager.release();
 				if (croppedImage!=null)
 				{
 					croppedImage.release();
@@ -549,8 +557,8 @@ public class MarkerDetector
 	private MarkerDrawMode markerDrawMode = MarkerDrawMode.off;
 	private CameraDrawMode cameraDrawMode = CameraDrawMode.normal;
 
-	private Greyscaler greyscaler = new Greyscaler.IntensityGreyscaler(0, false);
 	private Object greyscalerLock = new Object();
+	private ImageProcessor imageProcessor = new ImageProcessor(null, 1);
 
 	private MarkerCodeFactory markerCodeFactory = null;
 
@@ -573,22 +581,22 @@ public class MarkerDetector
 		this.markerDrawMode = mode;
 	}
 
-	public void setGreyscaler(Greyscaler newGreyscaler)
+	public void setGreyscaler(ImageProcessor newImageProcessor)
 	{
 		synchronized (greyscalerLock)
 		{
 			// it should not be possible to set a null object here as it will cause problems if (for some reason) no experience is selected
-			if (newGreyscaler==null)
+			if (newImageProcessor==null)
 			{
-				newGreyscaler = new Greyscaler.IntensityGreyscaler(0, false);
+				newImageProcessor = new ImageProcessor(null, 1);
 			}
 
-			Greyscaler oldGreyscaler = greyscaler;
-			greyscaler = newGreyscaler;
+			ImageProcessor oldImageProcessor = this.imageProcessor;
+			this.imageProcessor = newImageProcessor;
 
-			if (oldGreyscaler!=null)
+			if (oldImageProcessor!=null)
 			{
-				oldGreyscaler.release();
+				oldImageProcessor.release();
 			}
 		}
 		resetFps();

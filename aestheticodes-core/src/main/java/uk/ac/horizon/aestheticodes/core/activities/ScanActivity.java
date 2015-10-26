@@ -54,6 +54,7 @@ import uk.ac.horizon.aestheticodes.controllers.ExperienceController;
 import uk.ac.horizon.aestheticodes.controllers.ExperienceParser;
 import uk.ac.horizon.aestheticodes.controllers.MarkerDetector;
 import uk.ac.horizon.aestheticodes.core.R;
+import uk.ac.horizon.aestheticodes.grey.ImageProcessor;
 import uk.ac.horizon.aestheticodes.model.Experience;
 import uk.ac.horizon.aestheticodes.model.Scene;
 import uk.ac.horizon.aestheticodes.views.ViewfinderView;
@@ -106,7 +107,7 @@ public class ScanActivity extends ActionBarActivity implements ExperienceControl
 		if (experience != null)
 		{
 			detector.start();
-			detector.setGreyscaler(experience.getGreyscaler());
+			detector.setGreyscaler(new ImageProcessor(ImageProcessor.parseComponents(experience.getImageProcessingComponents()), 4));
 			detector.setMarkerCodeFactory(experience.getMarkerCodeFactory());
 
 			setTitle(experience.getName());

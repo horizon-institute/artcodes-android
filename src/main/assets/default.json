@@ -2,20 +2,23 @@
   {
 	"name": "A princess honeymoons in our town",
 	"id": "55a4bbf4-0327-426b-b554-8fb064663b8a",
+	"version": 3,
 	"greyscaleOptions": ["RGB",1,0,0],
+	"invertGreyscale": true,
+	"imageProcessingComponents": ["whiteBalance","hlsEdit(0,80,80)","redRgbFilter","invert"],
 	"minRegions": 5,
 	"maxRegions": 5,
 	"checksumModulo": 500,
 	"embeddedChecksum": true,
 	"image": "mural_nws.jpg",
-	"description": "Illustrated by Dan Huggett and written by Pippa Hennessy.",
+	"description": "Illustrated by Dan Huggett and written by Pippa Hennessy. (P1V3)",
 	"thresholdBehaviour": "temporalTile",
 	"openMode": "autoOpen",
 	"markers": [
 	  {
 		"code": "1:2:3:6:6",
 		"title": "A princess honeymoons in our town",
-		"action": "http://stefan1979.github.io/murals/NWS_intro.html",
+		"action": "https://stefan1979.github.io/murals/NWS_intro.html",
 		"showDetail": false
 	  }
 	]
@@ -23,7 +26,9 @@
   {
 	"name": "A princess honeymoons in our town",
 	"id": "15ed3dea-36f0-47d6-a635-f282ac926f76",
+	"version": 2000,
 	"greyscaleOptions": ["RGB",1,0,0],
+	"imageProcessingComponents": ["whiteBalance","hlsEdit(0,80,80)","redRgbFilter"],
 	"minRegions": 5,
 	"maxRegions": 5,
 	"checksumModulo": 500,
@@ -33,41 +38,43 @@
 	"thresholdBehaviour": "temporalTile",
 	"openMode": "autoOpen",
 	"ignoreEmptyRegions":true,
+	"relaxedEmbeddedChecksumIgnoreMultipleHollowSegments": true,
+	"relaxedEmbeddedChecksumIgnoreNonHollowDots": true,
 	"markers": [
 	  {
 		"code": "1:2:2:3:6>1:2:3:5:6",
 		"title": "Arthur and Finestra",
-		"action": "http://stefan1979.github.io/murals/NWS_raf.html",
+		"action": "https://stefan1979.github.io/murals/NWS_raf.html",
 		"showDetail": false
 	  },
 	  {
 		"code": "1:2:3:5:6>1:2:2:3:6",
 		"title": "Arthur and Finestra",
-		"action": "http://stefan1979.github.io/murals/NWS_raf.html",
+		"action": "https://stefan1979.github.io/murals/NWS_raf.html",
 		"showDetail": false
 	  },
 	  {
 		"code": "1:1:2:4:5>1:2:2:3:6",
 		"title": "Arthur and Juan",
-		"action": "http://stefan1979.github.io/murals/NWS_raj.html",
+		"action": "https://stefan1979.github.io/murals/NWS_raj.html",
 		"showDetail": false
 	  },
 	  {
 		"code": "1:2:2:3:6>1:1:2:4:5",
 		"title": "Arthur and Juan",
-		"action": "http://stefan1979.github.io/murals/NWS_raj.html",
+		"action": "https://stefan1979.github.io/murals/NWS_raj.html",
 		"showDetail": false
 	  },
 	  {
 		"code": "1:1:2:4:5>1:2:3:5:6",
 		"title": "Juan and Finestra",
-		"action": "http://stefan1979.github.io/murals/NWS_rfj.html",
+		"action": "https://stefan1979.github.io/murals/NWS_rfj.html",
 		"showDetail": false
 	  },
 	  {
 		"code": "1:2:3:5:6>1:1:2:4:5",
 		"title": "Juan and Finestra",
-		"action": "http://stefan1979.github.io/murals/NWS_rfj.html",
+		"action": "https://stefan1979.github.io/murals/NWS_rfj.html",
 		"showDetail": false
 	  }
 	]
@@ -75,7 +82,10 @@
   {
 	"name": "A princess honeymoons in our town",
 	"id": "5fa76a34-5c2e-4886-9b37-543008b316b7",
+	"version": 2,
 	"greyscaleOptions": ["CMYK",0,0,1,0],
+	"invertGreyscale": true,
+	"imageProcessingComponents": ["whiteBalance","yellowCmykFilter","invert"],
 	"minRegions": 5,
 	"maxRegions": 5,
 	"checksumModulo": 500,
@@ -91,37 +101,37 @@
 	  {
 		"code": "1:2:3:3:4>1:1:3:4:6",
 		"title": "Arthur and Finestra",
-		"action": "http://stefan1979.github.io/murals/NWS_ykaf.html",
+		"action": "https://stefan1979.github.io/murals/NWS_ykaf.html",
 		"showDetail": false
 	  },
 	  {
 		"code": "1:1:3:4:6>1:2:3:3:4",
 		"title": "Arthur and Finestra",
-		"action": "http://stefan1979.github.io/murals/NWS_ykaf.html",
+		"action": "https://stefan1979.github.io/murals/NWS_ykaf.html",
 		"showDetail": false
 	  },
 	  {
 		"code": "1:1:2:2:4>1:2:3:3:4",
 		"title": "Arthur and Juan",
-		"action": "http://stefan1979.github.io/murals/NWS_ykaj.html",
+		"action": "https://stefan1979.github.io/murals/NWS_ykaj.html",
 		"showDetail": false
 	  },
 	  {
 		"code": "1:2:3:3:4>1:1:2:2:4",
 		"title": "Arthur and Juan",
-		"action": "http://stefan1979.github.io/murals/NWS_ykaj.html",
+		"action": "https://stefan1979.github.io/murals/NWS_ykaj.html",
 		"showDetail": false
 	  },
 	  {
 		"code": "1:1:2:2:4>1:1:3:4:6",
 		"title": "Juan and Finestra",
-		"action": "http://stefan1979.github.io/murals/NWS_ykfj.html",
+		"action": "https://stefan1979.github.io/murals/NWS_ykfj.html",
 		"showDetail": false
 	  },
 	  {
 		"code": "1:1:3:4:6>1:1:2:2:4",
 		"title": "Juan and Finestra",
-		"action": "http://stefan1979.github.io/murals/NWS_ykfj.html",
+		"action": "https://stefan1979.github.io/murals/NWS_ykfj.html",
 		"showDetail": false
 	  }
 	]
@@ -129,61 +139,76 @@
   {
 	"name": "WHO AM I?",
 	"id": "a564fe42-da31-4544-b317-143637bc9c85",
-	"version": 3,
+	"version": 6,
 	"greyscaleOptions": ["CMYK",1,0,0,0],
 	"invertGreyscale": true,
+	"imageProcessingComponents": ["whiteBalance","cyanCmykFilter","invert"],
 	"minRegions": 5,
 	"maxRegions": 5,
+	"ignoreEmptyRegions":true,
 	"checksumModulo": 500,
 	"embeddedChecksum": true,
+	"relaxedEmbeddedChecksumIgnoreMultipleHollowSegments": true,
+	"relaxedEmbeddedChecksumIgnoreNonHollowDots": true,
 	"image": "mural_bearcat.jpg",
-	"description": "Illustrated by Lilli Cowley-Wood and written by Carol Adlam.",
+	"description": "Illustrated by Lilli Cowley-Wood and written by Carol Adlam. (P1V6)",
 	"thresholdBehaviour": "temporalTile",
 	"openMode": "autoOpen",
-	"startUpURL": "http://stefan1979.github.io/murals/BEAR-greeting-hello.html",
+	"startUpURL": "https://stefan1979.github.io/murals/BEAR-greeting-hello.html",
 	"markers":[
 	  {
-		"code": "1:1:1:3:4+3:3:4:4:6+3:5:6:6:6",
+		"code": "3:5:6:6:6",
 		"title": "WHO AM I?",
-		"action": "http://stefan1979.github.io/murals/BEAR-panel-1-screen.html",
-		"changeToExperienceOnOpen": "8b77b6e9-09dd-46bf-aadb-44c5c16b74eb"
+		"action": "https://stefan1979.github.io/murals/BEAR-panel-1-screen.html",
+		"changeToExperienceOnOpen": "8b77b6e9-09dd-46bf-aadb-44c5c16b74eb",
+		"changeToExperienceWithIdOnOpen": "8b77b6e9-09dd-46bf-aadb-44c5c16b74eb"
 	  }
 	]
   },
   {
 	"name": "WHO AM I?",
 	"id": "8b77b6e9-09dd-46bf-aadb-44c5c16b74eb",
+	"version": 5,
+	"imageProcessingComponents": ["whiteBalance"],
 	"minRegions": 5,
 	"maxRegions": 5,
-	"checksumModulo": 500,
+	"ignoreEmptyRegions":true,
+	"checksumModulo": 11,
 	"embeddedChecksum": true,
+	"relaxedEmbeddedChecksumIgnoreMultipleHollowSegments": true,
+	"relaxedEmbeddedChecksumIgnoreNonHollowDots": true,
 	"image": "mural_bearcat.jpg",
-	"description": "Illustrated by Lilli Cowley-Wood and written by Carol Adlam.",
+	"description": "Illustrated by Lilli Cowley-Wood and written by Carol Adlam. (P2V5)",
 	"thresholdBehaviour": "temporalTile",
 	"openMode": "autoOpen",
 	"markers":[
 	  {
 		"code": "1:1:5:6:6",
 		"title": "WHO AM I?",
-		"action": "http://stefan1979.github.io/murals/BEAR-panel-2-screen.html",
-		"changeToExperienceOnOpen": "65a79d09-c1c1-4705-ab30-2f0d77d70441"
+		"action": "https://stefan1979.github.io/murals/BEAR-panel-2-screen.html",
+		"changeToExperienceOnOpen": "65a79d09-c1c1-4705-ab30-2f0d77d70441",
+		"changeToExperienceWithIdOnOpen": "65a79d09-c1c1-4705-ab30-2f0d77d70441"
 	  },
 	  {
 		"code": "1:1:1:2:6",
 		"title": "WHO AM I?",
-		"action": "http://stefan1979.github.io/murals/BEAR-panel-5-screen.html"
+		"action": "https://stefan1979.github.io/murals/BEAR-panel-5-screen.html",
+		"changeToExperienceOnOpen": "d7e260ea-a150-4b7c-b7c0-aadb59dec8bd",
+		"changeToExperienceWithIdOnOpen": "d7e260ea-a150-4b7c-b7c0-aadb59dec8bd"
 	  },
 	  {
 		"code": "1:1:1:2:3",
 		"title": "WHO AM I?",
-		"action": "http://stefan1979.github.io/murals/BEAR-panel-6-screen.html"
+		"action": "https://stefan1979.github.io/murals/BEAR-panel-6-screen.html"
 	  }
 	]
   },
   {
 	"name": "WHO AM I?",
 	"id": "65a79d09-c1c1-4705-ab30-2f0d77d70441",
+	"version": 2,
 	"greyscaleOptions": ["CMYK",0,0,1,0],
+	"imageProcessingComponents": ["whiteBalance","yellowCmykFilter"],
 	"minRegions": 5,
 	"maxRegions": 5,
 	"checksumModulo": 500,
@@ -196,43 +221,81 @@
 	  {
 		"code": "1:1:1:2:3",
 		"title": "WHO AM I?",
-		"action": "http://stefan1979.github.io/murals/BEAR-panel-3-screen.html",
-		"changeToExperienceOnOpen": "7af2e1ac-741d-464c-86b8-ae2435874d08"
+		"action": "https://stefan1979.github.io/murals/BEAR-panel-3-screen.html",
+		"changeToExperienceOnOpen": "7af2e1ac-741d-464c-86b8-ae2435874d08",
+		"changeToExperienceWithIdOnOpen": "7af2e1ac-741d-464c-86b8-ae2435874d08"
 	  }
 	]
   },
   {
 	"name": "WHO AM I?",
 	"id": "7af2e1ac-741d-464c-86b8-ae2435874d08",
+	"version": 5,
 	"greyscaleOptions": ["CMYK",0,1,0,0],
+	"invertGreyscale": true,
+	"imageProcessingComponents": ["whiteBalance","magentaCmykFilter","invert"],
 	"minRegions": 5,
 	"maxRegions": 5,
+	"ignoreEmptyRegions":true,
 	"checksumModulo": 500,
 	"embeddedChecksum": true,
+	"relaxedEmbeddedChecksumIgnoreMultipleHollowSegments": true,
+	"relaxedEmbeddedChecksumIgnoreNonHollowDots": true,
 	"image": "mural_bearcat.jpg",
-	"description": "Illustrated by Lilli Cowley-Wood and written by Carol Adlam.",
+	"description": "Illustrated by Lilli Cowley-Wood and written by Carol Adlam. (P4V5)",
 	"thresholdBehaviour": "temporalTile",
 	"openMode": "autoOpen",
 	"markers":[
 	  {
-		"code": "1:1:1:1:4>1:1:2:2:3>6:6:6:6:6",
+		"code": "1:1:1:1:4>6:6:6:6:6>1:1:2:2:3",
 		"title": "WHO AM I?",
-		"action": "http://stefan1979.github.io/murals/BEAR-panel-4-screen.html",
-		"changeToExperienceOnOpen": "8b77b6e9-09dd-46bf-aadb-44c5c16b74eb"
+		"action": "https://stefan1979.github.io/murals/BEAR-panel-4-screen.html",
+		"changeToExperienceOnOpen": "8b77b6e9-09dd-46bf-aadb-44c5c16b74eb",
+		"changeToExperienceWithIdOnOpen": "8b77b6e9-09dd-46bf-aadb-44c5c16b74eb"
+	  }
+	]
+  },
+  {
+	"name": "WHO AM I?",
+	"id": "d7e260ea-a150-4b7c-b7c0-aadb59dec8bd",
+	"invertGreyscale": true,
+	"imageProcessingComponents": ["whiteBalance","invert"],
+	"version": 4,
+	"minRegions": 5,
+	"maxRegions": 5,
+	"ignoreEmptyRegions":true,
+	"checksumModulo": 11,
+	"embeddedChecksum": true,
+	"relaxedEmbeddedChecksumIgnoreMultipleHollowSegments": true,
+	"relaxedEmbeddedChecksumIgnoreNonHollowDots": true,
+	"image": "mural_bearcat.jpg",
+	"description": "Illustrated by Lilli Cowley-Wood and written by Carol Adlam. (P2V4)",
+	"thresholdBehaviour": "temporalTile",
+	"openMode": "autoOpen",
+	"markers":[
+	  {
+		"code": "1:1:1:2:3",
+		"title": "WHO AM I?",
+		"action": "https://stefan1979.github.io/murals/BEAR-panel-6-screen.html"
 	  }
 	]
   },
   {
 	"name": "Stalkers",
 	"id": "053197ac-eedc-4a3f-a248-4ae21b8fb77a",
+	"version": 33,
 	"greyscaleOptions": ["CMYK",0,0,0,1],
 	"invertGreyscale": true,
+	"imageProcessingComponents": ["whiteBalance","blackCmykFilter","invert"],
 	"minRegions": 5,
 	"maxRegions": 5,
+	"ignoreEmptyRegions":true,
 	"checksumModulo": 500,
 	"embeddedChecksum": true,
+	"relaxedEmbeddedChecksumIgnoreMultipleHollowSegments": true,
+	"relaxedEmbeddedChecksumIgnoreNonHollowDots": true,
 	"image": "mural_stalkers.jpg",
-	"description": "Illustrated by James Dawe and written by Alicja Shaw.",
+	"description": "Illustrated by James Dawe and written by Alicja Shaw. (P1V33)",
 	"thresholdBehaviour": "temporalTile",
 	"openMode": "autoOpen",
 	"comingSoon": false,
@@ -240,35 +303,41 @@
 	  {
 		"code": "1:2:2:3:3",
 		"title": "Stalkers",
-		"action": "http://stefan1979.github.io/murals/STALKER-1a-journal.html",
-		"changeToExperienceOnOpen": "11066c08-5396-4f1e-9caa-65074e1610d4"
+		"action": "https://stefan1979.github.io/murals/STALKER-1a-journal.html",
+		"changeToExperienceOnOpen": "11066c08-5396-4f1e-9caa-65074e1610d4",
+		"changeToExperienceWithIdOnOpen": "11066c08-5396-4f1e-9caa-65074e1610d4"
 	  }
 	]
   },
   {
 	"name": "Stalkers",
 	"id": "11066c08-5396-4f1e-9caa-65074e1610d4",
+	"version": 3,
+	"imageProcessingComponents": ["whiteBalance"],
 	"minRegions": 5,
 	"maxRegions": 5,
 	"checksumModulo": 500,
 	"embeddedChecksum": true,
 	"image": "mural_stalkers.jpg",
-	"description": "Illustrated by James Dawe and written by Alicja Shaw.",
+	"description": "Illustrated by James Dawe and written by Alicja Shaw. (V3)",
 	"thresholdBehaviour": "temporalTile",
 	"openMode": "autoOpen",
 	"markers":[
 	  {
 		"code": "1:1:1:2:2",
 		"title": "Stalkers",
-		"action": "http://stefan1979.github.io/murals/STALKER-2a-radio-mast.html",
-		"changeToExperienceOnOpen": "bfba3046-3707-4ce7-a201-3764fdf528e6"
+		"action": "https://stefan1979.github.io/murals/STALKER-2-radio-mast.html",
+		"changeToExperienceOnOpen": "bfba3046-3707-4ce7-a201-3764fdf528e6",
+		"changeToExperienceWithIdOnOpen": "bfba3046-3707-4ce7-a201-3764fdf528e6"
 	  }
 	]
   },
   {
 	"name": "Stalkers",
 	"id": "bfba3046-3707-4ce7-a201-3764fdf528e6",
+	"version": 2,
 	"greyscaleOptions": ["CMYK",0,0,1,0],
+	"imageProcessingComponents": ["whiteBalance","yellowCmykFilter"],
 	"minRegions": 5,
 	"maxRegions": 5,
 	"checksumModulo": 500,
@@ -281,58 +350,71 @@
 	  {
 		"code": "1:1:1:3:5",
 		"title": "Stalkers",
-		"action": "http://stefan1979.github.io/murals/STALKER-3-visor.html",
-		"changeToExperienceOnOpen": "6de1d9cf-c1c9-44bb-9c3f-ba34a525a895"
+		"action": "https://stefan1979.github.io/murals/STALKER-3-visor.html",
+		"changeToExperienceOnOpen": "6de1d9cf-c1c9-44bb-9c3f-ba34a525a895",
+		"changeToExperienceWithIdOnOpen": "6de1d9cf-c1c9-44bb-9c3f-ba34a525a895"
 	  }
 	]
   },
   {
 	"name": "Stalkers",
 	"id": "6de1d9cf-c1c9-44bb-9c3f-ba34a525a895",
+	"version": 3,
 	"greyscaleOptions": ["CMYK",0,0,0,1],
+	"invertGreyscale": true,
+	"imageProcessingComponents": ["whiteBalance","blackCmykFilter","invert"],
 	"minRegions": 5,
 	"maxRegions": 5,
 	"checksumModulo": 500,
 	"embeddedChecksum": true,
 	"image": "mural_stalkers.jpg",
-	"description": "Illustrated by James Dawe and written by Alicja Shaw.",
+	"description": "Illustrated by James Dawe and written by Alicja Shaw. (P4V3)",
 	"thresholdBehaviour": "temporalTile",
 	"openMode": "autoOpen",
 	"markers":[
 	  {
 		"code": "1:1:2:2:4",
 		"title": "Stalkers",
-		"action": "http://stefan1979.github.io/murals/STALKER-4-mountain-map.html",
-		"changeToExperienceOnOpen": "de41cdd6-0cc2-4736-b716-3dc346281ca1"
+		"action": "https://stefan1979.github.io/murals/STALKER-4-mountain-map.html",
+		"changeToExperienceOnOpen": "de41cdd6-0cc2-4736-b716-3dc346281ca1",
+		"changeToExperienceWithIdOnOpen": "de41cdd6-0cc2-4736-b716-3dc346281ca1"
 	  }
 	]
   },
   {
 	"name": "Stalkers",
 	"id": "de41cdd6-0cc2-4736-b716-3dc346281ca1",
+	"version": 3,
 	"greyscaleOptions": ["CMYK",0,0,0,1],
 	"invertGreyscale": true,
+	"imageProcessingComponents": ["whiteBalance","blackCmykFilter","invert"],
 	"minRegions": 5,
 	"maxRegions": 5,
+	"ignoreEmptyRegions":true,
 	"checksumModulo": 500,
 	"embeddedChecksum": true,
+	"relaxedEmbeddedChecksumIgnoreMultipleHollowSegments": true,
+	"relaxedEmbeddedChecksumIgnoreNonHollowDots": true,
 	"image": "mural_stalkers.jpg",
-	"description": "Illustrated by James Dawe and written by Alicja Shaw.",
+	"description": "Illustrated by James Dawe and written by Alicja Shaw. (P5V3)",
 	"thresholdBehaviour": "temporalTile",
 	"openMode": "autoOpen",
 	"markers":[
 	  {
 		"code": "1:1:1:1:4",
 		"title": "Stalkers",
-		"action": "http://stefan1979.github.io/murals/STALKER-5-bluecenter.html",
-		"changeToExperienceOnOpen": "bf510b9c-4478-4d03-b0b0-ed6aec6103d9"
+		"action": "https://stefan1979.github.io/murals/STALKER-5-bluecenter.html",
+		"changeToExperienceOnOpen": "bf510b9c-4478-4d03-b0b0-ed6aec6103d9",
+		"changeToExperienceWithIdOnOpen": "bf510b9c-4478-4d03-b0b0-ed6aec6103d9"
 	  }
 	]
   },
   {
 	"name": "Stalkers",
 	"id": "bf510b9c-4478-4d03-b0b0-ed6aec6103d9",
+	"version": 2,
 	"greyscaleOptions": ["CMY",1,0,0],
+	"imageProcessingComponents": ["whiteBalance","cyanCmyFilter"],
 	"minRegions": 5,
 	"maxRegions": 5,
 	"checksumModulo": 500,
@@ -345,7 +427,7 @@
 	  {
 		"code": "2:3:3:3:4",
 		"title": "Stalkers",
-		"action": "http://stefan1979.github.io/murals/STALKER-6a-meat-grinder.html"
+		"action": "https://stefan1979.github.io/murals/STALKER-6a-meat-grinder.html"
 	  }
 	]
   }
