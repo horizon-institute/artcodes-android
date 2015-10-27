@@ -18,7 +18,7 @@
   ~     along with this program.  If not, see <http://www.gnu.org/licenses/>.
   -->
 <resources xmlns:tools="http://schemas.android.com/tools">
-	<string name="app_name">Artcodes</string>
+	<string name="app_name">Storicodes</string>
 	<string name="property_set">Set %s</string>
 	<string name="code_text">Marker %s</string>
 	<string name="marker_open">Open %s</string>
