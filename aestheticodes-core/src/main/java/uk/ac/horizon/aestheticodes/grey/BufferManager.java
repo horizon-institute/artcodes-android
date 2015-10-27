@@ -19,6 +19,7 @@
 
 package uk.ac.horizon.aestheticodes.grey;
 
+import org.opencv.core.Core;
 import org.opencv.core.CvType;
 import org.opencv.core.Mat;
 import org.opencv.imgproc.Imgproc;
@@ -62,12 +63,46 @@ public class BufferManager
     {
         this.yuvBuffer = this.mostRecentSetData = yuvSource;
         this.greyBuffer = greyResultBuffer;
+
+        if (this.greyBuffer!=null)
+        {
+            int desiredCols = this.yuvBuffer.cols();
+            int desiredRows = (this.yuvBuffer.rows() / 3) * 2;
+            if (desiredRows != this.greyBuffer.rows() || desiredCols != this.greyBuffer.cols())
+            {
+                if (desiredCols == this.greyBuffer.rows() && desiredRows == this.greyBuffer.cols())
+                {
+                    Core.transpose(this.greyBuffer, this.greyBuffer);
+                }
+                else
+                {
+                    this.greyBuffer.release();
+                    this.greyBuffer = new Mat(this.bgrBuffer.size(), CvType.CV_8UC1);
+                }
+            }
+        }
     }
 
     public void setupWithBgrSourceAndGreyResultBuffer(Mat bgrSource, Mat greyResultBuffer)
     {
         this.bgrBuffer = this.mostRecentSetData = bgrSource;
         this.greyBuffer = greyResultBuffer;
+
+        if (this.greyBuffer!=null)
+        {
+            if (this.bgrBuffer.rows() != this.greyBuffer.rows() || this.bgrBuffer.cols() != this.greyBuffer.cols())
+            {
+                if (this.bgrBuffer.cols() == this.greyBuffer.rows() && this.bgrBuffer.rows() == this.greyBuffer.cols())
+                {
+                    Core.transpose(this.greyBuffer, this.greyBuffer);
+                }
+                else
+                {
+                    this.greyBuffer.release();
+                    this.greyBuffer = new Mat(this.bgrBuffer.size(), CvType.CV_8UC1);
+                }
+            }
+        }
     }
 
     public void release()
