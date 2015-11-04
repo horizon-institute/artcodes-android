@@ -131,6 +131,7 @@ public class AestheticodesActivity extends ScanActivity implements ExperienceLis
 		});
 
 		this.saveSelectedExperienceToPreferences(experience);
+		this.markerChanged(null, null, -1, null, false);
 	}
 
 
@@ -195,9 +196,17 @@ public class AestheticodesActivity extends ScanActivity implements ExperienceLis
 
 		//
 		String hint = null;
+		Experience experience = experienceController.get();
 		if (historySize > 0)
 		{
-			hint = "This code is part of a sequence, find the next!";
+			if (experience!=null && experience.getHintText()!=null && experience.getHintText().get("sequencePart")!=null)
+			{
+				hint = experience.getHintText().get("sequencePart");
+			}
+			else
+			{
+				hint = "This code is part of a sequence, find the next!";
+			}
 		}
 		else if (markerCode!=null)
 		{
@@ -231,7 +240,14 @@ public class AestheticodesActivity extends ScanActivity implements ExperienceLis
 		}
 		else
 		{
-			hint = "Place an Artcode in the camera view";
+			if (experience!=null && experience.getHintText()!=null && experience.getHintText().get("rest")!=null)
+			{
+				hint = experience.getHintText().get("rest");
+			}
+			else
+			{
+				hint = "Place an Artcode in the camera view";
+			}
 		}
 		final String finalHint = new String(hint);
 		runOnUiThread(new Runnable()

@@ -38,6 +38,16 @@ public class Experience
         this.ignoreEmptyRegions = ignoreEmptyRegions;
     }
 
+    public Map<String, String> getHintText()
+    {
+        return hintText;
+    }
+
+    public void setHintText(Map<String, String> hintText)
+    {
+        this.hintText = hintText;
+    }
+
     public enum Operation
     {
         create, retrieve, update, deleted, add, remove
@@ -79,6 +89,8 @@ public class Experience
     private boolean embeddedChecksum = false;
     private Threshold threshold = Threshold.temporalTile;
     private List<String> imageProcessingComponents = null;
+
+    private Map<String,String> hintText = null;
 
     // addition values
     private String startUpURL = null;

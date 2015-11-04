@@ -21,7 +21,10 @@
 		"action": "https://stefan1979.github.io/murals/NWS_intro.html",
 		"showDetail": false
 	  }
-	]
+	],
+	"hintText": {
+	  "rest": "Scan the buildings!"
+	}
   },
   {
 	"name": "A princess honeymoons in our town",
@@ -77,7 +80,11 @@
 		"action": "https://stefan1979.github.io/murals/NWS_rfj.html",
 		"showDetail": false
 	  }
-	]
+	],
+	"hintText": {
+	  "rest": "Scan a character",
+	  "sequencePart": "Great! Scan a second character"
+	}
   },
   {
 	"name": "A princess honeymoons in our town",
@@ -134,7 +141,11 @@
 		"action": "https://stefan1979.github.io/murals/NWS_ykfj.html",
 		"showDetail": false
 	  }
-	]
+	],
+	"hintText": {
+	  "rest": "Scan the 3 pairs again",
+	  "sequencePart": "Great! Scan a second character"
+	}
   },
   {
 	"name": "WHO AM I?",
