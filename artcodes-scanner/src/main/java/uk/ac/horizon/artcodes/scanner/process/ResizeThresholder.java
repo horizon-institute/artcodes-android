@@ -19,27 +19,39 @@
 
 package uk.ac.horizon.artcodes.scanner.process;
 
-import org.opencv.core.Mat;
+import android.view.LayoutInflater;
+import android.view.ViewGroup;
+
 import org.opencv.core.Size;
 import org.opencv.imgproc.Imgproc;
+
+import java.util.List;
+
+import uk.ac.horizon.artcodes.scanner.ImageBuffers;
+import uk.ac.horizon.artcodes.scanner.TextAnimator;
 
 public class ResizeThresholder implements ImageProcessor
 {
 	private transient int neighbourhood = 5;
 
 	@Override
-	public Mat process(Mat image)
+	public void process(ImageBuffers buffers)
 	{
-		Imgproc.resize(image, image, new Size(540, 540));
+		Imgproc.resize(buffers.getImage(), buffers.getImage(), new Size(540, 540));
 
-		Imgproc.GaussianBlur(image, image, new Size(5, 5), 0);
+		Imgproc.GaussianBlur(buffers.getImage(), buffers.getImage(), new Size(5, 5), 0);
 
 		// TODO if (!detected)
 		//{
 			neighbourhood = (neighbourhood % 50) + 5;
 		//}
 		//Log.i(TAG, "Neighbourhood = " + neighbourhood);
-		Imgproc.adaptiveThreshold(image, image, 255, Imgproc.ADAPTIVE_THRESH_MEAN_C, Imgproc.THRESH_BINARY, neighbourhood, 2);
-		return image;
+		Imgproc.adaptiveThreshold(buffers.getImage(), buffers.getImage(), 255, Imgproc.ADAPTIVE_THRESH_MEAN_C, Imgproc.THRESH_BINARY, neighbourhood, 2);
+	}
+
+	@Override
+	public void getSettings(List<ImageProcessorSetting> settings)
+	{
+
 	}
 }

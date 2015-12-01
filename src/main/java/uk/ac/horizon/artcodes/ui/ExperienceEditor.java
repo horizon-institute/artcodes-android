@@ -65,7 +65,23 @@ public class ExperienceEditor extends BaseObservable
 	@Bindable
 	public int getChecksum()
 	{
-		return experience.getChecksumModulo() - 1;
+		if(experience.getPipeline() != null)
+		{
+			String detector = experience.getPipeline().get(experience.getPipeline().size() - 1);
+			if (detector.contains(":"))
+			{
+				String[] parts =detector.split(":");
+				try
+				{
+					return Integer.parseInt(parts[parts.length - 1]) - 1;
+				}
+				catch (Exception e)
+				{
+					//
+				}
+			}
+		}
+		return 0;
 	}
 
 	public int getChecksumMax()
@@ -80,7 +96,7 @@ public class ExperienceEditor extends BaseObservable
 			@Override
 			public void onCheckedChanged(CompoundButton buttonView, boolean isChecked)
 			{
-				experience.setEmbeddedChecksum(isChecked);
+				// TODO experience.setEmbeddedChecksum(isChecked);
 				notifyPropertyChanged(uk.ac.horizon.artcodes.BR.checksumText);
 			}
 		};
@@ -88,7 +104,12 @@ public class ExperienceEditor extends BaseObservable
 
 	public boolean getEmbeddedChecksum()
 	{
-		return experience.getEmbeddedChecksum();
+		if(experience.getPipeline() != null)
+		{
+			String detector = experience.getPipeline().get(experience.getPipeline().size() - 1);
+			return detector.startsWith("embedded");
+		}
+		return false;
 	}
 
 	public SeekBar.OnSeekBarChangeListener getChecksumListener()
@@ -98,7 +119,7 @@ public class ExperienceEditor extends BaseObservable
 			@Override
 			public void onProgressChanged(SeekBar seekBar, int progress, boolean fromUser)
 			{
-				experience.setChecksumModulo(progress + 1);
+				// TODO experience.setChecksumModulo(progress + 1);
 				notifyPropertyChanged(uk.ac.horizon.artcodes.BR.checksumText);
 			}
 
@@ -119,15 +140,17 @@ public class ExperienceEditor extends BaseObservable
 	@Bindable
 	public String getChecksumText()
 	{
-		if (experience.getChecksumModulo() <= 1)
+		if (getChecksum() <= 1)
 		{
 			return context.getString(R.string.checksumModulo_off);
-		} else if (experience.getEmbeddedChecksum())
+		}
+		else if (getEmbeddedChecksum())
 		{
-			return context.getString(R.string.checksumModulo_embedded_value, experience.getChecksumModulo());
-		} else
+			return context.getString(R.string.checksumModulo_embedded_value, getChecksum());
+		}
+		else
 		{
-			return context.getString(R.string.checksumModulo_value, experience.getChecksumModulo());
+			return context.getString(R.string.checksumModulo_value, getChecksum());
 		}
 	}
 

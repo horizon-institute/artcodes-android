@@ -19,8 +19,15 @@
 
 package uk.ac.horizon.artcodes.scanner.process;
 
+import android.view.LayoutInflater;
+import android.view.ViewGroup;
+
 import org.opencv.core.Core;
-import org.opencv.core.Mat;
+
+import java.util.List;
+
+import uk.ac.horizon.artcodes.scanner.ImageBuffers;
+import uk.ac.horizon.artcodes.scanner.TextAnimator;
 
 public class Inverter implements ImageProcessor
 {
@@ -30,9 +37,13 @@ public class Inverter implements ImageProcessor
 	}
 
 	@Override
-	public Mat process(Mat image)
+	public void process(ImageBuffers buffers)
 	{
-		Core.bitwise_not(image, image);
-		return image;
+		Core.bitwise_not(buffers.getImage(), buffers.getImage());
+	}
+
+	@Override
+	public void getSettings(List<ImageProcessorSetting> settings)
+	{
 	}
 }

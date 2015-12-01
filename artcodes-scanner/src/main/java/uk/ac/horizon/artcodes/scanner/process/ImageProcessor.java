@@ -19,9 +19,17 @@
 
 package uk.ac.horizon.artcodes.scanner.process;
 
-import org.opencv.core.Mat;
+import android.view.LayoutInflater;
+import android.view.ViewGroup;
+
+import java.util.List;
+
+import uk.ac.horizon.artcodes.scanner.ImageBuffers;
+import uk.ac.horizon.artcodes.scanner.TextAnimator;
 
 public interface ImageProcessor
 {
-	Mat process(Mat image);
+	void process(ImageBuffers images);
+
+	void getSettings(List<ImageProcessorSetting> settings);
 }

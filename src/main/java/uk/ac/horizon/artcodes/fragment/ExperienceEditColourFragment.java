@@ -26,47 +26,29 @@ import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.AdapterView;
-import android.widget.CompoundButton;
-import android.widget.SeekBar;
 
 import org.opencv.android.OpenCVLoader;
-import org.opencv.core.Mat;
 
 import java.util.ArrayList;
 import java.util.List;
 
-import uk.ac.horizon.artcodes.GoogleAnalytics;
 import uk.ac.horizon.artcodes.R;
 import uk.ac.horizon.artcodes.databinding.ExperienceEditColourBinding;
-import uk.ac.horizon.artcodes.scanner.camera.CameraAdapter;
-import uk.ac.horizon.artcodes.scanner.camera.FrameProcessor;
-import uk.ac.horizon.artcodes.scanner.overlay.Overlay;
-import uk.ac.horizon.artcodes.scanner.overlay.ThresholdLayer;
-import uk.ac.horizon.artcodes.scanner.process.HueShifter;
+import uk.ac.horizon.artcodes.scanner.FrameProcessor;
+import uk.ac.horizon.artcodes.scanner.ImageBuffers;
+import uk.ac.horizon.artcodes.scanner.Scanner;
 import uk.ac.horizon.artcodes.scanner.process.ImageProcessor;
-import uk.ac.horizon.artcodes.scanner.process.IntensityGreyscaler;
-import uk.ac.horizon.artcodes.scanner.process.Inverter;
 import uk.ac.horizon.artcodes.scanner.process.RGBGreyscaler;
-import uk.ac.horizon.artcodes.scanner.process.TileThresholder;
 
 public class ExperienceEditColourFragment extends ExperienceEditFragment
 {
-	static
-	{
-		if (!OpenCVLoader.initDebug())
-		{
-			Log.e("", "Error Initializing OpenCV");
-		}
-	}
-
 	private final Object lockObject = new Object();
 	private final List<ImageProcessor> presets = new ArrayList<>();
-	private final HueShifter hueShifter = new HueShifter();
+	private final ImageBuffers buffers = new ImageBuffers();
 	private ExperienceEditColourBinding binding;
-	private CameraAdapter camera;
-	private Overlay overlay;
-	private Inverter inverter;
-	private ImageProcessor preset;
+	private Scanner scanner;
+	private ImageProcessor filter;
+	private FrameProcessor frameProcessor;
 
 	@Override
 	public int getTitleResource()
@@ -74,134 +56,24 @@ public class ExperienceEditColourFragment extends ExperienceEditFragment
 		return R.string.fragment_colour;
 	}
 
-	private void updatePipeline()
-	{
-		getExperience().getProcessors().clear();
-		if (hueShifter.getHueShift() != 0)
-		{
-			getExperience().getProcessors().add(hueShifter);
-		}
-		if (preset != null)
-		{
-			getExperience().getProcessors().add(preset);
-		}
-		if (inverter != null)
-		{
-			getExperience().getProcessors().add(inverter);
-		}
-		// TODO getExperience().getProcessors().add(new TileThresholder());
-	}
-
 	@Nullable
 	@Override
 	public View onCreateView(final LayoutInflater inflater, ViewGroup container, Bundle savedInstanceState)
 	{
 		binding = ExperienceEditColourBinding.inflate(inflater, container, false);
-		camera = new CameraAdapter(getActivity());
-		binding.setCamera(camera);
-		overlay = new Overlay();
-		overlay.setThresholdLayer(new ThresholdLayer());
-		binding.setOverlay(overlay);
+		scanner = new Scanner(getActivity());
 
-		presets.add(new IntensityGreyscaler());
+		binding.cameraSurface.getHolder().addCallback(scanner);
+		binding.setBuffers(buffers);
+
+		//presets.add(new IntensityGreyscaler());
 		presets.add(new RGBGreyscaler(RGBGreyscaler.Channel.red));
 		presets.add(new RGBGreyscaler(RGBGreyscaler.Channel.green));
 		presets.add(new RGBGreyscaler(RGBGreyscaler.Channel.blue));
-		// TODO Add cmyk
-		// TODO Add cmy?
+		// TODO Add cmy/cmyk/custom?
 
-		camera.setFrameProcessor(new FrameProcessor()
-		{
-			@Override
-			public void process(Mat image)
-			{
-				try
-				{
-					if (hueShifter.getHueShift() != 0)
-					{
-						image = hueShifter.process(image);
-					}
-					if (preset != null)
-					{
-						image = preset.process(image);
-					}
-					if (inverter != null)
-					{
-						image = inverter.process(image);
-					}
-
-					if (overlay.hasOutput(image))
-					{
-						rotate(image, image);
-					}
-
-					overlay.drawThreshold(image);
-				} catch (Exception e)
-				{
-					GoogleAnalytics.trackException(e);
-				}
-			}
-		});
-
-		//invertSwitch.setChecked(experience.getInvertGreyscale());
-		binding.invertSwitch.setOnCheckedChangeListener(new CompoundButton.OnCheckedChangeListener()
-		{
-			@Override
-			public void onCheckedChanged(CompoundButton compoundButton, boolean b)
-			{
-				synchronized (lockObject)
-				{
-					if (b)
-					{
-						inverter = new Inverter();
-					} else
-					{
-						inverter = null;
-					}
-					updatePipeline();
-				}
-			}
-		});
-
-		//hueShiftLabel.setText(getString(R.string.greyscaleHueSeekBarLabel, (int) experience.getHueShift()));
-		//hueSlider.setProgress((int) experience.getHueShift());
-		binding.hueSlider.setOnSeekBarChangeListener(new SeekBar.OnSeekBarChangeListener()
-		{
-			@Override
-			public void onProgressChanged(SeekBar seekBar, int i, boolean b)
-			{
-				hueShifter.setHueShift(i);
-			}
-
-			@Override
-			public void onStartTrackingTouch(SeekBar seekBar)
-			{
-			}
-
-			@Override
-			public void onStopTrackingTouch(SeekBar seekBar)
-			{
-				updatePipeline();
-			}
-		});
-
-		int index = 0;
-//		if (experience.getGreyscaleOptions() != null)
-//		{
-//			index = presets.indexOf(experience.getGreyscaleOptions());
-//			if (index < 0) // if the current preset is not in the list add an "other" option
-//			{
-//				names.add("Other");
-//				presets.add(this.experience.getGreyscaleOptions());
-//				colourPresetSpinner.setSelection(presets.size() - 1);
-//			}
-//		}
-
-		// setup the adapter for the spinner
-		//ArrayAdapter<CharSequence> adapter = ArrayAdapter.createFromResource(this, R.array.colourPresetNames, android.R.layout.simple_spinner_item);
-		//adapter.setDropDownViewResource(android.R.layout.simple_spinner_dropdown_item);
-		//colourPresetSpinner.setAdapter(adapter);
-		//colourPresetSpinner.setSelection(index);
+		frameProcessor = new FrameProcessor(buffers);
+		scanner.setFrameProcessor(frameProcessor);
 
 		binding.colourPresetSpinner.setOnItemSelectedListener(new AdapterView.OnItemSelectedListener()
 		{
@@ -225,5 +97,14 @@ public class ExperienceEditColourFragment extends ExperienceEditFragment
 		});
 
 		return binding.getRoot();
+	}
+
+	private void savePipeline()
+	{
+		// TODO
+		getExperience().getPipeline().clear();
+
+		getExperience().getPipeline().add("tile");
+		getExperience().getPipeline().add("detect");
 	}
 }

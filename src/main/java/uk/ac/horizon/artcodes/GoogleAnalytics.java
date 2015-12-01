@@ -80,7 +80,7 @@ public final class GoogleAnalytics
 
 	public static void trackException(Exception e)
 	{
-		Log.e("", e.getMessage(), e);
+		Log.e("Google Analytics", e.getMessage(), e);
 		get(Target.APP).send(new HitBuilders.ExceptionBuilder()
 				.setDescription(Throwables.getStackTraceAsString(e))
 				.build());

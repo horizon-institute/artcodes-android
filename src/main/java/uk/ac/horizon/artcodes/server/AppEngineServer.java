@@ -51,7 +51,7 @@ import uk.ac.horizon.artcodes.request.Request;
 import uk.ac.horizon.artcodes.request.RequestCallback;
 import uk.ac.horizon.artcodes.request.RequestCallbackBase;
 import uk.ac.horizon.artcodes.request.RequestFactory;
-import uk.ac.horizon.artcodes.scanner.camera.CameraAdapter;
+import uk.ac.horizon.artcodes.scanner.Scanner;
 
 public class AppEngineServer implements ArtcodeServer
 {
@@ -229,7 +229,7 @@ public class AppEngineServer implements ArtcodeServer
 	}
 
 	@Override
-	public void logScan(String uri, Action action, CameraAdapter adapter)
+	public void logScan(String uri, Action action, Scanner adapter)
 	{
 
 	}

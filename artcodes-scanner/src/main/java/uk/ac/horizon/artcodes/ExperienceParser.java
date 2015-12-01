@@ -27,6 +27,7 @@ import com.google.gson.GsonBuilder;
 import com.google.gson.JsonArray;
 import com.google.gson.JsonElement;
 import com.google.gson.JsonObject;
+import com.google.gson.JsonPrimitive;
 import com.google.gson.TypeAdapter;
 import com.google.gson.TypeAdapterFactory;
 import com.google.gson.reflect.TypeToken;
@@ -51,11 +52,6 @@ public class ExperienceParser
 			{
 				builder.registerTypeAdapterFactory(new ExperienceTypeAdapterFactor());
 			}
-//			builder.registerTypeAdapterFactory(RuntimeTypeAdapterFactory.of(ImageProcessor.class)
-//					.registerSubtype(TileThresholder.class, "tile")
-//					.registerSubtype(ResizeThresholder.class, "resize")
-//					.registerSubtype(HueShifter.class, "hue")
-//					.registerSubtype(Inverter.class, "invert"));
 			gson = builder.create();
 		}
 		return gson;
@@ -95,6 +91,24 @@ public class ExperienceParser
 							{
 								jsonObject.addProperty("id", "http://aestheticodes.appspot.com/experience/" + id);
 							}
+						}
+
+						if (!jsonObject.has("pipeline"))
+						{
+							JsonArray array = new JsonArray();
+							array.add(new JsonPrimitive("tile"));
+							if(jsonObject.has("embeddedChecksum")
+									&& jsonObject.get("embeddedChecksum") instanceof JsonPrimitive
+									&& jsonObject.get("embeddedChecksum").getAsBoolean())
+							{
+								array.add(new JsonPrimitive("detectEmbedded"));
+							}
+							else
+							{
+								array.add(new JsonPrimitive("detect"));
+							}
+
+							jsonObject.add("pipeline", array);
 						}
 
 						if (jsonObject.has("markers"))

@@ -24,7 +24,6 @@
         tools:context=".activities.ScannerActivity">
 
     <data>
-
         <import type="android.view.View"/>
 
         <variable
@@ -32,12 +31,8 @@
             type="uk.ac.horizon.artcodes.model.Experience"/>
 
         <variable
-            name="camera"
-            type="uk.ac.horizon.artcodes.scanner.camera.CameraAdapter"/>
-
-        <variable
-            name="overlay"
-            type="uk.ac.horizon.artcodes.scanner.overlay.Overlay"/>
+            name="buffers"
+            type="uk.ac.horizon.artcodes.scanner.ImageBuffers"/>
     </data>
 
     <FrameLayout
@@ -48,7 +43,7 @@
         <SurfaceView
             android:layout_width="fill_parent"
             android:layout_height="fill_parent"
-            app:surface="@{camera.surfaceCallback}"/>
+            android:id="@+id/cameraSurface"/>
 
         <LinearLayout
             android:layout_width="fill_parent"
@@ -64,19 +59,18 @@
                 android:background="@color/viewfinder_mask"
                 android:fitsSystemWindows="true"
                 android:title="@{experience.name}"
-                app:height="@{overlay.viewfinderSize}"/>
+                app:height="@{buffers.borderTop}"/>
 
             <android.support.design.widget.CoordinatorLayout
                 android:layout_width="fill_parent"
                 android:layout_height="0dp"
-                android:layout_weight="1"
-                app:snacktext="@{overlay.feedback}">
+                android:layout_weight="1">
 
                 <ImageView
                     android:layout_width="match_parent"
                     android:layout_height="match_parent"
                     android:scaleType="fitXY"
-                    app:imageBitmap="@{overlay.bitmap}"
+                    app:imageBitmap="@{buffers.overlayBitmap}"
                     tools:ignore="ContentDescription"/>
 
                 <LinearLayout
@@ -86,53 +80,26 @@
                     android:layout_gravity="bottom"
                     android:background="@color/settings_mask"
                     android:gravity="center"
-                    android:orientation="horizontal"
-                    android:paddingLeft="48dp"
-                    android:paddingRight="48dp"
+                    android:orientation="vertical"
                     android:visibility="invisible"
+                    android:animateLayoutChanges="true"
                     tools:visibility="visible">
 
-                    <ImageButton
-                        style="@style/Widget.AppCompat.ActionButton"
-                        android:layout_width="wrap_content"
+                    <TextView
+                        android:layout_width="match_parent"
                         android:layout_height="wrap_content"
-                        android:layout_weight="1"
-                        android:onClick="nextThresholdDrawMode"
-                        app:image="@{overlay.thresholdIcon}"
-                        tools:src="@drawable/ic_filter_b_and_w_off_white_24dp"
-                        android:tint="#FFF"/>
+                        android:padding="8dp"
+                        android:visibility="gone"
+                        android:id="@+id/settingsFeedback"
+                        android:gravity="center_horizontal"/>
 
-                    <ImageButton
-                        style="@style/Widget.AppCompat.ActionButton"
-                        android:layout_width="wrap_content"
+                    <LinearLayout
+                        android:id="@+id/settingsSwitches"
+                        android:layout_width="200dp"
                         android:layout_height="wrap_content"
-                        android:layout_weight="1"
-                        android:onClick="nextCodeDrawMode"
-                        app:image="@{overlay.codeIcon}"
-                        tools:src="@drawable/ic_filter_b_and_w_off_white_24dp"
-                        android:tint="#FFF"/>
-
-                    <ImageButton
-                        style="@style/Widget.AppCompat.ActionButton"
-                        android:layout_width="wrap_content"
-                        android:layout_height="wrap_content"
-                        android:layout_weight="1"
-                        android:onClick="nextMarkerDrawMode"
-                        app:image="@{overlay.markerIcon}"
-                        tools:src="@drawable/ic_border_clear_24dp"
-                        android:tint="#FFF"/>
-
-                    <ImageButton
-                        style="@style/Widget.AppCompat.ActionButton"
-                        android:layout_width="wrap_content"
-                        android:layout_height="wrap_content"
-                        android:layout_weight="1"
-                        android:onClick="flipCamera"
-                        android:visibility="@{camera.cameraCount > 1 ? View.VISIBLE : View.GONE}"
-                        app:image="@{camera.cameraFacingIcon}"
-                        tools:src="@drawable/ic_camera_rear_24dp"
-                        android:tint="#FFF"/>
-
+                        android:gravity="center"
+                        android:orientation="horizontal">
+                    </LinearLayout>
                 </LinearLayout>
 
                 <ImageButton
@@ -146,8 +113,8 @@
                     android:background="@drawable/camera_floating_action_button"
                     android:contentDescription="@string/display_menu"
                     android:onClick="showMenu"
-                    android:tint="#FFF"
-                    android:src="@drawable/ic_more_horiz_24dp"/>
+                    android:src="@drawable/ic_more_horiz_24dp"
+                    android:tint="#FFF"/>
 
                 <ProgressBar
                     android:id="@+id/progressBar"
@@ -168,7 +135,7 @@
                 android:paddingBottom="@dimen/nav_padding"
                 android:text="@string/status_searching"
                 android:textAppearance="@style/TextAppearance.AppCompat.Medium"
-                app:height="@{overlay.viewfinderSize}"/>
+                app:height="@{buffers.borderBottom}"/>
         </LinearLayout>
     </FrameLayout>
 </layout>

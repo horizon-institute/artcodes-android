@@ -25,13 +25,11 @@ import java.util.ArrayList;
 import java.util.List;
 
 import uk.ac.horizon.artcodes.scanner.BR;
-import uk.ac.horizon.artcodes.scanner.process.ImageProcessor;
 
 public class Experience extends BaseObservable
 {
 	private final List<Action> actions = new ArrayList<>();
 	private final List<Availability> availabilities = new ArrayList<>();
-	private final List<ImageProcessor> processors = new ArrayList<>();
 	private final List<String> pipeline = new ArrayList<>();
 	private String id;
 	private String name;
@@ -42,10 +40,7 @@ public class Experience extends BaseObservable
 	private String callback;
 	private String originalID;
 
-	private int checksumModulo = 3;
-	private boolean embeddedChecksum = false;
 	private boolean editable = false;
-	private String detector;
 
 	public Experience()
 	{
@@ -82,17 +77,6 @@ public class Experience extends BaseObservable
 	}
 
 	@Bindable
-	public int getChecksumModulo()
-	{
-		return checksumModulo;
-	}
-
-	public void setChecksumModulo(int checksumModulo)
-	{
-		this.checksumModulo = checksumModulo;
-	}
-
-	@Bindable
 	public String getDescription()
 	{
 		return description;
@@ -106,21 +90,6 @@ public class Experience extends BaseObservable
 	public List<String> getPipeline()
 	{
 		return pipeline;
-	}
-
-	public String getDetector()
-	{
-		return detector;
-	}
-
-	public boolean getEmbeddedChecksum()
-	{
-		return embeddedChecksum;
-	}
-
-	public void setEmbeddedChecksum(boolean embeddedChecksum)
-	{
-		this.embeddedChecksum = embeddedChecksum;
 	}
 
 	@Bindable
@@ -181,11 +150,6 @@ public class Experience extends BaseObservable
 	public boolean isSharable()
 	{
 		return id != null && (id.startsWith("http:") || id.startsWith("https:"));
-	}
-
-	public List<ImageProcessor> getProcessors()
-	{
-		return processors;
 	}
 
 	private boolean hasCode(String code, Action.Match... matches)

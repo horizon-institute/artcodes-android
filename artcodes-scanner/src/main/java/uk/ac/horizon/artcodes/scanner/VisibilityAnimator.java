@@ -30,7 +30,7 @@ import android.view.ViewAnimationUtils;
 public class VisibilityAnimator
 {
 	private final View view;
-	private View center;
+	private final View center;
 	private Animator animator;
 
 	public VisibilityAnimator(View view)
@@ -68,7 +68,8 @@ public class VisibilityAnimator
 				}
 			});
 			animator.start();
-		} else if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.HONEYCOMB)
+		}
+		else if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.HONEYCOMB)
 		{
 			animator = ObjectAnimator.ofFloat(view, "alpha", 1f, 0f);
 			animator.setDuration(500);
@@ -85,7 +86,8 @@ public class VisibilityAnimator
 				}
 			});
 			animator.start();
-		} else
+		}
+		else
 		{
 			if (view != center)
 			{
@@ -107,13 +109,15 @@ public class VisibilityAnimator
 			animator = ViewAnimationUtils.createCircularReveal(view, cx, cy, 0, view.getWidth());
 			animator.addListener(listener);
 			animator.start();
-		} else if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.HONEYCOMB)
+		}
+		else if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.HONEYCOMB)
 		{
 			animator = ObjectAnimator.ofFloat(view, "alpha", 1f, 0f);
 			animator.setDuration(500);
 			animator.addListener(listener);
 			animator.start();
-		} else
+		}
+		else
 		{
 			listener.onAnimationEnd(null);
 		}
@@ -130,7 +134,8 @@ public class VisibilityAnimator
 
 			animator = ViewAnimationUtils.createCircularReveal(view, cx, cy, 0, view.getWidth());
 			animator.start();
-		} else if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.HONEYCOMB)
+		}
+		else if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.HONEYCOMB)
 		{
 			animator = ObjectAnimator.ofFloat(view, "alpha", 0f, 1f);
 			animator.setDuration(250);

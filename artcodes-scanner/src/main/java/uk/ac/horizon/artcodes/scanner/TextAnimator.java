@@ -17,40 +17,35 @@
  *     along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-package uk.ac.horizon.artcodes.scanner.overlay;
+package uk.ac.horizon.artcodes.scanner;
 
-import org.opencv.core.Mat;
-import org.opencv.core.MatOfPoint;
-import org.opencv.core.Scalar;
+import android.os.Handler;
+import android.view.View;
+import android.widget.TextView;
 
-import java.util.List;
-
-import uk.ac.horizon.artcodes.scanner.detect.Marker;
-
-public abstract class Layer
+public class TextAnimator
 {
-	protected Scalar detectedColour = new Scalar(255, 255, 0, 255);
-	protected Scalar regionColour = new Scalar(255, 128, 0, 255);
-	protected Scalar outlineColour = new Scalar(0, 0, 0, 255);
-
-	void drawMarkers(Mat overlay, List<Marker> markers, List<MatOfPoint> contours)
+	private final Handler settingsFeedbackHandler = new Handler();
+	private final Runnable settingsFeedbackRunnable = new Runnable()
 	{
+		@Override
+		public void run()
+		{
+			view.setVisibility(View.GONE);
+		}
+	};
+	private final TextView view;
 
+	public TextAnimator(TextView view)
+	{
+		this.view = view;
 	}
 
-	void drawThreshold(Mat image, Mat overlay)
+	public void setText(int text)
 	{
-
-	}
-
-	abstract int getFeedback();
-
-	abstract int getIcon();
-
-	abstract Layer getNext();
-
-	boolean hasOutput()
-	{
-		return false;
+		view.setText(text);
+		view.setVisibility(View.VISIBLE);
+		settingsFeedbackHandler.removeCallbacks(settingsFeedbackRunnable);
+		settingsFeedbackHandler.postDelayed(settingsFeedbackRunnable, 3000);
 	}
 }

@@ -26,6 +26,8 @@ import android.util.Log;
 import android.view.MenuItem;
 import android.view.View;
 
+import com.google.common.collect.Multiset;
+
 import java.util.List;
 
 import uk.ac.horizon.artcodes.Artcodes;
@@ -36,9 +38,7 @@ import uk.ac.horizon.artcodes.model.Experience;
 import uk.ac.horizon.artcodes.request.IntentSource;
 import uk.ac.horizon.artcodes.request.RequestCallbackBase;
 import uk.ac.horizon.artcodes.scanner.VisibilityAnimator;
-import uk.ac.horizon.artcodes.scanner.activity.ScannerActivity;
-import uk.ac.horizon.artcodes.scanner.detect.ActionDetectionHandler;
-import uk.ac.horizon.artcodes.scanner.detect.MarkerDetectionHandler;
+import uk.ac.horizon.artcodes.scanner.ScannerActivity;
 import uk.ac.horizon.artcodes.server.ArtcodeServer;
 import uk.ac.horizon.artcodes.ui.IntentBuilder;
 
@@ -48,6 +48,61 @@ public class ArtcodeActivity extends ScannerActivity
 
 	private ScannerActionBinding actionBinding;
 	private VisibilityAnimator actionAnimator;
+
+	private Action action;
+
+	@Override
+	protected void onMarkersDetected(Multiset<String> markers)
+	{
+		int best = 0;
+		Action selected = null;
+		for (Action action : experience.getActions())
+		{
+			if (action.getMatch() == Action.Match.any)
+			{
+				for (String code : action.getCodes())
+				{
+					int count = markers.count(code);
+					if (count > best)
+					{
+						selected = action;
+						best = count;
+					}
+				}
+			}
+			else if (action.getMatch() == Action.Match.all)
+			{
+				int min = MAX;
+				int total = 0;
+				for (String code : action.getCodes())
+				{
+					int count = markers.count(code);
+					min = Math.min(min, count);
+					total += count;
+				}
+
+				if (min > REQUIRED && total > best)
+				{
+					best = total;
+					selected = action;
+				}
+			}
+		}
+
+		if (selected == null || best < REQUIRED)
+		{
+			if (action != null)
+			{
+				action = null;
+				onActionChanged(null);
+			}
+		}
+		else if (selected != action)
+		{
+			action = selected;
+			onActionChanged(action);
+		}
+	}
 
 	@Override
 	public void onCreate(Bundle savedInstanceState)
@@ -118,58 +173,50 @@ public class ArtcodeActivity extends ScannerActivity
 		});
 	}
 
-	@Override
-	protected MarkerDetectionHandler createMarkerHandler(final Experience experience)
+	private void onActionChanged(final Action action)
 	{
-		return new ActionDetectionHandler(experience)
+		if (action != null)
 		{
-			@Override
-			public void onActionChanged(final Action action)
+			getServer().logScan(experience.getId(), action, scanner);
+			GoogleAnalytics.trackEvent("Action", "Scanned", experience.getId(), action.getName());
+
+			actionBinding.setAction(action);
+			actionBinding.getRoot().setOnClickListener(new View.OnClickListener()
 			{
-				if (action != null)
+				@Override
+				public void onClick(View v)
 				{
-					getServer().logScan(experience.getId(), action, camera);
-					GoogleAnalytics.trackEvent("Action", "Scanned", experience.getId(), action.getName());
+					GoogleAnalytics.trackEvent("Action", "Opened", experience.getId(), action.getName());
+					if (action.getShowDetail())
+					{
+						ActionActivity.start(ArtcodeActivity.this, action);
+					} else
+					{
+						Intent intent = new Intent(Intent.ACTION_VIEW, Uri.parse(action.getUrl()));
+						intent.putExtra(EXTRA_CUSTOM_TABS_SESSION_ID, -1); // -1 or any valid session id returned from newSession() call
 
-					actionBinding.setAction(action);
-					actionBinding.getRoot().setOnClickListener(new View.OnClickListener()
-					{
-						@Override
-						public void onClick(View v)
-						{
-							GoogleAnalytics.trackEvent("Action", "Opened", experience.getId(), action.getName());
-							if (action.getShowDetail())
-							{
-								ActionActivity.start(ArtcodeActivity.this, action);
-							} else
-							{
-								Intent intent = new Intent(Intent.ACTION_VIEW, Uri.parse(action.getUrl()));
-								intent.putExtra(EXTRA_CUSTOM_TABS_SESSION_ID, -1); // -1 or any valid session id returned from newSession() call
-
-								startActivity(intent);
-							}
-						}
-					});
-					runOnUiThread(new Runnable()
-					{
-						@Override
-						public void run()
-						{
-							actionAnimator.showView();
-						}
-					});
-				} else
-				{
-					runOnUiThread(new Runnable()
-					{
-						@Override
-						public void run()
-						{
-							actionAnimator.hideView();
-						}
-					});
+						startActivity(intent);
+					}
 				}
-			}
-		};
+			});
+			runOnUiThread(new Runnable()
+			{
+				@Override
+				public void run()
+				{
+					actionAnimator.showView();
+				}
+			});
+		} else
+		{
+			runOnUiThread(new Runnable()
+			{
+				@Override
+				public void run()
+				{
+					actionAnimator.hideView();
+				}
+			});
+		}
 	}
 }

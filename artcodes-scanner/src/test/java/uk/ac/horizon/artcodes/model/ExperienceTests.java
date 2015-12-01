@@ -27,7 +27,7 @@ public class ExperienceTests
 	public void test()
 	{
 		Experience experience = new Experience();
-		experience.setChecksumModulo(3);
+		//experience.setChecksumModulo(3);
 		// TODO
 		//experience.setMinRegions(4);
 		//experience.setMaxRegions(4);

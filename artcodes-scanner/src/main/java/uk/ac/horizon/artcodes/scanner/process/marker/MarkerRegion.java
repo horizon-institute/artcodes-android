@@ -17,31 +17,17 @@
  *     along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-package uk.ac.horizon.artcodes.scanner.detect;
+package uk.ac.horizon.artcodes.scanner.process.marker;
 
-import com.google.common.collect.Multiset;
-
-public abstract class CodeDetectionHandler extends MarkerDetectionHandler
+class MarkerRegion
 {
-	public abstract void onCodeDetected(String code);
+	public final int index;
+	public final int value;
+	public Object data;
 
-	public void onMarkersDetected(Multiset<String> markers)
+	public MarkerRegion(int index, int value)
 	{
-		int best = 0;
-		String selected = null;
-		for (String code : markers.elementSet())
-		{
-			int count = markers.count(code);
-			if (count > best)
-			{
-				selected = code;
-				best = count;
-			}
-		}
-
-		if (selected != null || best >= REQUIRED)
-		{
-			onCodeDetected(selected);
-		}
+		this.index = index;
+		this.value = value;
 	}
 }

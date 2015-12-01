@@ -37,6 +37,7 @@
     <string name="camera_rear">Rear</string>
 
     <string name="draw_threshold_on">Display thresholding</string>
+    <string name="draw_threshold_greyscale">Display greyscale</string>
     <string name="draw_threshold_off">Hide thresholding</string>
 
     <string name="draw_code">Display marker codes</string>

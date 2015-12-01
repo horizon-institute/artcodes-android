@@ -20,10 +20,17 @@
 package uk.ac.horizon.artcodes.scanner.process;
 
 import android.util.Log;
+import android.view.LayoutInflater;
+import android.view.ViewGroup;
 
 import org.opencv.core.CvType;
 import org.opencv.core.Mat;
 import org.opencv.imgproc.Imgproc;
+
+import java.util.List;
+
+import uk.ac.horizon.artcodes.scanner.ImageBuffers;
+import uk.ac.horizon.artcodes.scanner.TextAnimator;
 
 public class HueShifter implements ImageProcessor
 {
@@ -57,17 +64,16 @@ public class HueShifter implements ImageProcessor
 	}
 
 	@Override
-	public Mat process(Mat image)
+	public void process(ImageBuffers buffers)
 	{
-		int desiredRows = (image.rows() / 3) * 2, desiredCols = image.cols();
+		int desiredRows = (buffers.getImage().rows() / 3) * 2, desiredCols = buffers.getImage().cols();
 		if (threeChannelBuffer == null || threeChannelBuffer.rows() != desiredRows || threeChannelBuffer.cols() != desiredCols)
 		{
 			Log.i("", "Creating new Mat buffer (1)");
 			threeChannelBuffer = new Mat(desiredRows, desiredCols, CvType.CV_8UC3);
 		}
-		Imgproc.cvtColor(image, threeChannelBuffer, Imgproc.COLOR_YUV2BGR_NV21);
+		Imgproc.cvtColor(buffers.getImage(), threeChannelBuffer, Imgproc.COLOR_YUV2BGR_NV21);
 		this.justHueShiftImage(this.threeChannelBuffer, this.threeChannelBuffer);
-		return threeChannelBuffer;
 	}
 
 	/**
@@ -99,5 +105,10 @@ public class HueShifter implements ImageProcessor
 			// convert back to BGR
 			Imgproc.cvtColor(resultImage, resultImage, Imgproc.COLOR_HLS2BGR);
 		}
+	}
+
+	@Override
+	public void getSettings(List<ImageProcessorSetting> settings)
+	{
 	}
 }

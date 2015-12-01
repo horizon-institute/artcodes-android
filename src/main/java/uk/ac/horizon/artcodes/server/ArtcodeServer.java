@@ -31,7 +31,7 @@ import uk.ac.horizon.artcodes.account.Account;
 import uk.ac.horizon.artcodes.model.Action;
 import uk.ac.horizon.artcodes.model.Experience;
 import uk.ac.horizon.artcodes.request.RequestCallback;
-import uk.ac.horizon.artcodes.scanner.camera.CameraAdapter;
+import uk.ac.horizon.artcodes.scanner.Scanner;
 
 public interface ArtcodeServer
 {
@@ -47,7 +47,7 @@ public interface ArtcodeServer
 
 	void loadRecent(RequestCallback<List<String>> callback);
 
-	void logScan(String uri, Action action, CameraAdapter adapter);
+	void logScan(String uri, Action action, Scanner adapter);
 
 	void loadExperience(String id, RequestCallback<Experience> callback);
 

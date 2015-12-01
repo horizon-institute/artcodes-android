@@ -28,12 +28,8 @@
         <import type="android.view.View"/>
 
         <variable
-            name="camera"
-            type="uk.ac.horizon.artcodes.scanner.camera.CameraAdapter"/>
-
-        <variable
-            name="overlay"
-            type="uk.ac.horizon.artcodes.scanner.overlay.Overlay"/>
+            name="buffers"
+            type="uk.ac.horizon.artcodes.scanner.ImageBuffers" />
     </data>
 
     <FrameLayout
@@ -43,51 +39,26 @@
         <SurfaceView
             android:layout_width="fill_parent"
             android:layout_height="fill_parent"
-            app:surface="@{camera.surfaceCallback}"/>
+            android:id="@+id/cameraSurface"/>
 
         <ImageView
             android:layout_width="match_parent"
             android:layout_height="match_parent"
             android:scaleType="fitXY"
-            app:imageBitmap="@{overlay.bitmap}"
+            app:imageBitmap="@{buffers.overlayBitmap}"
             tools:ignore="ContentDescription"/>
 
         <LinearLayout
-            android:id="@+id/bottomView"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
             android:layout_gravity="bottom"
             android:background="#AFFF"
             android:orientation="vertical">
 
-            <android.support.v7.widget.SwitchCompat
-                android:id="@+id/invertSwitch"
-                style="@style/Base.TextAppearance.AppCompat"
-                android:layout_width="fill_parent"
-                android:layout_height="wrap_content"
-                android:checked="false"
-                android:padding="16dp"
-                android:text="@string/invert"/>
-
             <Spinner
                 android:id="@+id/colourPresetSpinner"
                 android:layout_width="fill_parent"
                 android:layout_height="wrap_content"/>
-
-            <TextView
-                android:id="@+id/hueSeekBarLabel"
-                style="@style/Base.TextAppearance.AppCompat"
-                android:layout_width="fill_parent"
-                android:layout_height="wrap_content"
-                android:layout_marginTop="10dp"
-                android:text="@string/hue"/>
-
-            <SeekBar
-                android:id="@+id/hueSlider"
-                android:layout_width="fill_parent"
-                android:layout_height="wrap_content"
-                android:max="180"
-                android:padding="16dp"/>
 
         </LinearLayout>
     </FrameLayout>

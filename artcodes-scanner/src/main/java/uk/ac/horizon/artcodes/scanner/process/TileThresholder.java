@@ -19,33 +19,58 @@
 
 package uk.ac.horizon.artcodes.scanner.process;
 
+import android.view.LayoutInflater;
+import android.view.View;
+import android.view.ViewGroup;
+import android.widget.ImageButton;
+
 import org.opencv.core.Mat;
 import org.opencv.core.Size;
 import org.opencv.imgproc.Imgproc;
 
-import uk.ac.horizon.artcodes.model.MarkerSettings;
+import java.util.List;
+
+import uk.ac.horizon.artcodes.scanner.ImageBuffers;
+import uk.ac.horizon.artcodes.scanner.R;
+import uk.ac.horizon.artcodes.scanner.TextAnimator;
 
 public class TileThresholder implements ImageProcessor
 {
-	private transient int tiles = 1;
-	private final MarkerSettings settings;
-
-	public TileThresholder(MarkerSettings settings)
+	private enum Display
 	{
-		this.settings = settings;
+		none, greyscale, threshold;
+
+		private static Display[] vals = values();
+
+		public Display next()
+		{
+			return vals[(this.ordinal() + 1) % vals.length];
+		}
+	}
+
+	private transient int tiles = 1;
+	private Display display = Display.none;
+
+	public TileThresholder()
+	{
 	}
 
 	@Override
-	public Mat process(Mat image)
+	public void process(ImageBuffers buffers)
 	{
-		Imgproc.GaussianBlur(image, image, new Size(5, 5), 0);
+		Imgproc.GaussianBlur(buffers.getImage(), buffers.getImage(), new Size(5, 5), 0);
 
-		if (!settings.detected)
+		if (display == Display.greyscale)
+		{
+			Imgproc.cvtColor(buffers.getImage(), buffers.getOverlay(false), Imgproc.COLOR_GRAY2BGRA);
+		}
+
+		if (!buffers.hasDetected())
 		{
 			tiles = (tiles % 9) + 1;
 		}
-		final int tileHeight = (int) image.size().height / tiles;
-		final int tileWidth = (int) image.size().width / tiles;
+		final int tileHeight = (int) buffers.getImage().size().height / tiles;
+		final int tileWidth = (int) buffers.getImage().size().width / tiles;
 
 		// Split image into tiles and apply process on each image tile separately.
 		for (int tileRow = 0; tileRow < tiles; tileRow++)
@@ -55,9 +80,10 @@ public class TileThresholder implements ImageProcessor
 			if (tileRow < tiles - 1)
 			{
 				endRow = (tileRow + 1) * tileHeight;
-			} else
+			}
+			else
 			{
-				endRow = (int) image.size().height;
+				endRow = (int) buffers.getImage().size().height;
 			}
 
 			for (int tileCol = 0; tileCol < tiles; tileCol++)
@@ -67,17 +93,60 @@ public class TileThresholder implements ImageProcessor
 				if (tileCol < tiles - 1)
 				{
 					endCol = (tileCol + 1) * tileWidth;
-				} else
+				}
+				else
 				{
-					endCol = (int) image.size().width;
+					endCol = (int) buffers.getImage().size().width;
 				}
 
-				final Mat tileMat = image.submat(startRow, endRow, startCol, endCol);
+				final Mat tileMat = buffers.getImage().submat(startRow, endRow, startCol, endCol);
 				Imgproc.threshold(tileMat, tileMat, 127, 255, Imgproc.THRESH_OTSU);
 				tileMat.release();
 			}
 		}
 
-		return image;
+		if (display == Display.threshold)
+		{
+			Imgproc.cvtColor(buffers.getImage(), buffers.getOverlay(false), Imgproc.COLOR_GRAY2BGRA);
+		}
+	}
+
+	@Override
+	public void getSettings(List<ImageProcessorSetting> settings)
+	{
+		settings.add(new ImageProcessorSetting()
+		{
+			@Override
+			public void nextValue()
+			{
+				display = display.next();
+			}
+
+			@Override
+			public void updateUI(ImageButton button, TextAnimator textAnimator)
+			{
+				int text = 0;
+				switch (display)
+				{
+					case none:
+						button.setImageResource(R.drawable.ic_image_24dp);
+						text = R.string.draw_threshold_off;
+						break;
+					case greyscale:
+						button.setImageResource(R.drawable.ic_gradient_24dp);
+						text = R.string.draw_threshold_greyscale;
+						break;
+					case threshold:
+						button.setImageResource(R.drawable.ic_filter_b_and_w_24dp);
+						text = R.string.draw_threshold_on;
+						break;
+				}
+
+				if(text != 0 && textAnimator != null)
+				{
+					textAnimator.setText(text);
+				}
+			}
+		});
 	}
 }

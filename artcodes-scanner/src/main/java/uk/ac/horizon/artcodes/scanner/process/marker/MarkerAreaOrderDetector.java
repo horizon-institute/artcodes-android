@@ -17,7 +17,7 @@
  *     along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-package uk.ac.horizon.artcodes.scanner.detect;
+package uk.ac.horizon.artcodes.scanner.process.marker;
 
 import org.opencv.core.Mat;
 import org.opencv.core.MatOfPoint;
@@ -26,48 +26,37 @@ import org.opencv.imgproc.Imgproc;
 import java.util.Collections;
 import java.util.Comparator;
 import java.util.List;
-import java.util.Map;
 
 import uk.ac.horizon.artcodes.model.Experience;
-import uk.ac.horizon.artcodes.model.MarkerSettings;
+import uk.ac.horizon.artcodes.scanner.detect.MarkerDetectionHandler;
 
 public class MarkerAreaOrderDetector extends MarkerDetector
 {
-
-	private static final String REGION_AREA = "area";
-
-	public MarkerAreaOrderDetector(MarkerSettings settings)
+	public MarkerAreaOrderDetector(Experience experience, MarkerDetectionHandler handler)
 	{
-		super(settings);
+		super(experience, handler);
 	}
 
 	@Override
-	protected Marker.MarkerDetails parseRegionsAt(int nodeIndex, List<MatOfPoint> contours, Mat hierarchy, MarkerSettings settings)
+	protected MarkerRegion createRegionForNode(int regionIndex, List<MatOfPoint> contours, Mat hierarchy)
 	{
-		Marker.MarkerDetails details = super.parseRegionsAt(nodeIndex, contours, hierarchy, settings);
-
-		if (details != null)
+		MarkerRegion region = super.createRegionForNode(regionIndex, contours, hierarchy);
+		if(region != null)
 		{
-			for (Map<String, Object> region : details.regions)
-			{
-				int index = (Integer) region.get(Marker.MarkerDetails.REGION_INDEX);
-				double area = Imgproc.contourArea(contours.get(index));
-				region.put(REGION_AREA, area);
-			}
+			region.data = Imgproc.contourArea(contours.get(region.index));
 		}
-
-		return details;
+		return region;
 	}
 
 	@Override
-	protected void sortCode(Marker.MarkerDetails details)
+	protected void sortCode(Marker marker)
 	{
-		Collections.sort(details.regions, new Comparator<Map<String, Object>>()
+		Collections.sort(marker.regions, new Comparator<MarkerRegion>()
 		{
 			@Override
-			public int compare(Map<String, Object> region1, Map<String, Object> region2)
+			public int compare(MarkerRegion region1, MarkerRegion region2)
 			{
-				return ((Double) region1.get(REGION_AREA)).compareTo((Double) region2.get(REGION_AREA));
+				return Double.compare((Double) region1.data, (Double) region2.data);
 			}
 		});
 	}

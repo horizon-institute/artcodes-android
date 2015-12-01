@@ -19,65 +19,67 @@
 
 package uk.ac.horizon.artcodes.scanner.process;
 
-import org.opencv.core.Mat;
+import org.opencv.core.Size;
+import org.opencv.imgproc.Imgproc;
+
+import java.util.List;
+
+import uk.ac.horizon.artcodes.scanner.ImageBuffers;
 
 public class RGBGreyscaler implements ImageProcessor
 {
+	public enum Channel
+	{
+		red, green, blue
+	}
+
 	private final Channel channel;
-	private byte[] singleChannelGreyPixelBuffer = null;
+
 	public RGBGreyscaler(Channel channel)
 	{
 		this.channel = channel;
 	}
 
-	@Override
-	public Mat process(Mat image)
+	private double getValue(double[] data)
 	{
-//	        /*
-//	        // This method is much simpler (and a little faster) but randomly crashes :(
-//            List<Mat> channels = new ArrayList<>(3);
-//            Core.split(colorImage, channels);
-//            return channels.get(this.singleChannel);
-//            */
-//
-//		if (image == null || image.rows() != colorImage.rows() || image.cols() != colorImage.cols())
-//		{
-//			Log.i(KEY, "Creating new Mat buffer (3)");
-//			image = new Mat(colorImage.size(), CvType.CV_8UC1);
-//		}
-//
-//		Mat colorImage = image;
-//
-//		int desiredColorBufferSize = colorImage.rows() * colorImage.cols() * colorImage.channels();
-//		if (this.colorPixelBuffer == null || this.colorPixelBuffer.length < desiredColorBufferSize)
-//		{
-//			Log.i("", "Creating new byte[" + desiredColorBufferSize + "] buffer (4)");
-//			this.colorPixelBuffer = new byte[desiredColorBufferSize];
-//		}
-//
-//		int desiredGreyBufferSize = colorImage.rows() * colorImage.cols();
-//		if (this.singleChannelGreyPixelBuffer == null || this.singleChannelGreyPixelBuffer.length != desiredGreyBufferSize)
-//		{
-//			Log.i("", "Creating new byte[" + desiredGreyBufferSize + "] buffer (5)");
-//			this.singleChannelGreyPixelBuffer = new byte[desiredGreyBufferSize];
-//		}
-//
-//		colorImage.get(0, 0, this.colorPixelBuffer);
-//		int c = this.singleChannel, g = 0, channels = colorImage.channels();
-//		while (g < desiredGreyBufferSize)
-//		{
-//			this.singleChannelGreyPixelBuffer[g] = this.colorPixelBuffer[c];
-//			++g;
-//			c += channels;
-//		}
-//		image.put(0, 0, this.singleChannelGreyPixelBuffer);
-
-
-		return image;
+		switch (channel)
+		{
+			case red:
+				return data[2];
+			case blue:
+				return data[0];
+			case green:
+				return data[1];
+		}
+		return 0;
 	}
 
-	public enum Channel
+	@Override
+	public void process(ImageBuffers buffers)
 	{
-		red, green, blue
+		Imgproc.cvtColor(buffers.getImage(), buffers.getTemp(), Imgproc.COLOR_YUV2BGR_YUY2);
+
+		final Size sizeA = buffers.getTemp().size();
+		for (int i = 0; i < sizeA.height; i++)
+		{
+			for (int j = 0; j < sizeA.width; j++)
+			{
+				final double[] data = buffers.getTemp().get(i, j);
+				final double value = getValue(data);
+
+				data[0] = value;
+				data[1] = value;
+				data[2] = value;
+				buffers.getTemp().put(i, j, data);
+			}
+		}
+
+		Imgproc.cvtColor(buffers.getTemp(), buffers.getImage(), Imgproc.COLOR_BGR2GRAY);
+	}
+
+	@Override
+	public void getSettings(List<ImageProcessorSetting> settings)
+	{
+		//SettingButtonBinding
 	}
 }

@@ -30,7 +30,7 @@ To create the Artcode reader
 ```java
 import com.google.gson.Gson;
 import com.google.gson.GsonBuilder;
-import uk.ac.horizon.artcodes.scanner.activity.ScannerActivity;
+import uk.ac.horizon.artcodes.scanner.ScannerActivity;
 
 // Create and configure artcode experience
 Experience experience = new Experience();

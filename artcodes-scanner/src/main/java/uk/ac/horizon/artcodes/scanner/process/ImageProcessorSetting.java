@@ -19,9 +19,12 @@
 
 package uk.ac.horizon.artcodes.scanner.process;
 
-import uk.ac.horizon.artcodes.model.MarkerSettings;
+import android.widget.ImageButton;
 
-public interface ImageProcessorFactory
+import uk.ac.horizon.artcodes.scanner.TextAnimator;
+
+public interface ImageProcessorSetting
 {
-	ImageProcessor create(String id);
+	void nextValue();
+	void updateUI(ImageButton button, TextAnimator textAnimator);
 }

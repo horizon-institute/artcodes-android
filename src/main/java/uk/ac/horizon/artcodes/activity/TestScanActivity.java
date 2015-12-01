@@ -125,7 +125,7 @@ public class TestScanActivity extends Activity
 				label.setText("scan result for null action");
 			} else
 			{
-				label.setText("Found Marker " + marker);
+				label.setText("Found MarkerDisplay " + marker);
 			}
 		}
 	}

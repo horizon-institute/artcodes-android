@@ -35,11 +35,9 @@ import java.util.List;
 import uk.ac.horizon.artcodes.R;
 import uk.ac.horizon.artcodes.databinding.ActionEditBinding;
 import uk.ac.horizon.artcodes.databinding.ActionEditCodeBinding;
-import uk.ac.horizon.artcodes.databinding.ChecksumEditBinding;
 import uk.ac.horizon.artcodes.databinding.ExperienceEditActionsBinding;
 import uk.ac.horizon.artcodes.model.Action;
 import uk.ac.horizon.artcodes.ui.ActionEditor;
-import uk.ac.horizon.artcodes.ui.ExperienceEditor;
 import uk.ac.horizon.artcodes.ui.MarkerFormat;
 import uk.ac.horizon.artcodes.ui.SimpleTextWatcher;
 
@@ -104,7 +102,8 @@ public class ExperienceEditActionFragment extends ExperienceEditFragment
 					actionBinding.newMarkerCode.requestFocus();
 					actionBinding.getAction().getCodes().remove(index);
 					updateCodes(actionBinding);
-				} else
+				}
+				else
 				{
 					actionBinding.getAction().getCodes().set(index, value);
 				}
@@ -126,8 +125,6 @@ public class ExperienceEditActionFragment extends ExperienceEditFragment
 
 	private class ActionAdapter extends RecyclerView.Adapter<ActionAdapter.ViewHolder>
 	{
-		private static final int VIEW_ACTION = 0;
-		private static final int VIEW_CHECKSUM = 1;
 		private List<Action> actions;
 
 		public ActionAdapter(List<Action> actions)
@@ -138,146 +135,102 @@ public class ExperienceEditActionFragment extends ExperienceEditFragment
 		@Override
 		public int getItemCount()
 		{
-			return actions.size() + 1;
+			return actions.size();
 		}
 
 		@Override
 		public void onBindViewHolder(final ViewHolder holder, int position)
 		{
-			if (position == 0)
+
+			final Action action = actions.get(position);
+			holder.binding.setAction(action);
+			holder.binding.setActionEditor(new ActionEditor(action));
+			Log.i("", "Action at " + (position) + " = " + action.getName() + ", " + action.getDisplayUrl());
+			holder.binding.editToggle.setOnClickListener(new View.OnClickListener()
 			{
-				holder.checksumBinding.setExperience(new ExperienceEditor(getActivity(), getExperience()));
-				holder.checksumBinding.titlePanel.setOnClickListener(new View.OnClickListener()
+				@Override
+				public void onClick(View v)
 				{
-					@Override
-					public void onClick(View v)
+					if (selected != null)
 					{
-						if (holder.checksumBinding.editPanel.getVisibility() == View.GONE)
-						{
-							holder.checksumBinding.editPanel.setVisibility(View.VISIBLE);
-							holder.checksumBinding.expandImage.setImageResource(R.drawable.ic_expand_less_black_24dp);
-						} else
-						{
-							holder.checksumBinding.editPanel.setVisibility(View.GONE);
-							holder.checksumBinding.expandImage.setImageResource(R.drawable.ic_expand_more_black_24dp);
-						}
+						selected.overview.setVisibility(View.VISIBLE);
+						selected.editview.setVisibility(View.GONE);
+						selected.expandImage.setImageResource(R.drawable.ic_expand_more_black_24dp);
 					}
-				});
-			} else
+
+					if (selected != holder.binding)
+					{
+						holder.binding.overview.setVisibility(View.GONE);
+						holder.binding.editview.setVisibility(View.VISIBLE);
+						holder.binding.expandImage.setImageResource(R.drawable.ic_expand_less_black_24dp);
+						holder.binding.actionName.requestFocus();
+						selected = holder.binding;
+					}
+					else
+					{
+						selected = null;
+					}
+				}
+			});
+			holder.binding.newMarkerCode.addTextChangedListener(new SimpleTextWatcher()
 			{
-				final Action action = actions.get(position - 1);
-				holder.binding.setAction(action);
-				holder.binding.setActionEditor(new ActionEditor(action));
-				Log.i("", "Action at " + (position - 1) + " = " + action.getName() + ", " + action.getDisplayUrl());
-				holder.binding.editToggle.setOnClickListener(new View.OnClickListener()
+				@Override
+				public String getText()
 				{
-					@Override
-					public void onClick(View v)
-					{
-						if (selected != null)
-						{
-							selected.overview.setVisibility(View.VISIBLE);
-							selected.editview.setVisibility(View.GONE);
-							selected.expandImage.setImageResource(R.drawable.ic_expand_more_black_24dp);
-						}
+					return null;
+				}
 
-						if (selected != holder.binding)
-						{
-							holder.binding.overview.setVisibility(View.GONE);
-							holder.binding.editview.setVisibility(View.VISIBLE);
-							holder.binding.expandImage.setImageResource(R.drawable.ic_expand_less_black_24dp);
-							holder.binding.actionName.requestFocus();
-							selected = holder.binding;
-						} else
-						{
-							selected = null;
-						}
-					}
-				});
-				holder.binding.newMarkerCode.addTextChangedListener(new SimpleTextWatcher()
+				@Override
+				public void onTextChanged(String value)
 				{
-					@Override
-					public String getText()
+					if (!value.isEmpty())
 					{
-						return null;
-					}
+						holder.binding.newMarkerCode.setText("");
+						action.getCodes().add(value);
 
-					@Override
-					public void onTextChanged(String value)
-					{
-						if (!value.isEmpty())
-						{
-							holder.binding.newMarkerCode.setText("");
-							action.getCodes().add(value);
-
-							ActionEditCodeBinding codeBinding = createCodeEditor(holder.binding, action.getCodes().size() - 1);
-							codeBinding.editMarkerCode.requestFocus();
-						}
+						ActionEditCodeBinding codeBinding = createCodeEditor(holder.binding, action.getCodes().size() - 1);
+						codeBinding.editMarkerCode.requestFocus();
 					}
-				});
-				holder.binding.actionDelete.setOnClickListener(new View.OnClickListener()
+				}
+			});
+			holder.binding.actionDelete.setOnClickListener(new View.OnClickListener()
+			{
+				@Override
+				public void onClick(View v)
 				{
-					@Override
-					public void onClick(View v)
-					{
-						final int index = getExperience().getActions().indexOf(action);
-						getExperience().getActions().remove(action);
-						notifyItemRemoved(index + 1);
-						Snackbar.make(binding.getRoot(), R.string.action_deleted, Snackbar.LENGTH_LONG)
-								.setAction(R.string.action_delete_undo, new View.OnClickListener()
+					final int index = getExperience().getActions().indexOf(action);
+					getExperience().getActions().remove(action);
+					notifyItemRemoved(index + 1);
+					Snackbar.make(binding.getRoot(), R.string.action_deleted, Snackbar.LENGTH_LONG)
+							.setAction(R.string.action_delete_undo, new View.OnClickListener()
+							{
+								@Override
+								public void onClick(View v)
 								{
-									@Override
-									public void onClick(View v)
-									{
-										getExperience().getActions().add(index, action);
-										notifyItemInserted(index + 1);
-									}
-								}).show();
-					}
-				});
+									getExperience().getActions().add(index, action);
+									notifyItemInserted(index + 1);
+								}
+							}).show();
+				}
+			});
 
-				updateCodes(holder.binding);
-			}
-		}
-
-		@Override
-		public int getItemViewType(int position)
-		{
-			if (position == 0)
-			{
-				return VIEW_CHECKSUM;
-			}
-			return VIEW_ACTION;
+			updateCodes(holder.binding);
 		}
 
 		@Override
 		public ActionAdapter.ViewHolder onCreateViewHolder(ViewGroup parent, int viewType)
 		{
-			if (viewType == VIEW_ACTION)
-			{
-				return new ViewHolder(ActionEditBinding.inflate(LayoutInflater.from(parent.getContext()), parent, false));
-			} else
-			{
-				return new ViewHolder(ChecksumEditBinding.inflate(LayoutInflater.from(parent.getContext()), parent, false));
-			}
+			return new ViewHolder(ActionEditBinding.inflate(LayoutInflater.from(parent.getContext()), parent, false));
 		}
 
 		public class ViewHolder extends RecyclerView.ViewHolder
 		{
 			private ActionEditBinding binding;
-			private ChecksumEditBinding checksumBinding;
 
 			public ViewHolder(ActionEditBinding binding)
 			{
 				super(binding.getRoot());
 				this.binding = binding;
-			}
-
-
-			public ViewHolder(ChecksumEditBinding binding)
-			{
-				super(binding.getRoot());
-				this.checksumBinding = binding;
 			}
 		}
 	}

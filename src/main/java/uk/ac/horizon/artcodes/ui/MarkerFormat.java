@@ -119,7 +119,7 @@ public class MarkerFormat implements InputFilter
 //	{
 //		if (value == null)
 //		{
-//			return "No Code";
+//			return "No CodeDisplay";
 //		}
 //		else if (value instanceof String)
 //		{
@@ -132,7 +132,7 @@ public class MarkerFormat implements InputFilter
 //
 //			if (experience.getMarkers().containsKey(text) && !text.equals(original))
 //			{
-//				return "Code Already Exists";
+//				return "CodeDisplay Already Exists";
 //			}
 //		}
 //		return null;

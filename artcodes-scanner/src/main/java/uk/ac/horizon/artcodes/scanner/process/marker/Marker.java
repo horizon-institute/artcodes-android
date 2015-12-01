@@ -17,42 +17,20 @@
  *     along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-package uk.ac.horizon.artcodes.scanner.overlay;
+package uk.ac.horizon.artcodes.scanner.process.marker;
 
-import org.opencv.core.Mat;
-import org.opencv.imgproc.Imgproc;
+import java.util.List;
 
-import uk.ac.horizon.artcodes.scanner.R;
-
-public class ThresholdLayer extends Layer
+class Marker
 {
-	@Override
-	public int getIcon()
-	{
-		return R.drawable.ic_filter_b_and_w_24dp;
-	}
+	public final int markerIndex;
+	public final List<MarkerRegion> regions;
+	public final MarkerRegion checksumRegion;
 
-	@Override
-	public Layer getNext()
+	public Marker(int markerIndex, List<MarkerRegion> regions, MarkerRegion checksumRegion)
 	{
-		return new ThresholdNullLayer();
-	}
-
-	@Override
-	public boolean hasOutput()
-	{
-		return true;
-	}
-
-	@Override
-	void drawThreshold(Mat image, Mat overlay)
-	{
-		Imgproc.cvtColor(image, overlay, Imgproc.COLOR_GRAY2BGRA);
-	}
-
-	@Override
-	int getFeedback()
-	{
-		return R.string.draw_threshold_on;
+		this.markerIndex = markerIndex;
+		this.regions = regions;
+		this.checksumRegion = checksumRegion;
 	}
 }

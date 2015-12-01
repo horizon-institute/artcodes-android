@@ -21,14 +21,12 @@ buildscript {
         jcenter()
     }
     dependencies {
-        classpath 'com.android.tools.build:gradle:1.4.0-beta6'
-        classpath 'com.android.databinding:dataBinder:1.0-rc4'
+        classpath 'com.android.tools.build:gradle:1.5.0'
     }
 }
 
 apply plugin: 'idea'
 apply plugin: 'com.android.library'
-apply plugin: 'com.android.databinding'
 
 repositories {
     jcenter()
@@ -36,9 +34,9 @@ repositories {
 }
 
 dependencies {
-    compile 'com.android.support:design:23.1.0'
-    compile 'com.android.support:appcompat-v7:23.1.0'
-    compile 'com.google.code.gson:gson:2.3.1'
+    compile 'com.android.support:design:23.1.1'
+    compile 'com.android.support:appcompat-v7:23.1.1'
+    compile 'com.google.code.gson:gson:2.4'
     compile 'com.google.guava:guava:18.0'
     compile 'org.opencv:opencv-android:2.4.8'
     testCompile 'junit:junit:4.12'
@@ -46,10 +44,14 @@ dependencies {
 
 android {
     compileSdkVersion 23
-    buildToolsVersion "23.0.1"
+    buildToolsVersion "23.0.2"
+
+    dataBinding {
+        enabled = true
+    }
 
     defaultConfig {
-        minSdkVersion 10
+        minSdkVersion 15
         targetSdkVersion 23
         versionCode 400029
         versionName '3.0'
@@ -65,5 +67,5 @@ android {
 }
 
 task wrapper(type: Wrapper) {
-    gradleVersion = '2.4'
+    gradleVersion = '2.8'
 }
