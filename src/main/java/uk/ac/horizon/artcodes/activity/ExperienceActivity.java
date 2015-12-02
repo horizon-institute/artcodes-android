@@ -19,11 +19,14 @@
 
 package uk.ac.horizon.artcodes.activity;
 
+import android.content.Intent;
 import android.databinding.DataBindingUtil;
+import android.net.Uri;
 import android.os.Build;
 import android.os.Bundle;
 import android.support.v4.app.ShareCompat;
 import android.text.Layout;
+import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewTreeObserver;
 
@@ -33,6 +36,8 @@ import uk.ac.horizon.artcodes.Feature;
 import uk.ac.horizon.artcodes.GoogleAnalytics;
 import uk.ac.horizon.artcodes.R;
 import uk.ac.horizon.artcodes.databinding.ExperienceBinding;
+import uk.ac.horizon.artcodes.databinding.LocationBinding;
+import uk.ac.horizon.artcodes.model.Availability;
 import uk.ac.horizon.artcodes.model.Experience;
 import uk.ac.horizon.artcodes.request.RequestCallbackBase;
 import uk.ac.horizon.artcodes.ui.IntentBuilder;
@@ -89,6 +94,28 @@ public class ExperienceActivity extends ExperienceActivityBase
 				}
 			}
 		});
+
+		binding.experienceLocations.removeAllViews();
+		for(final Availability availability: experience.getAvailabilities())
+		{
+			if(availability.getName() != null && availability.getLat() != null && availability.getLon() != null)
+			{
+				final LocationBinding locationBinding = LocationBinding.inflate(getLayoutInflater(), binding.experienceLocations, false);
+				locationBinding.setAvailability(availability);
+				locationBinding.getRoot().setOnClickListener(new View.OnClickListener()
+				{
+					@Override
+					public void onClick(View v)
+					{
+						final Uri gmmIntentUri = Uri.parse("geo:" + availability.getLat() + "," + availability.getLon());
+						final Intent mapIntent = new Intent(Intent.ACTION_VIEW, gmmIntentUri);
+						mapIntent.setPackage("com.google.android.apps.maps");
+						startActivity(mapIntent);
+					}
+				});
+				binding.experienceLocations.addView(locationBinding.getRoot());
+			}
+		}
 
 		updateStarred();
 	}
