@@ -1,70 +1,72 @@
-[{
-	"markers": [
-		{
-			"code": "1:1:1:1:2",
-			"action": "http://www.aestheticodes.com"
-		},
-		{
-			"code": "1:1:1:4:5",
-			"action": "http://www.aestheticodes.com"
-		},
-		{
-			"code": "1:1:2:3:5",
-			"action": "http://www.aestheticodes.com"
-		},
-		{
-			"code": "1:1:2:4:4",
-			"action": "http://www.aestheticodes.com"
-		},
-		{
-			"code": "1:1:3:3:4",
-			"action": "http://www.cs.nott.ac.uk"
-		}
-	],
-	"id": "uk.ac.horizon.aestheticodes.carolan",
-	"name": "Carolan",
-	"icon": "http://www.wornchaos.org/carolan_logo.png",
-	"minRegions": 5,
-	"maxRegions": 5,
-	"maxEmptyRegions": 0,
-	"maxRegionValue": 6,
-	"validationRegions": 2,
-	"validationRegionValue": 1,
-	"checksumModulo": 3,
-	"thresholdBehaviour": "temporalTile"
-},
-{
-	"markers": [
-		{
-			"code": "1:1:1:1:2",
-			"action": "http://www.aestheticodes.com"
-		},
-		{
-			"code": "1:1:1:4:5",
-			"action": "http://www.aestheticodes.com"
-		},
-		{
-			"code": "1:1:2:3:5",
-			"action": "http://www.aestheticodes.com"
-		},
-		{
-			"code": "1:1:2:4:4",
-			"action": "http://www.aestheticodes.com"
-		},
-		{
-			"code": "1:1:3:3:4",
-			"action": "http://www.aestheticodes.com"
-		}
-	],
-	"id": "uk.ac.horizon.aestheticodes.default",
-	"name": "Aestheticodes",
-	"icon": "http://www.wornchaos.org/default_logo.png",
-	"minRegions": 5,
-	"maxRegions": 5,
-	"maxEmptyRegions": 0,
-	"maxRegionValue": 6,
-	"validationRegions": 2,
-	"validationRegionValue": 1,
-	"checksumModulo": 3,
-	"thresholdBehaviour": "temporalTile"
-}]
+[
+  {
+    "markers": [
+      {
+        "code": "1:1:1:1:2",
+        "action": "http://www.aestheticodes.com"
+      },
+      {
+        "code": "1:1:1:4:5",
+        "action": "http://www.aestheticodes.com"
+      },
+      {
+        "code": "1:1:2:3:5",
+        "action": "http://www.aestheticodes.com"
+      },
+      {
+        "code": "1:1:2:4:4",
+        "action": "http://www.aestheticodes.com"
+      },
+      {
+        "code": "1:1:3:3:4",
+        "action": "http://www.cs.nott.ac.uk"
+      }
+    ],
+    "id": "uk.ac.horizon.aestheticodes.carolan",
+    "name": "Carolan",
+    "icon": "http://www.wornchaos.org/carolan_logo.png",
+    "minRegions": 5,
+    "maxRegions": 5,
+    "maxEmptyRegions": 0,
+    "maxRegionValue": 6,
+    "validationRegions": 2,
+    "validationRegionValue": 1,
+    "checksumModulo": 3,
+    "thresholdBehaviour": "temporalTile"
+  },
+  {
+    "markers": [
+      {
+        "code": "1:1:1:1:2",
+        "action": "http://www.aestheticodes.com"
+      },
+      {
+        "code": "1:1:1:4:5",
+        "action": "http://www.aestheticodes.com"
+      },
+      {
+        "code": "1:1:2:3:5",
+        "action": "http://www.aestheticodes.com"
+      },
+      {
+        "code": "1:1:2:4:4",
+        "action": "http://www.aestheticodes.com"
+      },
+      {
+        "code": "1:1:3:3:4",
+        "action": "http://www.aestheticodes.com"
+      }
+    ],
+    "id": "uk.ac.horizon.aestheticodes.default",
+    "name": "Artcodes",
+    "icon": "http://www.wornchaos.org/default_logo.png",
+    "minRegions": 5,
+    "maxRegions": 5,
+    "maxEmptyRegions": 0,
+    "maxRegionValue": 6,
+    "validationRegions": 2,
+    "validationRegionValue": 1,
+    "checksumModulo": 3,
+    "thresholdBehaviour": "temporalTile"
+  }
+]

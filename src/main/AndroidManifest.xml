@@ -1,6 +1,6 @@
 <?xml version="1.0" encoding="utf-8"?>
 <!--
-  ~ Aestheticodes recognises a different marker scheme that allows the
+  ~ Artcodes recognises a different marker scheme that allows the
   ~ creation of aesthetically pleasing, even beautiful, codes.
   ~ Copyright (C) 2013-2015  The University of Nottingham
   ~
@@ -17,130 +17,157 @@
   ~     You should have received a copy of the GNU Affero General Public License
   ~     along with this program.  If not, see <http://www.gnu.org/licenses/>.
 -->
-<manifest xmlns:android="http://schemas.android.com/apk/res/android"
-          xmlns:tools="http://schemas.android.com/tools"
-          package="uk.ac.horizon.aestheticodes">
+<manifest package="uk.ac.horizon.artcodes"
+          xmlns:android="http://schemas.android.com/apk/res/android"
+          xmlns:tools="http://schemas.android.com/tools">
 
-	<uses-permission android:name="android.permission.CAMERA" />
-	<uses-permission android:name="android.permission.INTERNET" />
-	<uses-permission android:name="android.permission.ACCESS_NETWORK_STATE" />
-	<uses-permission android:name="android.permission.GET_ACCOUNTS" />
-	<uses-permission android:name="android.permission.USE_CREDENTIALS" />
-	<uses-permission android:name="android.permission.ACCESS_FINE_LOCATION" />
-	<uses-permission android:name="android.permission.WRITE_EXTERNAL_STORAGE" />
+    <uses-permission android:name="android.permission.CAMERA"/>
+    <uses-permission android:name="android.permission.INTERNET"/>
+    <uses-permission android:name="android.permission.ACCESS_NETWORK_STATE"/>
+    <uses-permission android:name="android.permission.GET_ACCOUNTS"/>
+    <uses-permission android:name="android.permission.MANAGE_ACCOUNTS"/>
+    <uses-permission android:name="android.permission.USE_CREDENTIALS"/>
+    <uses-permission android:name="android.permission.ACCESS_FINE_LOCATION"/>
 
-	<uses-feature android:name="android.hardware.camera"
-	              android:required="false" />
-	<uses-feature android:name="android.hardware.camera.any"
-	              android:required="false" />
-	<uses-feature android:name="android.hardware.camera.front"
-	              android:required="false" />
-	<uses-feature android:name="android.hardware.camera.autofocus"
-	              android:required="false" />
-	<uses-feature android:name="android.hardware.camera.flash"
-	              android:required="false" />
-	<uses-feature android:name="android.hardware.touchscreen" />
+    <uses-feature
+        android:name="android.hardware.camera"
+        android:required="false"/>
+    <uses-feature
+        android:name="android.hardware.camera.any"
+        android:required="false"/>
+    <uses-feature
+        android:name="android.hardware.camera.front"
+        android:required="false"/>
+    <uses-feature
+        android:name="android.hardware.camera.autofocus"
+        android:required="false"/>
+    <uses-feature
+        android:name="android.hardware.camera.flash"
+        android:required="false"/>
+    <uses-feature android:name="android.hardware.touchscreen"/>
 
-	<application android:name="uk.ac.horizon.aestheticodes.Aestheticodes"
-	             android:allowBackup="false"
-	             android:icon="@mipmap/ic_launcher"
-	             android:label="@string/app_name"
-	             android:supportsRtl="true"
-	             android:theme="@style/Theme.Aestheticodes"
-	             tools:ignore="UnusedAttribute">
-		<meta-data android:name="com.google.android.gms.version"
-		           android:value="@integer/google_play_services_version" />
-		<meta-data android:name="com.google.android.geo.API_KEY"
-		           android:value="@string/api_key" />
+    <application
+        android:name=".Artcodes"
+        android:allowBackup="false"
+        android:icon="@mipmap/ic_launcher"
+        android:label="@string/app_name"
+        android:supportsRtl="true"
+        android:theme="@style/Theme.Artcodes"
+        tools:ignore="UnusedAttribute">
+        <meta-data
+            android:name="com.google.android.gms.version"
+            android:value="@integer/google_play_services_version"/>
+        <meta-data
+            android:name="com.google.android.geo.API_KEY"
+            android:value="@string/api_key"/>
 
-		<!--
-		<activity android:name=".activities.TestScanActivity">
-			<intent-filter>
-				<action android:name="android.intent.action.MAIN" />
+        <!--
+        <activity android:name=".activities.TestScanActivity">
+            <intent-filter>
+                <action android:name="android.intent.action.MAIN" />
 
-				<category android:name="android.intent.category.LAUNCHER" />
-			</intent-filter>
-		</activity>
-		-->
-		<activity
-				android:name=".activities.AestheticodesActivity"
-				android:screenOrientation="portrait"
-				android:theme="@style/Theme.Aestheticodes.Camera">
-			<intent-filter>
-				<action android:name="android.intent.action.MAIN" />
+                <category android:name="android.intent.category.LAUNCHER" />
+            </intent-filter>
+        </activity>
+        -->
+        <activity
+            android:name=".activity.ArtcodeActivity"
+            android:screenOrientation="portrait"
+            android:theme="@style/Theme.Artcodes.Camera">
+        </activity>
+        <activity
+            android:name=".scanner.ScannerActivity"
+            android:screenOrientation="portrait"
+            android:theme="@style/Theme.Artcodes.Camera">
+            <intent-filter>
+                <action android:name="uk.ac.horizon.aestheticodes.SCAN"/>
 
-				<category android:name="android.intent.category.LAUNCHER" />
-			</intent-filter>
-			<intent-filter>
-				<action android:name="android.intent.action.VIEW" />
+                <category android:name="android.intent.category.DEFAULT"/>
+            </intent-filter>
+            <intent-filter>
+                <action android:name="android.intent.action.VIEW"/>
 
-				<category android:name="android.intent.category.DEFAULT" />
-				<category android:name="android.intent.category.BROWSABLE" />
+                <category android:name="android.intent.category.DEFAULT"/>
+                <category android:name="android.intent.category.BROWSABLE"/>
 
-				<data android:mimeType="application/x-artcode" />
-			</intent-filter>
-			<intent-filter>
-				<action android:name="android.intent.action.VIEW" />
+                <data android:scheme="@string/artcode_scan_scheme"/>
+            </intent-filter>
+        </activity>
+        <activity
+            android:name=".activity.ActionActivity"
+            android:parentActivityName=".activity.ArtcodeActivity"
+            android:theme="@style/Theme.Artcodes.Transparent">
+            <meta-data
+                android:name="android.support.PARENT_ACTIVITY"
+                android:value="uk.ac.horizon.artcodes.activity.ArtcodeActivity"/>
+        </activity>
+        <activity
+            android:name=".activity.ExperienceActivity"
+            android:exported="true"
+            android:parentActivityName=".activity.NavigationActivity"
+            android:theme="@style/Theme.Artcodes.Transparent">
+            <meta-data
+                android:name="android.support.PARENT_ACTIVITY"
+                android:value="uk.ac.horizon.artcodes.activity.NavigationActivity"/>
 
-				<category android:name="android.intent.category.DEFAULT" />
-				<category android:name="android.intent.category.BROWSABLE" />
+            <intent-filter>
+                <action android:name="android.intent.action.VIEW"/>
 
-				<data android:scheme="file" />
-				<data android:scheme="smb" />
-				<data android:scheme="content" />
-				<data android:scheme="http" />
-				<data android:scheme="https" />
-				<data android:mimeType="*/*" />
-				<data android:host="*" />
-				<data android:pathPattern=".*\\.artcode" />
-			</intent-filter>
-		</activity>
-		<activity
-				android:name=".core.activities.ScanActivity"
-				android:screenOrientation="portrait"
-				android:theme="@style/Theme.Aestheticodes.Camera">
-			<intent-filter>
-				<action android:name="uk.ac.horizon.aestheticodes.SCAN" />
+                <category android:name="android.intent.category.DEFAULT"/>
+                <category android:name="android.intent.category.BROWSABLE"/>
 
-				<category android:name="android.intent.category.DEFAULT" />
-			</intent-filter>
-			<intent-filter>
-				<action android:name="android.intent.action.VIEW" />
+                <data
+                    android:mimeType="application/x-artcode"
+                    android:scheme="http"/>
+                <data
+                    android:mimeType="application/x-artcode"
+                    android:scheme="https"/>
+            </intent-filter>
+            <intent-filter>
+                <action android:name="android.intent.action.VIEW"/>
 
-				<category android:name="android.intent.category.DEFAULT" />
-				<category android:name="android.intent.category.BROWSABLE" />
+                <category android:name="android.intent.category.DEFAULT"/>
+                <category android:name="android.intent.category.BROWSABLE"/>
 
-				<data android:scheme="@string/artcode_scan_scheme" />
-			</intent-filter>
-		</activity>
-		<activity
-				android:name=".activities.MarkerActivity"
-				android:parentActivityName=".activities.AestheticodesActivity"
-				android:theme="@style/Theme.Aestheticodes.Transparent">
-			<meta-data
-					android:name="android.support.PARENT_ACTIVITY"
-					android:value=".activities.AestheticodesActivity" />
-		</activity>
-		<activity
-				android:name=".activities.ExperienceActivity"
-				android:parentActivityName=".activities.ExperienceListActivity"
-				android:theme="@style/Theme.Aestheticodes.Transparent">
-			<meta-data
-					android:name="android.support.PARENT_ACTIVITY"
-					android:value="uk.ac.horizon.aestheticodes.activities.ExperienceListActivity" />
-		</activity>
-		<activity
-				android:name=".activities.ExperienceListActivity"
-				android:label="@string/experiences"
-				android:parentActivityName=".activities.AestheticodesActivity">
-			<meta-data
-					android:name="android.support.PARENT_ACTIVITY"
-					android:value=".activities.AestheticodesActivity" />
-		</activity>
-		<activity
-				android:name=".activities.ExperienceEditActivity"
-				android:label="Edit Experience">
-		</activity>
-	</application>
+                <data android:scheme="file"/>
+                <data android:scheme="content"/>
+                <data android:scheme="http"/>
+                <data android:scheme="https"/>
+                <data android:mimeType="*/*"/>
+                <data android:host="*"/>
+                <data android:pathPattern="/.*\\.artcode"/>
+            </intent-filter>
+        </activity>
+        <activity android:name=".activity.NavigationActivity">
+            <intent-filter>
+                <action android:name="android.intent.action.MAIN"/>
+
+                <category android:name="android.intent.category.LAUNCHER"/>
+            </intent-filter>
+        </activity>
+        <activity
+            android:name=".activity.ExperienceEditActivity"
+            android:windowSoftInputMode="stateUnchanged">
+        </activity>
+
+        <activity
+            android:name=".activity.AboutArtcodeActivity"
+            android:theme="@style/Theme.Artcodes.About">
+        </activity>
+
+        <receiver
+            android:name="com.google.android.gms.analytics.AnalyticsReceiver"
+            android:exported="false"
+            android:enabled="true">
+            <intent-filter>
+                <action android:name="com.google.android.gms.analytics.ANALYTICS_DISPATCH"/>
+            </intent-filter>
+        </receiver>
+
+        <service
+            android:name="com.google.android.gms.analytics.AnalyticsService"
+            android:enabled="true"
+            android:exported="false"/>
+    </application>
 
 </manifest>

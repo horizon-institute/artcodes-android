@@ -1,0 +1,118 @@
+<?xml version="1.0" encoding="utf-8"?>
+
+<!--
+  ~ Artcodes recognises a different marker scheme that allows the
+  ~ creation of aesthetically pleasing, even beautiful, codes.
+  ~ Copyright (C) 2013-2015  The University of Nottingham
+  ~
+  ~     This program is free software: you can redistribute it and/or modify
+  ~     it under the terms of the GNU Affero General Public License as published
+  ~     by the Free Software Foundation, either version 3 of the License, or
+  ~     (at your option) any later version.
+  ~
+  ~     This program is distributed in the hope that it will be useful,
+  ~     but WITHOUT ANY WARRANTY; without even the implied warranty of
+  ~     MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+  ~     GNU Affero General Public License for more details.
+  ~
+  ~     You should have received a copy of the GNU Affero General Public License
+  ~     along with this program.  If not, see <http://www.gnu.org/licenses/>.
+  -->
+
+<layout xmlns:android="http://schemas.android.com/apk/res/android"
+        xmlns:app="http://schemas.android.com/apk/res-auto"
+        xmlns:tools="http://schemas.android.com/tools"
+        tools:context=".activities.ExperienceEditActivity">
+
+    <data>
+
+        <import type="android.view.View"/>
+
+        <variable
+            name="experience"
+            type="uk.ac.horizon.artcodes.model.Experience"/>
+
+        <variable
+            name="experienceEditor"
+            type="uk.ac.horizon.artcodes.ui.ExperienceEditor"/>
+    </data>
+
+    <ScrollView
+        android:layout_width="match_parent"
+        android:layout_height="match_parent">
+
+        <LinearLayout
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:orientation="vertical">
+
+            <ImageView
+                android:id="@+id/experience_image"
+                android:layout_width="match_parent"
+                android:layout_height="150dp"
+                android:adjustViewBounds="true"
+                android:background="?attr/selectableItemBackground"
+                android:onClick="editImage"
+                android:scaleType="fitCenter"
+                android:src="@drawable/ic_image_black_150dp"
+                app:imageUrl="@{experience.image}"
+                tools:ignore="ContentDescription"/>
+
+            <LinearLayout
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:orientation="vertical">
+
+                <LinearLayout
+                    android:layout_width="match_parent"
+                    android:layout_height="match_parent"
+                    android:orientation="horizontal">
+
+                    <ImageView
+                        android:id="@+id/experience_icon"
+                        android:layout_width="56dp"
+                        android:layout_height="56dp"
+                        android:layout_margin="16dp"
+                        android:background="?attr/selectableItemBackground"
+                        android:onClick="editIcon"
+                        android:src="@drawable/ic_image_black_150dp"
+                        app:imageUrl="@{experience.icon}"/>
+
+                    <EditText
+                        android:layout_width="match_parent"
+                        android:layout_height="wrap_content"
+                        android:layout_gravity="center_vertical"
+                        android:layout_margin="12dp"
+                        android:hint="@string/experienceTitle"
+                        android:singleLine="true"
+                        android:textAppearance="@style/TextAppearance.AppCompat.Title"
+                        app:textWatcher="@{experienceEditor.nameWatcher}"/>
+                </LinearLayout>
+
+                <LinearLayout
+                    android:layout_width="match_parent"
+                    android:layout_height="match_parent"
+                    android:orientation="horizontal">
+
+                    <ImageView
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:layout_margin="16dp"
+                        android:scaleType="fitCenter"
+                        android:src="@drawable/ic_subject_black_24dp"
+                        android:tint="@color/ic_tint"
+                        tools:ignore="ContentDescription"/>
+
+                    <EditText
+                        android:layout_width="match_parent"
+                        android:layout_height="wrap_content"
+                        android:layout_margin="8dp"
+                        android:hint="@string/experienceDescription"
+                        android:inputType="textMultiLine"
+                        android:textAppearance="@style/TextAppearance.AppCompat"
+                        app:textWatcher="@{experienceEditor.descWatcher}"/>
+                </LinearLayout>
+            </LinearLayout>
+        </LinearLayout>
+    </ScrollView>
+</layout>
