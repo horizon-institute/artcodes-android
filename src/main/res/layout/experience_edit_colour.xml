@@ -29,7 +29,7 @@
 
         <variable
             name="buffers"
-            type="uk.ac.horizon.artcodes.scanner.ImageBuffers" />
+            type="uk.ac.horizon.artcodes.scanner.ImageBuffers"/>
     </data>
 
     <FrameLayout
@@ -37,9 +37,9 @@
         android:layout_height="match_parent">
 
         <SurfaceView
+            android:id="@+id/cameraSurface"
             android:layout_width="fill_parent"
-            android:layout_height="fill_parent"
-            android:id="@+id/cameraSurface"/>
+            android:layout_height="fill_parent"/>
 
         <ImageView
             android:layout_width="match_parent"

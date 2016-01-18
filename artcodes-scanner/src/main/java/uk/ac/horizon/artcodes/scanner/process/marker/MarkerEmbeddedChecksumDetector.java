@@ -27,7 +27,6 @@ import java.util.ArrayList;
 import java.util.List;
 
 import uk.ac.horizon.artcodes.model.Experience;
-import uk.ac.horizon.artcodes.scanner.detect.DetectionSettings;
 import uk.ac.horizon.artcodes.scanner.detect.MarkerDetectionHandler;
 
 public class MarkerEmbeddedChecksumDetector extends MarkerDetector
@@ -35,6 +34,44 @@ public class MarkerEmbeddedChecksumDetector extends MarkerDetector
 	public MarkerEmbeddedChecksumDetector(Experience experience, MarkerDetectionHandler handler)
 	{
 		super(experience, handler);
+	}
+
+	protected Marker createMarkerForNode(int nodeIndex, List<MatOfPoint> contours, Mat hierarchy)
+	{
+		List<MarkerRegion> regions = null;
+		MarkerRegion checksumRegion = null;
+		for (int currentNodeIndex = (int) hierarchy.get(0, nodeIndex)[FIRST_NODE]; currentNodeIndex >= 0; currentNodeIndex = (int) hierarchy.get(0, currentNodeIndex)[NEXT_NODE])
+		{
+			final MarkerRegion region = createRegionForNode(currentNodeIndex, contours, hierarchy);
+			if (region != null)
+			{
+				if (regions == null)
+				{
+					regions = new ArrayList<>();
+				}
+				else if (regions.size() >= maxRegions)
+				{
+					return null;
+				}
+
+				regions.add(region);
+			}
+			else if (checksumRegion == null)
+			{
+				checksumRegion = getChecksumRegionAtNode(currentNodeIndex, hierarchy);
+				if (checksumRegion == null)
+				{
+					return null;
+				}
+			}
+		}
+
+		if (isValidRegionList(regions, checksumRegion))
+		{
+			return new Marker(nodeIndex, regions, checksumRegion);
+		}
+
+		return null;
 	}
 
 	private MarkerRegion getChecksumRegionAtNode(int regionIndex, Mat hierarchy)
@@ -75,47 +112,9 @@ public class MarkerEmbeddedChecksumDetector extends MarkerDetector
 				isValidDot((int) nodes[FIRST_NODE], hierarchy);// the child is a leaf
 	}
 
-	protected Marker createMarkerForNode(int nodeIndex, List<MatOfPoint> contours, Mat hierarchy)
-	{
-		List<MarkerRegion> regions = null;
-		MarkerRegion checksumRegion = null;
-		for (int currentNodeIndex = (int) hierarchy.get(0, nodeIndex)[FIRST_NODE]; currentNodeIndex >= 0; currentNodeIndex = (int) hierarchy.get(0, currentNodeIndex)[NEXT_NODE])
-		{
-			final MarkerRegion region = createRegionForNode(currentNodeIndex, contours, hierarchy);
-			if(region != null)
-			{
-				if(regions == null)
-				{
-					regions = new ArrayList<>();
-				}
-				else if (regions.size() >= maxRegions)
-				{
-					return null;
-				}
-
-				regions.add(region);
-			}
-			else if(checksumRegion == null)
-			{
-				checksumRegion = getChecksumRegionAtNode(currentNodeIndex, hierarchy);
-				if(checksumRegion == null)
-				{
-					return null;
-				}
-			}
-		}
-
-		if (isValidRegionList(regions, checksumRegion))
-		{
-			return new Marker(nodeIndex, regions, checksumRegion);
-		}
-
-		return null;
-	}
-
 	private boolean isValidRegionList(List<MarkerRegion> regions, MarkerRegion checksumRegion)
 	{
-		if(checksumRegion == null)
+		if (checksumRegion == null)
 		{
 			return isValidRegionList(regions);
 		}

@@ -49,4 +49,14 @@
         android:id="@+id/nav_addaccount"
         android:icon="@drawable/ic_add_black_24dp"
         android:title="@string/nav_addaccount"/>
+
+    <item
+        android:title="@string/about">
+        <menu>
+            <item
+                android:id="@+id/nav_about_artcodes"
+                android:icon="@drawable/ic_help_black_24dp"
+                android:title="@string/app_name"/>
+        </menu>
+    </item>
 </menu>

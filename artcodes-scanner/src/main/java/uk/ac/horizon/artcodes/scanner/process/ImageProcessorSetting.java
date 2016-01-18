@@ -19,12 +19,16 @@
 
 package uk.ac.horizon.artcodes.scanner.process;
 
-import android.widget.ImageButton;
-
-import uk.ac.horizon.artcodes.scanner.TextAnimator;
+import android.support.annotation.DrawableRes;
+import android.support.annotation.StringRes;
 
 public interface ImageProcessorSetting
 {
 	void nextValue();
-	void updateUI(ImageButton button, TextAnimator textAnimator);
+
+	@DrawableRes
+	int getIcon();
+
+	@StringRes
+	int getText();
 }

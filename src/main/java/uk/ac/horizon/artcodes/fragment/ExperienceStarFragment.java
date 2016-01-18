@@ -32,7 +32,7 @@ import uk.ac.horizon.artcodes.GoogleAnalytics;
 import uk.ac.horizon.artcodes.adapter.ExperienceAdapter;
 import uk.ac.horizon.artcodes.databinding.ExperienceStarBinding;
 import uk.ac.horizon.artcodes.model.Experience;
-import uk.ac.horizon.artcodes.request.RequestCallbackBase;
+import uk.ac.horizon.artcodes.server.LoadCallback;
 
 public class ExperienceStarFragment extends ArtcodeFragmentBase
 {
@@ -46,7 +46,7 @@ public class ExperienceStarFragment extends ArtcodeFragmentBase
 		binding = ExperienceStarBinding.inflate(inflater, container, false);
 		//binding.list.setHasFixedSize(true);
 		binding.list.setLayoutManager(new LinearLayoutManager(getActivity()));
-		adapter = new ExperienceAdapter(getActivity(), getServer());
+		adapter = new ExperienceAdapter(getActivity());
 		binding.list.setAdapter(adapter);
 
 		return binding.getRoot();
@@ -58,21 +58,21 @@ public class ExperienceStarFragment extends ArtcodeFragmentBase
 		super.onResume();
 		GoogleAnalytics.trackScreen("View Starred");
 		binding.progress.addPending();
-		getServer().loadStarred(new RequestCallbackBase<List<String>>()
+		getServer().loadStarred(new LoadCallback<List<String>>()
 		{
 			@Override
-			public void onResponse(List<String> item)
+			public void loaded(List<String> item)
 			{
 				for (String uri : item)
 				{
 					binding.progress.addPending();
-					getServer().loadExperience(uri, new RequestCallbackBase<Experience>()
+					getServer().loadExperience(uri, new LoadCallback<Experience>()
 					{
 						@Override
-						public void onResponse(Experience item)
+						public void loaded(Experience item)
 						{
 							binding.progress.removePending();
-							adapter.onResponse(item);
+							adapter.loaded(item);
 						}
 					});
 				}

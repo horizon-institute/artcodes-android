@@ -19,16 +19,12 @@
 
 package uk.ac.horizon.artcodes.scanner.process;
 
-import android.view.LayoutInflater;
-import android.view.ViewGroup;
-
 import org.opencv.core.Size;
 import org.opencv.imgproc.Imgproc;
 
 import java.util.List;
 
 import uk.ac.horizon.artcodes.scanner.ImageBuffers;
-import uk.ac.horizon.artcodes.scanner.TextAnimator;
 
 public class ResizeThresholder implements ImageProcessor
 {
@@ -43,7 +39,7 @@ public class ResizeThresholder implements ImageProcessor
 
 		// TODO if (!detected)
 		//{
-			neighbourhood = (neighbourhood % 50) + 5;
+		neighbourhood = (neighbourhood % 50) + 5;
 		//}
 		//Log.i(TAG, "Neighbourhood = " + neighbourhood);
 		Imgproc.adaptiveThreshold(buffers.getImage(), buffers.getImage(), 255, Imgproc.ADAPTIVE_THRESH_MEAN_C, Imgproc.THRESH_BINARY, neighbourhood, 2);

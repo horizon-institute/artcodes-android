@@ -20,6 +20,8 @@
 <resources>
     <color name="apptheme_primary">#324A5E</color>
     <color name="apptheme_primary_dark">#2b3f4f</color>
+    <color name="apptheme_accent">#295a9e</color>
+    <color name="apptheme_accent_light">#29c1e7</color>
 
     <color name="PRESSED_STATE_COLOR">#324A5E</color>
     <color name="FOCUSED_STATE_COLOR">#324A5E</color>

@@ -53,7 +53,8 @@ public class ActionEditor
 						action.setName(null);
 						action.notifyPropertyChanged(BR.name);
 					}
-				} else if (!value.equals(action.getName()))
+				}
+				else if (!value.equals(action.getName()))
 				{
 					action.setName(value);
 					action.notifyPropertyChanged(BR.name);
@@ -83,7 +84,8 @@ public class ActionEditor
 						action.notifyPropertyChanged(BR.url);
 						action.notifyPropertyChanged(BR.displayUrl);
 					}
-				} else
+				}
+				else
 				{
 					Uri uri = Uri.parse(value);
 					String urlValue = value;

@@ -23,15 +23,16 @@
         tools:context=".activities.ExperienceEditActivity">
 
     <data>
+
         <variable
             name="availability"
             type="uk.ac.horizon.artcodes.model.Availability"/>
     </data>
 
     <LinearLayout
-        android:background="?attr/selectableItemBackground"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
+        android:background="?attr/selectableItemBackground"
         android:orientation="horizontal">
 
         <ImageView
@@ -42,7 +43,8 @@
             android:layout_marginRight="16dp"
             android:layout_marginTop="8dp"
             android:src="@drawable/ic_place_black_24dp"
-            android:tint="@color/ic_tint"/>
+            android:tint="@color/ic_tint"
+            tools:ignore="ContentDescription"/>
 
         <TextView
             android:id="@+id/availability_location"

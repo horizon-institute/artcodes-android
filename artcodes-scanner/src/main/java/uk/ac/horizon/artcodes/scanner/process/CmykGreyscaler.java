@@ -20,13 +20,10 @@
 package uk.ac.horizon.artcodes.scanner.process;
 
 import android.util.Log;
-import android.view.LayoutInflater;
-import android.view.ViewGroup;
 
 import java.util.List;
 
 import uk.ac.horizon.artcodes.scanner.ImageBuffers;
-import uk.ac.horizon.artcodes.scanner.TextAnimator;
 
 public class CmykGreyscaler implements ImageProcessor
 {
@@ -36,7 +33,7 @@ public class CmykGreyscaler implements ImageProcessor
 	public CmykGreyscaler(double hueShift, double cMultiplier, double mMultiplier, double yMultiplier, double kMultiplier, boolean invert)
 	{
 		super();
-		Log.i("", "Creating CmykGreyscaler");
+		Log.i("greyscale", "Creating CmykGreyscaler");
 
 		this.cMultiplier = (float) cMultiplier;
 		this.mMultiplier = (float) mMultiplier;

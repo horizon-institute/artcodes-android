@@ -19,18 +19,14 @@
 
 package uk.ac.horizon.artcodes.server;
 
-import android.content.Context;
+import android.location.Location;
 
-import com.google.gson.Gson;
-
-import java.lang.reflect.Type;
 import java.util.List;
 import java.util.Map;
 
 import uk.ac.horizon.artcodes.account.Account;
 import uk.ac.horizon.artcodes.model.Action;
 import uk.ac.horizon.artcodes.model.Experience;
-import uk.ac.horizon.artcodes.request.RequestCallback;
 import uk.ac.horizon.artcodes.scanner.Scanner;
 
 public interface ArtcodeServer
@@ -39,21 +35,21 @@ public interface ArtcodeServer
 
 	Account getAccount(String id);
 
+	Account createAccount(String id);
+
 	List<Account> getAccounts();
 
-	void loadStarred(RequestCallback<List<String>> callback);
+	void saveRecent(List<String> recent);
 
-	void loadRecommended(RequestCallback<Map<String, List<String>>> callback);
+	void saveStarred(List<String> starred);
 
-	void loadRecent(RequestCallback<List<String>> callback);
+	void loadExperience(String id, LoadCallback<Experience> callback);
+
+	void loadRecent(LoadCallback<List<String>> callback);
+
+	void loadRecommended(LoadCallback<Map<String, List<String>>> callback, Location location);
+
+	void loadStarred(LoadCallback<List<String>> callback);
 
 	void logScan(String uri, Action action, Scanner adapter);
-
-	void loadExperience(String id, RequestCallback<Experience> callback);
-
-	<T> void load(String uri, Type type, RequestCallback<T> callback);
-
-	Context getContext();
-
-	Gson getGson();
 }

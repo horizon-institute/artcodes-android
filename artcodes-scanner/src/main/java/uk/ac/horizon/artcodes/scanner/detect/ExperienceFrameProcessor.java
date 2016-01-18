@@ -34,7 +34,7 @@ public class ExperienceFrameProcessor extends FrameProcessor
 	public ExperienceFrameProcessor(ImageBuffers buffers, Experience experience, MarkerDetectionHandler handler)
 	{
 		super(buffers);
-		for(String processor: experience.getPipeline())
+		for (String processor : experience.getPipeline())
 		{
 			// TODO Construct pipeline
 		}

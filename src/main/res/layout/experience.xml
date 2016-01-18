@@ -115,7 +115,7 @@
                         android:layout_marginEnd="16dp"
                         android:layout_marginRight="16dp"
                         android:scaleType="fitCenter"
-                        android:src="@mipmap/ic_launcher"
+                        tools:src="@mipmap/ic_launcher"
                         app:imageUrl="@{experience.icon}"
                         tools:ignore="ContentDescription"/>
 
@@ -154,19 +154,26 @@
                     android:paddingLeft="16dp"
                     android:paddingRight="16dp"
                     android:text="@string/read_more"
-                    android:visibility="gone"/>
+                    android:visibility="visible"/>
 
                 <LinearLayout
                     android:id="@+id/experienceLocations"
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content"
+                    android:orientation="vertical"
                     android:paddingLeft="16dp"
-                    android:paddingRight="16dp"
-                    android:orientation="vertical">
+                    android:paddingRight="16dp">
 
                 </LinearLayout>
 
+                <ProgressBar
+                    android:id="@+id/saveProgress"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:layout_gravity="center_horizontal"/>
+
                 <LinearLayout
+                    android:id="@+id/buttonBar"
                     android:layout_width="match_parent"
                     android:layout_height="match_parent"
                     android:layout_marginTop="16dp"
@@ -190,19 +197,18 @@
                         android:text="@string/edit"/>
 
                     <Button
-                        android:id="@+id/experience_history_button"
+                        android:id="@+id/experience_copy_button"
                         style="@style/Widget.AppCompat.ActionButton"
                         android:layout_width="wrap_content"
                         android:layout_height="wrap_content"
                         android:layout_weight="1"
                         android:background="?attr/selectableItemBackground"
                         android:drawablePadding="4dp"
-                        android:drawableTop="@drawable/ic_history_black_24dp"
+                        android:drawableTop="@drawable/ic_folder_move_black_24dp"
                         android:gravity="center"
-                        android:onClick="startExperienceHistory"
+                        android:onClick="copyExperience"
                         android:padding="8dp"
-                        android:text="@string/scan_history"
-                        android:visibility="gone"/>
+                        android:text="@string/copy"/>
 
                     <Button
                         android:id="@+id/experience_favourite_button"

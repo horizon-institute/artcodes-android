@@ -21,20 +21,15 @@ package uk.ac.horizon.artcodes.server;
 
 import android.content.Context;
 import android.content.SharedPreferences;
-import android.location.Criteria;
 import android.location.Location;
-import android.location.LocationManager;
+import android.util.Log;
 
 import com.google.common.reflect.TypeToken;
 import com.google.gson.Gson;
 
-import java.lang.reflect.Type;
 import java.util.ArrayList;
-import java.util.Comparator;
 import java.util.List;
 import java.util.Map;
-import java.util.SortedMap;
-import java.util.TreeMap;
 
 import uk.ac.horizon.artcodes.ExperienceParser;
 import uk.ac.horizon.artcodes.account.Account;
@@ -42,84 +37,85 @@ import uk.ac.horizon.artcodes.account.AppEngineAccount;
 import uk.ac.horizon.artcodes.account.LocalAccount;
 import uk.ac.horizon.artcodes.model.Action;
 import uk.ac.horizon.artcodes.model.Experience;
-import uk.ac.horizon.artcodes.request.AppEngineRequest;
-import uk.ac.horizon.artcodes.request.ContentRequest;
-import uk.ac.horizon.artcodes.request.FileRequest;
-import uk.ac.horizon.artcodes.request.HTTPRequest;
-import uk.ac.horizon.artcodes.request.IDList;
-import uk.ac.horizon.artcodes.request.Request;
-import uk.ac.horizon.artcodes.request.RequestCallback;
-import uk.ac.horizon.artcodes.request.RequestCallbackBase;
-import uk.ac.horizon.artcodes.request.RequestFactory;
 import uk.ac.horizon.artcodes.scanner.Scanner;
 
 public class AppEngineServer implements ArtcodeServer
 {
+	private static final String starred_tag = "starred";
+	private static final String recent_tag = "recent";
+	private static final String accounts_tag = "accounts";
 	private static final String prefix = "google:";
 	private final Context context;
 	private final Gson gson;
-	private final SortedMap<String, RequestFactory> factories = new TreeMap<>(new Comparator<String>()
-	{
-		@Override
-		public int compare(String lhs, String rhs)
-		{
-			int diff = rhs.length() - lhs.length();
-			if (diff == 0)
-			{
-				return lhs.compareTo(rhs);
-			}
-			return diff;
-		}
-	});
+	private final List<Account> accounts = new ArrayList<>();
 
 	public AppEngineServer(Context context)
 	{
 		this.context = context;
 		this.gson = ExperienceParser.createGson(context);
+		final List<String> accountIDs = loadIDs(Account.class, accounts_tag);
+		if (!accountIDs.contains("local"))
+		{
+			accountIDs.add("local");
+			saveIDs(Account.class, accounts_tag, accountIDs);
+		}
 
-		add(new AppEngineRequest.Factory());
-		add(new ContentRequest.Factory());
-		add(new FileRequest.Factory());
-		add(new HTTPRequest.Factory());
+		for (String accountID : accountIDs)
+		{
+			accounts.add(createAccount(accountID));
+		}
 	}
 
-	public void add(RequestFactory factory)
+	public Account createAccount(String id)
 	{
-		for (String prefix : factory.getPrefixes())
+		if (id.startsWith(prefix))
 		{
-			factories.put(prefix, factory);
+			String name = id.substring(prefix.length());
+			return new AppEngineAccount(context, name, gson);
 		}
+		else if (id.equals("local"))
+		{
+			return new LocalAccount(context, gson);
+		}
+		return null;
 	}
 
 	@Override
 	public void add(Account account)
 	{
-		IDList list = new IDList(context, Account.class.getName(), "accounts");
-		if (!list.contains(account.getId()))
+		if (getAccount(account.getId()) != null)
 		{
-			int localIndex = list.indexOf("local");
-			list.beginEdit();
-			if (localIndex == -1)
-			{
-				list.add(account.getId());
-				list.add("local");
-			} else
-			{
-				list.add(localIndex, account.getId());
-			}
-			list.commit();
+			return;
 		}
+
+		accounts.add(accounts.size() - 1, account);
+		List<String> accountIDs = new ArrayList<>();
+		for (Account accountItem : accounts)
+		{
+			accountIDs.add(accountItem.getId());
+		}
+		saveIDs(Account.class, accounts_tag, accountIDs);
+	}
+
+	public void saveRecent(List<String> ids)
+	{
+		saveIDs(Experience.class, recent_tag, ids);
+	}
+
+	public void saveStarred(List<String> ids)
+	{
+		saveIDs(Experience.class, starred_tag, ids);
 	}
 
 	@Override
 	public Account getAccount(String id)
 	{
-		if (id.startsWith(prefix))
+		for (Account account : accounts)
 		{
-			return new AppEngineAccount(this, id.substring(prefix.length()));
-		} else if (id.equals("local"))
-		{
-			return new LocalAccount(this);
+			if (account.getId().equals(id))
+			{
+				return account;
+			}
 		}
 		return null;
 	}
@@ -127,105 +123,57 @@ public class AppEngineServer implements ArtcodeServer
 	@Override
 	public List<Account> getAccounts()
 	{
-		final IDList ids = new IDList(context, Account.class.getName(), "accounts");
-		final List<Account> accounts = new ArrayList<>();
-		if (ids.isEmpty())
-		{
-			accounts.add(new LocalAccount(this));
-		} else
-		{
-			for (String id : ids)
-			{
-				Account account = getAccount(id);
-				if (account != null)
-				{
-					accounts.add(account);
-				}
-			}
-		}
 		return accounts;
+//		final IDList ids = new IDList(context, Account.class, "accounts");
+//		final List<Account> accounts = new ArrayList<>();
+//		if (ids.isEmpty())
+//		{
+//			accounts.add(new LocalAccount(context, gson));
+//		}
+//		else
+//		{
+//			for (String id : ids)
+//			{
+//				Account account = getAccount(id);
+//				if (account != null)
+//				{
+//					accounts.add(account);
+//				}
+//			}
+//		}
+//		return accounts;
 	}
 
 	@Override
-	public Context getContext()
+	public void loadExperience(final String id, final LoadCallback<Experience> callback)
 	{
-		return context;
+		load(id, new JsonCallback<>(Experience.class, gson, context, callback));
 	}
 
 	@Override
-	public Gson getGson()
+	public void loadRecent(LoadCallback<List<String>> callback)
 	{
-		return gson;
-	}
-
-	public <T> void load(String uri, Type type, RequestCallback<T> callback)
-	{
-		for (String key : factories.keySet())
-		{
-			if (uri.startsWith(key))
-			{
-				Request<T> source = factories.get(key).createRequest(this, uri, type);
-				if (source != null)
-				{
-					source.loadInto(callback);
-					return;
-				}
-			}
-		}
+		callback.loaded(loadIDs(Experience.class, recent_tag));
 	}
 
 	@Override
-	public void loadExperience(final String id, final RequestCallback<Experience> callback)
-	{
-		load(id, Experience.class, new RequestCallbackBase<Experience>()
-		{
-			@Override
-			public void onResponse(Experience item)
-			{
-				if (!item.isEditable())
-				{
-					SharedPreferences preferences = context.getSharedPreferences(Account.class.getName(), Context.MODE_PRIVATE);
-					String account = preferences.getString(id, null);
-					if (account != null)
-					{
-						String accounts = preferences.getString("accounts", "[]");
-						if (accounts.contains(account))
-						{
-							item.setEditable(true);
-						}
-					}
-				}
-
-				callback.onResponse(item);
-			}
-		});
-	}
-
-	@Override
-	public void loadRecent(RequestCallback<List<String>> callback)
-	{
-		callback.onResponse(new IDList(context, Experience.class.getName(), "recent"));
-	}
-
-	@Override
-	public void loadRecommended(RequestCallback<Map<String, List<String>>> callback)
+	public void loadRecommended(final LoadCallback<Map<String, List<String>>> callback, Location location)
 	{
 		String url = "http://aestheticodes.appspot.com/recommended";
-		final Location location = getLocation();
 		if (location != null)
 		{
 			url = url + "?lat=" + location.getLatitude() + "&lon=" + location.getLongitude();
 		}
 
-		load(url, new TypeToken<Map<String, List<String>>>()
+		load(url, new JsonCallback<>(new TypeToken<Map<String, List<String>>>()
 		{
-		}.getType(), callback);
+		}.getType(), gson, context, callback));
 	}
 
 	@Override
-	public void loadStarred(RequestCallback<List<String>> callback)
+	public void loadStarred(LoadCallback<List<String>> callback)
 	{
-		callback.onResponse(new IDList(context, Experience.class.getName(), "starred"));
+		callback.loaded(loadIDs(Experience.class, starred_tag));
 	}
 
 	@Override
@@ -234,24 +182,46 @@ public class AppEngineServer implements ArtcodeServer
 
 	}
 
-	private Location getLocation()
+	private void load(String uri, URILoaderCallback callback)
 	{
-		final LocationManager locationManager = (LocationManager) context.getApplicationContext().getSystemService(Context.LOCATION_SERVICE);
-		float accuracy = Float.MAX_VALUE;
-		Location location = null;
-		for (String provider : locationManager.getProviders(new Criteria(), true))
+		SharedPreferences preferences = context.getSharedPreferences(Account.class.getName(), Context.MODE_PRIVATE);
+		String accountID = preferences.getString(uri, null);
+		if (accountID != null)
 		{
-			Location newLocation = locationManager.getLastKnownLocation(provider);
-			if (newLocation != null)
+			Account account = getAccount(accountID);
+			if (account != null)
 			{
-				if (newLocation.getAccuracy() < accuracy)
+				if (account.load(uri, callback))
 				{
-					accuracy = newLocation.getAccuracy();
-					location = newLocation;
+					return;
 				}
 			}
 		}
 
-		return location;
+		for (Account account : getAccounts())
+		{
+			if (account.load(uri, callback))
+			{
+				return;
+			}
+		}
+		Log.w("", "Failed to find loader for " + uri);
+	}
+
+	private List<String> loadIDs(Class<?> clazz, String name)
+	{
+		SharedPreferences preferences = context.getSharedPreferences(clazz.getName(), Context.MODE_PRIVATE);
+		String jsonPreferences = preferences.getString(name, "[]");
+		Log.i("ids", name + " = " + jsonPreferences);
+		return gson.fromJson(jsonPreferences, new TypeToken<List<String>>()
+		{
+		}.getType());
+	}
+
+	private void saveIDs(Class<?> clazz, String name, List<String> ids)
+	{
+		SharedPreferences preferences = context.getSharedPreferences(clazz.getName(), Context.MODE_PRIVATE);
+		String jsonPreferences = gson.toJson(ids);
+		preferences.edit().putString(name, jsonPreferences).apply();
 	}
 }

@@ -20,7 +20,6 @@
 package uk.ac.horizon.artcodes.scanner.process.marker;
 
 import android.util.Log;
-import android.widget.ImageButton;
 
 import org.opencv.core.Core;
 import org.opencv.core.Mat;
@@ -40,7 +39,6 @@ import uk.ac.horizon.artcodes.model.Action;
 import uk.ac.horizon.artcodes.model.Experience;
 import uk.ac.horizon.artcodes.scanner.ImageBuffers;
 import uk.ac.horizon.artcodes.scanner.R;
-import uk.ac.horizon.artcodes.scanner.TextAnimator;
 import uk.ac.horizon.artcodes.scanner.detect.MarkerDetectionHandler;
 import uk.ac.horizon.artcodes.scanner.process.ImageProcessor;
 import uk.ac.horizon.artcodes.scanner.process.ImageProcessorSetting;
@@ -70,14 +68,11 @@ public class MarkerDetector implements ImageProcessor
 			return vals[(this.ordinal() + 1) % vals.length];
 		}
 	}
-
+	static final int NEXT_NODE = 0;
+	static final int FIRST_NODE = 2;
 	private static final Scalar detectedColour = new Scalar(255, 255, 0, 255);
 	private static final Scalar regionColour = new Scalar(255, 128, 0, 255);
 	private static final Scalar outlineColour = new Scalar(0, 0, 0, 255);
-
-	protected static final int NEXT_NODE = 0;
-	protected static final int FIRST_NODE = 2;
-
 	protected final int checksum;
 	protected final Collection<String> validCodes = new HashSet<>();
 	protected final int minRegions;
@@ -132,7 +127,7 @@ public class MarkerDetector implements ImageProcessor
 		this.minRegions = minRegionCount;
 		this.maxRegions = maxRegionCount;
 		this.checksum = checksum;
-		Log.i("", "Regions " + minRegionCount + "-" + maxRegionCount + ", <" + maxValue + ", checksum " + checksum);
+		Log.i("detect", "Regions " + minRegionCount + "-" + maxRegionCount + ", <" + maxValue + ", checksum " + checksum);
 	}
 
 	private static int gcd(int a, int b)
@@ -150,7 +145,7 @@ public class MarkerDetector implements ImageProcessor
 		final ArrayList<MatOfPoint> contours = new ArrayList<>();
 		final Mat hierarchy = new Mat();
 		// Make sure the image is rotated before the contours are generated, if necessary
-		if(outlineDisplay != OutlineDisplay.none || codeDisplay == CodeDisplay.visible)
+		if (outlineDisplay != OutlineDisplay.none || codeDisplay == CodeDisplay.visible)
 		{
 			buffers.getOverlay();
 		}
@@ -168,7 +163,7 @@ public class MarkerDetector implements ImageProcessor
 					{
 						foundMarkers.add(markerCode);
 
-						if(outlineDisplay != OutlineDisplay.none)
+						if (outlineDisplay != OutlineDisplay.none)
 						{
 							Mat overlay = buffers.getOverlay();
 							if (outlineDisplay == OutlineDisplay.regions)
@@ -190,7 +185,7 @@ public class MarkerDetector implements ImageProcessor
 							Imgproc.drawContours(overlay, contours, i, detectedColour, 5);
 						}
 
-						if(codeDisplay == CodeDisplay.visible)
+						if (codeDisplay == CodeDisplay.visible)
 						{
 							Mat overlay = buffers.getOverlay();
 							Rect bounds = Imgproc.boundingRect(contours.get(i));
@@ -222,6 +217,85 @@ public class MarkerDetector implements ImageProcessor
 		}
 		builder.deleteCharAt(builder.length() - 1);
 		return builder.toString();
+	}
+
+	@Override
+	public void getSettings(List<ImageProcessorSetting> settings)
+	{
+		settings.add(new ImageProcessorSetting()
+		{
+			@Override
+			public void nextValue()
+			{
+				outlineDisplay = outlineDisplay.next();
+			}
+
+			@Override
+			public int getIcon()
+			{
+				switch (outlineDisplay)
+				{
+					case none:
+						return R.drawable.ic_border_clear_24dp;
+					case marker:
+						return R.drawable.ic_border_outer_24dp;
+					case regions:
+						return R.drawable.ic_border_all_24dp;
+				}
+
+				return 0;
+			}
+
+			@Override
+			public int getText()
+			{
+				switch (outlineDisplay)
+				{
+					case none:
+						return R.string.draw_marker_off;
+					case marker:
+						return R.string.draw_marker_outline;
+					case regions:
+						return R.string.draw_marker_regions;
+				}
+				return 0;
+			}
+		});
+		settings.add(new ImageProcessorSetting()
+		{
+			@Override
+			public void nextValue()
+			{
+				codeDisplay = codeDisplay.next();
+			}
+
+			@Override
+			public int getIcon()
+			{
+				switch (codeDisplay)
+				{
+					case hidden:
+						return R.drawable.ic_filter_none_black_24dp;
+					case visible:
+						return R.drawable.ic_filter_1_black_24dp;
+				}
+				return 0;
+			}
+
+			@Override
+			public int getText()
+			{
+				switch (codeDisplay)
+				{
+					case hidden:
+						return R.string.draw_code_off;
+					case visible:
+						return R.string.draw_code;
+				}
+
+				return 0;
+			}
+		});
 	}
 
 	protected boolean isValidDot(int nodeIndex, Mat hierarchy)
@@ -360,74 +434,5 @@ public class MarkerDetector implements ImageProcessor
 			numberOfLeaves += region.value;
 		}
 		return (numberOfLeaves % checksum) == 0;
-	}
-
-	@Override
-	public void getSettings(List<ImageProcessorSetting> settings)
-	{
-		settings.add(new ImageProcessorSetting()
-		{
-			@Override
-			public void nextValue()
-			{
-				codeDisplay = codeDisplay.next();
-			}
-
-			@Override
-			public void updateUI(ImageButton button, TextAnimator textAnimator)
-			{
-				int text = 0;
-				switch (codeDisplay)
-				{
-					case hidden:
-						button.setImageResource(R.drawable.ic_image_24dp);
-						text = R.string.draw_code_off;
-						break;
-					case visible:
-						button.setImageResource(R.drawable.ic_looks_one_24dp);
-						text = R.string.draw_code;
-						break;
-				}
-
-				if(text != 0 && textAnimator != null)
-				{
-					textAnimator.setText(text);
-				}
-			}
-		});
-		settings.add(new ImageProcessorSetting()
-		{
-			@Override
-			public void nextValue()
-			{
-				outlineDisplay = outlineDisplay.next();
-			}
-
-			@Override
-			public void updateUI(ImageButton button, TextAnimator textAnimator)
-			{
-				int text = 0;
-				switch (outlineDisplay)
-				{
-					case none:
-						button.setImageResource(R.drawable.ic_border_clear_24dp);
-						text = R.string.draw_marker_off;
-						break;
-					case marker:
-						button.setImageResource(R.drawable.ic_border_outer_24dp);
-						text = R.string.draw_marker_outline;
-						break;
-					case regions:
-						button.setImageResource(R.drawable.ic_border_all_24dp);
-						text = R.string.draw_marker_regions;
-						break;
-				}
-
-				if(text != 0 && textAnimator != null)
-				{
-					textAnimator.setText(text);
-				}
-			}
-		});
 	}
 }

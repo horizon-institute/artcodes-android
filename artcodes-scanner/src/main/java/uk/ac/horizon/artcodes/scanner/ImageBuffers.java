@@ -66,7 +66,7 @@ public class ImageBuffers extends BaseObservable
 	public void setImage(byte[] data)
 	{
 		overlayReady = false;
-		cameraImage.put(0,0,data);
+		cameraImage.put(0, 0, data);
 	}
 
 	public byte[] createBuffer(int imageWidth, int imageHeight, int imageDepth)
@@ -78,7 +78,7 @@ public class ImageBuffers extends BaseObservable
 
 	public void setROI(Rect rect)
 	{
-		if(rect == null)
+		if (rect == null)
 		{
 			image = cameraImage;
 		}
@@ -99,10 +99,30 @@ public class ImageBuffers extends BaseObservable
 		return borderTop;
 	}
 
+	public void setBorderTop(int borderTop)
+	{
+		if (this.borderTop != borderTop)
+		{
+			Log.i("ImageBuffer", "Top = " + borderTop);
+			this.borderTop = borderTop;
+			notifyPropertyChanged(BR.borderTop);
+		}
+	}
+
 	@Bindable
 	public int getBorderBottom()
 	{
 		return borderBottom;
+	}
+
+	public void setBorderBottom(int borderBottom)
+	{
+		if (this.borderBottom != borderBottom)
+		{
+			Log.i("ImageBuffer", "Bottom = " + borderBottom);
+			this.borderBottom = borderBottom;
+			notifyPropertyChanged(BR.borderBottom);
+		}
 	}
 
 	@Bindable
@@ -123,9 +143,9 @@ public class ImageBuffers extends BaseObservable
 
 	public Bitmap createOverlayBitmap()
 	{
-		if(overlayReady)
+		if (overlayReady)
 		{
-			if(overlayBitmap == null)
+			if (overlayBitmap == null)
 			{
 				overlayBitmap = Bitmap.createBitmap(overlay.cols(), overlay.rows(), Bitmap.Config.ARGB_8888);
 			}
@@ -133,28 +153,13 @@ public class ImageBuffers extends BaseObservable
 			notifyPropertyChanged(BR.overlayBitmap);
 			return overlayBitmap;
 		}
+		else if(overlayBitmap != null)
+		{
+			overlayBitmap = null;
+			notifyPropertyChanged(BR.overlayBitmap);
+		}
+
 		return null;
-	}
-
-	public void setBorderBottom(int borderBottom)
-	{
-		if(this.borderBottom != borderBottom)
-		{
-			Log.i("ImageBuffer", "Bottom = " + borderBottom);
-			this.borderBottom = borderBottom;
-			notifyPropertyChanged(BR.borderBottom);
-		}
-	}
-
-
-	public void setBorderTop(int borderTop)
-	{
-		if(this.borderTop != borderTop)
-		{
-			Log.i("ImageBuffer", "Top = " + borderTop);
-			this.borderTop = borderTop;
-			notifyPropertyChanged(BR.borderTop);
-		}
 	}
 
 	public void setRotation(int rotation)
@@ -165,6 +170,39 @@ public class ImageBuffers extends BaseObservable
 	public void setFrontFacing(boolean frontFacing)
 	{
 		this.flip = frontFacing;
+	}
+
+	public Mat getTemp()
+	{
+		if (temp == null)
+		{
+			temp = new Mat(image.rows(), image.cols(), CvType.CV_8UC3);
+		}
+		return temp;
+	}
+
+	public Mat getOverlay(boolean clear)
+	{
+		if (overlayReady)
+		{
+			return overlay;
+		}
+
+		rotate(image);
+
+		if (overlay == null)
+		{
+			overlay = new Mat(image.rows(), image.cols(), CvType.CV_8UC4);
+		}
+
+		if (clear)
+		{
+			overlay.setTo(new Scalar(0, 0, 0, 0));
+		}
+
+		overlayReady = true;
+
+		return overlay;
 	}
 
 	private void rotate(Mat image)
@@ -181,38 +219,5 @@ public class ImageBuffers extends BaseObservable
 			Core.transpose(image, image);
 			Core.flip(image, image, flip_horizontal_or_vertical);
 		}
-	}
-
-	public Mat getTemp()
-	{
-		if(temp == null)
-		{
-			temp = new Mat(image.rows(), image.cols(), CvType.CV_8UC3);
-		}
-		return temp;
-	}
-
-	public Mat getOverlay(boolean clear)
-	{
-		if(overlayReady)
-		{
-			return overlay;
-		}
-
-		rotate(image);
-
-		if(overlay == null)
-		{
-			overlay = new Mat(image.rows(), image.cols(), CvType.CV_8UC4);
-		}
-
-		if(clear)
-		{
-			overlay.setTo(new Scalar(0,0,0,0));
-		}
-
-		overlayReady = true;
-
-		return overlay;
 	}
 }

@@ -18,15 +18,22 @@
  */
 package uk.ac.horizon.artcodes.scanner;
 
+import android.Manifest;
 import android.content.Intent;
+import android.content.pm.PackageManager;
 import android.databinding.DataBindingUtil;
 import android.net.Uri;
 import android.os.Build;
 import android.os.Bundle;
+import android.support.annotation.NonNull;
+import android.support.v4.app.ActivityCompat;
+import android.support.v4.content.ContextCompat;
 import android.support.v7.app.AppCompatActivity;
 import android.util.Log;
 import android.view.View;
 import android.view.WindowManager;
+import android.widget.ImageButton;
+import android.widget.LinearLayout;
 
 import com.google.common.collect.HashMultiset;
 import com.google.common.collect.Multiset;
@@ -36,20 +43,24 @@ import java.util.HashSet;
 import java.util.List;
 
 import uk.ac.horizon.artcodes.model.Experience;
+import uk.ac.horizon.artcodes.scanner.databinding.ScannerBinding;
 import uk.ac.horizon.artcodes.scanner.detect.ExperienceFrameProcessor;
 import uk.ac.horizon.artcodes.scanner.detect.MarkerDetectionHandler;
-import uk.ac.horizon.artcodes.scanner.databinding.ScannerBinding;
 import uk.ac.horizon.artcodes.scanner.process.ImageProcessorSetting;
 
 public class ScannerActivity extends AppCompatActivity implements MarkerDetectionHandler
 {
+	private static final int CAMERA_PERMISSION_REQUEST = 47;
+	protected static final int REQUIRED = 5;
+	protected static final int MAX = REQUIRED * 4;
+	private final ImageBuffers buffers = new ImageBuffers();
+	private final Multiset<String> markerCounts = HashMultiset.create();
 	protected ScannerBinding binding;
 	// TODO Use binding variables?
 	protected Scanner scanner;
+	protected Experience experience;
 	private VisibilityAnimator menuAnimator;
 	private TextAnimator textAnimator;
-	private final ImageBuffers buffers = new ImageBuffers();
-	protected Experience experience;
 
 	public void hideMenu(View view)
 	{
@@ -66,20 +77,59 @@ public class ScannerActivity extends AppCompatActivity implements MarkerDetectio
 			getWindow().getDecorView().setSystemUiVisibility(View.SYSTEM_UI_FLAG_LAYOUT_HIDE_NAVIGATION | View.SYSTEM_UI_FLAG_LAYOUT_STABLE);
 		}
 
-		Log.i("", "Setup Scanner");
-		binding = DataBindingUtil.setContentView(this, R.layout.scanner);
 		scanner = new Scanner(this);
-		binding.cameraSurface.getHolder().addCallback(scanner);
+		binding = DataBindingUtil.setContentView(this, R.layout.scanner);
 		binding.setBuffers(buffers);
+		binding.cameraSurface.getHolder().addCallback(scanner);
+		binding.progressBar.setVisibility(View.INVISIBLE);
 		setSupportActionBar(binding.toolbar);
+
+		if (ContextCompat.checkSelfPermission(this, Manifest.permission.CAMERA) != PackageManager.PERMISSION_GRANTED)
+		{
+			ActivityCompat.requestPermissions(this, new String[]{Manifest.permission.CAMERA}, CAMERA_PERMISSION_REQUEST);
+		}
 
 		menuAnimator = new VisibilityAnimator(binding.settingsMenu, binding.settingsMenuButton);
 		textAnimator = new TextAnimator(binding.settingsFeedback);
 	}
 
-	protected static final int REQUIRED = 5;
-	protected static final int MAX = REQUIRED * 4;
-	private final Multiset<String> markerCounts = HashMultiset.create();
+	@Override
+	public void onRequestPermissionsResult(int requestCode, @NonNull String[] permissions, @NonNull int[] grantResults)
+	{
+		switch (requestCode)
+		{
+			case CAMERA_PERMISSION_REQUEST:
+			{
+				// If request is cancelled, the result arrays are empty.
+				if (grantResults.length > 0 && grantResults[0] == PackageManager.PERMISSION_GRANTED)
+				{
+					startScanning();
+				}
+				else
+				{
+					Log.i("a", "Permission not granted");
+					// TODO
+				}
+			}
+		}
+	}
+
+	private void startScanning()
+	{
+		List<ImageProcessorSetting> settings;
+		if (experience != null)
+		{
+			Log.i("a", "Start Scanning");
+			settings = scanner.setFrameProcessor(new ExperienceFrameProcessor(buffers, experience, this));
+			binding.progressBar.setVisibility(View.VISIBLE);
+		}
+		else
+		{
+			settings = scanner.setFrameProcessor(null);
+		}
+		createSettingsUI(settings);
+	}
+
 
 	public void onMarkersDetected(Collection<String> markers)
 	{
@@ -103,6 +153,18 @@ public class ScannerActivity extends AppCompatActivity implements MarkerDetectio
 		onMarkersDetected(markerCounts);
 	}
 
+	public void loaded(Experience experience)
+	{
+		this.experience = experience;
+		binding.setExperience(experience);
+		startScanning();
+	}
+
+	public void showMenu(View view)
+	{
+		menuAnimator.showView();
+	}
+
 	protected void onMarkersDetected(Multiset<String> markers)
 	{
 		int best = 0;
@@ -123,9 +185,14 @@ public class ScannerActivity extends AppCompatActivity implements MarkerDetectio
 		}
 	}
 
+	protected Experience getExperience()
+	{
+		return experience;
+	}
+
 	private void onCodeDetected(String markerCode)
 	{
-		Log.i("", "MarkerDisplay Detected: " + markerCode);
+		Log.i("Marker", "MarkerDisplay Detected: " + markerCode);
 		if (markerCode != null)
 		{
 			if (experience.getCallback() == null)
@@ -142,37 +209,33 @@ public class ScannerActivity extends AppCompatActivity implements MarkerDetectio
 		}
 	}
 
-	protected Experience getExperience()
-	{
-		return experience;
-	}
-
-	public void onLoaded(Experience experience)
-	{
-		this.experience = experience;
-		binding.setExperience(experience);
-		List<ImageProcessorSetting> settings;
-		if (experience != null)
-		{
-			settings = scanner.setFrameProcessor(new ExperienceFrameProcessor(buffers, experience, this));
-		}
-		else
-		{
-			settings = scanner.setFrameProcessor(null);
-		}
-		createSettingsUI(settings);
-	}
-
 	private void createSettingsUI(List<ImageProcessorSetting> settings)
 	{
 		binding.settingsSwitches.removeAllViews();
-
-		for(ImageProcessorSetting setting: settings)
+		if (settings != null)
 		{
-
+			for (final ImageProcessorSetting setting : settings)
+			{
+				final View view = getLayoutInflater().inflate(R.layout.setting_button, binding.settingsSwitches, false);
+				final ImageButton button = (ImageButton)view.findViewById(R.id.button);
+				button.setOnClickListener(new View.OnClickListener()
+				{
+					@Override
+					public void onClick(View v)
+					{
+						setting.nextValue();
+						button.setImageResource(setting.getIcon());
+						textAnimator.setText(setting.getText());
+					}
+				});
+				button.setImageResource(setting.getIcon());
+				final LinearLayout.LayoutParams params = new LinearLayout.LayoutParams(LinearLayout.LayoutParams.WRAP_CONTENT, LinearLayout.LayoutParams.WRAP_CONTENT, 1);
+				button.setLayoutParams(params);
+				binding.settingsSwitches.addView(button);
+			}
 		}
 
-		if(binding.settingsSwitches.getChildCount() > 0)
+		if (binding.settingsSwitches.getChildCount() > 0)
 		{
 			binding.settingsMenuButton.setVisibility(View.VISIBLE);
 		}
@@ -180,10 +243,5 @@ public class ScannerActivity extends AppCompatActivity implements MarkerDetectio
 		{
 			binding.settingsMenuButton.setVisibility(View.GONE);
 		}
-	}
-
-	public void showMenu(View view)
-	{
-		menuAnimator.showView();
 	}
 }

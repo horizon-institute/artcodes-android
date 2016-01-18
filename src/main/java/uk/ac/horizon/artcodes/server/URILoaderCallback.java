@@ -17,11 +17,13 @@
  *     along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-package uk.ac.horizon.artcodes.request;
+package uk.ac.horizon.artcodes.server;
 
-public interface RequestCallback<T>
+import java.io.Reader;
+
+public interface URILoaderCallback
 {
-	void onResponse(T item);
+	void onLoaded(Reader reader);
 
 	void onError(Exception e);
 }

@@ -28,6 +28,10 @@ import uk.ac.horizon.artcodes.scanner.BR;
 
 public class Experience extends BaseObservable
 {
+	public enum Status
+	{
+		loaded, modified, saving
+	}
 	private final List<Action> actions = new ArrayList<>();
 	private final List<Availability> availabilities = new ArrayList<>();
 	private final List<String> pipeline = new ArrayList<>();
@@ -40,8 +44,6 @@ public class Experience extends BaseObservable
 	private String callback;
 	private String originalID;
 
-	private boolean editable = false;
-
 	public Experience()
 	{
 	}
@@ -49,16 +51,6 @@ public class Experience extends BaseObservable
 	public List<Action> getActions()
 	{
 		return actions;
-	}
-
-	public boolean isEditable()
-	{
-		return editable;
-	}
-
-	public void setEditable(boolean editable)
-	{
-		this.editable = editable;
 	}
 
 	public List<Availability> getAvailabilities()
@@ -168,10 +160,5 @@ public class Experience extends BaseObservable
 			}
 		}
 		return false;
-	}
-
-	public enum Status
-	{
-		loaded, modified, saving
 	}
 }

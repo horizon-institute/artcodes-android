@@ -43,9 +43,12 @@ public class TextAnimator
 
 	public void setText(int text)
 	{
-		view.setText(text);
-		view.setVisibility(View.VISIBLE);
-		settingsFeedbackHandler.removeCallbacks(settingsFeedbackRunnable);
-		settingsFeedbackHandler.postDelayed(settingsFeedbackRunnable, 3000);
+		if(text != 0)
+		{
+			view.setText(text);
+			view.setVisibility(View.VISIBLE);
+			settingsFeedbackHandler.removeCallbacks(settingsFeedbackRunnable);
+			settingsFeedbackHandler.postDelayed(settingsFeedbackRunnable, 3000);
+		}
 	}
 }

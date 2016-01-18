@@ -33,31 +33,124 @@ import java.util.Map;
 
 import uk.ac.horizon.artcodes.Feature;
 import uk.ac.horizon.artcodes.R;
+import uk.ac.horizon.artcodes.activity.AboutArtcodeActivity;
 import uk.ac.horizon.artcodes.activity.ArtcodeActivity;
 import uk.ac.horizon.artcodes.activity.ExperienceActivity;
 import uk.ac.horizon.artcodes.databinding.SectionExperienceItemBinding;
 import uk.ac.horizon.artcodes.databinding.SectionHeaderBinding;
 import uk.ac.horizon.artcodes.databinding.WelcomeBinding;
 import uk.ac.horizon.artcodes.model.Experience;
-import uk.ac.horizon.artcodes.server.ArtcodeServer;
-import uk.ac.horizon.artcodes.ui.IntentBuilder;
 
 public class SectionedExperienceAdapter extends RecyclerView.Adapter<SectionedExperienceAdapter.ViewHolderBase>
 {
+	public abstract class ViewHolderBase extends RecyclerView.ViewHolder
+	{
+		public ViewHolderBase(View root)
+		{
+			super(root);
+		}
+
+		public abstract void setItem(Object item);
+	}
+
+	private class ExperienceViewHolder extends ViewHolderBase
+	{
+		private SectionExperienceItemBinding binding;
+
+		public ExperienceViewHolder(SectionExperienceItemBinding binding)
+		{
+			super(binding.getRoot());
+			this.binding = binding;
+		}
+
+		@Override
+		public void setItem(Object item)
+		{
+			final Experience experience = (Experience) item;
+			binding.setExperience(experience);
+			binding.getRoot().setOnClickListener(new View.OnClickListener()
+			{
+				@Override
+				public void onClick(View v)
+				{
+					ExperienceActivity.start(context, experience);
+				}
+			});
+			binding.scanButton.setOnClickListener(new View.OnClickListener()
+			{
+				@Override
+				public void onClick(View v)
+				{
+					ArtcodeActivity.start(context, experience);
+				}
+			});
+		}
+	}
+
+	private class WelcomeViewHolder extends ViewHolderBase
+	{
+		private WelcomeBinding binding;
+
+		public WelcomeViewHolder(WelcomeBinding welcomeBinding)
+		{
+			super(welcomeBinding.getRoot());
+			this.binding = welcomeBinding;
+			binding.dismissButton.setOnClickListener(new View.OnClickListener()
+			{
+				@Override
+				public void onClick(View v)
+				{
+					setShowHeaderItem(false);
+					Feature.get(context, R.bool.feature_show_welcome).setEnabled(false);
+				}
+			});
+			binding.moreButton.setOnClickListener(new View.OnClickListener()
+			{
+				@Override
+				public void onClick(View v)
+				{
+					context.startActivity(new Intent(context, AboutArtcodeActivity.class));
+				}
+			});
+		}
+
+		@Override
+		public void setItem(Object item)
+		{
+
+		}
+	}
+
+	private class SectionViewHolder extends ViewHolderBase
+	{
+		private SectionHeaderBinding binding;
+
+		public SectionViewHolder(SectionHeaderBinding binding)
+		{
+			super(binding.getRoot());
+			this.binding = binding;
+		}
+
+		@Override
+		public void setItem(Object item)
+		{
+			String group = (String) item;
+			binding.title.setText(getStringResourceByName(group));
+		}
+	}
+
 	private static final int EXPERIENCE_VIEW = 0;
 	private static final int SECTION_VIEW = 1;
 	private static final int HEADER_VIEW = 2;
-	private final ArtcodeServer server;
 	private final Context context;
 	private String[] ordering = {"recent", "nearby", "featured", "new", "popular"};
 	private Map<String, SparseArray<Experience>> experienceMap = new HashMap<>();
 	private boolean hasHeaderItem = false;
 
-	public SectionedExperienceAdapter(Context context, ArtcodeServer server)
+	public SectionedExperienceAdapter(Context context)
 	{
 		super();
 		this.context = context;
-		this.server = server;
 	}
 
 	public void setShowHeaderItem(boolean showHeader)
@@ -66,7 +159,8 @@ public class SectionedExperienceAdapter extends RecyclerView.Adapter<SectionedEx
 		if (showHeader)
 		{
 			notifyItemInserted(0);
-		} else
+		}
+		else
 		{
 			notifyItemRemoved(0);
 		}
@@ -137,7 +231,8 @@ public class SectionedExperienceAdapter extends RecyclerView.Adapter<SectionedEx
 		if (position == 0 && hasHeaderItem)
 		{
 			return HEADER_VIEW;
-		} else
+		}
+		else
 		{
 			Object item = getItemAt(position);
 			if (item instanceof Experience)
@@ -161,11 +256,37 @@ public class SectionedExperienceAdapter extends RecyclerView.Adapter<SectionedEx
 			experienceMap.put(group, experiences);
 			experiences.append(index, experience);
 			notifyItemRangeInserted(indexOf(group), 2);
-		} else
+		}
+		else
 		{
 			experiences.append(index, experience);
 			notifyItemInserted(indexOf(experience));
 		}
+	}
+
+	@Override
+	public void onBindViewHolder(ViewHolderBase holder, int position)
+	{
+		holder.setItem(getItemAt(position));
+	}
+
+	@Override
+	public ViewHolderBase onCreateViewHolder(ViewGroup parent, int viewType)
+	{
+		if (viewType == EXPERIENCE_VIEW)
+		{
+			return new ExperienceViewHolder(SectionExperienceItemBinding.inflate(LayoutInflater.from(parent.getContext()), parent, false));
+		}
+		else if (viewType == HEADER_VIEW)
+		{
+			return new WelcomeViewHolder(WelcomeBinding.inflate(LayoutInflater.from(parent.getContext()), parent, false));
+		}
+		else if (viewType == SECTION_VIEW)
+		{
+			return new SectionViewHolder(SectionHeaderBinding.inflate(LayoutInflater.from(parent.getContext()), parent, false));
+		}
+
+		return null;
 	}
 
 	private int indexOf(String group)
@@ -221,142 +342,12 @@ public class SectionedExperienceAdapter extends RecyclerView.Adapter<SectionedEx
 
 	private String getStringResourceByName(String aString)
 	{
-		String packageName = server.getContext().getPackageName();
-		int resId = server.getContext().getResources().getIdentifier(aString, "string", packageName);
+		String packageName = context.getPackageName();
+		int resId = context.getResources().getIdentifier(aString, "string", packageName);
 		if (resId == 0)
 		{
 			return aString.substring(0, 1).toUpperCase() + aString.substring(1);
 		}
-		return server.getContext().getString(resId);
-	}
-
-	@Override
-	public void onBindViewHolder(ViewHolderBase holder, int position)
-	{
-		holder.setItem(getItemAt(position));
-	}
-
-	@Override
-	public ViewHolderBase onCreateViewHolder(ViewGroup parent, int viewType)
-	{
-		if (viewType == EXPERIENCE_VIEW)
-		{
-			return new ExperienceViewHolder(SectionExperienceItemBinding.inflate(LayoutInflater.from(parent.getContext()), parent, false));
-		} else if (viewType == HEADER_VIEW)
-		{
-			return new WelcomeViewHolder(WelcomeBinding.inflate(LayoutInflater.from(parent.getContext()), parent, false));
-		} else if (viewType == SECTION_VIEW)
-		{
-			return new SectionViewHolder(SectionHeaderBinding.inflate(LayoutInflater.from(parent.getContext()), parent, false));
-		}
-
-		return null;
-	}
-
-	public abstract class ViewHolderBase extends RecyclerView.ViewHolder
-	{
-		public ViewHolderBase(View root)
-		{
-			super(root);
-		}
-
-		public abstract void setItem(Object item);
-	}
-
-	private class ExperienceViewHolder extends ViewHolderBase
-	{
-		private SectionExperienceItemBinding binding;
-
-		public ExperienceViewHolder(SectionExperienceItemBinding binding)
-		{
-			super(binding.getRoot());
-			this.binding = binding;
-		}
-
-		@Override
-		public void setItem(Object item)
-		{
-			final Experience experience = (Experience) item;
-			binding.setExperience(experience);
-			binding.getRoot().setOnClickListener(new View.OnClickListener()
-			{
-				@Override
-				public void onClick(View v)
-				{
-					IntentBuilder.with(context)
-							.target(ExperienceActivity.class)
-							.setServer(server)
-							.set("experience", experience)
-							.start();
-				}
-			});
-			binding.scanButton.setOnClickListener(new View.OnClickListener()
-			{
-				@Override
-				public void onClick(View v)
-				{
-					IntentBuilder.with(context)
-							.target(ArtcodeActivity.class)
-							.setServer(server)
-							.set("experience", experience)
-							.start();
-				}
-			});
-		}
-	}
-
-	private class WelcomeViewHolder extends ViewHolderBase
-	{
-		private WelcomeBinding binding;
-
-		public WelcomeViewHolder(WelcomeBinding welcomeBinding)
-		{
-			super(welcomeBinding.getRoot());
-			this.binding = welcomeBinding;
-			binding.dismissButton.setOnClickListener(new View.OnClickListener()
-			{
-				@Override
-				public void onClick(View v)
-				{
-					setShowHeaderItem(false);
-					Feature.get(server.getContext(), R.bool.feature_show_welcome).setEnabled(false);
-				}
-			});
-			binding.moreButton.setOnClickListener(new View.OnClickListener()
-			{
-				@Override
-				public void onClick(View v)
-				{
-					IntentBuilder.with(context)
-							.setAction(Intent.ACTION_VIEW)
-							.setURI("http://aestheticodes.com/info/")
-							.start();
-				}
-			});
-		}
-
-		@Override
-		public void setItem(Object item)
-		{
-
-		}
-	}
-
-	private class SectionViewHolder extends ViewHolderBase
-	{
-		private SectionHeaderBinding binding;
-
-		public SectionViewHolder(SectionHeaderBinding binding)
-		{
-			super(binding.getRoot());
-			this.binding = binding;
-		}
-
-		@Override
-		public void setItem(Object item)
-		{
-			String group = (String) item;
-			binding.title.setText(getStringResourceByName(group));
-		}
+		return context.getString(resId);
 	}
 }

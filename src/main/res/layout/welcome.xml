@@ -81,7 +81,8 @@
                     android:stateListAnimator="@null"
                     android:text="@string/gotit"
                     android:textColor="#FFF"
-                    android:theme="@style/ButtonDark"/>
+                    android:theme="@style/ButtonDark"
+                    />
             </LinearLayout>
         </LinearLayout>
     </android.support.v7.widget.CardView>

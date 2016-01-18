@@ -20,8 +20,6 @@
 package uk.ac.horizon.artcodes.scanner.process;
 
 import android.util.Log;
-import android.view.LayoutInflater;
-import android.view.ViewGroup;
 
 import org.opencv.core.CvType;
 import org.opencv.core.Mat;
@@ -30,7 +28,6 @@ import org.opencv.imgproc.Imgproc;
 import java.util.List;
 
 import uk.ac.horizon.artcodes.scanner.ImageBuffers;
-import uk.ac.horizon.artcodes.scanner.TextAnimator;
 
 public class HueShifter implements ImageProcessor
 {
@@ -43,14 +40,14 @@ public class HueShifter implements ImageProcessor
 	{
 	}
 
-	public String getPrefix()
-	{
-		return "hue";
-	}
-
 	public HueShifter(int hueShift)
 	{
 		this.hueShift = hueShift;
+	}
+
+	public String getPrefix()
+	{
+		return "hue";
 	}
 
 	public int getHueShift()
@@ -69,11 +66,16 @@ public class HueShifter implements ImageProcessor
 		int desiredRows = (buffers.getImage().rows() / 3) * 2, desiredCols = buffers.getImage().cols();
 		if (threeChannelBuffer == null || threeChannelBuffer.rows() != desiredRows || threeChannelBuffer.cols() != desiredCols)
 		{
-			Log.i("", "Creating new Mat buffer (1)");
+			Log.i("hue", "Creating new Mat buffer (1)");
 			threeChannelBuffer = new Mat(desiredRows, desiredCols, CvType.CV_8UC3);
 		}
 		Imgproc.cvtColor(buffers.getImage(), threeChannelBuffer, Imgproc.COLOR_YUV2BGR_NV21);
 		this.justHueShiftImage(this.threeChannelBuffer, this.threeChannelBuffer);
+	}
+
+	@Override
+	public void getSettings(List<ImageProcessorSetting> settings)
+	{
 	}
 
 	/**
@@ -82,7 +84,7 @@ public class HueShifter implements ImageProcessor
 	 * @param colorImage  A BGR image (CV_8UC3).
 	 * @param resultImage A BGR image (CV_8UC3) where the result will be stored, can be the same object as colorImage.
 	 */
-	protected void justHueShiftImage(Mat colorImage, Mat resultImage)
+	private void justHueShiftImage(Mat colorImage, Mat resultImage)
 	{
 		if (this.hueShift != 0)
 		{
@@ -91,7 +93,7 @@ public class HueShifter implements ImageProcessor
 			int desiredBufferSize = colorImage.rows() * colorImage.cols() * colorImage.channels();
 			if (this.colorPixelBuffer == null || this.colorPixelBuffer.length < desiredBufferSize)
 			{
-				Log.i("", "Creating new byte[" + desiredBufferSize + "] buffer (2)");
+				Log.i("hue", "Creating new byte[" + desiredBufferSize + "] buffer (2)");
 				this.colorPixelBuffer = new byte[desiredBufferSize];
 			}
 
@@ -105,10 +107,5 @@ public class HueShifter implements ImageProcessor
 			// convert back to BGR
 			Imgproc.cvtColor(resultImage, resultImage, Imgproc.COLOR_HLS2BGR);
 		}
-	}
-
-	@Override
-	public void getSettings(List<ImageProcessorSetting> settings)
-	{
 	}
 }

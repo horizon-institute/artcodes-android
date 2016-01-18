@@ -19,53 +19,69 @@
 
 package uk.ac.horizon.artcodes.activity;
 
+import android.app.Dialog;
+import android.content.BroadcastReceiver;
+import android.content.Context;
 import android.content.Intent;
+import android.content.IntentFilter;
 import android.databinding.DataBindingUtil;
 import android.net.Uri;
 import android.os.Build;
 import android.os.Bundle;
 import android.support.v4.app.ShareCompat;
+import android.support.v4.content.LocalBroadcastManager;
+import android.support.v7.app.AlertDialog;
 import android.text.Layout;
-import android.view.LayoutInflater;
+import android.util.Log;
 import android.view.View;
 import android.view.ViewTreeObserver;
+import android.widget.LinearLayout;
+
+import com.google.gson.Gson;
 
 import java.util.List;
 
-import uk.ac.horizon.artcodes.Feature;
 import uk.ac.horizon.artcodes.GoogleAnalytics;
 import uk.ac.horizon.artcodes.R;
+import uk.ac.horizon.artcodes.account.Account;
+import uk.ac.horizon.artcodes.databinding.AccountItemBinding;
 import uk.ac.horizon.artcodes.databinding.ExperienceBinding;
 import uk.ac.horizon.artcodes.databinding.LocationBinding;
 import uk.ac.horizon.artcodes.model.Availability;
 import uk.ac.horizon.artcodes.model.Experience;
-import uk.ac.horizon.artcodes.request.RequestCallbackBase;
-import uk.ac.horizon.artcodes.ui.IntentBuilder;
+import uk.ac.horizon.artcodes.server.LoadCallback;
 
 public class ExperienceActivity extends ExperienceActivityBase
 {
 	private ExperienceBinding binding;
 
+	public static void start(Context context, Experience experience)
+	{
+		Intent intent = new Intent(context, ExperienceActivity.class);
+		intent.putExtra("experience", new Gson().toJson(experience));
+		context.startActivity(intent);
+	}
+
 	public void editExperience(View view)
 	{
-		IntentBuilder.with(this)
-				.target(ExperienceEditActivity.class)
-				.setServer(getServer())
-				.set("experience", getExperience())
-				.start();
+		Account account = getAccount();
+		if (account != null)
+		{
+			ExperienceEditActivity.start(this, getExperience(), account);
+		}
 	}
 
 	@Override
-	public void onResponse(Experience experience)
+	public void loaded(Experience experience)
 	{
-		super.onResponse(experience);
+		super.loaded(experience);
 		GoogleAnalytics.trackScreen("View Experience", experience.getId());
 		binding.setExperience(experience);
 
-		if (Feature.get(this, R.bool.feature_history).isEnabled())
-		{
-			binding.experienceHistoryButton.setVisibility(View.VISIBLE);
-		}
+//		if (Feature.get(this, R.bool.feature_history).isEnabled())
+//		{
+//			binding.experienceHistoryButton.setVisibility(View.VISIBLE);
+//		}
 
 		binding.experienceDescription.getViewTreeObserver().addOnGlobalLayoutListener(new ViewTreeObserver.OnGlobalLayoutListener()
 		{
@@ -85,7 +101,8 @@ public class ExperienceActivity extends ExperienceActivityBase
 							if (ellipsisCount == 0)
 							{
 								binding.experienceDescriptionMore.setVisibility(View.GONE);
-							} else
+							}
+							else
 							{
 								binding.experienceDescriptionMore.setVisibility(View.VISIBLE);
 							}
@@ -96,9 +113,9 @@ public class ExperienceActivity extends ExperienceActivityBase
 		});
 
 		binding.experienceLocations.removeAllViews();
-		for(final Availability availability: experience.getAvailabilities())
+		for (final Availability availability : experience.getAvailabilities())
 		{
-			if(availability.getName() != null && availability.getLat() != null && availability.getLon() != null)
+			if (availability.getName() != null && availability.getLat() != null && availability.getLon() != null)
 			{
 				final LocationBinding locationBinding = LocationBinding.inflate(getLayoutInflater(), binding.experienceLocations, false);
 				locationBinding.setAvailability(availability);
@@ -117,7 +134,50 @@ public class ExperienceActivity extends ExperienceActivityBase
 			}
 		}
 
+		if(updateActions())
+		{
+			LocalBroadcastManager.getInstance(this).registerReceiver(new BroadcastReceiver()
+			{
+				@Override
+				public void onReceive(Context context, Intent intent)
+				{
+					if (intent.hasExtra("experience"))
+					{
+						loaded(new Gson().fromJson(intent.getStringExtra("experience"), Experience.class));
+					}
+				}
+			}, new IntentFilter(getUri()));
+		}
 		updateStarred();
+	}
+
+	private boolean updateActions()
+	{
+		boolean copiable = false;
+		boolean editable = false;
+		boolean saving = false;
+		for (Account account : getServer().getAccounts())
+		{
+			if (account.canEdit(getUri()))
+			{
+				editable = true;
+			}
+			else
+			{
+				copiable = true;
+			}
+
+			if (account.isSaving(getUri()))
+			{
+				saving = true;
+			}
+		}
+
+		setVisible(binding.experienceEditButton, editable);
+		setVisible(binding.experienceCopyButton, copiable);
+		setVisible(binding.saveProgress, saving);
+		setVisible(binding.buttonBar, !saving);
+		return saving;
 	}
 
 	public void readDescription(View view)
@@ -130,11 +190,7 @@ public class ExperienceActivity extends ExperienceActivityBase
 
 	public void scanExperience(View view)
 	{
-		IntentBuilder.with(this)
-				.target(ArtcodeActivity.class)
-				.setServer(getServer())
-				.set("experience", getExperience())
-				.start();
+		ArtcodeActivity.start(this, getExperience());
 	}
 
 	public void shareExperience(View view)
@@ -149,32 +205,68 @@ public class ExperienceActivity extends ExperienceActivityBase
 
 	public void starExperience(View view)
 	{
-		getServer().loadStarred(new RequestCallbackBase<List<String>>()
+		getServer().loadStarred(new LoadCallback<List<String>>()
 		{
 			@Override
-			public void onResponse(List<String> starred)
+			public void loaded(List<String> starred)
 			{
 				if (starred.contains(getUri()))
 				{
 					GoogleAnalytics.trackEvent("Experience", "Unstar", getUri());
 					starred.remove(getUri());
-				} else
+					getServer().saveStarred(starred);
+				}
+				else
 				{
 					GoogleAnalytics.trackEvent("Experience", "Star", getUri());
 					starred.add(getUri());
+					getServer().saveStarred(starred);
 				}
 				updateStarred();
 			}
 		});
 	}
 
+	public void copyExperience(View view)
+	{
+		final AlertDialog.Builder builder = new AlertDialog.Builder(this);
+		final LinearLayout linearLayout = new LinearLayout(this);
+		linearLayout.setOrientation(LinearLayout.VERTICAL);
+		LinearLayout.LayoutParams layoutParams = new LinearLayout.LayoutParams(LinearLayout.LayoutParams.WRAP_CONTENT, LinearLayout.LayoutParams.WRAP_CONTENT);
+		linearLayout.setLayoutParams(layoutParams);
+		builder.setTitle(R.string.copy);
+		builder.setView(linearLayout);
+		final Dialog dialog = builder.create();
+
+		for (final Account account : getServer().getAccounts())
+		{
+			if (!account.canEdit(getUri()))
+			{
+				Log.i("copy", "Added " + account.getId());
+				AccountItemBinding binding = AccountItemBinding.inflate(getLayoutInflater(), linearLayout, false);
+				binding.setAccount(account);
+				binding.getRoot().setOnClickListener(new View.OnClickListener()
+				{
+					@Override
+					public void onClick(View v)
+					{
+						dialog.dismiss();
+						// TODO !!
+						final Experience experience = getExperience();
+						account.saveExperience(experience);
+						ExperienceActivity.start(ExperienceActivity.this, experience);
+					}
+				});
+				linearLayout.addView(binding.getRoot());
+			}
+		}
+
+		dialog.show();
+	}
+
 	public void startExperienceHistory(View view)
 	{
-		IntentBuilder.with(this)
-				.target(ExperienceHistoryActivity.class)
-				.setServer(getServer())
-				.set("experience", getExperience())
-				.start();
+		ExperienceHistoryActivity.start(this, getExperience());
 	}
 
 	@Override
@@ -198,18 +290,43 @@ public class ExperienceActivity extends ExperienceActivityBase
 		}
 	}
 
+	private Account getAccount()
+	{
+		for (Account account : getServer().getAccounts())
+		{
+			if (account.canEdit(getUri()))
+			{
+				return account;
+			}
+		}
+		return null;
+	}
+
+	private void setVisible(View view, boolean visible)
+	{
+		if (visible)
+		{
+			view.setVisibility(View.VISIBLE);
+		}
+		else
+		{
+			view.setVisibility(View.GONE);
+		}
+	}
+
 	private void updateStarred()
 	{
-		getServer().loadStarred(new RequestCallbackBase<List<String>>()
+		getServer().loadStarred(new LoadCallback<List<String>>()
 		{
 			@Override
-			public void onResponse(List<String> item)
+			public void loaded(List<String> item)
 			{
 				if (item.contains(getUri()))
 				{
 					binding.experienceFavouriteButton.setText(R.string.unstar);
 					binding.experienceFavouriteButton.setCompoundDrawablesWithIntrinsicBounds(0, R.drawable.ic_star_black_24dp, 0, 0);
-				} else
+				}
+				else
 				{
 					binding.experienceFavouriteButton.setText(R.string.star);
 					binding.experienceFavouriteButton.setCompoundDrawablesWithIntrinsicBounds(0, R.drawable.ic_star_border_black_24dp, 0, 0);

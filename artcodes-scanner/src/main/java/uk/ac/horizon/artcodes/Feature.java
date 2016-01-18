@@ -26,6 +26,7 @@ public final class Feature
 {
 	private final Context context;
 	private final int featureID;
+
 	private Feature(Context context, int featureID)
 	{
 		this.context = context;

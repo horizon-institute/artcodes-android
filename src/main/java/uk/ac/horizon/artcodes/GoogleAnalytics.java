@@ -23,7 +23,6 @@ import android.content.Context;
 import android.util.Log;
 
 import com.google.android.gms.analytics.HitBuilders;
-import com.google.android.gms.analytics.Logger;
 import com.google.android.gms.analytics.Tracker;
 import com.google.common.base.Throwables;
 
@@ -32,6 +31,12 @@ import java.util.Map;
 
 public final class GoogleAnalytics
 {
+	public enum Target
+	{
+		APP,
+		// Add more trackers here if you need, and update the code in #get(Target) below
+	}
+
 	private static final String dimensionValue = "experience";
 	private static GoogleAnalytics googleAnalytics;
 	private final Map<Target, Tracker> trackers = new HashMap<>();
@@ -53,18 +58,7 @@ public final class GoogleAnalytics
 		if (BuildConfig.DEBUG)
 		{
 			com.google.android.gms.analytics.GoogleAnalytics.getInstance(context).setDryRun(true);
-			com.google.android.gms.analytics.GoogleAnalytics.getInstance(context).getLogger().setLogLevel(Logger.LogLevel.VERBOSE);
 		}
-	}
-
-	public static synchronized Tracker get(Target target)
-	{
-		if (googleAnalytics == null)
-		{
-			throw new IllegalStateException("Call initialize() before getInstance()");
-		}
-
-		return googleAnalytics.getTracker(target);
 	}
 
 	public static void trackEvent(Map<String, String> analytics)
@@ -116,7 +110,17 @@ public final class GoogleAnalytics
 				.setCustomDimension(1, uri).build());
 	}
 
-	public synchronized Tracker getTracker(Target target)
+	private static synchronized Tracker get(Target target)
+	{
+		if (googleAnalytics == null)
+		{
+			throw new IllegalStateException("Call initialize() before getInstance()");
+		}
+
+		return googleAnalytics.getTracker(target);
+	}
+
+	private synchronized Tracker getTracker(Target target)
 	{
 		if (!trackers.containsKey(target))
 		{
@@ -133,11 +137,5 @@ public final class GoogleAnalytics
 		}
 
 		return trackers.get(target);
-	}
-
-	public enum Target
-	{
-		APP,
-		// Add more trackers here if you need, and update the code in #get(Target) below
 	}
 }

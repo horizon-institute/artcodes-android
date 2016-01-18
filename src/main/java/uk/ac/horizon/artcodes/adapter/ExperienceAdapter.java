@@ -30,27 +30,34 @@ import android.view.ViewGroup;
 
 import com.google.common.collect.Ordering;
 
-import uk.ac.horizon.artcodes.GoogleAnalytics;
 import uk.ac.horizon.artcodes.activity.ArtcodeActivity;
 import uk.ac.horizon.artcodes.activity.ExperienceActivity;
 import uk.ac.horizon.artcodes.databinding.ExperienceItemBinding;
 import uk.ac.horizon.artcodes.model.Experience;
-import uk.ac.horizon.artcodes.request.RequestCallback;
-import uk.ac.horizon.artcodes.server.ArtcodeServer;
-import uk.ac.horizon.artcodes.ui.IntentBuilder;
+import uk.ac.horizon.artcodes.server.LoadCallback;
 
-public class ExperienceAdapter extends RecyclerView.Adapter<ExperienceAdapter.ExperienceViewHolder> implements RequestCallback<Experience>
+public class ExperienceAdapter extends RecyclerView.Adapter<ExperienceAdapter.ExperienceViewHolder> implements LoadCallback<Experience>
 {
-	public static final Ordering<String> CASE_INSENSITIVE_NULL_SAFE_ORDER =
+	public class ExperienceViewHolder extends RecyclerView.ViewHolder
+	{
+		private ExperienceItemBinding binding;
+
+		public ExperienceViewHolder(ExperienceItemBinding binding)
+		{
+			super(binding.getRoot());
+			this.binding = binding;
+		}
+	}
+
+	private static final Ordering<String> CASE_INSENSITIVE_NULL_SAFE_ORDER =
 			Ordering.from(String.CASE_INSENSITIVE_ORDER).nullsLast();
 	private final SortedList<Experience> experiences;
-	private final ArtcodeServer server;
 	private final Context context;
-	public ExperienceAdapter(Context context, ArtcodeServer server)
+
+	public ExperienceAdapter(Context context)
 	{
 		super();
 		this.context = context;
-		this.server = server;
 		experiences = new SortedList<>(Experience.class, new SortedListAdapterCallback<Experience>(this)
 		{
 			@Override
@@ -94,11 +101,7 @@ public class ExperienceAdapter extends RecyclerView.Adapter<ExperienceAdapter.Ex
 			@Override
 			public void onClick(View v)
 			{
-				IntentBuilder.with(context)
-						.target(ExperienceActivity.class)
-						.setServer(server)
-						.set("experience", experience)
-						.start();
+				ExperienceActivity.start(context, experience);
 			}
 		});
 		holder.binding.scanButton.setOnClickListener(new View.OnClickListener()
@@ -106,11 +109,7 @@ public class ExperienceAdapter extends RecyclerView.Adapter<ExperienceAdapter.Ex
 			@Override
 			public void onClick(View v)
 			{
-				IntentBuilder.with(context)
-						.target(ArtcodeActivity.class)
-						.setServer(server)
-						.set("experience", experience)
-						.start();
+				ArtcodeActivity.start(context, experience);
 			}
 		});
 	}
@@ -122,25 +121,8 @@ public class ExperienceAdapter extends RecyclerView.Adapter<ExperienceAdapter.Ex
 	}
 
 	@Override
-	public void onResponse(Experience item)
+	public void loaded(Experience item)
 	{
 		experiences.add(item);
-	}
-
-	@Override
-	public void onError(Exception e)
-	{
-		GoogleAnalytics.trackException(e);
-	}
-
-	public class ExperienceViewHolder extends RecyclerView.ViewHolder
-	{
-		private ExperienceItemBinding binding;
-
-		public ExperienceViewHolder(ExperienceItemBinding binding)
-		{
-			super(binding.getRoot());
-			this.binding = binding;
-		}
 	}
 }

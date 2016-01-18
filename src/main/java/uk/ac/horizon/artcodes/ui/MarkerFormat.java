@@ -108,7 +108,8 @@ public class MarkerFormat implements InputFilter
 			}
 
 			return true;
-		} catch (Exception e)
+		}
+		catch (Exception e)
 		{
 			return false;
 		}

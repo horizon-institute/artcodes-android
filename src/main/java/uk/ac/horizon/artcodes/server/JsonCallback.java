@@ -17,22 +17,50 @@
  *     along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-package uk.ac.horizon.artcodes.request;
+package uk.ac.horizon.artcodes.server;
 
+import android.content.Context;
+import android.os.Handler;
+
+import com.google.gson.Gson;
+
+import java.io.Reader;
 import java.lang.reflect.Type;
 
-import uk.ac.horizon.artcodes.server.ArtcodeServer;
+import uk.ac.horizon.artcodes.GoogleAnalytics;
 
-public abstract class UriSource<T> implements Request<T>
+public class JsonCallback<T> implements URILoaderCallback
 {
-	protected final ArtcodeServer server;
-	protected final String uri;
-	protected final Type type;
+	private final Handler mainHandler;
+	private final Gson gson;
+	private final LoadCallback<T> callback;
+	private final Type type;
 
-	protected UriSource(ArtcodeServer server, String uri, Type type)
+	public JsonCallback(Type type, Gson gson, Context context, LoadCallback<T> callback)
 	{
-		this.uri = uri;
-		this.server = server;
+		this.gson = gson;
+		mainHandler = new Handler(context.getMainLooper());
+		this.callback = callback;
 		this.type = type;
+	}
+
+	@Override
+	public void onLoaded(Reader reader)
+	{
+		final T item = gson.fromJson(reader, type);
+		mainHandler.post(new Runnable()
+		{
+			@Override
+			public void run()
+			{
+				callback.loaded(item);
+			}
+		});
+	}
+
+	@Override
+	public void onError(Exception e)
+	{
+		GoogleAnalytics.trackException(e);
 	}
 }

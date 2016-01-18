@@ -19,15 +19,11 @@
 
 package uk.ac.horizon.artcodes.scanner.process;
 
-import android.view.LayoutInflater;
-import android.view.ViewGroup;
-
 import org.opencv.core.Core;
 
 import java.util.List;
 
 import uk.ac.horizon.artcodes.scanner.ImageBuffers;
-import uk.ac.horizon.artcodes.scanner.TextAnimator;
 
 public class Inverter implements ImageProcessor
 {

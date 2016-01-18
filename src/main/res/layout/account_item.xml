@@ -18,12 +18,41 @@
   ~     along with this program.  If not, see <http://www.gnu.org/licenses/>.
   -->
 
-<TextView
-    xmlns:android="http://schemas.android.com/apk/res/android"
-    android:layout_width="match_parent"
-    android:layout_height="wrap_content"
-    android:background="@color/apptheme_primary"
-    android:gravity="end"
-    android:padding="8dp"
-    android:textAppearance="@style/TextAppearance.AppCompat"
-    android:textColor="#FFF"/>
+<layout xmlns:android="http://schemas.android.com/apk/res/android"
+        xmlns:tools="http://schemas.android.com/tools"
+        tools:context=".activities.ExperienceEditActivity">
+
+    <data>
+
+        <variable
+            name="account"
+            type="uk.ac.horizon.artcodes.account.Account"/>
+    </data>
+
+    <LinearLayout
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:background="?attr/selectableItemBackground"
+        android:gravity="center_vertical"
+        android:orientation="horizontal">
+
+        <ImageView
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_margin="16dp"
+            android:src="@drawable/ic_folder_black_24dp"
+            android:tint="@color/ic_tint"
+            tools:ignore="ContentDescription"/>
+
+        <TextView
+            android:layout_width="0dp"
+            android:layout_height="wrap_content"
+            android:layout_marginLeft="16dp"
+            android:layout_marginRight="16dp"
+            android:layout_weight="1"
+            android:singleLine="true"
+            android:text="@{account.name}"
+            android:textAppearance="@style/TextAppearance.AppCompat"
+            tools:text="Test"/>
+    </LinearLayout>
+</layout>

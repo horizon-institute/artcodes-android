@@ -20,14 +20,13 @@
   -->
 
 <layout xmlns:android="http://schemas.android.com/apk/res/android"
-        xmlns:app="http://schemas.android.com/apk/res-auto"
         xmlns:tools="http://schemas.android.com/tools"
         tools:context=".activities.ExperienceEditActivity">
 
     <data>
     </data>
 
-    <android.support.design.widget.CoordinatorLayout
+    <FrameLayout
         android:layout_width="match_parent"
         android:layout_height="match_parent">
 
@@ -43,15 +42,5 @@
             android:gravity="center"
             android:text="@string/availability_private"/>
 
-        <android.support.design.widget.FloatingActionButton
-            android:id="@+id/add"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:layout_gravity="bottom|right|end"
-            android:layout_margin="16dp"
-            android:elevation="4dp"
-            android:src="@drawable/ic_add_black_24dp"
-            android:tint="#FFF"
-            app:pressedTranslationZ="8dp"/>
-    </android.support.design.widget.CoordinatorLayout>
+    </FrameLayout>
 </layout>

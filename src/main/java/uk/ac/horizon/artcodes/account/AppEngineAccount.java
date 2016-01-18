@@ -21,331 +21,175 @@ package uk.ac.horizon.artcodes.account;
 
 import android.content.Context;
 import android.content.SharedPreferences;
-import android.graphics.Bitmap;
-import android.graphics.BitmapFactory;
-import android.net.Uri;
 import android.util.Log;
 
-import com.android.volley.toolbox.HttpHeaderParser;
+import com.google.android.gms.auth.GoogleAuthException;
 import com.google.android.gms.auth.GoogleAuthUtil;
-import com.google.common.hash.Hashing;
-import com.google.common.hash.HashingInputStream;
-import com.google.common.hash.HashingOutputStream;
-import com.google.common.io.ByteStreams;
+import com.google.android.gms.auth.UserRecoverableAuthException;
 import com.google.common.reflect.TypeToken;
+import com.google.gson.Gson;
 
-import java.io.ByteArrayInputStream;
-import java.io.File;
-import java.io.FileInputStream;
 import java.io.IOException;
-import java.io.InputStream;
-import java.io.InputStreamReader;
-import java.io.OutputStreamWriter;
-import java.net.HttpURLConnection;
-import java.net.URL;
+import java.io.StringReader;
 import java.util.HashMap;
-import java.util.HashSet;
 import java.util.List;
 import java.util.Map;
-import java.util.Set;
+import java.util.UUID;
 
+import okhttp3.Request;
+import okhttp3.Response;
+import uk.ac.horizon.artcodes.Artcodes;
 import uk.ac.horizon.artcodes.GoogleAnalytics;
 import uk.ac.horizon.artcodes.model.Experience;
-import uk.ac.horizon.artcodes.request.HTTPRequest;
-import uk.ac.horizon.artcodes.request.RequestCallback;
-import uk.ac.horizon.artcodes.request.RequestCallbackBase;
-import uk.ac.horizon.artcodes.server.ArtcodeServer;
+import uk.ac.horizon.artcodes.server.JsonCallback;
+import uk.ac.horizon.artcodes.server.LoadCallback;
+import uk.ac.horizon.artcodes.server.URILoaderCallback;
 
 public class AppEngineAccount implements Account
 {
-	private final ArtcodeServer server;
+	static final String appSavePrefix = "appSaveID:";
+	private static final String httpRoot = "http://aestheticodes.appspot.com/";
+	private static final String httpsRoot = "https://aestheticodes.appspot.com/";
+
+	private final Context context;
+	private final Gson gson;
 	private final String name;
-	//private static final Map<String, AppEngineUpload> requests = new HashMap<>();
+	private final android.accounts.Account account;
+	private final Map<String, AppEngineUploadThread> uploadThreads = new HashMap<>();
 
-	public AppEngineAccount(ArtcodeServer server, String name)
+	public AppEngineAccount(Context context, String name, Gson gson)
 	{
-		this.server = server;
+		this.context = context;
 		this.name = name;
-	}
-
-	public String getToken()
-	{
-		try
-		{
-			return GoogleAuthUtil.getToken(server.getContext(), name, "oauth2:email");
-		} catch (Exception e)
-		{
-			GoogleAnalytics.trackException(e);
-		}
-		return null;
+		this.gson = gson;
+		this.account = new android.accounts.Account(name, "com.google");
 	}
 
 	@Override
-	public void loadLibrary(final RequestCallback<List<String>> callback)
+	public boolean validates() throws UserRecoverableAuthException
 	{
-		server.load("https://aestheticodes.appspot.com/experiences", new TypeToken<List<String>>()
+		try
 		{
-		}.getType(), new RequestCallbackBase<List<String>>()
+			return getToken() != null;
+		}
+		catch (UserRecoverableAuthException e)
+		{
+			throw e;
+		}
+		catch (GoogleAuthException | IOException e)
+		{
+			GoogleAnalytics.trackException(e);
+			return false;
+		}
+	}
+
+	@Override
+	public void loadLibrary(final LoadCallback<List<String>> callback)
+	{
+		load("https://aestheticodes.appspot.com/experiences", new JsonCallback<>(new TypeToken<List<String>>()
+		{
+		}.getType(), gson, context, new LoadCallback<List<String>>()
 		{
 			@Override
-			public void onResponse(List<String> item)
+			public void loaded(List<String> item)
 			{
-				SharedPreferences.Editor editor = server.getContext().getSharedPreferences(Account.class.getName(), Context.MODE_PRIVATE).edit();
+				SharedPreferences.Editor editor = context.getSharedPreferences(Account.class.getName(), Context.MODE_PRIVATE).edit();
 				for (String uri : item)
 				{
 					editor.putString(uri, getId());
 				}
 				editor.apply();
-				callback.onResponse(item);
+				callback.loaded(item);
 			}
-		});
+		}));
+	}
+
+	@Override
+	public boolean load(final String uri, final URILoaderCallback callback)
+	{
+		if (uri.startsWith(httpRoot) || uri.startsWith(httpsRoot))
+		{
+			new Thread(new Runnable()
+			{
+				@Override
+				public void run()
+				{
+					try
+					{
+						String url = uri.replace(httpRoot, httpsRoot);
+						final Request.Builder builder = new Request.Builder()
+								.get()
+								.url(url);
+						authenticate(builder);
+						final Request request = builder.build();
+						final Response response = Artcodes.httpClient.newCall(request).execute();
+
+						if (validResponse(request, response))
+						{
+							callback.onLoaded(response.body().charStream());
+						}
+					}
+					catch (Exception e)
+					{
+						callback.onError(e);
+					}
+				}
+			}).start();
+			return true;
+		}
+
+		AppEngineUploadThread uploadThread = uploadThreads.get(uri);
+		if (uploadThread != null)
+		{
+			Experience experience = uploadThread.getExperience();
+			callback.onLoaded(new StringReader(gson.toJson(experience)));
+			return true;
+		}
+		return false;
 	}
 
 	@Override
 	public void saveExperience(final Experience experience)
 	{
+		if (experience.getId() == null)
+		{
+			experience.setId(appSavePrefix + UUID.randomUUID().toString());
+		}
+		AppEngineUploadThread uploadThread = new AppEngineUploadThread(this, experience);
+		uploadThreads.put(experience.getId(), uploadThread);
+		uploadThread.start();
+	}
+
+	@Override
+	public void deleteExperience(final Experience experience)
+	{
+		if (!canEdit(experience.getId()))
+		{
+			return;
+		}
 		new Thread(new Runnable()
 		{
-			private static final String rootHTTP = "http://aestheticodes.appspot.com/experience";
-			private static final String rootHTTPS = "https://aestheticodes.appspot.com/experience";
-			private static final int imageMaxSize = 1024;
-
 			@Override
 			public void run()
 			{
 				try
 				{
-					// TODO Save temp file, notify starting
+					final Request.Builder builder = new Request.Builder();
+					builder.url(experience.getId());
+					builder.delete();
+					authenticate(builder);
 
-					final Set<String> images = new HashSet<>();
-					conditionalAdd(images, experience.getImage());
-					conditionalAdd(images, experience.getIcon());
-
-					for (String imageURI : images)
+					final Request request = builder.build();
+					final Response response = Artcodes.httpClient.newCall(request).execute();
+					if (validResponse(request, response))
 					{
-						final Uri uri = Uri.parse(imageURI);
-						final Bitmap bitmap = resizedBitmap(uri);
-
-						final String hash = getHash(uri, bitmap);
-						final String url = "https://aestheticodes.appspot.com/image/" + hash;
-
-						boolean success = exists(url);
-						if (!success)
-						{
-							HttpURLConnection connection = save(imageURI, bitmap, url);
-							success = connection.getResponseCode() == 200;
-						}
-
-						if (success)
-						{
-							if (imageURI.equals(experience.getImage()))
-							{
-								experience.setImage(url);
-							}
-
-							if (imageURI.equals(experience.getIcon()))
-							{
-								experience.setIcon(url);
-							}
-							Log.i("", imageURI + " is now " + url);
-						}
+						// TODO
 					}
-
-					HttpURLConnection connection = save(experience);
-					byte[] bytes = ByteStreams.toByteArray(connection.getInputStream());
-					Map<String, String> headers = new HashMap<>();
-					for (String headerName : connection.getHeaderFields().keySet())
-					{
-						headers.put(headerName, connection.getHeaderField(headerName));
-					}
-
-					String charset = HttpHeaderParser.parseCharset(headers, "UTF-8");
-					Experience saved = server.getGson().fromJson(new InputStreamReader(new ByteArrayInputStream(bytes), charset), Experience.class);
-
-					SharedPreferences.Editor editor = server.getContext().getSharedPreferences(Account.class.getName(), Context.MODE_PRIVATE).edit();
-					editor.putString(saved.getId(), getId()).apply();
-
-					HTTPRequest.getQueue(server.getContext()).getCache().remove(saved.getId());
-				} catch (Exception e)
+				}
+				catch (Exception e)
 				{
 					GoogleAnalytics.trackException(e);
 				}
-			}
-
-			private void conditionalAdd(Set<String> urls, String url)
-			{
-				if (url != null && (url.startsWith("file:") || url.startsWith("content:")))
-				{
-					urls.add(url);
-				}
-			}
-
-			private boolean exists(String url) throws Exception
-			{
-				HttpURLConnection connection = (HttpURLConnection) (new URL(url).openConnection());
-				connection.setRequestMethod("HEAD");
-				connection.connect();
-				return connection.getResponseCode() == 200;
-			}
-
-			private String getHash(Uri uri, Bitmap bitmap) throws IOException
-			{
-				if (bitmap == null)
-				{
-					HashingInputStream inputStream = new HashingInputStream(Hashing.sha256(), getInputStream(uri));
-					ByteStreams.copy(inputStream, ByteStreams.nullOutputStream());
-					inputStream.close();
-					return inputStream.hash().toString();
-				} else
-				{
-					HashingOutputStream outputStream = new HashingOutputStream(Hashing.sha256(), ByteStreams.nullOutputStream());
-					bitmap.compress(Bitmap.CompressFormat.JPEG, 90, outputStream);
-					outputStream.close();
-					return outputStream.hash().toString();
-				}
-			}
-
-			private InputStream getInputStream(Uri uri) throws IOException
-			{
-				if (uri.getScheme().equals("content"))
-				{
-					return server.getContext().getContentResolver().openInputStream(uri);
-				} else if (uri.getScheme().equals("file"))
-				{
-					return new FileInputStream(new File(uri.getPath()));
-				}
-				throw new IOException("Could not open " + uri.toString());
-			}
-
-			private Bitmap resizedBitmap(Uri uri) throws IOException
-			{
-				BitmapFactory.Options o = new BitmapFactory.Options();
-				o.inJustDecodeBounds = true;
-				BitmapFactory.decodeStream(getInputStream(uri), null, o);
-
-				int width_tmp = o.outWidth;
-				int height_tmp = o.outHeight;
-				int scale = 1;
-
-				while (width_tmp > imageMaxSize && height_tmp > imageMaxSize)
-				{
-					width_tmp /= 2;
-					height_tmp /= 2;
-					scale *= 2;
-				}
-
-				if (scale != 1)
-				{
-					BitmapFactory.Options o2 = new BitmapFactory.Options();
-					o2.inSampleSize = scale;
-					return BitmapFactory.decodeStream(getInputStream(uri), null, o2);
-				}
-				return null;
-			}
-
-			private HttpURLConnection save(String imageURI, Bitmap bitmap, String url) throws Exception
-			{
-				HttpURLConnection connection = (HttpURLConnection) (new URL(url).openConnection());
-
-				connection.setDoOutput(true);
-				connection.setRequestMethod("PUT");
-				connection.setRequestProperty("Content-Type", "application/json");
-				String token = null;
-				try
-				{
-					token = getToken();
-					connection.setRequestProperty("Authorization", "Bearer " + token);
-				} catch (Exception e)
-				{
-					GoogleAnalytics.trackException(e);
-				}
-
-				if (bitmap == null)
-				{
-					InputStream inputStream = getInputStream(Uri.parse(imageURI));
-					ByteStreams.copy(inputStream, connection.getOutputStream());
-				} else
-				{
-					bitmap.compress(Bitmap.CompressFormat.JPEG, 90, connection.getOutputStream());
-				}
-
-				connection.connect();
-				if (connection.getResponseCode() == 401)
-				{
-					Log.w("", "Response " + connection.getResponseCode());
-					if (token != null)
-					{
-						GoogleAuthUtil.invalidateToken(server.getContext(), token);
-					}
-				} else if (connection.getResponseCode() != 200)
-				{
-					Log.w("", "Response " + connection.getResponseCode() + ": " + connection.getResponseMessage());
-				}
-
-				return connection;
-			}
-
-			private HttpURLConnection save(Experience experience) throws Exception
-			{
-				String url = experience.getId();
-				String method = "PUT";
-
-				Log.i("", "Saving id = " + url);
-
-				if (url == null)
-				{
-					url = rootHTTPS;
-					method = "POST";
-				} else
-				{
-					url = url.toLowerCase();
-					if (url.startsWith(rootHTTP))
-					{
-						Log.i("", "== http:// :" + url);
-						url = url.replace("http://", "https://");
-					} else if (!url.startsWith(rootHTTPS))
-					{
-						Log.i("", "!= https:// :" + url);
-						url = rootHTTPS;
-						method = "POST";
-					}
-				}
-
-				HttpURLConnection connection = (HttpURLConnection) (new URL(url).openConnection());
-
-				connection.setDoOutput(true);
-				connection.setRequestMethod(method);
-				connection.setRequestProperty("Content-Type", "application/json");
-				String token = null;
-				try
-				{
-					token = getToken();
-					connection.setRequestProperty("Authorization", "Bearer " + token);
-				} catch (Exception e)
-				{
-					GoogleAnalytics.trackException(e);
-				}
-
-				String experienceJSON = server.getGson().toJson(experience);
-				Log.i("", "Saving " + experienceJSON);
-				OutputStreamWriter out = new OutputStreamWriter(connection.getOutputStream());
-				out.write(experienceJSON);
-				out.close();
-
-				connection.connect();
-				if (connection.getResponseCode() == 401)
-				{
-					Log.w("", "Response " + connection.getResponseCode());
-					if (token != null)
-					{
-						GoogleAuthUtil.invalidateToken(server.getContext(), token);
-					}
-				} else if (connection.getResponseCode() != 200)
-				{
-					Log.w("", "Response " + connection.getResponseCode() + ": " + connection.getResponseMessage());
-				}
-
-				return connection;
 			}
 		}).start();
 	}
@@ -372,12 +216,87 @@ public class AppEngineAccount implements Account
 	public String getName()
 	{
 		return name;
-		//return server.getContext().getString(R.string.server, name);
 	}
 
 	@Override
-	public boolean willCreateCopy(String uri)
+	public boolean canEdit(String uri)
 	{
+		final SharedPreferences preferences = context.getSharedPreferences(Account.class.getName(), Context.MODE_PRIVATE);
+		final String account = preferences.getString(uri, null);
+		return account != null && account.equals(getId());
+	}
+
+	@Override
+	public boolean isSaving(String uri)
+	{
+		try
+		{
+			AppEngineUploadThread uploadThread = uploadThreads.get(uri);
+			return uploadThread != null && !uploadThread.isFinished();
+		}
+		catch (Exception e)
+		{
+			GoogleAnalytics.trackException(e);
+		}
 		return false;
+	}
+
+	Gson getGson()
+	{
+		return gson;
+	}
+
+	Context getContext()
+	{
+		return context;
+	}
+
+	boolean validResponse(Request request, Response response)
+	{
+		if (response.code() == 401)
+		{
+			Log.w("", "Response " + response.code());
+			String authHeader = request.header("Authorization");
+			if (authHeader != null)
+			{
+				String token = authHeader.split(" ")[1];
+				try
+				{
+					GoogleAuthUtil.clearToken(context, token);
+				}
+				catch (GoogleAuthException | IOException e)
+				{
+					GoogleAnalytics.trackException(e);
+				}
+			}
+			return false;
+		}
+		else if (response.code() != 200)
+		{
+			Log.w("", "Response " + response.code() + ": " + response.message());
+			return false;
+		}
+		return true;
+	}
+
+	void authenticate(Request.Builder builder)
+	{
+		try
+		{
+			String token = getToken();
+			if (token != null)
+			{
+				builder.header("Authorization", "Bearer " + token);
+			}
+		}
+		catch (Exception e)
+		{
+			GoogleAnalytics.trackException(e);
+		}
+	}
+
+	private String getToken() throws IOException, GoogleAuthException
+	{
+		return GoogleAuthUtil.getToken(context, account, "oauth2:email");
 	}
 }

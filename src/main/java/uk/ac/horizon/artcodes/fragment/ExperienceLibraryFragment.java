@@ -34,8 +34,7 @@ import uk.ac.horizon.artcodes.activity.ExperienceEditActivity;
 import uk.ac.horizon.artcodes.adapter.ExperienceAdapter;
 import uk.ac.horizon.artcodes.databinding.ExperienceLibraryBinding;
 import uk.ac.horizon.artcodes.model.Experience;
-import uk.ac.horizon.artcodes.request.RequestCallbackBase;
-import uk.ac.horizon.artcodes.ui.IntentBuilder;
+import uk.ac.horizon.artcodes.server.LoadCallback;
 
 public class ExperienceLibraryFragment extends ArtcodeFragmentBase
 {
@@ -50,7 +49,7 @@ public class ExperienceLibraryFragment extends ArtcodeFragmentBase
 		binding = ExperienceLibraryBinding.inflate(inflater, container, false);
 		//binding.list.setHasFixedSize(true);
 		binding.list.setLayoutManager(new LinearLayoutManager(getActivity()));
-		adapter = new ExperienceAdapter(getActivity(), getServer());
+		adapter = new ExperienceAdapter(getActivity());
 		binding.list.setAdapter(adapter);
 		binding.progress.setEnabled(false);
 		binding.fab.setOnClickListener(new View.OnClickListener()
@@ -58,19 +57,60 @@ public class ExperienceLibraryFragment extends ArtcodeFragmentBase
 			@Override
 			public void onClick(View v)
 			{
-				IntentBuilder.with(getActivity())
-						.target(ExperienceEditActivity.class)
-						.setServer(getServer())
-						.set("experience", new Experience())
-						.set("account", getAccount().getId())
-						.start();
+				ExperienceEditActivity.start(getActivity(), new Experience(), account);
 			}
 		});
 
 		return binding.getRoot();
 	}
 
-	public Account getAccount()
+	@Override
+	public void setUserVisibleHint(boolean isVisibleToUser)
+	{
+		super.setUserVisibleHint(isVisibleToUser);
+		if (isInLayout())
+		{
+			if (isVisibleToUser)
+			{
+				binding.fab.show();
+			}
+			else
+			{
+				binding.fab.hide();
+			}
+		}
+	}
+
+	@Override
+	public void onResume()
+	{
+		super.onResume();
+		GoogleAnalytics.trackScreen("View Library");
+		binding.progress.addPending();
+		getAccount().loadLibrary(new LoadCallback<List<String>>()
+		{
+			@Override
+			public void loaded(List<String> item)
+			{
+				for (String uri : item)
+				{
+					binding.progress.addPending();
+					getServer().loadExperience(uri, new LoadCallback<Experience>()
+					{
+						@Override
+						public void loaded(Experience item)
+						{
+							binding.progress.removePending();
+							adapter.loaded(item);
+						}
+					});
+				}
+				binding.progress.removePending();
+			}
+		});
+	}
+
+	private Account getAccount()
 	{
 		if (account == null)
 		{
@@ -88,50 +128,5 @@ public class ExperienceLibraryFragment extends ArtcodeFragmentBase
 			}
 		}
 		return account;
-	}
-
-	@Override
-	public void setUserVisibleHint(boolean isVisibleToUser)
-	{
-		super.setUserVisibleHint(isVisibleToUser);
-		if (isInLayout())
-		{
-			if (isVisibleToUser)
-			{
-				binding.fab.show();
-			} else
-			{
-				binding.fab.hide();
-			}
-		}
-	}
-
-	@Override
-	public void onResume()
-	{
-		super.onResume();
-		GoogleAnalytics.trackScreen("View Library");
-		binding.progress.addPending();
-		getAccount().loadLibrary(new RequestCallbackBase<List<String>>()
-		{
-			@Override
-			public void onResponse(List<String> item)
-			{
-				for (String uri : item)
-				{
-					binding.progress.addPending();
-					getServer().loadExperience(uri, new RequestCallbackBase<Experience>()
-					{
-						@Override
-						public void onResponse(Experience item)
-						{
-							binding.progress.removePending();
-							adapter.onResponse(item);
-						}
-					});
-				}
-				binding.progress.removePending();
-			}
-		});
 	}
 }

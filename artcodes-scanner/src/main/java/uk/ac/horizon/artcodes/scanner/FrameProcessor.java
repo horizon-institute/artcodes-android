@@ -21,9 +21,6 @@ package uk.ac.horizon.artcodes.scanner;
 
 import android.hardware.Camera;
 import android.util.Log;
-import android.view.LayoutInflater;
-import android.view.ViewGroup;
-import android.widget.ImageButton;
 
 import org.opencv.core.Rect;
 
@@ -69,7 +66,7 @@ public class FrameProcessor implements Camera.PreviewCallback
 	public List<ImageProcessorSetting> getSettings()
 	{
 		final List<ImageProcessorSetting> settings = new ArrayList<>();
-		for (ImageProcessor imageProcessor: pipeline)
+		for (ImageProcessor imageProcessor : pipeline)
 		{
 			imageProcessor.getSettings(settings);
 		}
@@ -77,17 +74,17 @@ public class FrameProcessor implements Camera.PreviewCallback
 		return settings;
 	}
 
-	protected Rect createROI(int imageWidth, int imageHeight, int surfaceWidth, int surfaceHeight)
-	{
-		return null;
-	}
-
-	protected byte[] createBuffer(Scanner.CameraInfo info, int surfaceWidth, int surfaceHeight)
+	byte[] createBuffer(Scanner.CameraInfo info, int surfaceWidth, int surfaceHeight)
 	{
 		byte[] buffer = buffers.createBuffer(info.getImageWidth(), info.getImageHeight(), info.getImageDepth());
 		buffers.setROI(createROI(info.getImageWidth(), info.getImageHeight(), surfaceWidth, surfaceHeight));
 		buffers.setRotation(info.getRotation());
 		buffers.setFrontFacing(info.isFrontFacing());
 		return buffer;
+	}
+
+	protected Rect createROI(int imageWidth, int imageHeight, int surfaceWidth, int surfaceHeight)
+	{
+		return null;
 	}
 }

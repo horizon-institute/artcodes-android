@@ -76,9 +76,10 @@ public class TestScanActivity extends Activity
 					Experience experience = createExperience();
 					experience.setCallback("http://aestheticodes.appspot.com/action/{code}");
 					String url = getString(R.string.artcode_scan_scheme) + ":" + URLEncoder.encode(experienceToJson(experience), "UTF-8");
-					Log.i("", url);
+					Log.i("test", url);
 					startActivity(new Intent(Intent.ACTION_VIEW, Uri.parse(url)));
-				} catch (Exception e)
+				}
+				catch (Exception e)
 				{
 					GoogleAnalytics.trackException(e);
 				}
@@ -97,7 +98,8 @@ public class TestScanActivity extends Activity
 				{
 					String url = "https://aestheticodes.appspot.com/experience/b29f7f6a-7fdd-4a6d-bee3-3f27f77ef931.artcode";
 					startActivity(new Intent(Intent.ACTION_VIEW, Uri.parse(url)));
-				} catch (Exception e)
+				}
+				catch (Exception e)
 				{
 					GoogleAnalytics.trackException(e);
 				}
@@ -117,13 +119,15 @@ public class TestScanActivity extends Activity
 		if (resultCode == Activity.RESULT_CANCELED)
 		{
 			label.setText("scan cancelled");
-		} else if (resultCode == Activity.RESULT_OK)
+		}
+		else if (resultCode == Activity.RESULT_OK)
 		{
 			String marker = data.getStringExtra("action");
 			if (marker == null)
 			{
 				label.setText("scan result for null action");
-			} else
+			}
+			else
 			{
 				label.setText("Found MarkerDisplay " + marker);
 			}

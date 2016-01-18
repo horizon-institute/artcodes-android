@@ -41,22 +41,6 @@ import uk.ac.horizon.artcodes.scanner.R;
 
 public class ExperienceParser
 {
-	private static Gson gson;
-
-	public static Gson createGson(Context context)
-	{
-		if (gson == null)
-		{
-			GsonBuilder builder = new GsonBuilder();
-			if (context == null || Feature.get(context, R.bool.feature_load_old_experiences).isEnabled())
-			{
-				builder.registerTypeAdapterFactory(new ExperienceTypeAdapterFactor());
-			}
-			gson = builder.create();
-		}
-		return gson;
-	}
-
 	private static class ExperienceTypeAdapterFactor implements TypeAdapterFactory
 	{
 		@SuppressWarnings("unchecked")
@@ -97,7 +81,7 @@ public class ExperienceParser
 						{
 							JsonArray array = new JsonArray();
 							array.add(new JsonPrimitive("tile"));
-							if(jsonObject.has("embeddedChecksum")
+							if (jsonObject.has("embeddedChecksum")
 									&& jsonObject.get("embeddedChecksum") instanceof JsonPrimitive
 									&& jsonObject.get("embeddedChecksum").getAsBoolean())
 							{
@@ -156,5 +140,20 @@ public class ExperienceParser
 				}
 			};
 		}
+	}
+	private static Gson gson;
+
+	public static Gson createGson(Context context)
+	{
+		if (gson == null)
+		{
+			GsonBuilder builder = new GsonBuilder();
+			if (context == null || Feature.get(context, R.bool.feature_load_old_experiences).isEnabled())
+			{
+				builder.registerTypeAdapterFactory(new ExperienceTypeAdapterFactor());
+			}
+			gson = builder.create();
+		}
+		return gson;
 	}
 }

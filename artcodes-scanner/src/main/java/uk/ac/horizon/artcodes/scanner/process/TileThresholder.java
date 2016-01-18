@@ -19,11 +19,6 @@
 
 package uk.ac.horizon.artcodes.scanner.process;
 
-import android.view.LayoutInflater;
-import android.view.View;
-import android.view.ViewGroup;
-import android.widget.ImageButton;
-
 import org.opencv.core.Mat;
 import org.opencv.core.Size;
 import org.opencv.imgproc.Imgproc;
@@ -32,7 +27,6 @@ import java.util.List;
 
 import uk.ac.horizon.artcodes.scanner.ImageBuffers;
 import uk.ac.horizon.artcodes.scanner.R;
-import uk.ac.horizon.artcodes.scanner.TextAnimator;
 
 public class TileThresholder implements ImageProcessor
 {
@@ -123,29 +117,33 @@ public class TileThresholder implements ImageProcessor
 			}
 
 			@Override
-			public void updateUI(ImageButton button, TextAnimator textAnimator)
+			public int getIcon()
 			{
-				int text = 0;
 				switch (display)
 				{
 					case none:
-						button.setImageResource(R.drawable.ic_image_24dp);
-						text = R.string.draw_threshold_off;
-						break;
+						return R.drawable.ic_image_24dp;
 					case greyscale:
-						button.setImageResource(R.drawable.ic_gradient_24dp);
-						text = R.string.draw_threshold_greyscale;
-						break;
+						return R.drawable.ic_gradient_24dp;
 					case threshold:
-						button.setImageResource(R.drawable.ic_filter_b_and_w_24dp);
-						text = R.string.draw_threshold_on;
-						break;
+						return R.drawable.ic_filter_b_and_w_24dp;
 				}
+				return 0;
+			}
 
-				if(text != 0 && textAnimator != null)
+			@Override
+			public int getText()
+			{
+				switch (display)
 				{
-					textAnimator.setText(text);
+					case none:
+						return R.string.draw_threshold_off;
+					case greyscale:
+						return R.string.draw_threshold_greyscale;
+					case threshold:
+						return R.string.draw_threshold_on;
 				}
+				return 0;
 			}
 		});
 	}

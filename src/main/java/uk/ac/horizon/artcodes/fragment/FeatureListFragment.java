@@ -23,7 +23,6 @@ import android.os.Bundle;
 import android.support.annotation.Nullable;
 import android.support.v4.app.Fragment;
 import android.support.v7.widget.LinearLayoutManager;
-import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -38,15 +37,6 @@ import uk.ac.horizon.artcodes.databinding.FeatureListBinding;
 
 public class FeatureListFragment extends Fragment
 {
-	private void addFeature(FeatureAdapter adapter, int featureID)
-	{
-		Feature feature = Feature.get(getActivity(), featureID);
-		if (feature.getName().startsWith("feature_"))
-		{
-			adapter.add(feature);
-		}
-	}
-
 	@Nullable
 	@Override
 	public View onCreateView(LayoutInflater inflater, ViewGroup container, Bundle savedInstanceState)
@@ -64,9 +54,10 @@ public class FeatureListFragment extends Fragment
 			try
 			{
 				addFeature(adapter, field.getInt(features));
-			} catch (Exception e)
+			}
+			catch (Exception e)
 			{
-				Log.i("", e.getMessage(), e);
+				GoogleAnalytics.trackException(e);
 			}
 		}
 
@@ -78,9 +69,10 @@ public class FeatureListFragment extends Fragment
 			try
 			{
 				addFeature(adapter, field.getInt(features));
-			} catch (Exception e)
+			}
+			catch (Exception e)
 			{
-				Log.i("", e.getMessage(), e);
+				GoogleAnalytics.trackException(e);
 			}
 		}
 
@@ -92,5 +84,14 @@ public class FeatureListFragment extends Fragment
 	{
 		super.onResume();
 		GoogleAnalytics.trackScreen("View Features");
+	}
+
+	private void addFeature(FeatureAdapter adapter, int featureID)
+	{
+		Feature feature = Feature.get(getActivity(), featureID);
+		if (feature.getName().startsWith("feature_"))
+		{
+			adapter.add(feature);
+		}
 	}
 }

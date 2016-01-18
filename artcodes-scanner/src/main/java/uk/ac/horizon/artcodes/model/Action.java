@@ -27,6 +27,10 @@ import java.util.List;
 
 public class Action extends BaseObservable
 {
+	public enum Match
+	{
+		any, all, sequence
+	}
 	public static final String HTTP_PREFIX = "http://";
 	private List<String> codes = new ArrayList<>();
 	private Match match = Match.any;
@@ -124,14 +128,17 @@ public class Action extends BaseObservable
 				if (match == Match.all)
 				{
 					builder.append(" + ");
-				} else if (match == Match.any)
+				}
+				else if (match == Match.any)
 				{
 					builder.append(", ");
-				} else if (match == Match.sequence)
+				}
+				else if (match == Match.sequence)
 				{
 					builder.append(" -> ");
 				}
-			} else
+			}
+			else
 			{
 				comma = true;
 			}
@@ -140,10 +147,5 @@ public class Action extends BaseObservable
 		}
 		builder.append(")");
 		return builder.toString();
-	}
-
-	public enum Match
-	{
-		any, all, sequence
 	}
 }

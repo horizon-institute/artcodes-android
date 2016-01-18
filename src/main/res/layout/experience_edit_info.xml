@@ -54,7 +54,7 @@
                 android:background="?attr/selectableItemBackground"
                 android:onClick="editImage"
                 android:scaleType="fitCenter"
-                android:src="@drawable/ic_insert_photo_black_48dp"
+                android:src="@drawable/ic_image_black_150dp"
                 app:imageUrl="@{experience.image}"
                 tools:ignore="ContentDescription"/>
 
@@ -75,7 +75,7 @@
                         android:layout_margin="16dp"
                         android:background="?attr/selectableItemBackground"
                         android:onClick="editIcon"
-                        android:src="@drawable/ic_insert_photo_black_48dp"
+                        android:src="@drawable/ic_image_black_150dp"
                         app:imageUrl="@{experience.icon}"/>
 
                     <EditText

@@ -26,13 +26,13 @@ import uk.ac.horizon.artcodes.server.ArtcodeServer;
 
 public class ArtcodeFragmentBase extends Fragment
 {
-	protected Artcodes getArtcodes()
-	{
-		return (Artcodes) getActivity().getApplication();
-	}
-
-	protected ArtcodeServer getServer()
+	ArtcodeServer getServer()
 	{
 		return getArtcodes().getServer();
+	}
+
+	private Artcodes getArtcodes()
+	{
+		return (Artcodes) getActivity().getApplication();
 	}
 }

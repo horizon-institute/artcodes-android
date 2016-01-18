@@ -17,10 +17,9 @@
  *     along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-package uk.ac.horizon.artcodes.request;
+package uk.ac.horizon.artcodes.server;
 
-
-public interface Request<T>
+public interface LoadCallback<T>
 {
-	void loadInto(RequestCallback<T> target);
+	void loaded(T item);
 }

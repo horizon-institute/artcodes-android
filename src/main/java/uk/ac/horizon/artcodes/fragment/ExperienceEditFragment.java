@@ -27,11 +27,6 @@ import uk.ac.horizon.artcodes.model.Experience;
 
 public abstract class ExperienceEditFragment extends ArtcodeFragmentBase
 {
-	public Experience getExperience()
-	{
-		return ((ExperienceEditActivity) getActivity()).getExperience();
-	}
-
 	public Account getAccount()
 	{
 		return ((ExperienceEditActivity) getActivity()).getAccount();
@@ -42,7 +37,26 @@ public abstract class ExperienceEditFragment extends ArtcodeFragmentBase
 		((ExperienceEditActivity) getActivity()).setAccount(account);
 	}
 
+	public boolean displayAddFAB()
+	{
+		return false;
+	}
+
+	public void add()
+	{
+
+	}
+
+	public void update()
+	{
+
+	}
 
 	@StringRes
 	public abstract int getTitleResource();
+
+	Experience getExperience()
+	{
+		return ((ExperienceEditActivity) getActivity()).getExperience();
+	}
 }

@@ -19,13 +19,27 @@
 
 package uk.ac.horizon.artcodes.activity;
 
+import android.content.Context;
+import android.content.Intent;
+
+import com.google.gson.Gson;
+
 import uk.ac.horizon.artcodes.model.Experience;
 
 public class ExperienceHistoryActivity extends ExperienceActivityBase
 {
-	@Override
-	public void onResponse(Experience experience)
+	public static void start(Context context, Experience experience)
 	{
-		super.onResponse(experience);
+		Intent intent = new Intent(context, ExperienceHistoryActivity.class);
+		intent.putExtra("experience", new Gson().toJson(experience));
+		context.startActivity(intent);
 	}
+
+	@Override
+	public void loaded(Experience experience)
+	{
+		super.loaded(experience);
+	}
+
+
 }

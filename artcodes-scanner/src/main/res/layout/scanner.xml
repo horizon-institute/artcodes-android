@@ -24,6 +24,7 @@
         tools:context=".activities.ScannerActivity">
 
     <data>
+
         <import type="android.view.View"/>
 
         <variable
@@ -41,9 +42,9 @@
         android:layout_height="match_parent">
 
         <SurfaceView
+            android:id="@+id/cameraSurface"
             android:layout_width="fill_parent"
-            android:layout_height="fill_parent"
-            android:id="@+id/cameraSurface"/>
+            android:layout_height="fill_parent"/>
 
         <LinearLayout
             android:layout_width="fill_parent"
@@ -78,20 +79,20 @@
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content"
                     android:layout_gravity="bottom"
+                    android:animateLayoutChanges="true"
                     android:background="@color/settings_mask"
                     android:gravity="center"
                     android:orientation="vertical"
                     android:visibility="invisible"
-                    android:animateLayoutChanges="true"
                     tools:visibility="visible">
 
                     <TextView
+                        android:id="@+id/settingsFeedback"
                         android:layout_width="match_parent"
                         android:layout_height="wrap_content"
+                        android:gravity="center_horizontal"
                         android:padding="8dp"
-                        android:visibility="gone"
-                        android:id="@+id/settingsFeedback"
-                        android:gravity="center_horizontal"/>
+                        android:visibility="gone"/>
 
                     <LinearLayout
                         android:id="@+id/settingsSwitches"
@@ -115,27 +116,25 @@
                     android:onClick="showMenu"
                     android:src="@drawable/ic_more_horiz_24dp"
                     android:tint="#FFF"/>
-
-                <ProgressBar
-                    android:id="@+id/progressBar"
-                    style="@style/Widget.AppCompat.ProgressBar.Horizontal"
-                    android:layout_width="match_parent"
-                    android:layout_height="wrap_content"
-                    android:layout_gravity="bottom"
-                    android:layout_marginBottom="-8dp"
-                    android:indeterminateOnly="true"/>
             </android.support.design.widget.CoordinatorLayout>
 
-            <TextView
+            <FrameLayout
+                android:orientation="vertical"
                 android:id="@+id/bottomView"
                 android:layout_width="match_parent"
                 android:layout_height="100dp"
+                app:height="@{buffers.borderBottom}"
                 android:background="@color/viewfinder_mask"
-                android:gravity="center"
-                android:paddingBottom="@dimen/nav_padding"
-                android:text="@string/status_searching"
-                android:textAppearance="@style/TextAppearance.AppCompat.Medium"
-                app:height="@{buffers.borderBottom}"/>
+                android:paddingBottom="@dimen/nav_padding">
+
+                <ProgressBar
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:indeterminateTint="#555"
+                    android:indeterminateTintMode="src_in"
+                    android:id="@+id/progressBar"
+                    android:layout_gravity="center"/>
+            </FrameLayout>
         </LinearLayout>
     </FrameLayout>
 </layout>

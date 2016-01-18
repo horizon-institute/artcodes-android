@@ -25,13 +25,12 @@ import android.net.Uri;
 import android.os.Bundle;
 import android.view.View;
 
-import uk.ac.horizon.artcodes.ExperienceParser;
+import com.google.gson.Gson;
+
 import uk.ac.horizon.artcodes.GoogleAnalytics;
 import uk.ac.horizon.artcodes.R;
 import uk.ac.horizon.artcodes.databinding.ActionBinding;
 import uk.ac.horizon.artcodes.model.Action;
-import uk.ac.horizon.artcodes.request.IntentSource;
-import uk.ac.horizon.artcodes.request.RequestCallbackBase;
 
 public class ActionActivity extends ArtcodeActivityBase
 {
@@ -39,8 +38,8 @@ public class ActionActivity extends ArtcodeActivityBase
 
 	public static void start(Context context, Action action)
 	{
-		Intent intent = new Intent(context, ActionActivity.class);
-		intent.putExtra("action", ExperienceParser.createGson(context).toJson(action));
+		final Intent intent = new Intent(context, ActionActivity.class);
+		intent.putExtra("action", new Gson().toJson(action));
 		context.startActivity(intent);
 	}
 
@@ -50,14 +49,6 @@ public class ActionActivity extends ArtcodeActivityBase
 		super.onCreate(savedInstanceState);
 
 		binding = DataBindingUtil.setContentView(this, R.layout.action);
-		new IntentSource<Action>(getServer(), getIntent(), savedInstanceState, Action.class).loadInto(new RequestCallbackBase<Action>()
-		{
-			@Override
-			public void onResponse(Action item)
-			{
-				binding.setAction(item);
-			}
-		});
 	}
 
 	public void open(View view)
@@ -65,6 +56,25 @@ public class ActionActivity extends ArtcodeActivityBase
 		if (binding.getAction() != null && binding.getAction().getUrl() != null)
 		{
 			startActivity(new Intent(Intent.ACTION_VIEW, Uri.parse(binding.getAction().getUrl())));
+		}
+	}
+
+	@Override
+	protected void onPostCreate(Bundle savedInstanceState)
+	{
+		super.onPostCreate(savedInstanceState);
+		if (savedInstanceState != null && savedInstanceState.containsKey("action"))
+		{
+
+			binding.setAction(new Gson().fromJson(savedInstanceState.getString("action"), Action.class));
+		}
+		else
+		{
+			Intent intent = getIntent();
+			if (intent.hasExtra("experience"))
+			{
+				binding.setAction(new Gson().fromJson(intent.getStringExtra("action"), Action.class));
+			}
 		}
 	}
 

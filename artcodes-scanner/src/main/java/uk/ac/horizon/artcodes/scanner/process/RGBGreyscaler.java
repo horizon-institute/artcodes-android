@@ -40,20 +40,6 @@ public class RGBGreyscaler implements ImageProcessor
 		this.channel = channel;
 	}
 
-	private double getValue(double[] data)
-	{
-		switch (channel)
-		{
-			case red:
-				return data[2];
-			case blue:
-				return data[0];
-			case green:
-				return data[1];
-		}
-		return 0;
-	}
-
 	@Override
 	public void process(ImageBuffers buffers)
 	{
@@ -81,5 +67,19 @@ public class RGBGreyscaler implements ImageProcessor
 	public void getSettings(List<ImageProcessorSetting> settings)
 	{
 		//SettingButtonBinding
+	}
+
+	private double getValue(double[] data)
+	{
+		switch (channel)
+		{
+			case red:
+				return data[2];
+			case blue:
+				return data[0];
+			case green:
+				return data[1];
+		}
+		return 0;
 	}
 }

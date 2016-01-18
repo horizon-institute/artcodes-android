@@ -22,17 +22,20 @@ package uk.ac.horizon.artcodes.dialog;
 import android.accounts.AccountManager;
 import android.app.Dialog;
 import android.os.Bundle;
+import android.support.annotation.NonNull;
 import android.support.v4.app.DialogFragment;
 import android.support.v7.app.AlertDialog;
-import android.util.Log;
 
 import com.google.android.gms.auth.GoogleAuthUtil;
 
 import java.util.ArrayList;
 import java.util.List;
 
-public class SelectAccountDialog extends DialogFragment
+import uk.ac.horizon.artcodes.GoogleAnalytics;
+
+public class AccountSelectDialog extends DialogFragment
 {
+	@NonNull
 	@Override
 	public Dialog onCreateDialog(Bundle savedInstanceState)
 	{
@@ -44,9 +47,10 @@ public class SelectAccountDialog extends DialogFragment
 			try
 			{
 				accountList.add(account.name);
-			} catch (Exception e)
+			}
+			catch (Exception e)
 			{
-				Log.i("", e.getMessage(), e);
+				GoogleAnalytics.trackException(e);
 			}
 		}
 

@@ -18,38 +18,95 @@
  */
 package uk.ac.horizon.artcodes.activity;
 
+import android.content.Context;
 import android.content.Intent;
 import android.net.Uri;
 import android.os.Bundle;
+import android.support.customtabs.CustomTabsIntent;
 import android.support.v4.app.NavUtils;
+import android.support.v4.content.ContextCompat;
 import android.util.Log;
 import android.view.MenuItem;
 import android.view.View;
 
 import com.google.common.collect.Multiset;
+import com.google.gson.Gson;
 
 import java.util.List;
 
 import uk.ac.horizon.artcodes.Artcodes;
 import uk.ac.horizon.artcodes.GoogleAnalytics;
+import uk.ac.horizon.artcodes.R;
 import uk.ac.horizon.artcodes.databinding.ScannerActionBinding;
 import uk.ac.horizon.artcodes.model.Action;
 import uk.ac.horizon.artcodes.model.Experience;
-import uk.ac.horizon.artcodes.request.IntentSource;
-import uk.ac.horizon.artcodes.request.RequestCallbackBase;
-import uk.ac.horizon.artcodes.scanner.VisibilityAnimator;
 import uk.ac.horizon.artcodes.scanner.ScannerActivity;
+import uk.ac.horizon.artcodes.scanner.VisibilityAnimator;
 import uk.ac.horizon.artcodes.server.ArtcodeServer;
-import uk.ac.horizon.artcodes.ui.IntentBuilder;
+import uk.ac.horizon.artcodes.server.LoadCallback;
 
-public class ArtcodeActivity extends ScannerActivity
+public class ArtcodeActivity extends ScannerActivity implements LoadCallback<Experience>
 {
-	private static final String EXTRA_CUSTOM_TABS_SESSION_ID = "android.support.CUSTOM_TABS:session_id";
-
 	private ScannerActionBinding actionBinding;
 	private VisibilityAnimator actionAnimator;
 
 	private Action action;
+
+	public static void start(Context context, Experience experience)
+	{
+		Intent intent = new Intent(context, ArtcodeActivity.class);
+		intent.putExtra("experience", new Gson().toJson(experience));
+		context.startActivity(intent);
+	}
+
+	@Override
+	public void onCreate(Bundle savedInstanceState)
+	{
+		super.onCreate(savedInstanceState);
+
+		actionBinding = ScannerActionBinding.inflate(getLayoutInflater(), binding.bottomView, false);
+		binding.bottomView.addView(actionBinding.getRoot());
+		actionAnimator = new VisibilityAnimator(actionBinding.getRoot());
+
+		if (getSupportActionBar() != null)
+		{
+			getSupportActionBar().setDisplayHomeAsUpEnabled(true);
+		}
+	}
+
+	@Override
+	public boolean onOptionsItemSelected(MenuItem item)
+	{
+		switch (item.getItemId())
+		{
+			case android.R.id.home:
+				Intent intent = new Intent(this, ExperienceActivity.class);
+				intent.putExtra("experience", new Gson().toJson(getExperience()));
+				NavUtils.navigateUpTo(this, intent);
+				return true;
+		}
+		return super.onOptionsItemSelected(item);
+	}
+
+	@Override
+	public void loaded(final Experience experience)
+	{
+		super.loaded(experience);
+		if (experience != null)
+		{
+			GoogleAnalytics.trackScreen("Scan", getExperience().getId());
+			getServer().loadRecent(new LoadCallback<List<String>>()
+			{
+				@Override
+				public void loaded(List<String> item)
+				{
+					item.remove(experience.getId());
+					item.add(0, experience.getId());
+					getServer().saveRecent(item);
+				}
+			});
+		}
+	}
 
 	@Override
 	protected void onMarkersDetected(Multiset<String> markers)
@@ -105,76 +162,45 @@ public class ArtcodeActivity extends ScannerActivity
 	}
 
 	@Override
-	public void onCreate(Bundle savedInstanceState)
+	protected void onPostCreate(Bundle savedInstanceState)
 	{
-		super.onCreate(savedInstanceState);
-
-		actionBinding = ScannerActionBinding.inflate(getLayoutInflater(), binding.contentFrame, false);
-		binding.contentFrame.addView(actionBinding.getRoot());
-		actionAnimator = new VisibilityAnimator(actionBinding.getRoot());
-
-		if (getSupportActionBar() != null)
+		super.onPostCreate(savedInstanceState);
+		if (savedInstanceState != null && savedInstanceState.containsKey("experience"))
 		{
-			getSupportActionBar().setDisplayHomeAsUpEnabled(true);
+
+			loaded(new Gson().fromJson(savedInstanceState.getString("experience"), Experience.class));
+		}
+		else
+		{
+			Intent intent = getIntent();
+			if (intent.hasExtra("experience"))
+			{
+				loaded(new Gson().fromJson(intent.getStringExtra("experience"), Experience.class));
+			}
+			else
+			{
+				final Uri data = intent.getData();
+				if (data != null)
+				{
+					getServer().loadExperience(data.toString(), this);
+				}
+			}
 		}
 	}
 
-	protected Artcodes getArtcodes()
+	private Artcodes getArtcodes()
 	{
 		return (Artcodes) getApplication();
 	}
 
-	protected ArtcodeServer getServer()
+	private ArtcodeServer getServer()
 	{
 		return getArtcodes().getServer();
 	}
 
-	@Override
-	public boolean onOptionsItemSelected(MenuItem item)
-	{
-		switch (item.getItemId())
-		{
-			case android.R.id.home:
-				NavUtils.navigateUpTo(this, IntentBuilder.with(this)
-						.setServer(getServer())
-						.target(ExperienceActivity.class)
-						.set("experience", getExperience())
-						.create());
-				return true;
-		}
-		return super.onOptionsItemSelected(item);
-	}
-
-	@Override
-	protected void onPostCreate(Bundle savedInstanceState)
-	{
-		super.onPostCreate(savedInstanceState);
-		new IntentSource<Experience>(getServer(), getIntent(), savedInstanceState, Experience.class).loadInto(new RequestCallbackBase<Experience>()
-		{
-			@Override
-			public void onResponse(final Experience experience)
-			{
-				onLoaded(experience);
-				Log.i("", "Set experience " + experience);
-				if (experience != null)
-				{
-					GoogleAnalytics.trackScreen("Scan", getExperience().getId());
-					getServer().loadRecent(new RequestCallbackBase<List<String>>()
-					{
-						@Override
-						public void onResponse(List<String> item)
-						{
-							item.remove(experience.getId());
-							item.add(0, experience.getId());
-						}
-					});
-				}
-			}
-		});
-	}
-
 	private void onActionChanged(final Action action)
 	{
+		Log.i("action", ""+action);
 		if (action != null)
 		{
 			getServer().logScan(experience.getId(), action, scanner);
@@ -190,12 +216,18 @@ public class ArtcodeActivity extends ScannerActivity
 					if (action.getShowDetail())
 					{
 						ActionActivity.start(ArtcodeActivity.this, action);
-					} else
+					}
+					else
 					{
-						Intent intent = new Intent(Intent.ACTION_VIEW, Uri.parse(action.getUrl()));
-						intent.putExtra(EXTRA_CUSTOM_TABS_SESSION_ID, -1); // -1 or any valid session id returned from newSession() call
+						CustomTabsIntent.Builder builder = new CustomTabsIntent.Builder();
+						// TODO Warmup urls
+						//builder.setSession(session);
+						builder.setToolbarColor(ContextCompat.getColor(ArtcodeActivity.this, R.color.apptheme_primary));
+						//builder.setStartAnimations(this, R.anim.slide_in_right, R.anim.slide_out_left);
+						//builder.setExitAnimations(this, R.anim.slide_in_left, R.anim.slide_out_right);
 
-						startActivity(intent);
+						CustomTabsIntent customTabsIntent = builder.build();
+						customTabsIntent.launchUrl(ArtcodeActivity.this, Uri.parse(action.getUrl()));
 					}
 				}
 			});
@@ -205,9 +237,11 @@ public class ArtcodeActivity extends ScannerActivity
 				public void run()
 				{
 					actionAnimator.showView();
+					binding.progressBar.setVisibility(View.INVISIBLE);
 				}
 			});
-		} else
+		}
+		else
 		{
 			runOnUiThread(new Runnable()
 			{
@@ -215,6 +249,7 @@ public class ArtcodeActivity extends ScannerActivity
 				public void run()
 				{
 					actionAnimator.hideView();
+					binding.progressBar.setVisibility(View.VISIBLE);
 				}
 			});
 		}

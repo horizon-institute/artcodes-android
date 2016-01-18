@@ -19,20 +19,31 @@
 
 package uk.ac.horizon.artcodes.account;
 
+import com.google.android.gms.auth.UserRecoverableAuthException;
+
 import java.util.List;
 
 import uk.ac.horizon.artcodes.model.Experience;
-import uk.ac.horizon.artcodes.request.RequestCallback;
+import uk.ac.horizon.artcodes.server.LoadCallback;
+import uk.ac.horizon.artcodes.server.URILoaderCallback;
 
 public interface Account
 {
-	void loadLibrary(RequestCallback<List<String>> callback);
+	void loadLibrary(LoadCallback<List<String>> callback);
 
 	void saveExperience(Experience experience);
+
+	void deleteExperience(Experience experience);
 
 	String getId();
 
 	String getName();
 
-	boolean willCreateCopy(String uri);
+	boolean canEdit(String uri);
+
+	boolean isSaving(String uri);
+
+	boolean validates() throws UserRecoverableAuthException;
+
+	boolean load(String uri, URILoaderCallback callback);
 }

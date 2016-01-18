@@ -17,46 +17,35 @@
  *     along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-package uk.ac.horizon.artcodes.request;
+package uk.ac.horizon.artcodes.fragment;
 
-import java.io.File;
-import java.io.FileReader;
-import java.lang.reflect.Type;
-import java.net.URI;
+import android.os.Bundle;
+import android.support.annotation.Nullable;
+import android.support.v4.app.Fragment;
+import android.view.LayoutInflater;
+import android.view.View;
+import android.view.ViewGroup;
 
-import uk.ac.horizon.artcodes.server.ArtcodeServer;
-
-public class FileRequest<T> extends UriSource<T>
+public class AboutFragment extends Fragment
 {
-	public FileRequest(ArtcodeServer server, String uri, Type type)
+	public static AboutFragment create(int layout)
 	{
-		super(server, uri, type);
+		Bundle arguments = new Bundle();
+		arguments.putInt("layout", layout);
+		AboutFragment aboutFragment = new AboutFragment();
+		aboutFragment.setArguments(arguments);
+		return aboutFragment;
 	}
 
+	@Nullable
 	@Override
-	public void loadInto(RequestCallback<T> callback)
+	public View onCreateView(LayoutInflater inflater, @Nullable ViewGroup container, @Nullable Bundle savedInstanceState)
 	{
-		try
+		int layout = getArguments().getInt("layout");
+		if (layout != 0)
 		{
-			callback.onResponse(server.getGson().<T>fromJson(new FileReader(new File(URI.create(uri))), type));
-		} catch (Exception e)
-		{
-			callback.onError(e);
+			return inflater.inflate(layout, container, false);
 		}
-	}
-
-	public static final class Factory implements RequestFactory
-	{
-		@Override
-		public String[] getPrefixes()
-		{
-			return new String[]{"file:"};
-		}
-
-		@Override
-		public <T> Request<T> createRequest(ArtcodeServer server, String uri, Type type)
-		{
-			return new FileRequest<>(server, uri, type);
-		}
+		return null;
 	}
 }

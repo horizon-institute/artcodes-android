@@ -20,19 +20,14 @@
 package uk.ac.horizon.artcodes.ui;
 
 import android.databinding.BindingAdapter;
-import android.graphics.Bitmap;
 import android.net.Uri;
 import android.os.Build;
-import android.support.v4.util.LruCache;
 import android.widget.Button;
 import android.widget.EditText;
 import android.widget.ImageView;
 import android.widget.TextView;
 
-import com.android.volley.RequestQueue;
-import com.android.volley.VolleyError;
-import com.android.volley.toolbox.ImageLoader;
-import com.android.volley.toolbox.Volley;
+import com.squareup.picasso.Picasso;
 
 import java.text.SimpleDateFormat;
 import java.util.Calendar;
@@ -43,7 +38,6 @@ public final class Bindings
 {
 	private static final SimpleDateFormat dateFormat = new SimpleDateFormat("d MMMM", Locale.US);
 	private static final SimpleDateFormat dateFormatYear = new SimpleDateFormat("d MMMM yyyy", Locale.US);
-	private static ImageLoader imageLoader;
 
 	@BindingAdapter("imageUrl")
 	public static void bindImageURL(final ImageView view, String url)
@@ -53,53 +47,10 @@ public final class Bindings
 			if (url.startsWith("content:") || url.startsWith("file:"))
 			{
 				view.setImageURI(Uri.parse(url));
-			} else
+			}
+			else
 			{
-				if (imageLoader == null)
-				{
-					RequestQueue requestQueue = Volley.newRequestQueue(view.getContext().getApplicationContext());
-					imageLoader = new ImageLoader(requestQueue,
-							new ImageLoader.ImageCache()
-							{
-								private final LruCache<String, Bitmap>
-										cache = new LruCache<>(20);
-
-								@Override
-								public Bitmap getBitmap(String url)
-								{
-									return cache.get(url);
-								}
-
-								@Override
-								public void putBitmap(String url, Bitmap bitmap)
-								{
-									cache.put(url, bitmap);
-								}
-							});
-				}
-
-				imageLoader.get(url, new ImageLoader.ImageListener()
-				{
-					@Override
-					public void onErrorResponse(VolleyError error)
-					{
-						//if (errorImageResId != 0) {
-						//	view.setImageResource(errorImageResId);
-						//}
-					}
-
-					@Override
-					public void onResponse(ImageLoader.ImageContainer response, boolean isImmediate)
-					{
-						if (response.getBitmap() != null)
-						{
-							view.setImageBitmap(response.getBitmap());
-						}
-						//else if (defaultImageResId != 0) {
-						//	view.setImageResource(defaultImageResId);
-						//}
-					}
-				});
+				Picasso.with(view.getContext()).load(url).into(view);
 			}
 		}
 	}
@@ -120,7 +71,8 @@ public final class Bindings
 		if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.JELLY_BEAN_MR1)
 		{
 			view.setCompoundDrawablesRelativeWithIntrinsicBounds(icon, 0, 0, 0);
-		} else
+		}
+		else
 		{
 			view.setCompoundDrawablesWithIntrinsicBounds(icon, 0, 0, 0);
 		}
@@ -146,14 +98,17 @@ public final class Bindings
 					if (endCal.get(Calendar.YEAR) == now.get(Calendar.YEAR))
 					{
 						return dateFormat.format(new Date(end));
-					} else
+					}
+					else
 					{
 						return dateFormatYear.format(new Date(end));
 					}
-				} else if (endCal.get(Calendar.YEAR) == now.get(Calendar.YEAR))
+				}
+				else if (endCal.get(Calendar.YEAR) == now.get(Calendar.YEAR))
 				{
 					return startCal.get(Calendar.DAY_OF_MONTH) + " – " + dateFormat.format(new Date(end));
-				} else
+				}
+				else
 				{
 					return startCal.get(Calendar.DAY_OF_MONTH) + " – " + dateFormatYear.format(new Date(end));
 				}
@@ -161,11 +116,13 @@ public final class Bindings
 			if (endCal.get(Calendar.YEAR) == now.get(Calendar.YEAR))
 			{
 				return dateFormat.format(new Date(start)) + " – " + dateFormat.format(new Date(end));
-			} else
+			}
+			else
 			{
 				return dateFormat.format(new Date(start)) + " – " + dateFormatYear.format(new Date(end));
 			}
-		} else
+		}
+		else
 		{
 			return dateFormatYear.format(new Date(start)) + " – " + dateFormatYear.format(new Date(end));
 		}
@@ -183,7 +140,8 @@ public final class Bindings
 			if (calendar.get(Calendar.YEAR) == now.get(Calendar.YEAR))
 			{
 				return dateFormat.format(new Date(timestamp));
-			} else
+			}
+			else
 			{
 				return dateFormatYear.format(new Date(timestamp));
 			}

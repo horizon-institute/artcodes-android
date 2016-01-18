@@ -69,12 +69,12 @@ public class Availability extends BaseObservable
 		return lat;
 	}
 
-	public void setLat(Double lat)
+	public void setLat(double lat)
 	{
 		this.lat = lat;
 	}
 
-	public void setLat(double lat)
+	public void setLat(Double lat)
 	{
 		this.lat = lat;
 	}
@@ -84,12 +84,12 @@ public class Availability extends BaseObservable
 		return lon;
 	}
 
-	public void setLon(Double lon)
+	public void setLon(double lon)
 	{
 		this.lon = lon;
 	}
 
-	public void setLon(double lon)
+	public void setLon(Double lon)
 	{
 		this.lon = lon;
 	}

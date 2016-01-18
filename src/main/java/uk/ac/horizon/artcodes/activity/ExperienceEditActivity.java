@@ -19,21 +19,25 @@
 
 package uk.ac.horizon.artcodes.activity;
 
+import android.content.Context;
+import android.content.DialogInterface;
 import android.content.Intent;
 import android.content.SharedPreferences;
 import android.databinding.DataBindingUtil;
 import android.net.Uri;
 import android.os.Bundle;
+import android.support.design.widget.Snackbar;
 import android.support.v4.app.Fragment;
 import android.support.v4.app.FragmentManager;
 import android.support.v4.app.FragmentPagerAdapter;
 import android.support.v4.app.NavUtils;
-import android.util.Log;
+import android.support.v4.view.ViewPager;
+import android.support.v7.app.AlertDialog;
 import android.view.Menu;
 import android.view.MenuItem;
 import android.view.View;
-import android.widget.AdapterView;
-import android.widget.ArrayAdapter;
+
+import com.google.gson.Gson;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -48,16 +52,61 @@ import uk.ac.horizon.artcodes.fragment.ExperienceEditAvailabilityFragment;
 import uk.ac.horizon.artcodes.fragment.ExperienceEditColourFragment;
 import uk.ac.horizon.artcodes.fragment.ExperienceEditFragment;
 import uk.ac.horizon.artcodes.fragment.ExperienceEditInfoFragment;
+import uk.ac.horizon.artcodes.model.Action;
 import uk.ac.horizon.artcodes.model.Experience;
-import uk.ac.horizon.artcodes.ui.IntentBuilder;
 
 public class ExperienceEditActivity extends ExperienceActivityBase
 {
-	public static final int IMAGE_PICKER_REQUEST = 121;
-	public static final int ICON_PICKER_REQUEST = 123;
+	public class ExperienceEditPagerAdapter extends FragmentPagerAdapter
+	{
+		private final List<ExperienceEditFragment> fragments = new ArrayList<>();
+
+		public ExperienceEditPagerAdapter(FragmentManager fm)
+		{
+			super(fm);
+
+			fragments.add(new ExperienceEditInfoFragment());
+			fragments.add(new ExperienceEditAvailabilityFragment());
+			fragments.add(new ExperienceEditActionFragment());
+			if (Feature.get(getApplicationContext(), R.bool.feature_edit_colour).isEnabled())
+			{
+				fragments.add(new ExperienceEditColourFragment());
+			}
+		}
+
+		@Override
+		public int getCount()
+		{
+			return fragments.size();
+		}
+
+		@Override
+		public Fragment getItem(int position)
+		{
+			return fragments.get(position);
+		}
+
+		@Override
+		public CharSequence getPageTitle(int position)
+		{
+			// Generate title based on item position
+			return getString(fragments.get(position).getTitleResource());
+		}
+	}
+
+	private static final int IMAGE_PICKER_REQUEST = 121;
+	private static final int ICON_PICKER_REQUEST = 123;
 	private ExperienceEditBinding binding;
 	private Account account;
-	private List<Account> accounts;
+	private ExperienceEditPagerAdapter adapter;
+
+	public static void start(Context context, Experience experience, Account account)
+	{
+		Intent intent = new Intent(context, ExperienceEditActivity.class);
+		intent.putExtra("experience", new Gson().toJson(experience));
+		intent.putExtra("account", account.getId());
+		context.startActivity(intent);
+	}
 
 	public void editIcon(View view)
 	{
@@ -111,7 +160,6 @@ public class ExperienceEditActivity extends ExperienceActivityBase
 	public boolean onCreateOptionsMenu(Menu menu)
 	{
 		getMenuInflater().inflate(R.menu.save_menu, menu);
-		//updateSave();
 		return super.onCreateOptionsMenu(menu);
 	}
 
@@ -124,43 +172,77 @@ public class ExperienceEditActivity extends ExperienceActivityBase
 				NavUtils.navigateUpTo(this, createCancelIntent());
 				return true;
 			case R.id.save:
-				getAccount().saveExperience(getExperience());
-				NavUtils.navigateUpTo(this, IntentBuilder.with(this)
-						.target(ExperienceActivity.class)
-						.setServer(getServer())
-						.set("experience", getExperience())
-						.create());
+				Experience experience = getExperience();
+				getAccount().saveExperience(experience);
+				ExperienceActivity.start(this, experience);
 				return true;
 		}
 		return super.onOptionsItemSelected(item);
 	}
 
 	@Override
-	public void onResponse(Experience experience)
+	public void loaded(Experience experience)
 	{
-		super.onResponse(experience);
+		super.loaded(experience);
+
+		if (experience.getId() == null)
+		{
+			binding.actionBar.setVisibility(View.GONE);
+		}
+		else
+		{
+			binding.actionBar.setVisibility(View.VISIBLE);
+		}
+
 		GoogleAnalytics.trackScreen("Edit Experience", experience.getId());
+	}
 
-		Account account = getAccount();
+	public void deleteAction(final int index)
+	{
+		final Experience experience = getExperience();
+		if (experience != null)
+		{
+			final Action action = getExperience().getActions().get(index);
+			experience.getActions().remove(action);
+			updateFragment();
+			Snackbar.make(binding.getRoot(), R.string.action_deleted, Snackbar.LENGTH_LONG)
+					.setAction(R.string.action_delete_undo, new View.OnClickListener()
+					{
+						@Override
+						public void onClick(View v)
+						{
+							experience.getActions().add(index, action);
+							updateFragment();
+						}
+					}).show();
+		}
+	}
 
-		int index = accounts.indexOf(account);
-		binding.accountList.setSelection(index);
+	public void deleteExperience(View view)
+	{
+		new AlertDialog.Builder(this)
+				.setMessage(getString(R.string.experienceDeleteConfirm, getExperience().getName()))
+				.setPositiveButton(R.string.delete, new DialogInterface.OnClickListener()
+				{
+					public void onClick(DialogInterface dialog, int whichButton)
+					{
+						getAccount().deleteExperience(getExperience());
+						NavUtils.navigateUpTo(ExperienceEditActivity.this, new Intent(ExperienceEditActivity.this, NavigationActivity.class));
+					}
+				})
+				.setNegativeButton(android.R.string.cancel, null).show();
 	}
 
 	protected void onActivityResult(int requestCode, int resultCode, Intent data)
 	{
-		Log.i("", "Activity result for " + requestCode);
-		Log.i("", "Activity result is " + resultCode);
-		if (requestCode == IMAGE_PICKER_REQUEST)
+		if (resultCode == RESULT_OK)
 		{
-			if (resultCode == RESULT_OK)
+			if (requestCode == IMAGE_PICKER_REQUEST)
 			{
 				Uri fullPhotoUri = data.getData();
 				getExperience().setImage(fullPhotoUri.toString());
 			}
-		} else if (requestCode == ICON_PICKER_REQUEST)
-		{
-			if (resultCode == RESULT_OK)
+			else if (requestCode == ICON_PICKER_REQUEST)
 			{
 				Uri fullPhotoUri = data.getData();
 				getExperience().setIcon(fullPhotoUri.toString());
@@ -175,7 +257,59 @@ public class ExperienceEditActivity extends ExperienceActivityBase
 		super.onCreate(savedInstanceState);
 
 		binding = DataBindingUtil.setContentView(this, R.layout.experience_edit);
-		binding.viewpager.setAdapter(new ExperienceEditPagerAdapter(getSupportFragmentManager()));
+		adapter = new ExperienceEditPagerAdapter(getSupportFragmentManager());
+		binding.viewpager.setAdapter(adapter);
+		binding.viewpager.addOnPageChangeListener(new ViewPager.OnPageChangeListener()
+		{
+			@Override
+			public void onPageSelected(int position)
+			{
+				Fragment fragment = adapter.getItem(position);
+				if (fragment instanceof ExperienceEditFragment)
+				{
+					ExperienceEditFragment experienceEditFragment = (ExperienceEditFragment) fragment;
+					if (experienceEditFragment.displayAddFAB())
+					{
+						binding.add.show();
+					}
+					else
+					{
+						binding.add.hide();
+					}
+				}
+				else
+				{
+					binding.add.hide();
+				}
+			}
+
+			@Override
+			public void onPageScrollStateChanged(int state)
+			{
+			}
+
+			@Override
+			public void onPageScrolled(int position, float positionOffset, int positionOffsetPixels)
+			{
+			}
+		});
+		binding.add.setOnClickListener(new View.OnClickListener()
+		{
+			@Override
+			public void onClick(View v)
+			{
+				int position = binding.viewpager.getCurrentItem();
+				Fragment fragment = adapter.getItem(position);
+				if (fragment instanceof ExperienceEditFragment)
+				{
+					ExperienceEditFragment experienceEditFragment = (ExperienceEditFragment) fragment;
+					if (experienceEditFragment.displayAddFAB())
+					{
+						experienceEditFragment.add();
+					}
+				}
+			}
+		});
 		binding.tabs.setupWithViewPager(binding.viewpager);
 
 		if (savedInstanceState != null)
@@ -184,28 +318,10 @@ public class ExperienceEditActivity extends ExperienceActivityBase
 		}
 
 		setSupportActionBar(binding.toolbar);
-		getSupportActionBar().setDisplayShowTitleEnabled(false);
-
-		accounts = getServer().getAccounts();
-		binding.accountList.setAdapter(new ArrayAdapter<>(this, R.layout.account_item, accounts));
-		binding.accountList.setOnItemSelectedListener(new AdapterView.OnItemSelectedListener()
+		if (getSupportActionBar() != null)
 		{
-			@Override
-			public void onItemSelected(AdapterView<?> parent, View view, int position, long id)
-			{
-				Account account = (Account) binding.accountList.getAdapter().getItem(position);
-				if (account != null)
-				{
-					setAccount(account);
-				}
-			}
-
-			@Override
-			public void onNothingSelected(AdapterView<?> parent)
-			{
-
-			}
-		});
+			getSupportActionBar().setDisplayShowTitleEnabled(false);
+		}
 
 		binding.toolbar.setNavigationIcon(R.drawable.ic_close_white_24dp);
 	}
@@ -216,7 +332,7 @@ public class ExperienceEditActivity extends ExperienceActivityBase
 		super.onSaveInstanceState(outState);
 
 		outState.putInt("tab", binding.viewpager.getCurrentItem());
-		outState.putString("experience", getServer().getGson().toJson(getExperience()));
+		outState.putString("experience", new Gson().toJson(getExperience()));
 	}
 
 	private Intent createCancelIntent()
@@ -226,6 +342,17 @@ public class ExperienceEditActivity extends ExperienceActivityBase
 		return intent;
 	}
 
+	private void updateFragment()
+	{
+		int position = binding.viewpager.getCurrentItem();
+		Fragment fragment = adapter.getItem(position);
+		if (fragment instanceof ExperienceEditFragment)
+		{
+			ExperienceEditFragment experienceEditFragment = (ExperienceEditFragment) fragment;
+			experienceEditFragment.update();
+		}
+	}
+
 	private void selectImage(int request_id)
 	{
 		Intent intent = new Intent(Intent.ACTION_GET_CONTENT);
@@ -233,43 +360,6 @@ public class ExperienceEditActivity extends ExperienceActivityBase
 		if (intent.resolveActivity(getPackageManager()) != null)
 		{
 			startActivityForResult(intent, request_id);
-		}
-	}
-
-	public class ExperienceEditPagerAdapter extends FragmentPagerAdapter
-	{
-		private final List<ExperienceEditFragment> fragments = new ArrayList<>();
-
-		public ExperienceEditPagerAdapter(FragmentManager fm)
-		{
-			super(fm);
-
-			fragments.add(new ExperienceEditInfoFragment());
-			fragments.add(new ExperienceEditAvailabilityFragment());
-			fragments.add(new ExperienceEditActionFragment());
-			if (Feature.get(getApplicationContext(), R.bool.feature_edit_colour).isEnabled())
-			{
-				fragments.add(new ExperienceEditColourFragment());
-			}
-		}
-
-		@Override
-		public int getCount()
-		{
-			return fragments.size();
-		}
-
-		@Override
-		public Fragment getItem(int position)
-		{
-			return fragments.get(position);
-		}
-
-		@Override
-		public CharSequence getPageTitle(int position)
-		{
-			// Generate title based on item position
-			return getString(fragments.get(position).getTitleResource());
 		}
 	}
 }

@@ -19,14 +19,17 @@
 
 package uk.ac.horizon.artcodes.activity;
 
+import android.content.Intent;
+import android.net.Uri;
 import android.os.Bundle;
+import android.util.Log;
 
-import uk.ac.horizon.artcodes.GoogleAnalytics;
+import com.google.gson.Gson;
+
 import uk.ac.horizon.artcodes.model.Experience;
-import uk.ac.horizon.artcodes.request.IntentSource;
-import uk.ac.horizon.artcodes.request.RequestCallback;
+import uk.ac.horizon.artcodes.server.LoadCallback;
 
-public abstract class ExperienceActivityBase extends ArtcodeActivityBase implements RequestCallback<Experience>
+public abstract class ExperienceActivityBase extends ArtcodeActivityBase implements LoadCallback<Experience>
 {
 	private String uri;
 	private Experience experience;
@@ -36,7 +39,18 @@ public abstract class ExperienceActivityBase extends ArtcodeActivityBase impleme
 		return experience;
 	}
 
-	public String getUri()
+	@Override
+	public void loaded(Experience item)
+	{
+		Log.i("experience", "Experience loaded");
+		experience = item;
+		if (experience != null)
+		{
+			uri = experience.getId();
+		}
+	}
+
+	String getUri()
 	{
 		return uri;
 	}
@@ -47,25 +61,30 @@ public abstract class ExperienceActivityBase extends ArtcodeActivityBase impleme
 	}
 
 	@Override
-	public void onResponse(Experience item)
-	{
-		experience = item;
-		if (experience != null)
-		{
-			uri = experience.getId();
-		}
-	}
-
-	@Override
-	public void onError(Exception e)
-	{
-		GoogleAnalytics.trackException(e);
-	}
-
-	@Override
 	protected void onPostCreate(Bundle savedInstanceState)
 	{
 		super.onPostCreate(savedInstanceState);
-		new IntentSource<Experience>(getServer(), getIntent(), savedInstanceState, Experience.class).loadInto(this);
+		if (savedInstanceState != null && savedInstanceState.containsKey("experience"))
+		{
+
+			loaded(new Gson().fromJson(savedInstanceState.getString("experience"), Experience.class));
+		}
+		else
+		{
+			Intent intent = getIntent();
+			if (intent.hasExtra("experience"))
+			{
+				loaded(new Gson().fromJson(intent.getStringExtra("experience"), Experience.class));
+			}
+			else
+			{
+				final Uri data = intent.getData();
+				if (data != null)
+				{
+					uri = data.toString();
+					getServer().loadExperience(data.toString(), this);
+				}
+			}
+		}
 	}
 }

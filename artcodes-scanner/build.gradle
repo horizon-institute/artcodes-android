@@ -36,8 +36,8 @@ repositories {
 dependencies {
     compile 'com.android.support:design:23.1.1'
     compile 'com.android.support:appcompat-v7:23.1.1'
-    compile 'com.google.code.gson:gson:2.4'
-    compile 'com.google.guava:guava:18.0'
+    compile 'com.google.code.gson:gson:2.5'
+    compile 'com.google.guava:guava:19.0'
     compile 'org.opencv:opencv-android:2.4.8'
     testCompile 'junit:junit:4.12'
 }
@@ -67,5 +67,5 @@ android {
 }
 
 task wrapper(type: Wrapper) {
-    gradleVersion = '2.8'
+    gradleVersion = '2.9'
 }

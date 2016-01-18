@@ -52,7 +52,7 @@ public class VisibilityAnimator
 			final int cx = ((center.getLeft() + center.getRight()) / 2) - view.getLeft();
 			final int cy = ((center.getTop() + center.getBottom()) / 2) - view.getTop();
 
-			Log.i("", "Circle center " + cx + ", " + cy + " width " + view.getWidth());
+			Log.i("circleanim", "Circle center " + cx + ", " + cy + " width " + view.getWidth());
 
 			animator = ViewAnimationUtils.createCircularReveal(view, cx, cy, view.getWidth(), 0);
 			animator.addListener(new AnimatorListenerAdapter()
@@ -104,7 +104,7 @@ public class VisibilityAnimator
 			final int cx = ((center.getLeft() + center.getRight()) / 2) - view.getLeft();
 			final int cy = ((center.getTop() + center.getBottom()) / 2) - view.getTop();
 
-			Log.i("", "Circle center " + cx + ", " + cy + " width " + view.getWidth());
+			Log.i("circleanim", "Circle center " + cx + ", " + cy + " width " + view.getWidth());
 
 			animator = ViewAnimationUtils.createCircularReveal(view, cx, cy, 0, view.getWidth());
 			animator.addListener(listener);
@@ -130,7 +130,7 @@ public class VisibilityAnimator
 			final int cx = ((center.getLeft() + center.getRight()) / 2) - view.getLeft();
 			final int cy = ((center.getTop() + center.getBottom()) / 2) - view.getTop();
 
-			//Log.i("", "Circle center " + cx + ", " + cy + " width " + view.getWidth());
+			//Log.i("circleanim", "Circle center " + cx + ", " + cy + " width " + view.getWidth());
 
 			animator = ViewAnimationUtils.createCircularReveal(view, cx, cy, 0, view.getWidth());
 			animator.start();

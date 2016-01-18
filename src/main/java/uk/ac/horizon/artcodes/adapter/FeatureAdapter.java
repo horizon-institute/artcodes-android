@@ -34,10 +34,22 @@ import uk.ac.horizon.artcodes.databinding.FeatureBinding;
 
 public class FeatureAdapter extends RecyclerView.Adapter<FeatureAdapter.FeatureViewHolder>
 {
-	public static final Ordering<String> CASE_INSENSITIVE_NULL_SAFE_ORDER =
+	public class FeatureViewHolder extends RecyclerView.ViewHolder
+	{
+		private FeatureBinding binding;
+
+		public FeatureViewHolder(FeatureBinding binding)
+		{
+			super(binding.getRoot());
+			this.binding = binding;
+		}
+	}
+
+	private static final Ordering<String> CASE_INSENSITIVE_NULL_SAFE_ORDER =
 			Ordering.from(String.CASE_INSENSITIVE_ORDER).nullsLast();
 	private final SortedList<Feature> features;
 	private final Context context;
+
 	public FeatureAdapter(Context context)
 	{
 		super();
@@ -94,16 +106,5 @@ public class FeatureAdapter extends RecyclerView.Adapter<FeatureAdapter.FeatureV
 	public FeatureViewHolder onCreateViewHolder(ViewGroup parent, int viewType)
 	{
 		return new FeatureViewHolder(FeatureBinding.inflate(LayoutInflater.from(parent.getContext()), parent, false));
-	}
-
-	public class FeatureViewHolder extends RecyclerView.ViewHolder
-	{
-		private FeatureBinding binding;
-
-		public FeatureViewHolder(FeatureBinding binding)
-		{
-			super(binding.getRoot());
-			this.binding = binding;
-		}
 	}
 }

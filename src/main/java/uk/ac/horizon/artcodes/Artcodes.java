@@ -21,11 +21,16 @@ package uk.ac.horizon.artcodes;
 
 import android.app.Application;
 
+import okhttp3.Cache;
+import okhttp3.OkHttpClient;
+
 import uk.ac.horizon.artcodes.server.AppEngineServer;
 import uk.ac.horizon.artcodes.server.ArtcodeServer;
 
 public final class Artcodes extends Application
 {
+	private static final int cacheSize = 10 * 1024 * 1024; // 10MiB
+	public static OkHttpClient httpClient;
 	private ArtcodeServer server;
 
 	@Override
@@ -35,6 +40,9 @@ public final class Artcodes extends Application
 		GoogleAnalytics.initialize(this);
 
 		server = new AppEngineServer(this);
+		OkHttpClient.Builder builder = new OkHttpClient.Builder();
+		builder.cache(new Cache(getCacheDir(), cacheSize));
+		httpClient = builder.build();
 	}
 
 	public ArtcodeServer getServer()

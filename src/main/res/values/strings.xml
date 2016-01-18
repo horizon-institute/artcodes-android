@@ -33,11 +33,12 @@
     <string name="dialog_action_set">Set</string>
     <string name="dialog_action_cancel">Cancel</string>
     <string name="dialog_action_delete">Delete</string>
-    <string name="markerCode">Marker Code</string>
+    <string name="markerCode">Code</string>
+    <string name="newMarkerCode">New Code</string>
     <string name="recommended">Recommended</string>
     <string name="recent">Recent</string>
     <string name="welcome_title">Create beautiful codes with Artcodes</string>
-    <string name="welcome_text">Artcodes uses a different marker scheme that allows us to create aesthetically pleasing, even beautiful, codes. \n\nThese codes are designed and can be made part of the patterns and designs we see on everyday objects in our lives.</string>
+    <string name="welcome_text">Artcodes allow everyone to become a coder. By drawing visually beautiful images, you can link them to websites to showcase how interaction can become fun and beautiful.</string>
     <string name="more">More</string>
     <string name="gotit">Got It</string>
     <!-- Default WebSites -->
@@ -57,8 +58,7 @@
     <string name="markerDeleteConfirmTitle">Delete Marker %s?</string>
     <string name="markerDeleteConfirmMessage">Marker %s will be permanently deleted</string>
 
-    <string name="experienceDeleteConfirmTitle">Delete %s?</string>
-    <string name="experienceDeleteConfirmMessage">%s will be permanently deleted</string>
+    <string name="experienceDeleteConfirm">Delete %s?</string>
     <string name="save">Save</string>
     <string name="save_to">Save to %s</string>
     <string name="deleteConfirm">Delete</string>
@@ -109,11 +109,12 @@
     <string name="unstar">Unstar</string>
     <string name="star">Star</string>
     <string name="nav_starred">Starred</string>
-    <string name="edit_copy">Edit Copy</string>
+    <string name="copy">Copy</string>
+    <string name="copy_to">Copy to</string>
     <string name="invert">Invert</string>
     <string name="presets">Presets</string>
     <string name="hue">Hue</string>
-
+    <string name="about">About</string>
     <string name="fragment_info">Info</string>
     <string name="fragment_availability">Availability</string>
     <string name="fragment_action">Actions</string>
@@ -125,4 +126,24 @@
     <string name="availability_private">Private</string>
     <string name="read_more">Read More</string>
     <string name="scan_history">Scan History</string>
+    <string name="available_always">Always Available</string>
+    <string name="available_from">Available from %s</string>
+    <string name="available_to">Available to %s</string>
+    <string name="available">Available %s</string>
+    <string name="match_any">Triggered by matching any of these codes</string>
+    <string name="match_all">Triggered by matching all of these codes</string>
+    <string name="about_artcodes1">An Artcode is a set of connected regions, with blobs \'floating\' inside the regions.</string>
+    <string name="about_artcodes2_1">Region: An enclosed space</string>
+    <string name="about_artcodes2_2">All regions need to be connected</string>
+    <string name="about_artcodes3_1">Blob: A solid shape within a region</string>
+    <string name="about_artcodes3_2">Code: Number of values represent the number of regions. Each value represents the number of blobs in each region</string>
+    <string name="about_artcodes3_3">This Artcode has the code 1:1:2:3:3</string>
+    <string name="about_artcodes4">These rules can now be translated into an artcode as seen here. 5 regions with \'noise\' both inside regions and as part of the boundary. Each region with the corresponding blobs floating within.</string>
+    <string name="done">Done</string>
+    <string name="skip">Skip</string>
+    <string name="next_page">Next Page</string>
+    <string name="about_artcodes_title">What is Artcodes?</string>
+    <string name="about_artcodes2_1_1">You can add noise to add detail to a region</string>
+    <string name="about_artcodes3_4">A blob can not touch the edge of a region</string>
+    <string name="about_artcodes1_image">An artcode</string>
 </resources>

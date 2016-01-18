@@ -19,9 +19,18 @@
 
 package uk.ac.horizon.artcodes.fragment;
 
+import android.Manifest;
+import android.content.Context;
+import android.content.pm.PackageManager;
+import android.location.Criteria;
+import android.location.Location;
+import android.location.LocationManager;
 import android.os.Bundle;
+import android.support.annotation.NonNull;
 import android.support.annotation.Nullable;
+import android.support.v4.content.ContextCompat;
 import android.support.v7.widget.LinearLayoutManager;
+import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -36,10 +45,11 @@ import uk.ac.horizon.artcodes.activity.NavigationActivity;
 import uk.ac.horizon.artcodes.adapter.SectionedExperienceAdapter;
 import uk.ac.horizon.artcodes.databinding.ExperienceRecommendBinding;
 import uk.ac.horizon.artcodes.model.Experience;
-import uk.ac.horizon.artcodes.request.RequestCallbackBase;
+import uk.ac.horizon.artcodes.server.LoadCallback;
 
 public class ExperienceRecommendFragment extends ArtcodeFragmentBase
 {
+	private static final int LOCATION_PERMISSION_REQUEST = 87;
 	private static final int RECENT_MAX = 3;
 	private SectionedExperienceAdapter adapter;
 	private ExperienceRecommendBinding binding;
@@ -48,14 +58,23 @@ public class ExperienceRecommendFragment extends ArtcodeFragmentBase
 	@Override
 	public View onCreateView(final LayoutInflater inflater, ViewGroup container, Bundle savedInstanceState)
 	{
+		// TODO Request location permission
+
 		binding = ExperienceRecommendBinding.inflate(inflater, container, false);
 		binding.list.setLayoutManager(new LinearLayoutManager(getActivity()));
-		adapter = new SectionedExperienceAdapter(getActivity(), getServer());
+		adapter = new SectionedExperienceAdapter(getActivity());
 		binding.list.setAdapter(adapter);
 		adapter.setShowHeaderItem(Feature.get(getActivity(), R.bool.feature_show_welcome).isEnabled());
 		binding.progress.setEnabled(false);
 
-		loadExperiences();
+		if (ContextCompat.checkSelfPermission(getContext(), Manifest.permission.ACCESS_FINE_LOCATION) == PackageManager.PERMISSION_GRANTED)
+		{
+			loadExperiences();
+		}
+		else
+		{
+			requestPermissions(new String[]{Manifest.permission.ACCESS_FINE_LOCATION}, LOCATION_PERMISSION_REQUEST);
+		}
 
 		return binding.getRoot();
 	}
@@ -65,16 +84,15 @@ public class ExperienceRecommendFragment extends ArtcodeFragmentBase
 	{
 		super.onResume();
 		GoogleAnalytics.trackScreen("View Recommended");
-
 	}
 
 	private void loadExperiences()
 	{
 		binding.progress.addPending();
-		getServer().loadRecent(new RequestCallbackBase<List<String>>()
+		getServer().loadRecent(new LoadCallback<List<String>>()
 		{
 			@Override
-			public void onResponse(List<String> item)
+			public void loaded(List<String> item)
 			{
 				updateGroup("recent", item.subList(0, Math.min(RECENT_MAX, item.size())));
 				binding.progress.removePending();
@@ -82,10 +100,10 @@ public class ExperienceRecommendFragment extends ArtcodeFragmentBase
 		});
 
 		binding.progress.addPending();
-		getServer().loadRecommended(new RequestCallbackBase<Map<String, List<String>>>()
+		getServer().loadRecommended(new LoadCallback<Map<String, List<String>>>()
 		{
 			@Override
-			public void onResponse(Map<String, List<String>> item)
+			public void loaded(Map<String, List<String>> item)
 			{
 				((NavigationActivity) getActivity()).updateAccounts();
 				for (String group : item.keySet())
@@ -94,9 +112,50 @@ public class ExperienceRecommendFragment extends ArtcodeFragmentBase
 				}
 				binding.progress.removePending();
 			}
-		});
+		}, getLocation());
 	}
 
+	private Location getLocation()
+	{
+		if (ContextCompat.checkSelfPermission(getContext(), Manifest.permission.ACCESS_FINE_LOCATION) == PackageManager.PERMISSION_GRANTED)
+		{
+			final LocationManager locationManager = (LocationManager) getContext().getApplicationContext().getSystemService(Context.LOCATION_SERVICE);
+			float accuracy = Float.MAX_VALUE;
+			Location location = null;
+			for (String provider : locationManager.getProviders(new Criteria(), true))
+			{
+				Location newLocation = locationManager.getLastKnownLocation(provider);
+				if (newLocation != null)
+				{
+					if (newLocation.getAccuracy() < accuracy)
+					{
+						accuracy = newLocation.getAccuracy();
+						location = newLocation;
+					}
+				}
+			}
+
+			return location;
+		}
+		else
+		{
+			Log.i("location", "No location permission");
+
+		}
+		return null;
+	}
+
+	@Override
+	public void onRequestPermissionsResult(int requestCode, @NonNull String[] permissions, @NonNull int[] grantResults)
+	{
+		switch (requestCode)
+		{
+			case LOCATION_PERMISSION_REQUEST:
+			{
+				loadExperiences();
+			}
+		}
+	}
 
 	private void updateGroup(final String group, List<String> ids)
 	{
@@ -105,10 +164,10 @@ public class ExperienceRecommendFragment extends ArtcodeFragmentBase
 		{
 			final int experienceIndex = index;
 			binding.progress.addPending();
-			getServer().loadExperience(uri, new RequestCallbackBase<Experience>()
+			getServer().loadExperience(uri, new LoadCallback<Experience>()
 			{
 				@Override
-				public void onResponse(final Experience experience)
+				public void loaded(final Experience experience)
 				{
 					binding.progress.removePending();
 					adapter.addExperience(experience, group, experienceIndex);

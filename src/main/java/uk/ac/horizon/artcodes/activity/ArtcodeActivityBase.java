@@ -26,13 +26,13 @@ import uk.ac.horizon.artcodes.server.ArtcodeServer;
 
 public abstract class ArtcodeActivityBase extends AppCompatActivity
 {
-	protected Artcodes getArtcodes()
-	{
-		return (Artcodes) getApplication();
-	}
-
-	protected ArtcodeServer getServer()
+	ArtcodeServer getServer()
 	{
 		return getArtcodes().getServer();
+	}
+
+	private Artcodes getArtcodes()
+	{
+		return (Artcodes) getApplication();
 	}
 }

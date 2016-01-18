@@ -19,16 +19,18 @@
 
 package uk.ac.horizon.artcodes.scanner;
 
+import android.Manifest;
 import android.content.Context;
+import android.content.pm.PackageManager;
 import android.graphics.ImageFormat;
 import android.hardware.Camera;
 import android.os.Handler;
 import android.os.HandlerThread;
+import android.support.v4.content.ContextCompat;
 import android.util.Log;
 import android.view.Surface;
 import android.view.SurfaceHolder;
 import android.view.WindowManager;
-import android.widget.ImageButton;
 
 import org.opencv.android.OpenCVLoader;
 
@@ -41,14 +43,6 @@ import uk.ac.horizon.artcodes.scanner.process.ImageProcessorSetting;
 @SuppressWarnings("deprecation")
 public class Scanner implements SurfaceHolder.Callback
 {
-	static
-	{
-		if (!OpenCVLoader.initDebug())
-		{
-			Log.e("OpenCV", "Error Initializing OpenCV");
-		}
-	}
-
 	public class CameraInfo
 	{
 		private int rotation;
@@ -82,12 +76,20 @@ public class Scanner implements SurfaceHolder.Callback
 			return frontFacing;
 		}
 	}
-
 	private static final String THREAD_NAME = "Frame Processor";
+
+	static
+	{
+		if (!OpenCVLoader.initDebug())
+		{
+			Log.e("OpenCV", "Error Initializing OpenCV");
+		}
+	}
+
 	// TODO private static boolean deviceNeedsManualAutoFocus = false;
 	private final Context context;
-	private Camera camera;
 	private final CameraInfo info = new CameraInfo();
+	private Camera camera;
 	private int facing = Camera.CameraInfo.CAMERA_FACING_BACK;
 	private FrameProcessor frameProcessor;
 	private HandlerThread cameraThread;
@@ -123,8 +125,10 @@ public class Scanner implements SurfaceHolder.Callback
 	@Override
 	public void surfaceChanged(SurfaceHolder holder, int format, int width, int height)
 	{
+		Log.i("scanner", "Surface changed");
 		if (holder.getSurface() == null)
 		{
+			Log.i("scanner", "No surface?");
 			return;
 		}
 		surface = holder;
@@ -137,6 +141,7 @@ public class Scanner implements SurfaceHolder.Callback
 	@Override
 	public void surfaceCreated(SurfaceHolder holder)
 	{
+		Log.i("scanner", "Surface created");
 	}
 
 	@Override
@@ -153,8 +158,12 @@ public class Scanner implements SurfaceHolder.Callback
 	public List<ImageProcessorSetting> setFrameProcessor(FrameProcessor processor)
 	{
 		this.frameProcessor = processor;
-		if(frameProcessor != null)
+		if (frameProcessor != null)
 		{
+			if (camera == null)
+			{
+				createCamera();
+			}
 			if(camera != null)
 			{
 				camera.addCallbackBuffer(frameProcessor.createBuffer(info, surfaceWidth, surfaceHeight));
@@ -170,48 +179,72 @@ public class Scanner implements SurfaceHolder.Callback
 				}
 
 				@Override
-				public void updateUI(ImageButton button, TextAnimator textAnimator)
+				public int getIcon()
 				{
+					switch (facing)
+					{
+						case Camera.CameraInfo.CAMERA_FACING_BACK:
+							return R.drawable.ic_camera_rear_24dp;
+						case  Camera.CameraInfo.CAMERA_FACING_FRONT:
+							return R.drawable.ic_camera_front_24dp;
+					}
+					return 0;
+				}
 
+				@Override
+				public int getText()
+				{
+					switch (facing)
+					{
+						case Camera.CameraInfo.CAMERA_FACING_BACK:
+							return R.string.camera_rear;
+						case  Camera.CameraInfo.CAMERA_FACING_FRONT:
+							return R.string.camera_front;
+					}
+
+					return 0;
 				}
 			});
 			return settings;
 		}
-		return Collections.EMPTY_LIST;
+		return Collections.emptyList();
 	}
 
 	private void createCamera()
 	{
-		Log.i("Scanner", "Create Camera");
-		for (int cameraId = 0; cameraId < Camera.getNumberOfCameras(); cameraId++)
+		Log.i("scanner", "Create Camera");
+		if (ContextCompat.checkSelfPermission(context, Manifest.permission.CAMERA) == PackageManager.PERMISSION_GRANTED)
 		{
-			try
+			for (int cameraId = 0; cameraId < Camera.getNumberOfCameras(); cameraId++)
 			{
-				Camera.CameraInfo info = new Camera.CameraInfo();
-				Camera.getCameraInfo(cameraId, info);
+				try
+				{
+					Camera.CameraInfo info = new Camera.CameraInfo();
+					Camera.getCameraInfo(cameraId, info);
 
-				if (info.facing == facing)
+					if (info.facing == facing)
+					{
+						openCamera(cameraId);
+						return;
+					}
+				}
+				catch (RuntimeException e)
+				{
+					Log.e("Scanner", "Failed to open scanner " + cameraId + ": " + e.getLocalizedMessage(), e);
+				}
+			}
+
+			for (int cameraId = 0; cameraId < Camera.getNumberOfCameras(); cameraId++)
+			{
+				try
 				{
 					openCamera(cameraId);
 					return;
 				}
-			}
-			catch (RuntimeException e)
-			{
-				Log.e("Scanner", "Failed to open scanner " + cameraId + ": " + e.getLocalizedMessage(), e);
-			}
-		}
-
-		for (int cameraId = 0; cameraId < Camera.getNumberOfCameras(); cameraId++)
-		{
-			try
-			{
-				openCamera(cameraId);
-				return;
-			}
-			catch (RuntimeException e)
-			{
-				Log.e("Scanner", "Failed to open scanner " + cameraId + ": " + e.getLocalizedMessage(), e);
+				catch (RuntimeException e)
+				{
+					Log.e("Scanner", "Failed to open scanner " + cameraId + ": " + e.getLocalizedMessage(), e);
+				}
 			}
 		}
 	}
@@ -356,8 +389,11 @@ public class Scanner implements SurfaceHolder.Callback
 			camera.stopPreview();
 			camera.setPreviewCallback(null);
 			camera.release();
-			cameraThread.quit();
-			cameraThread = null;
+			if(cameraThread != null)
+			{
+				cameraThread.quit();
+				cameraThread = null;
+			}
 			camera = null;
 		}
 	}
