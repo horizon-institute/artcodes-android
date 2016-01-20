@@ -25,6 +25,7 @@ import android.content.Intent;
 import android.os.Bundle;
 import android.support.annotation.Nullable;
 import android.support.design.widget.Snackbar;
+import android.support.v4.content.ContextCompat;
 import android.support.v7.widget.LinearLayoutManager;
 import android.support.v7.widget.RecyclerView;
 import android.support.v7.widget.helper.ItemTouchHelper;
@@ -279,7 +280,9 @@ public class ExperienceEditAvailabilityFragment extends ExperienceEditFragment
 						binding.list.getAdapter().notifyItemInserted(index);
 						updateAvailabilities();
 					}
-				}).show();
+				})
+				.setActionTextColor(ContextCompat.getColor(getActivity(), R.color.apptheme_accent_light))
+				.show();
 	}
 
 	private void updateAvailabilities()

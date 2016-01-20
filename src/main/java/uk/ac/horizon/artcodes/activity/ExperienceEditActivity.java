@@ -31,6 +31,7 @@ import android.support.v4.app.Fragment;
 import android.support.v4.app.FragmentManager;
 import android.support.v4.app.FragmentPagerAdapter;
 import android.support.v4.app.NavUtils;
+import android.support.v4.content.ContextCompat;
 import android.support.v4.view.ViewPager;
 import android.support.v7.app.AlertDialog;
 import android.view.Menu;
@@ -214,7 +215,9 @@ public class ExperienceEditActivity extends ExperienceActivityBase
 							experience.getActions().add(index, action);
 							updateFragment();
 						}
-					}).show();
+					})
+					.setActionTextColor(ContextCompat.getColor(this, R.color.apptheme_accent_light))
+					.show();
 		}
 	}
 
