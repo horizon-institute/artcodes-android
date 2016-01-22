@@ -116,12 +116,19 @@
                 <category android:name="android.intent.category.DEFAULT"/>
                 <category android:name="android.intent.category.BROWSABLE"/>
 
-                <data
-                    android:mimeType="application/x-artcode"
-                    android:scheme="http"/>
-                <data
-                    android:mimeType="application/x-artcode"
-                    android:scheme="https"/>
+                <data android:scheme="http" />
+                <data android:scheme="https" />
+                <data android:mimeType="application/x-artcode" />
+            </intent-filter>
+            <intent-filter>
+                <action android:name="android.intent.action.VIEW"/>
+                <category android:name="android.intent.category.DEFAULT"/>
+                <category android:name="android.intent.category.BROWSABLE"/>
+
+                <data android:scheme="http"/>
+                <data android:scheme="https"/>
+                <data android:host="aestheticodes.appspot.com" />
+                <data android:pathPrefix="/experience/"/>
             </intent-filter>
             <intent-filter>
                 <action android:name="android.intent.action.VIEW"/>
