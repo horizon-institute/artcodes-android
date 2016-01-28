@@ -41,7 +41,6 @@ import java.util.Map;
 import uk.ac.horizon.artcodes.Feature;
 import uk.ac.horizon.artcodes.GoogleAnalytics;
 import uk.ac.horizon.artcodes.R;
-import uk.ac.horizon.artcodes.activity.NavigationActivity;
 import uk.ac.horizon.artcodes.adapter.SectionedExperienceAdapter;
 import uk.ac.horizon.artcodes.databinding.ExperienceRecommendBinding;
 import uk.ac.horizon.artcodes.model.Experience;
@@ -58,8 +57,6 @@ public class ExperienceRecommendFragment extends ArtcodeFragmentBase
 	@Override
 	public View onCreateView(final LayoutInflater inflater, ViewGroup container, Bundle savedInstanceState)
 	{
-		// TODO Request location permission
-
 		binding = ExperienceRecommendBinding.inflate(inflater, container, false);
 		binding.list.setLayoutManager(new LinearLayoutManager(getActivity()));
 		adapter = new SectionedExperienceAdapter(getActivity());
@@ -105,7 +102,7 @@ public class ExperienceRecommendFragment extends ArtcodeFragmentBase
 			@Override
 			public void loaded(Map<String, List<String>> item)
 			{
-				((NavigationActivity) getActivity()).updateAccounts();
+				// Why? ((NavigationActivity) getActivity()).updateAccounts();
 				for (String group : item.keySet())
 				{
 					updateGroup(group, item.get(group));

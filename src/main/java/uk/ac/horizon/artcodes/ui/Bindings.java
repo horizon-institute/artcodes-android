@@ -42,6 +42,7 @@ public final class Bindings
 	@BindingAdapter("imageUrl")
 	public static void bindImageURL(final ImageView view, String url)
 	{
+		// TODO Placeholder?
 		if (url != null)
 		{
 			if (url.startsWith("content:") || url.startsWith("file:"))
@@ -52,6 +53,10 @@ public final class Bindings
 			{
 				Picasso.with(view.getContext()).load(url).into(view);
 			}
+		}
+		else
+		{
+			view.setImageBitmap(null);
 		}
 	}
 
