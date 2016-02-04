@@ -70,11 +70,39 @@ public class CombinedMarkerSelection implements MarkerSelection
         {
             //increase occurrence if this marker is already in the list.
             MarkerCode existing = occurrences.get(markerCode.getCodeKey());
+            int prevOccurrences = 0;
             if (existing != null)
             {
-                // add to history (if it has passed the required occurrences on this frame)
-                if (existing.getOccurrences() < REQUIRED && existing.getOccurrences() + markerCode.getOccurrences() >= REQUIRED)
+                prevOccurrences = existing.getOccurrences();
+                // Existing marker occurrence: increase its occurrence count
+                existing.setOccurrences(markerCode.getOccurrences() + existing.getOccurrences());
+            }
+            else
+            {
+                // New marker occurrence: add it to data structure
+                for (MarkerCode.MarkerDetails markerDetails : markerCode.getMarkerDetails())
                 {
+                    // if the marker has an embedded checksum increase the number of occurrences so it reads in one frame
+                    if (markerDetails.embeddedChecksum!=null)
+                    {
+                        markerCode.setOccurrences(REQUIRED*2);
+                        break;
+                    }
+                }
+                occurrences.put(markerCode.getCodeKey(), markerCode);
+                existing = markerCode;
+            }
+
+            int newOccurrences = markerCode.getOccurrences();
+
+            if (prevOccurrences+newOccurrences >= REQUIRED)
+            {
+                // if this marker has enough occurrences to be detected set the time for it's most recent detection:
+                existing.setLastDetected(time);
+                // if it has passed the required occurrences on this frame...
+                if (prevOccurrences < REQUIRED)
+                {
+                    // ...add it to history and set time of it's first detection:
                     if (this.history.isEmpty() || System.currentTimeMillis()-this.lastAddedToHistory>=1000 || !existing.getCodeKey().equals(this.history.get(this.history.size()-1)))
                     {
                         history.add(existing.getCodeKey());
@@ -83,15 +111,6 @@ public class CombinedMarkerSelection implements MarkerSelection
                         existing.setFirstDetected(time);
                     }
                 }
-
-                // Existing marker occurence: increase its occurence count
-                existing.setOccurrences(markerCode.getOccurrences() + existing.getOccurrences());
-                existing.setLastDetected(time);
-            }
-            else
-            {
-                // New marker occurence: add it to data structure
-                occurrences.put(markerCode.getCodeKey(), markerCode);
             }
         }
 
