@@ -88,7 +88,7 @@ public class Thumbnail {
         }
 
         // draw the marker
-        Mat image = new Mat(tmpHeight, tmpWidth, CvType.CV_8UC4);
+        Mat image = new Mat(tmpHeight, tmpWidth, CvType.CV_8UC4, new Scalar(0,0,0,0));
         int verticalPadding = (tmpHeight-boundingBox.height)/2;
         int horizontalPadding = (tmpWidth-boundingBox.width)/2;
         Imgproc.drawContours(image, scene.getContours(), markerIndex, color, -1/*thinkness*/, 8/*line type*/, scene.getHierarchy(), 3/*level*/, new Point(horizontalPadding - boundingBox.tl().x, verticalPadding - boundingBox.tl().y)/*offset*/);

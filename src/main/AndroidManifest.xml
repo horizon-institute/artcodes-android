@@ -20,8 +20,8 @@
 <manifest xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:tools="http://schemas.android.com/tools"
     package="uk.ac.horizon.storicodes"
-          android:versionCode="2"
-          android:versionName="1.1">
+          android:versionCode="3"
+          android:versionName="1.1.1">
 
     <uses-sdk android:minSdkVersion="11" />
 
