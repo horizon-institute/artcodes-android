@@ -6,6 +6,7 @@ import android.content.Intent;
 import android.content.SharedPreferences;
 import android.graphics.Bitmap;
 import android.net.Uri;
+import android.os.Handler;
 import android.preference.PreferenceManager;
 import android.support.v7.app.ActionBarActivity;
 import android.os.Bundle;
@@ -22,6 +23,7 @@ import android.webkit.WebView;
 import android.webkit.WebViewClient;
 
 import java.io.InputStreamReader;
+import java.net.URI;
 import java.util.Scanner;
 
 import uk.ac.horizon.aestheticodes.Aestheticodes;
@@ -30,10 +32,15 @@ import uk.ac.horizon.aestheticodes.model.Experience;
 
 public class WebActivity extends Activity
 {
+    private WebView webView = null;
     private WebViewClient webViewClient = null;
     private String caller = null;
     private Context context;
     private String prevRedirect = null;
+    private long prevRedirectTime = 0;
+    private Handler mainThreadHandler;
+
+    private static final long TIME_TO_IGNORE_DUPLICATE_URLS_FOR_IN_MS = 1000;
 
     private void saveSelectedExperienceToPreferences(String experienceId)
     {
@@ -59,36 +66,7 @@ public class WebActivity extends Activity
         String url = getIntent().getStringExtra("URL");
         this.caller = getIntent().getStringExtra("caller");
 
-        this.webViewClient = new WebViewClient() {
-            @Override
-            public boolean shouldOverrideUrlLoading(WebView view, String url)
-            {
-                if (prevRedirect==null || !prevRedirect.equals(url))
-                {
-                    prevRedirect = url;
-                    return handleURL(url);
-                }
-                else
-                {
-                    return true;
-                }
-            }
-        };
-
-        WebView webView = (WebView) findViewById(R.id.webView);
-        webView.setWebViewClient(this.webViewClient);
-        WebSettings webSettings = webView.getSettings();
-        webSettings.setJavaScriptEnabled(true);
-        webSettings.setDomStorageEnabled(true);
-        webView.setInitialScale(getScale());
-
-        webView.addJavascriptInterface(new Object() {
-            @android.webkit.JavascriptInterface
-            public void go(String url)
-            {
-                handleURL(url);
-            }
-        }, "injectedRedirect");
+        webView = (WebView) findViewById(R.id.webView);
 
         if (url!=null)
         {
@@ -126,6 +104,8 @@ public class WebActivity extends Activity
                 webView.loadUrl(url);
             }
         }
+
+        mainThreadHandler = new Handler();
     }
 
     @Override
@@ -160,18 +140,51 @@ public class WebActivity extends Activity
         return (int)scale;
     }
 
-    private boolean handleURL(String url)
+    private static String getHost(String url)
     {
-        Log.i("HERE", "HandleURL("+url+")");
+        Log.i(WebActivity.class.getClass().getSimpleName(), "getHost input: "+url);
+        URI uri = null;
+        try
+        {
+            uri = URI.create(url);
+        }
+        catch (Exception e)
+        {
+            Log.e(WebActivity.class.getClass().getSimpleName(), "Error creating URI from URL ('"+url+"')", e);
+        }
+        return uri!=null ? (uri.getHost()!=null ? uri.getHost() : url) : null;
+    }
+
+    private boolean handleURL(final String url)
+    {
+        this.mainThreadHandler.post(new Runnable()
+        {
+            @Override
+            public void run()
+            {
+                handleURL(url, webView != null ? webView.getUrl() : "");
+            }
+        });
+        return true;
+    }
+
+    private boolean handleURL(String linkUrl, String currentUrl)
+    {
+        Log.i(this.getClass().getSimpleName(), "HandleURL("+linkUrl+")");
         String goToExperienceString = "?change_to_experience=";
-        if (url.startsWith("https://play.google.com/store/"))
+
+        String currentHost = WebActivity.getHost(currentUrl);
+        String requestHost = WebActivity.getHost(linkUrl);
+        Log.i(this.getClass().getSimpleName(), "currentHost: " + currentHost);
+        Log.i(this.getClass().getSimpleName(), "requestHost: " + requestHost);
+        if (!linkUrl.startsWith("?") && currentHost!=null && requestHost!=null && !currentHost.equals(requestHost))
         {
             Intent intent = new Intent(Intent.ACTION_VIEW);
-            intent.setData(Uri.parse(url));
+            intent.setData(Uri.parse(linkUrl));
             startActivity(intent);
             return true;
         }
-        if (url.contains("?go_to_camera"))
+        else if (linkUrl.contains("?go_to_camera"))
         {
             Intent intent = new Intent();
             intent.putExtra("caller", this.getClass().getCanonicalName());
@@ -180,7 +193,7 @@ public class WebActivity extends Activity
             startActivity(intent);
             return true;
         }
-        else if (url.contains("?go_to_start"))
+        else if (linkUrl.contains("?go_to_start"))
         {
             Intent intent = new Intent();
             intent.putExtra("caller", this.getClass().getCanonicalName());
@@ -189,9 +202,9 @@ public class WebActivity extends Activity
             startActivity(intent);
             return true;
         }
-        else if (url.contains(goToExperienceString))
+        else if (linkUrl.contains(goToExperienceString))
         {
-            String experienceId = url.substring(url.indexOf(goToExperienceString)+goToExperienceString.length());
+            String experienceId = linkUrl.substring(linkUrl.indexOf(goToExperienceString)+goToExperienceString.length());
             if (experienceId!=null)
             {
                 saveSelectedExperienceToPreferences(experienceId);
@@ -200,7 +213,64 @@ public class WebActivity extends Activity
         }
         else
         {
+            webView.loadUrl(linkUrl);
             return false;
+        }
+    }
+
+    @Override
+    protected void onResume()
+    {
+        super.onResume();
+        if (this.webView==null)
+        {
+            webView = (WebView) findViewById(R.id.webView);
+        }
+        if (this.webViewClient==null)
+        {
+            this.webViewClient = new WebViewClient()
+            {
+                @Override
+                public boolean shouldOverrideUrlLoading(WebView view, String url)
+                {
+                    if (prevRedirect == null || !(prevRedirect.equals(url) && prevRedirectTime+TIME_TO_IGNORE_DUPLICATE_URLS_FOR_IN_MS>System.currentTimeMillis()))
+                    {
+                        prevRedirect = url;
+                        prevRedirectTime = System.currentTimeMillis();
+                        return handleURL(url);
+                    }
+                    else
+                    {
+                        return true;
+                    }
+                }
+            };
+        }
+        webView.setWebViewClient(this.webViewClient);
+        WebSettings webSettings = webView.getSettings();
+        webSettings.setJavaScriptEnabled(true);
+        webSettings.setDomStorageEnabled(true);
+        webView.setInitialScale(getScale());
+
+        webView.addJavascriptInterface(new Object()
+        {
+            @android.webkit.JavascriptInterface
+            public void go(String url)
+            {
+                handleURL(url);
+            }
+        }, "injectedRedirect");
+
+    }
+
+    @Override
+    protected void onPause()
+    {
+        super.onPause();
+        if (this.webView!=null)
+        {
+            this.webView.setWebViewClient(null);
+            this.webView.removeJavascriptInterface("injectedRedirect");
         }
     }
 }
