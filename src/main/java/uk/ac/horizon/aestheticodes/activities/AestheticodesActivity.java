@@ -518,10 +518,10 @@ public class AestheticodesActivity extends ScanActivity implements ExperienceLis
 						.show();
 			}
 
-			if (marker.getChangeToExperienceOnOpen() != null)
+			if (marker.getChangeToExperienceWithIdOnOpen() != null)
 			{
-				Log.i("EXPERIENCE_PREF", "Changing to experience "+marker.getChangeToExperienceOnOpen() + "(from marker.getChangeToExperienceOnOpen)");
-				Experience experienceToChangeTo = this.experiences.getSelected(marker.getChangeToExperienceOnOpen());
+				Log.i("EXPERIENCE_PREF", "Changing to experience "+marker.getChangeToExperienceWithIdOnOpen() + "(from marker.getChangeToExperienceOnOpen)");
+				Experience experienceToChangeTo = this.experiences.getSelected(marker.getChangeToExperienceWithIdOnOpen());
 				if (experienceToChangeTo != null)
 				{
 					Log.i("EXPERIENCE_PREF", "..." + experienceToChangeTo.getName());
