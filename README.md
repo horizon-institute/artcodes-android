@@ -34,7 +34,6 @@ import uk.ac.horizon.artcodes.scanner.ScannerActivity;
 
 // Create Actions for the Markers you want to scan
 Action action = new Action();
-action.setUrl("http://www.cs.nott.ac.uk");
 action.getCodes().add("1:1:1:1:2");
 
 // Create and configure artcode experience
