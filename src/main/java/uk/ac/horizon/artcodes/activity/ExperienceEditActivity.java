@@ -1,7 +1,7 @@
 /*
  * Artcodes recognises a different marker scheme that allows the
  * creation of aesthetically pleasing, even beautiful, codes.
- * Copyright (C) 2013-2015  The University of Nottingham
+ * Copyright (C) 2013-2016  The University of Nottingham
  *
  *     This program is free software: you can redistribute it and/or modify
  *     it under the terms of the GNU Affero General Public License as published
@@ -26,12 +26,10 @@ import android.content.SharedPreferences;
 import android.databinding.DataBindingUtil;
 import android.net.Uri;
 import android.os.Bundle;
-import android.support.design.widget.Snackbar;
 import android.support.v4.app.Fragment;
 import android.support.v4.app.FragmentManager;
 import android.support.v4.app.FragmentPagerAdapter;
 import android.support.v4.app.NavUtils;
-import android.support.v4.content.ContextCompat;
 import android.support.v4.view.ViewPager;
 import android.support.v7.app.AlertDialog;
 import android.view.Menu;
@@ -48,12 +46,11 @@ import uk.ac.horizon.artcodes.GoogleAnalytics;
 import uk.ac.horizon.artcodes.R;
 import uk.ac.horizon.artcodes.account.Account;
 import uk.ac.horizon.artcodes.databinding.ExperienceEditBinding;
-import uk.ac.horizon.artcodes.fragment.ExperienceEditActionFragment;
-import uk.ac.horizon.artcodes.fragment.ExperienceEditAvailabilityFragment;
+import uk.ac.horizon.artcodes.fragment.ActionEditListFragment;
+import uk.ac.horizon.artcodes.fragment.AvailabilityEditListFragment;
 import uk.ac.horizon.artcodes.fragment.ExperienceEditColourFragment;
 import uk.ac.horizon.artcodes.fragment.ExperienceEditFragment;
 import uk.ac.horizon.artcodes.fragment.ExperienceEditInfoFragment;
-import uk.ac.horizon.artcodes.model.Action;
 import uk.ac.horizon.artcodes.model.Experience;
 
 public class ExperienceEditActivity extends ExperienceActivityBase
@@ -67,8 +64,8 @@ public class ExperienceEditActivity extends ExperienceActivityBase
 			super(fm);
 
 			fragments.add(new ExperienceEditInfoFragment());
-			fragments.add(new ExperienceEditAvailabilityFragment());
-			fragments.add(new ExperienceEditActionFragment());
+			fragments.add(new AvailabilityEditListFragment());
+			fragments.add(new ActionEditListFragment());
 			if (Feature.get(getApplicationContext(), R.bool.feature_edit_colour).isEnabled())
 			{
 				fragments.add(new ExperienceEditColourFragment());
@@ -108,6 +105,7 @@ public class ExperienceEditActivity extends ExperienceActivityBase
 		intent.putExtra("account", account.getId());
 		context.startActivity(intent);
 	}
+
 
 	public void editIcon(View view)
 	{
@@ -198,27 +196,9 @@ public class ExperienceEditActivity extends ExperienceActivityBase
 		GoogleAnalytics.trackScreen("Edit Experience", experience.getId());
 	}
 
-	public void deleteAction(final int index)
+	public View getRoot()
 	{
-		final Experience experience = getExperience();
-		if (experience != null)
-		{
-			final Action action = getExperience().getActions().get(index);
-			experience.getActions().remove(action);
-			updateFragment();
-			Snackbar.make(binding.getRoot(), R.string.action_deleted, Snackbar.LENGTH_LONG)
-					.setAction(R.string.action_delete_undo, new View.OnClickListener()
-					{
-						@Override
-						public void onClick(View v)
-						{
-							experience.getActions().add(index, action);
-							updateFragment();
-						}
-					})
-					.setActionTextColor(ContextCompat.getColor(this, R.color.apptheme_accent_light))
-					.show();
-		}
+		return binding.getRoot();
 	}
 
 	public void deleteExperience(View view)
@@ -345,16 +325,16 @@ public class ExperienceEditActivity extends ExperienceActivityBase
 		return intent;
 	}
 
-	private void updateFragment()
-	{
-		int position = binding.viewpager.getCurrentItem();
-		Fragment fragment = adapter.getItem(position);
-		if (fragment instanceof ExperienceEditFragment)
-		{
-			ExperienceEditFragment experienceEditFragment = (ExperienceEditFragment) fragment;
-			experienceEditFragment.update();
-		}
-	}
+//	private void updateFragment()
+//	{
+//		int position = binding.viewpager.getCurrentItem();
+//		Fragment fragment = adapter.getItem(position);
+//		if (fragment instanceof ExperienceEditFragment)
+//		{
+//			ExperienceEditFragment experienceEditFragment = (ExperienceEditFragment) fragment;
+//			experienceEditFragment.update();
+//		}
+//	}
 
 	private void selectImage(int request_id)
 	{

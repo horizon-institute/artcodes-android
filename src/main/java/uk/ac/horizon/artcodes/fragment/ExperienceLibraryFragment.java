@@ -1,7 +1,7 @@
 /*
  * Artcodes recognises a different marker scheme that allows the
  * creation of aesthetically pleasing, even beautiful, codes.
- * Copyright (C) 2013-2015  The University of Nottingham
+ * Copyright (C) 2013-2016  The University of Nottingham
  *
  *     This program is free software: you can redistribute it and/or modify
  *     it under the terms of the GNU Affero General Public License as published
@@ -19,40 +19,65 @@
 
 package uk.ac.horizon.artcodes.fragment;
 
+import android.graphics.Color;
+import android.graphics.drawable.Drawable;
+import android.os.Build;
 import android.os.Bundle;
-import android.support.annotation.Nullable;
-import android.support.v7.widget.LinearLayoutManager;
+import android.support.annotation.ColorInt;
+import android.support.annotation.DrawableRes;
+import android.support.annotation.NonNull;
+import android.support.design.widget.FloatingActionButton;
+import android.support.v4.content.ContextCompat;
+import android.support.v4.graphics.drawable.DrawableCompat;
+import android.view.Gravity;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
-
-import java.util.List;
+import android.widget.FrameLayout;
 
 import uk.ac.horizon.artcodes.GoogleAnalytics;
+import uk.ac.horizon.artcodes.R;
 import uk.ac.horizon.artcodes.account.Account;
 import uk.ac.horizon.artcodes.activity.ExperienceEditActivity;
 import uk.ac.horizon.artcodes.adapter.ExperienceAdapter;
-import uk.ac.horizon.artcodes.databinding.ExperienceLibraryBinding;
+import uk.ac.horizon.artcodes.adapter.ExperienceSortedListAdapter;
+import uk.ac.horizon.artcodes.databinding.ListBinding;
 import uk.ac.horizon.artcodes.model.Experience;
-import uk.ac.horizon.artcodes.server.LoadCallback;
 
 public class ExperienceLibraryFragment extends ArtcodeFragmentBase
 {
-	private ExperienceLibraryBinding binding;
 	private ExperienceAdapter adapter;
 	private Account account;
 
-	@Nullable
+	private Drawable getTintedDrawable(@DrawableRes int drawable, @ColorInt int color)
+	{
+		final Drawable original = ContextCompat.getDrawable(getContext(), drawable);
+		if(original != null)
+		{
+			final Drawable wrapDrawable = DrawableCompat.wrap(original);
+			DrawableCompat.setTint(wrapDrawable, color);
+			return wrapDrawable;
+		}
+		return null;
+	}
+
+	@NonNull
 	@Override
 	public View onCreateView(LayoutInflater inflater, ViewGroup container, Bundle savedInstanceState)
 	{
-		binding = ExperienceLibraryBinding.inflate(inflater, container, false);
-		//binding.list.setHasFixedSize(true);
-		binding.list.setLayoutManager(new LinearLayoutManager(getActivity()));
-		adapter = new ExperienceAdapter(getActivity());
-		binding.list.setAdapter(adapter);
-		binding.progress.setEnabled(false);
-		binding.fab.setOnClickListener(new View.OnClickListener()
+		ListBinding binding = ListBinding.inflate(inflater, container, false);
+		adapter = new ExperienceSortedListAdapter(getActivity(), getServer());
+		adapter.setFabPadding(true);
+		binding.setAdapter(adapter);
+
+		binding.emptyIcon.setImageResource(R.drawable.ic_folder_144dp);
+		binding.emptyText.setText(R.string.empty);
+		binding.emptyDetail.setText(R.string.emptyHint);
+
+		final FloatingActionButton fab = new FloatingActionButton(getContext());
+		fab.setImageDrawable(getTintedDrawable(R.drawable.ic_add_24dp, Color.WHITE));
+		//fab.setBackgroundColor(ContextCompat.getColor(getContext(), R.color.apptheme_accent));
+		fab.setOnClickListener(new View.OnClickListener()
 		{
 			@Override
 			public void onClick(View v)
@@ -60,25 +85,21 @@ public class ExperienceLibraryFragment extends ArtcodeFragmentBase
 				ExperienceEditActivity.start(getActivity(), new Experience(), account);
 			}
 		});
+		if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.LOLLIPOP)
+		{
+			fab.setElevation(4);
+		}
+
+		final int spacing = getResources().getDimensionPixelSize(R.dimen.padding);
+		final FrameLayout.LayoutParams layoutParams = new FrameLayout.LayoutParams(ViewGroup.LayoutParams.WRAP_CONTENT, ViewGroup.LayoutParams.WRAP_CONTENT);
+		layoutParams.gravity = Gravity.BOTTOM | Gravity.END;
+		layoutParams.setMargins(spacing, spacing, spacing, spacing);
+
+		fab.setLayoutParams(layoutParams);
+
+		((ViewGroup) binding.getRoot()).addView(fab);
 
 		return binding.getRoot();
-	}
-
-	@Override
-	public void setUserVisibleHint(boolean isVisibleToUser)
-	{
-		super.setUserVisibleHint(isVisibleToUser);
-		if (isInLayout())
-		{
-			if (isVisibleToUser)
-			{
-				binding.fab.show();
-			}
-			else
-			{
-				binding.fab.hide();
-			}
-		}
 	}
 
 	@Override
@@ -86,28 +107,9 @@ public class ExperienceLibraryFragment extends ArtcodeFragmentBase
 	{
 		super.onResume();
 		GoogleAnalytics.trackScreen("View Library");
-		binding.progress.addPending();
-		getAccount().loadLibrary(new LoadCallback<List<String>>()
-		{
-			@Override
-			public void loaded(List<String> item)
-			{
-				for (String uri : item)
-				{
-					binding.progress.addPending();
-					getServer().loadExperience(uri, new LoadCallback<Experience>()
-					{
-						@Override
-						public void loaded(Experience item)
-						{
-							binding.progress.removePending();
-							adapter.loaded(item);
-						}
-					});
-				}
-				binding.progress.removePending();
-			}
-		});
+		getActivity().setTitle(getAccount().getName());
+		adapter.loadStarted();
+		getAccount().loadLibrary(adapter);
 	}
 
 	private Account getAccount()

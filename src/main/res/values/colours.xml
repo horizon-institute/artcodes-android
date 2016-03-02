@@ -2,7 +2,7 @@
 <!--
   ~ Artcodes recognises a different marker scheme that allows the
   ~ creation of aesthetically pleasing, even beautiful, codes.
-  ~ Copyright (C) 2013-2015  The University of Nottingham
+  ~ Copyright (C) 2013-2016  The University of Nottingham
   ~
   ~     This program is free software: you can redistribute it and/or modify
   ~     it under the terms of the GNU Affero General Public License as published
@@ -18,14 +18,14 @@
   ~     along with this program.  If not, see <http://www.gnu.org/licenses/>.
   -->
 <resources>
-    <color name="apptheme_primary">#324A5E</color>
-    <color name="apptheme_primary_dark">#2b3f4f</color>
-    <color name="apptheme_accent">#295a9e</color>
-    <color name="apptheme_accent_light">#29c1e7</color>
+	<color name="apptheme_primary">#324a5e</color>
+	<color name="apptheme_primary_dark">#2b3f4f</color>
+	<color name="apptheme_accent">#295a9e</color>
+	<color name="apptheme_accent_light">#29c1e7</color>
 
-    <color name="PRESSED_STATE_COLOR">#324A5E</color>
-    <color name="FOCUSED_STATE_COLOR">#324A5E</color>
-    <color name="NORMAL_STATE_COLOR">#324A5E</color>
+	<color name="PRESSED_STATE_COLOR">#324A5E</color>
+	<color name="FOCUSED_STATE_COLOR">#324A5E</color>
+	<color name="NORMAL_STATE_COLOR">#324A5E</color>
 
-    <color name="ic_tint">#777</color>
+	<color name="ic_tint">#777777</color>
 </resources>

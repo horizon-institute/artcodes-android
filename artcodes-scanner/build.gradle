@@ -1,7 +1,7 @@
 /*
  * Artcodes recognises a different marker scheme that allows the
  * creation of aesthetically pleasing, even beautiful, codes.
- * Copyright (C) 2013-2015  The University of Nottingham
+ * Copyright (C) 2013-2016  The University of Nottingham
  *
  *     This program is free software: you can redistribute it and/or modify
  *     it under the terms of the GNU Affero General Public License as published
@@ -17,55 +17,50 @@
  *     along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 buildscript {
-    repositories {
-        jcenter()
-    }
-    dependencies {
-        classpath 'com.android.tools.build:gradle:1.5.0'
-    }
+	repositories {
+		jcenter()
+	}
+	dependencies {
+		classpath 'com.android.tools.build:gradle:1.5.0'
+	}
 }
 
 apply plugin: 'idea'
 apply plugin: 'com.android.library'
 
 repositories {
-    jcenter()
-    maven { url 'https://raw.github.com/vRallev/mvn-repo/master/' }
+	jcenter()
+	maven { url 'https://raw.github.com/vRallev/mvn-repo/master/' }
 }
 
 dependencies {
-    compile 'com.android.support:design:23.1.1'
-    compile 'com.android.support:appcompat-v7:23.1.1'
-    compile 'com.google.code.gson:gson:2.5'
-    compile 'com.google.guava:guava:19.0'
-    compile 'org.opencv:opencv-android:2.4.8'
-    testCompile 'junit:junit:4.12'
+	compile 'com.android.support:appcompat-v7:23.2.0'
+	compile 'com.google.code.gson:gson:2.6.2'
+	compile 'com.google.guava:guava:19.0'
+	compile 'org.opencv:opencv-android:2.4.8'
+	testCompile 'junit:junit:4.12'
 }
 
 android {
-    compileSdkVersion 23
-    buildToolsVersion "23.0.2"
+	compileSdkVersion 23
+	buildToolsVersion "23.0.2"
 
-    dataBinding {
-        enabled = true
-    }
+	dataBinding {
+		enabled = true
+	}
 
-    defaultConfig {
-        minSdkVersion 15
-        targetSdkVersion 23
-        versionCode 400029
-        versionName '3.0'
-    }
+	defaultConfig {
+		minSdkVersion 15
+		targetSdkVersion 23
+		versionCode 400029
+		versionName '3.0'
+	}
 
-    lintOptions {
-        abortOnError false
-    }
-    compileOptions {
-        sourceCompatibility JavaVersion.VERSION_1_7
-        targetCompatibility JavaVersion.VERSION_1_7
-    }
-}
-
-task wrapper(type: Wrapper) {
-    gradleVersion = '2.10'
+	lintOptions {
+		abortOnError false
+	}
+	compileOptions {
+		sourceCompatibility JavaVersion.VERSION_1_7
+		targetCompatibility JavaVersion.VERSION_1_7
+	}
 }

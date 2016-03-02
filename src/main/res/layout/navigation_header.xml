@@ -2,7 +2,7 @@
 <!--
   ~ Artcodes recognises a different marker scheme that allows the
   ~ creation of aesthetically pleasing, even beautiful, codes.
-  ~ Copyright (C) 2013-2015  The University of Nottingham
+  ~ Copyright (C) 2013-2016  The University of Nottingham
   ~
   ~     This program is free software: you can redistribute it and/or modify
   ~     it under the terms of the GNU Affero General Public License as published
@@ -19,13 +19,13 @@
   -->
 
 <ImageView
-    xmlns:android="http://schemas.android.com/apk/res/android"
-    xmlns:tools="http://schemas.android.com/tools"
-    android:layout_width="match_parent"
-    android:layout_height="180dp"
-    android:layout_marginTop="24dp"
-    android:fitsSystemWindows="true"
-    android:scaleType="fitCenter"
-    android:src="@drawable/penguins"
-    tools:ignore="ContentDescription">
+	xmlns:android="http://schemas.android.com/apk/res/android"
+	xmlns:tools="http://schemas.android.com/tools"
+	android:layout_width="match_parent"
+	android:layout_height="wrap_content"
+	android:fitsSystemWindows="true"
+	android:scaleType="fitCenter"
+	android:src="@drawable/about_artcodes_1"
+	tools:ignore="ContentDescription"
+	android:adjustViewBounds="true">
 </ImageView>

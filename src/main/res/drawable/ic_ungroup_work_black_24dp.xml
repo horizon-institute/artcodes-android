@@ -1,7 +1,7 @@
 <!--
   ~ Artcodes recognises a different marker scheme that allows the
   ~ creation of aesthetically pleasing, even beautiful, codes.
-  ~ Copyright (C) 2013-2015  The University of Nottingham
+  ~ Copyright (C) 2013-2016  The University of Nottingham
   ~
   ~     This program is free software: you can redistribute it and/or modify
   ~     it under the terms of the GNU Affero General Public License as published
@@ -22,7 +22,7 @@
         android:height="24dp"
         android:viewportHeight="24.0"
         android:viewportWidth="24.0">
-    <path
-        android:fillColor="#FF000000"
-        android:pathData="M8,17.5c-1.38,0 -2.5,-1.12 -2.5,-2.5s1.12,-2.5 2.5,-2.5 2.5,1.12 2.5,2.5 -1.12,2.5 -2.5,2.5zM9.5,8c0,-1.38 1.12,-2.5 2.5,-2.5s2.5,1.12 2.5,2.5 -1.12,2.5 -2.5,2.5S9.5,9.38 9.5,8zM16,17.5c-1.38,0 -2.5,-1.12 -2.5,-2.5s1.12,-2.5 2.5,-2.5 2.5,1.12 2.5,2.5 -1.12,2.5 -2.5,2.5z"/>
+	<path
+		android:fillColor="#FF000000"
+		android:pathData="M8,17.5c-1.38,0 -2.5,-1.12 -2.5,-2.5s1.12,-2.5 2.5,-2.5 2.5,1.12 2.5,2.5 -1.12,2.5 -2.5,2.5zM9.5,8c0,-1.38 1.12,-2.5 2.5,-2.5s2.5,1.12 2.5,2.5 -1.12,2.5 -2.5,2.5S9.5,9.38 9.5,8zM16,17.5c-1.38,0 -2.5,-1.12 -2.5,-2.5s1.12,-2.5 2.5,-2.5 2.5,1.12 2.5,2.5 -1.12,2.5 -2.5,2.5z"/>
 </vector>

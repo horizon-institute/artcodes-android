@@ -1,7 +1,7 @@
 /*
  * Artcodes recognises a different marker scheme that allows the
  * creation of aesthetically pleasing, even beautiful, codes.
- * Copyright (C) 2013-2015  The University of Nottingham
+ * Copyright (C) 2013-2016  The University of Nottingham
  *
  *     This program is free software: you can redistribute it and/or modify
  *     it under the terms of the GNU Affero General Public License as published
@@ -87,48 +87,36 @@ public class LocalAccount implements Account
 	@Override
 	public void saveExperience(final Experience experience)
 	{
-		new Thread(new Runnable()
+		try
 		{
-			@Override
-			public void run()
+			File file;
+			if (experience.getId() == null || !canEdit(experience.getId()))
 			{
-				try
+				if (experience.getId() != null && (experience.getId().startsWith("http://") || experience.getId().startsWith("https://")))
 				{
-					File file;
-					if (experience.getId() == null || !canEdit(experience.getId()))
-					{
-						if (experience.getOriginalID() != null && canEdit(experience.getOriginalID()))
-						{
-							file = new File(URI.create(experience.getOriginalID()));
-							experience.setId(file.toURI().toString());
-							experience.setOriginalID(null);
-						}
-						else
-						{
-							file = new File(getDirectory(), UUID.randomUUID().toString());
-							experience.setId(file.toURI().toString());
-						}
-					}
-					else
-					{
-						file = new File(URI.create(experience.getId()));
-					}
-
-					final FileWriter writer = new FileWriter(file);
-					gson.toJson(experience, writer);
-					writer.flush();
-					writer.close();
-
-					final SharedPreferences.Editor editor = context.getSharedPreferences(Account.class.getName(), Context.MODE_PRIVATE).edit();
-					Log.i("local", experience.getId() + " = " + getId());
-					editor.putString(experience.getId(), getId()).apply();
+					experience.setOriginalID(experience.getId());
 				}
-				catch (Exception e)
-				{
-					GoogleAnalytics.trackException(e);
-				}
+				file = new File(getDirectory(), UUID.randomUUID().toString());
+				experience.setId(file.toURI().toString());
 			}
-		}).start();
+			else
+			{
+				file = new File(URI.create(experience.getId()));
+			}
+
+			final FileWriter writer = new FileWriter(file);
+			gson.toJson(experience, writer);
+			writer.flush();
+			writer.close();
+
+			final SharedPreferences.Editor editor = context.getSharedPreferences(Account.class.getName(), Context.MODE_PRIVATE).edit();
+			Log.i("local", experience.getId() + " = " + getId());
+			editor.putString(experience.getId(), getId()).apply();
+		}
+		catch (Exception e)
+		{
+			GoogleAnalytics.trackException(e);
+		}
 	}
 
 	@Override
@@ -164,6 +152,12 @@ public class LocalAccount implements Account
 	}
 
 	@Override
+	public boolean logScan(String uri)
+	{
+		return false;
+	}
+
+	@Override
 	public boolean load(final String uri, final URILoaderCallback callback)
 	{
 		if (uri.startsWith("content:") || uri.startsWith("file:"))
@@ -190,9 +184,11 @@ public class LocalAccount implements Account
 						final Request request = new Request.Builder()
 								.get()
 								.url(uri)
+								.addHeader("User-Agent", Artcodes.userAgent)
 								.build();
 						final Response response = Artcodes.httpClient.newCall(request).execute();
 						callback.onLoaded(response.body().charStream());
+						response.body().close();
 					}
 					catch (Exception e)
 					{

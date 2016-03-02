@@ -1,7 +1,7 @@
 /*
  * Artcodes recognises a different marker scheme that allows the
  * creation of aesthetically pleasing, even beautiful, codes.
- * Copyright (C) 2013-2015  The University of Nottingham
+ * Copyright (C) 2013-2016  The University of Nottingham
  *
  *     This program is free software: you can redistribute it and/or modify
  *     it under the terms of the GNU Affero General Public License as published
@@ -21,6 +21,7 @@ package uk.ac.horizon.artcodes.server;
 
 import android.content.Context;
 import android.os.Handler;
+import android.util.Log;
 
 import com.google.gson.Gson;
 
@@ -48,6 +49,7 @@ public class JsonCallback<T> implements URILoaderCallback
 	public void onLoaded(Reader reader)
 	{
 		final T item = gson.fromJson(reader, type);
+		Log.i("JSON", gson.toJson(item));
 		mainHandler.post(new Runnable()
 		{
 			@Override

@@ -2,7 +2,7 @@
 <!--
   ~ Artcodes recognises a different marker scheme that allows the
   ~ creation of aesthetically pleasing, even beautiful, codes.
-  ~ Copyright (C) 2013-2015  The University of Nottingham
+  ~ Copyright (C) 2013-2016  The University of Nottingham
   ~
   ~     This program is free software: you can redistribute it and/or modify
   ~     it under the terms of the GNU Affero General Public License as published
@@ -21,11 +21,11 @@
 <shape xmlns:android="http://schemas.android.com/apk/res/android"
        android:shape="rectangle">
 
-    <size android:height="80dp"/>
+	<size android:height="80dp"/>
 
-    <gradient
-        android:angle="270"
-        android:endColor="#0000"
-        android:startColor="#4000"/>
+	<gradient
+		android:angle="270"
+		android:endColor="#0000"
+		android:startColor="#4000"/>
 
 </shape>

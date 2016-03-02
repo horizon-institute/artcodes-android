@@ -1,7 +1,7 @@
 /*
  * Artcodes recognises a different marker scheme that allows the
  * creation of aesthetically pleasing, even beautiful, codes.
- * Copyright (C) 2013-2015  The University of Nottingham
+ * Copyright (C) 2013-2016  The University of Nottingham
  *
  *     This program is free software: you can redistribute it and/or modify
  *     it under the terms of the GNU Affero General Public License as published
@@ -31,6 +31,7 @@ public class Action extends BaseObservable
 	{
 		any, all, sequence
 	}
+
 	public static final String HTTP_PREFIX = "http://";
 	private List<String> codes = new ArrayList<>();
 	private Match match = Match.any;
@@ -85,11 +86,6 @@ public class Action extends BaseObservable
 	public boolean getShowDetail()
 	{
 		return showDetail;
-	}
-
-	public void setShowDetail(boolean showDetail)
-	{
-		this.showDetail = showDetail;
 	}
 
 	@Bindable

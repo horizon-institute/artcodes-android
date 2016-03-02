@@ -3,7 +3,7 @@
 <!--
   ~ Artcodes recognises a different marker scheme that allows the
   ~ creation of aesthetically pleasing, even beautiful, codes.
-  ~ Copyright (C) 2013-2015  The University of Nottingham
+  ~ Copyright (C) 2013-2016  The University of Nottingham
   ~
   ~     This program is free software: you can redistribute it and/or modify
   ~     it under the terms of the GNU Affero General Public License as published
@@ -24,95 +24,123 @@
         xmlns:tools="http://schemas.android.com/tools"
         tools:context=".activities.ExperienceEditActivity">
 
-    <data>
+	<data>
 
-        <import type="android.view.View"/>
+		<import type="android.view.View"/>
 
-        <variable
-            name="experience"
-            type="uk.ac.horizon.artcodes.model.Experience"/>
+		<variable
+			name="experience"
+			type="uk.ac.horizon.artcodes.model.Experience"/>
 
-        <variable
-            name="experienceEditor"
-            type="uk.ac.horizon.artcodes.ui.ExperienceEditor"/>
-    </data>
+		<variable
+			name="experienceEditor"
+			type="uk.ac.horizon.artcodes.ui.ExperienceEditor"/>
+	</data>
 
-    <ScrollView
-        android:layout_width="match_parent"
-        android:layout_height="match_parent">
+	<ScrollView
+		android:layout_width="match_parent"
+		android:layout_height="match_parent"
+		android:background="#EEE">
 
-        <LinearLayout
-            android:layout_width="match_parent"
-            android:layout_height="wrap_content"
-            android:orientation="vertical">
+		<LinearLayout
+			android:layout_width="match_parent"
+			android:layout_height="wrap_content"
+			android:orientation="vertical">
 
-            <ImageView
-                android:id="@+id/experience_image"
-                android:layout_width="match_parent"
-                android:layout_height="150dp"
-                android:adjustViewBounds="true"
-                android:background="?attr/selectableItemBackground"
-                android:onClick="editImage"
-                android:scaleType="fitCenter"
-                android:src="@drawable/ic_image_black_150dp"
-                app:imageUrl="@{experience.image}"
-                tools:ignore="ContentDescription"/>
+			<ImageView
+				android:id="@+id/experience_image"
+				android:layout_width="match_parent"
+				android:layout_height="150dp"
+				android:adjustViewBounds="true"
+				android:background="?attr/selectableItemBackground"
+				android:onClick="editImage"
+				android:scaleType="fitCenter"
+				android:visibility="@{experience.image == null ? View.GONE : View.VISIBLE}"
+				app:imageUrl="@{experience.image}"
+				tools:ignore="ContentDescription"
+				tools:visibility="gone"/>
 
-            <LinearLayout
-                android:layout_width="match_parent"
-                android:layout_height="wrap_content"
-                android:orientation="vertical">
+			<ImageView
+				android:layout_width="fill_parent"
+				android:layout_height="150dp"
+				android:background="#DDD"
+				android:onClick="editImage"
+				android:padding="24dp"
+				android:scaleType="fitCenter"
+				android:src="@drawable/ic_image_black_144dp"
+				android:tint="#EEE"
+				android:visibility="@{experience.image == null ? View.VISIBLE : View.GONE}"
+				tools:ignore="ContentDescription"/>
 
-                <LinearLayout
-                    android:layout_width="match_parent"
-                    android:layout_height="match_parent"
-                    android:orientation="horizontal">
+			<LinearLayout
+				android:layout_width="match_parent"
+				android:layout_height="wrap_content"
+				android:orientation="vertical">
 
-                    <ImageView
-                        android:id="@+id/experience_icon"
-                        android:layout_width="56dp"
-                        android:layout_height="56dp"
-                        android:layout_margin="16dp"
-                        android:background="?attr/selectableItemBackground"
-                        android:onClick="editIcon"
-                        android:src="@drawable/ic_image_black_150dp"
-                        app:imageUrl="@{experience.icon}"/>
+				<LinearLayout
+					android:layout_width="match_parent"
+					android:layout_height="match_parent"
+					android:orientation="horizontal">
 
-                    <EditText
-                        android:layout_width="match_parent"
-                        android:layout_height="wrap_content"
-                        android:layout_gravity="center_vertical"
-                        android:layout_margin="12dp"
-                        android:hint="@string/experienceTitle"
-                        android:singleLine="true"
-                        android:textAppearance="@style/TextAppearance.AppCompat.Title"
-                        app:textWatcher="@{experienceEditor.nameWatcher}"/>
-                </LinearLayout>
+					<ImageView
+						android:id="@+id/experience_icon"
+						android:layout_width="56dp"
+						android:layout_height="56dp"
+						android:layout_margin="16dp"
+						android:background="?attr/selectableItemBackground"
+						android:onClick="editIcon"
+						android:visibility="@{experience.icon == null ? View.GONE : View.VISIBLE}"
+						app:imageUrl="@{experience.icon}"
+						tools:visibility="gone"
+						android:contentDescription="@string/experienceIcon"/>
 
-                <LinearLayout
-                    android:layout_width="match_parent"
-                    android:layout_height="match_parent"
-                    android:orientation="horizontal">
+					<ImageView
+						android:layout_width="56dp"
+						android:layout_height="56dp"
+						android:layout_margin="16dp"
+						android:background="#DDD"
+						android:onClick="editIcon"
+						android:scaleType="fitCenter"
+						android:src="@drawable/ic_image_black_144dp"
+						android:tint="#EEE"
+						android:visibility="@{experience.icon == null ? View.VISIBLE : View.GONE}"
+						tools:ignore="ContentDescription"/>
 
-                    <ImageView
-                        android:layout_width="wrap_content"
-                        android:layout_height="wrap_content"
-                        android:layout_margin="16dp"
-                        android:scaleType="fitCenter"
-                        android:src="@drawable/ic_subject_black_24dp"
-                        android:tint="@color/ic_tint"
-                        tools:ignore="ContentDescription"/>
+					<EditText
+						android:layout_width="match_parent"
+						android:layout_height="wrap_content"
+						android:layout_gravity="center_vertical"
+						android:layout_margin="12dp"
+						android:hint="@string/experienceTitle"
+						android:singleLine="true"
+						android:textAppearance="@style/TextAppearance.AppCompat.Title"
+						app:textWatcher="@{experienceEditor.nameWatcher}"/>
+				</LinearLayout>
 
-                    <EditText
-                        android:layout_width="match_parent"
-                        android:layout_height="wrap_content"
-                        android:layout_margin="8dp"
-                        android:hint="@string/experienceDescription"
-                        android:inputType="textMultiLine"
-                        android:textAppearance="@style/TextAppearance.AppCompat"
-                        app:textWatcher="@{experienceEditor.descWatcher}"/>
-                </LinearLayout>
-            </LinearLayout>
-        </LinearLayout>
-    </ScrollView>
+				<LinearLayout
+					android:layout_width="match_parent"
+					android:layout_height="match_parent"
+					android:orientation="horizontal">
+
+					<ImageView
+						android:layout_width="wrap_content"
+						android:layout_height="wrap_content"
+						android:layout_margin="16dp"
+						android:scaleType="fitCenter"
+						android:src="@drawable/ic_subject_black_24dp"
+						android:tint="@color/ic_tint"
+						tools:ignore="ContentDescription"/>
+
+					<EditText
+						android:layout_width="match_parent"
+						android:layout_height="wrap_content"
+						android:layout_margin="8dp"
+						android:hint="@string/experienceDescription"
+						android:inputType="textMultiLine"
+						android:textAppearance="@style/TextAppearance.AppCompat"
+						app:textWatcher="@{experienceEditor.descWatcher}"/>
+				</LinearLayout>
+			</LinearLayout>
+		</LinearLayout>
+	</ScrollView>
 </layout>

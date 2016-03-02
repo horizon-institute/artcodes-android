@@ -1,7 +1,7 @@
 /*
  * Artcodes recognises a different marker scheme that allows the
  * creation of aesthetically pleasing, even beautiful, codes.
- * Copyright (C) 2013-2015  The University of Nottingham
+ * Copyright (C) 2013-2016  The University of Nottingham
  *
  *     This program is free software: you can redistribute it and/or modify
  *     it under the terms of the GNU Affero General Public License as published
@@ -32,6 +32,7 @@ public class Experience extends BaseObservable
 	{
 		loaded, modified, saving
 	}
+
 	private final List<Action> actions = new ArrayList<>();
 	private final List<Availability> availabilities = new ArrayList<>();
 	private final List<String> pipeline = new ArrayList<>();

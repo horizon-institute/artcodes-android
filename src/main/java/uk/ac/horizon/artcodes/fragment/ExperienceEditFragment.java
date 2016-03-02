@@ -1,7 +1,7 @@
 /*
  * Artcodes recognises a different marker scheme that allows the
  * creation of aesthetically pleasing, even beautiful, codes.
- * Copyright (C) 2013-2015  The University of Nottingham
+ * Copyright (C) 2013-2016  The University of Nottingham
  *
  *     This program is free software: you can redistribute it and/or modify
  *     it under the terms of the GNU Affero General Public License as published
@@ -19,6 +19,7 @@
 
 package uk.ac.horizon.artcodes.fragment;
 
+import android.support.annotation.NonNull;
 import android.support.annotation.StringRes;
 
 import uk.ac.horizon.artcodes.account.Account;
@@ -29,12 +30,18 @@ public abstract class ExperienceEditFragment extends ArtcodeFragmentBase
 {
 	public Account getAccount()
 	{
-		return ((ExperienceEditActivity) getActivity()).getAccount();
+		return getEditActivity().getAccount();
 	}
 
 	public void setAccount(Account account)
 	{
-		((ExperienceEditActivity) getActivity()).setAccount(account);
+		getEditActivity().setAccount(account);
+	}
+
+	@NonNull
+	protected ExperienceEditActivity getEditActivity()
+	{
+		return (ExperienceEditActivity) getActivity();
 	}
 
 	public boolean displayAddFAB()
@@ -47,16 +54,11 @@ public abstract class ExperienceEditFragment extends ArtcodeFragmentBase
 
 	}
 
-	public void update()
-	{
-
-	}
-
 	@StringRes
 	public abstract int getTitleResource();
 
 	Experience getExperience()
 	{
-		return ((ExperienceEditActivity) getActivity()).getExperience();
+		return getEditActivity().getExperience();
 	}
 }

@@ -1,0 +1,73 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!--
+  ~ Artcodes recognises a different marker scheme that allows the
+  ~ creation of aesthetically pleasing, even beautiful, codes.
+  ~ Copyright (C) 2013-2016  The University of Nottingham
+  ~
+  ~     This program is free software: you can redistribute it and/or modify
+  ~     it under the terms of the GNU Affero General Public License as published
+  ~     by the Free Software Foundation, either version 3 of the License, or
+  ~     (at your option) any later version.
+  ~
+  ~     This program is distributed in the hope that it will be useful,
+  ~     but WITHOUT ANY WARRANTY; without even the implied warranty of
+  ~     MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+  ~     GNU Affero General Public License for more details.
+  ~
+  ~     You should have received a copy of the GNU Affero General Public License
+  ~     along with this program.  If not, see <http://www.gnu.org/licenses/>.
+  -->
+
+<layout xmlns:android="http://schemas.android.com/apk/res/android"
+        xmlns:tools="http://schemas.android.com/tools"
+        tools:context=".activities.ExperienceEditActivity">
+
+	<data>
+
+		<variable
+			name="availability"
+			type="uk.ac.horizon.artcodes.model.Availability"/>
+	</data>
+
+	<LinearLayout
+		android:layout_width="match_parent"
+		android:layout_height="wrap_content"
+		android:background="?attr/selectableItemBackground"
+		android:orientation="horizontal">
+
+		<ImageView
+			android:layout_width="wrap_content"
+			android:layout_height="wrap_content"
+			android:src="@drawable/ic_place_black_24dp"
+			android:tint="@color/ic_tint"
+			tools:ignore="ContentDescription"
+			android:layout_margin="8dp"/>
+
+		<LinearLayout
+			android:layout_width="0dp"
+			android:layout_height="wrap_content"
+			android:layout_weight="1"
+			android:orientation="vertical"
+			android:padding="8dp">
+
+			<TextView
+				android:id="@+id/availability_location"
+				android:layout_width="match_parent"
+				android:layout_height="wrap_content"
+				android:layout_gravity="center_vertical"
+				android:text="@{availability.name}"
+				android:textAppearance="@style/TextAppearance.AppCompat"
+				tools:text="Anywhere"/>
+
+			<TextView
+				android:id="@+id/availability_address"
+				android:layout_width="match_parent"
+				android:layout_height="wrap_content"
+				android:layout_gravity="center_vertical"
+				android:text="@{availability.address}"
+				android:textAppearance="@style/TextAppearance.AppCompat.Small"
+				tools:text="Anywhere"/>
+		</LinearLayout>
+
+	</LinearLayout>
+</layout>

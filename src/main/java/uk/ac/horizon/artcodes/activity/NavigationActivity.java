@@ -1,7 +1,7 @@
 /*
  * Artcodes recognises a different marker scheme that allows the
  * creation of aesthetically pleasing, even beautiful, codes.
- * Copyright (C) 2013-2015  The University of Nottingham
+ * Copyright (C) 2013-2016  The University of Nottingham
  *
  *     This program is free software: you can redistribute it and/or modify
  *     it under the terms of the GNU Affero General Public License as published
@@ -38,21 +38,21 @@ import android.view.View;
 import android.widget.BaseAdapter;
 import android.widget.HeaderViewListAdapter;
 import android.widget.ListView;
-
 import com.google.android.gms.auth.GoogleAuthUtil;
 import com.google.android.gms.auth.UserRecoverableAuthException;
 import com.google.android.gms.common.AccountPicker;
-
-import java.util.List;
-
 import uk.ac.horizon.artcodes.Feature;
 import uk.ac.horizon.artcodes.R;
 import uk.ac.horizon.artcodes.account.Account;
 import uk.ac.horizon.artcodes.databinding.NavigationBinding;
 import uk.ac.horizon.artcodes.fragment.ExperienceLibraryFragment;
+import uk.ac.horizon.artcodes.fragment.ExperienceRecentFragment;
 import uk.ac.horizon.artcodes.fragment.ExperienceRecommendFragment;
 import uk.ac.horizon.artcodes.fragment.ExperienceStarFragment;
 import uk.ac.horizon.artcodes.fragment.FeatureListFragment;
+import uk.ac.horizon.artcodes.server.LoadCallback;
+
+import java.util.List;
 
 public class NavigationActivity extends ArtcodeActivityBase implements
 		NavigationView.OnNavigationItemSelectedListener
@@ -102,21 +102,17 @@ public class NavigationActivity extends ArtcodeActivityBase implements
 
 				selected = menuItem;
 				menuItem.setChecked(true);
-				drawerActionHandler.postDelayed(new Runnable()
-				{
-					@Override
-					public void run()
-					{
-						navigate(menuItem);
-					}
-				}, DRAWER_CLOSE_DELAY_MS);
 			}
-			else if (menuItem.getItemId() == R.id.nav_addaccount)
+			drawerActionHandler.postDelayed(new Runnable()
 			{
-				// TODO Better account selection?
-				startActivityForResult(AccountPicker.newChooseAccountIntent(null, null, new String[]{GoogleAuthUtil.GOOGLE_ACCOUNT_TYPE}, true, null, null, null, null), REQUEST_CODE_PICK_ACCOUNT);
-			}
+				@Override
+				public void run()
+				{
+					navigate(menuItem, true);
+				}
+			}, DRAWER_CLOSE_DELAY_MS);
 		}
+
 		binding.drawer.closeDrawer(GravityCompat.START);
 		return true;
 	}
@@ -147,7 +143,7 @@ public class NavigationActivity extends ArtcodeActivityBase implements
 		{
 			Account account = accounts.get(index);
 			MenuItem menuItem = subMenu.add(R.id.navigation, index, Menu.NONE, account.getName());
-			menuItem.setIcon(R.drawable.ic_folder_black_24dp);
+			menuItem.setIcon(R.drawable.ic_folder_24dp);
 			menuItem.setCheckable(true);
 		}
 
@@ -161,6 +157,48 @@ public class NavigationActivity extends ArtcodeActivityBase implements
 				final BaseAdapter wrapped = (BaseAdapter) adapter.getWrappedAdapter();
 				wrapped.notifyDataSetChanged();
 			}
+		}
+
+		getServer().loadRecent(new LoadCallback<List<String>>()
+		{
+			@Override
+			public void loaded(List<String> item)
+			{
+				MenuItem recent = menu.findItem(R.id.nav_recent);
+				if (recent != null)
+				{
+					recent.setVisible(!item.isEmpty());
+				}
+			}
+		});
+		getServer().loadStarred(new LoadCallback<List<String>>()
+		{
+			@Override
+			public void loaded(List<String> item)
+			{
+				MenuItem starred = menu.findItem(R.id.nav_starred);
+				if (starred != null)
+				{
+					starred.setVisible(!item.isEmpty());
+				}
+			}
+		});
+	}
+
+	public void navigate(Fragment fragment, boolean addToBackStack)
+	{
+		if(addToBackStack)
+		{
+			getSupportFragmentManager().beginTransaction()
+					.replace(R.id.content, fragment)
+					.addToBackStack(null)
+					.commit();
+		}
+		else
+		{
+			getSupportFragmentManager().beginTransaction()
+					.replace(R.id.content, fragment)
+					.commit();
 		}
 	}
 
@@ -189,6 +227,12 @@ public class NavigationActivity extends ArtcodeActivityBase implements
 	protected void onCreate(final Bundle savedInstanceState)
 	{
 		super.onCreate(savedInstanceState);
+		if(Feature.get(this, R.bool.feature_show_welcome).isEnabled())
+		{
+			startActivity(new Intent(this, AboutArtcodesActivity.class));
+			return;
+		}
+
 		binding = DataBindingUtil.setContentView(this, R.layout.navigation);
 
 		setSupportActionBar(binding.toolbar);
@@ -228,7 +272,7 @@ public class NavigationActivity extends ArtcodeActivityBase implements
 				updateAccounts();
 			}
 		};
-		binding.drawer.setDrawerListener(drawerToggle);
+		binding.drawer.addDrawerListener(drawerToggle);
 
 		drawerToggle.syncState();
 
@@ -242,7 +286,8 @@ public class NavigationActivity extends ArtcodeActivityBase implements
 		{
 			item = binding.navigation.getMenu().findItem(R.id.nav_home);
 		}
-		onNavigationItemSelected(item);
+
+		navigate(item, false);
 	}
 
 	@Override
@@ -274,11 +319,11 @@ public class NavigationActivity extends ArtcodeActivityBase implements
 							public void run()
 							{
 								updateAccounts();
-								Bundle bundle = new Bundle();
+								final Bundle bundle = new Bundle();
 								bundle.putString("account", account.getId());
-								Fragment fragment = new ExperienceLibraryFragment();
+								final Fragment fragment = new ExperienceLibraryFragment();
 								fragment.setArguments(bundle);
-								getSupportFragmentManager().beginTransaction().replace(R.id.content, fragment).commit();
+								navigate(fragment, true);
 							}
 						});
 					}
@@ -296,37 +341,44 @@ public class NavigationActivity extends ArtcodeActivityBase implements
 		}).start();
 	}
 
-	private void navigate(MenuItem item)
+	private void navigate(MenuItem item, boolean addToBackStack)
 	{
-		binding.toolbar.setTitle(item.getTitle());
 		switch (item.getItemId())
 		{
 			case R.id.nav_home:
-				getSupportFragmentManager().beginTransaction().replace(R.id.content, new ExperienceRecommendFragment()).commit();
+				navigate(new ExperienceRecommendFragment(), addToBackStack);
 				break;
 
 			case R.id.nav_starred:
-				getSupportFragmentManager().beginTransaction().replace(R.id.content, new ExperienceStarFragment()).commit();
+				navigate(new ExperienceStarFragment(), addToBackStack);
 				break;
 
 			case R.id.nav_features:
-				getSupportFragmentManager().beginTransaction().replace(R.id.content, new FeatureListFragment()).commit();
+				navigate(new FeatureListFragment(), addToBackStack);
+				break;
+
+			case R.id.nav_recent:
+				navigate(new ExperienceRecentFragment(), addToBackStack);
 				break;
 
 			case R.id.nav_about_artcodes:
-				startActivity(new Intent(this, AboutArtcodeActivity.class));
+				startActivity(new Intent(this, AboutArtcodesActivity.class));
+				break;
+
+			case R.id.nav_addaccount:
+				startActivityForResult(AccountPicker.newChooseAccountIntent(null, null, new String[]{GoogleAuthUtil.GOOGLE_ACCOUNT_TYPE}, true, null, null, null, null), REQUEST_CODE_PICK_ACCOUNT);
 				break;
 
 			default:
-				List<Account> accounts = getServer().getAccounts();
+				final List<Account> accounts = getServer().getAccounts();
 				if (item.getItemId() < accounts.size())
 				{
-					Account account = accounts.get(item.getItemId());
+					final Account account = accounts.get(item.getItemId());
 					Bundle bundle = new Bundle();
 					bundle.putString("account", account.getId());
-					Fragment fragment = new ExperienceLibraryFragment();
+					final Fragment fragment = new ExperienceLibraryFragment();
 					fragment.setArguments(bundle);
-					getSupportFragmentManager().beginTransaction().replace(R.id.content, fragment).commit();
+					navigate(fragment, addToBackStack);
 				}
 				break;
 		}

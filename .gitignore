@@ -1,11 +1,9 @@
 .idea/
 .gradle/
 build/
+
 gradle.properties
 local.properties
-*.keystore
-EndpointConstants.java
 
 src/main/res/values/keys.xml
-
 src/main/res/xml/app_tracker.xml

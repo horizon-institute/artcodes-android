@@ -1,7 +1,7 @@
 /*
  * Artcodes recognises a different marker scheme that allows the
  * creation of aesthetically pleasing, even beautiful, codes.
- * Copyright (C) 2013-2015  The University of Nottingham
+ * Copyright (C) 2013-2016  The University of Nottingham
  *
  *     This program is free software: you can redistribute it and/or modify
  *     it under the terms of the GNU Affero General Public License as published
@@ -17,99 +17,101 @@
  *     along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 buildscript {
-    repositories {
-        jcenter()
-    }
-    dependencies {
-        classpath 'com.android.tools.build:gradle:1.5.0'
-    }
+	repositories {
+		jcenter()
+	}
+	dependencies {
+		classpath 'com.android.tools.build:gradle:1.5.0'
+	}
 }
 
 apply plugin: 'idea'
 apply plugin: 'com.android.application'
 
 repositories {
-    jcenter()
-    maven { url 'https://raw.github.com/vRallev/mvn-repo/master/' }
+	jcenter()
+	maven { url 'https://raw.github.com/vRallev/mvn-repo/master/' }
 }
 
 dependencies {
-    compile project(':artcodes-scanner')
-    compile 'com.android.support:customtabs:23.1.1'
-    compile 'com.android.support:appcompat-v7:23.1.1'
-    compile 'com.android.support:cardview-v7:23.1.1'
-    compile 'com.android.support:recyclerview-v7:23.1.1'
-    compile 'com.google.android.gms:play-services-base:8.4.0'
-    compile 'com.google.android.gms:play-services-location:8.4.0'
-    compile 'com.google.android.gms:play-services-analytics:8.4.0'
-    compile 'com.google.android.gms:play-services-identity:8.4.0'
-    compile 'com.google.android.gms:play-services-auth:8.4.0'
-    compile 'fr.avianey.com.viewpagerindicator:library:2.4.1@aar'
-    compile 'com.squareup.picasso:picasso:2.5.2'
-    compile 'com.squareup.okhttp3:okhttp:3.0.1'
+	compile project(':artcodes-scanner')
+	compile 'com.android.support:appcompat-v7:23.2.0'
+	compile 'com.android.support:design:23.2.0'
+	compile 'com.android.support:cardview-v7:23.2.0'
+	compile 'com.android.support:customtabs:23.2.0'
+	compile 'com.android.support:palette-v7:23.2.0'
+	compile 'com.android.support:recyclerview-v7:23.2.0'
+	compile 'com.google.android.gms:play-services-base:8.4.0'
+	compile 'com.google.android.gms:play-services-location:8.4.0'
+	compile 'com.google.android.gms:play-services-analytics:8.4.0'
+	compile 'com.google.android.gms:play-services-identity:8.4.0'
+	compile 'com.google.android.gms:play-services-auth:8.4.0'
+	compile 'fr.avianey.com.viewpagerindicator:library:2.4.1@aar'
+	compile 'com.squareup.picasso:picasso:2.5.2'
+	compile 'com.squareup.okhttp3:okhttp:3.2.0'
 }
 
 android {
-    compileSdkVersion 23
-    buildToolsVersion '23.0.2'
+	compileSdkVersion 23
+	buildToolsVersion '23.0.2'
 
-    dataBinding {
-        enabled = true
-    }
+	dataBinding {
+		enabled = true
+	}
 
-    signingConfigs {
-        release {
-            storeFile file(project.property('keystore'))
-            storePassword project.property('keystore.password')
-            keyAlias project.property('key.alias')
-            keyPassword project.property('key.password')
-        }
-    }
+	signingConfigs {
+		release {
+			storeFile file(project.property('keystore'))
+			storePassword project.property('keystore.password')
+			keyAlias project.property('key.alias')
+			keyPassword project.property('key.password')
+		}
+	}
 
-    buildTypes {
-        release {
-            signingConfig signingConfigs.release
-        }
-        debug {
-            signingConfig signingConfigs.release
-        }
-    }
+	buildTypes {
+		release {
+			signingConfig signingConfigs.release
+		}
+		debug {
+			signingConfig signingConfigs.release
+		}
+	}
 
-    defaultConfig {
-        applicationId "uk.ac.horizon.aestheticodes"
-        versionName '3.0'
-        versionCode 400048
-        minSdkVersion 15
-        targetSdkVersion 23
-        signingConfig signingConfigs.release
-    }
+	defaultConfig {
+		applicationId "uk.ac.horizon.aestheticodes"
+		versionName '3.1.1'
+		versionCode 400051
+		minSdkVersion 15
+		targetSdkVersion 23
+		signingConfig signingConfigs.release
+	}
 
-    lintOptions {
-        abortOnError false
-    }
+	lintOptions {
+		abortOnError false
+	}
 
-    splits {
-        abi {
-            enable true
-            reset()
-            include 'x86', 'armeabi', 'armeabi-v7a', 'mips'
-        }
-    }
-    // map for the version code
-    project.ext.versionCodes = [armeabi: 1, 'armeabi-v7a': 2, mips: 3, x86: 4]
-    android.applicationVariants.all { variant ->
-        // assign different version code for each output
-        variant.outputs.each { output ->
-            output.versionCodeOverride =
-                    project.ext.versionCodes.get(output.getFilter(com.android.build.OutputFile.ABI), 0) + (defaultConfig.versionCode * 10)
-        }
-    }
-    compileOptions {
-        sourceCompatibility JavaVersion.VERSION_1_7
-        targetCompatibility JavaVersion.VERSION_1_7
-    }
+	splits {
+		abi {
+			enable true
+			reset()
+			include 'x86', 'armeabi', 'armeabi-v7a', 'mips'
+		}
+	}
+	// map for the version code
+	project.ext.versionCodes = [armeabi: 1, 'armeabi-v7a': 2, mips: 3, x86: 4]
+	android.applicationVariants.all { variant ->
+		// assign different version code for each output
+		variant.outputs.each { output ->
+			output.versionCodeOverride =
+					project.ext.versionCodes.get(output.getFilter(com.android.build.OutputFile.ABI), 0) + (defaultConfig.versionCode * 10)
+		}
+	}
+	compileOptions {
+		sourceCompatibility JavaVersion.VERSION_1_7
+		targetCompatibility JavaVersion.VERSION_1_7
+	}
 }
 
 task wrapper(type: Wrapper) {
-    gradleVersion = '2.10'
+	gradleVersion = '2.11'
 }

@@ -1,7 +1,7 @@
 /*
  * Artcodes recognises a different marker scheme that allows the
  * creation of aesthetically pleasing, even beautiful, codes.
- * Copyright (C) 2013-2015  The University of Nottingham
+ * Copyright (C) 2013-2016  The University of Nottingham
  *
  *     This program is free software: you can redistribute it and/or modify
  *     it under the terms of the GNU Affero General Public License as published
@@ -19,15 +19,24 @@
 
 package uk.ac.horizon.artcodes.ui;
 
+import android.annotation.TargetApi;
+import android.content.res.ColorStateList;
 import android.databinding.BindingAdapter;
+import android.graphics.Bitmap;
+import android.graphics.Color;
+import android.graphics.drawable.Drawable;
 import android.net.Uri;
 import android.os.Build;
+import android.support.v7.graphics.Palette;
+import android.support.v7.widget.RecyclerView;
+import android.view.View;
 import android.widget.Button;
 import android.widget.EditText;
 import android.widget.ImageView;
 import android.widget.TextView;
 
 import com.squareup.picasso.Picasso;
+import com.squareup.picasso.Target;
 
 import java.text.SimpleDateFormat;
 import java.util.Calendar;
@@ -40,9 +49,8 @@ public final class Bindings
 	private static final SimpleDateFormat dateFormatYear = new SimpleDateFormat("d MMMM yyyy", Locale.US);
 
 	@BindingAdapter("imageUrl")
-	public static void bindImageURL(final ImageView view, String url)
+	public static void bindImageURL(final ImageView view, final String url)
 	{
-		// TODO Placeholder?
 		if (url != null)
 		{
 			if (url.startsWith("content:") || url.startsWith("file:"))
@@ -51,12 +59,72 @@ public final class Bindings
 			}
 			else
 			{
-				Picasso.with(view.getContext()).load(url).into(view);
+				Picasso.with(view.getContext())
+						.load(url)
+						.into(view);
 			}
 		}
 		else
 		{
 			view.setImageBitmap(null);
+		}
+	}
+
+	@BindingAdapter("backgroundTintURL")
+	public static void bindBackgroundTintURL(final View view, String url)
+	{
+		if (url != null)
+		{
+			if (url.startsWith("content:") || url.startsWith("file:"))
+			{
+				//view.setImageURI(Uri.parse(url));
+			}
+			else
+			{
+				Picasso.with(view.getContext()).load(url).into(new Target()
+				{
+					@Override
+					public void onBitmapLoaded(Bitmap bitmap, Picasso.LoadedFrom from)
+					{
+						if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.LOLLIPOP)
+						{
+							Palette.from(bitmap).generate(new Palette.PaletteAsyncListener()
+							{
+								@TargetApi(Build.VERSION_CODES.LOLLIPOP)
+								public void onGenerated(Palette p)
+								{
+									int color = p.getDarkMutedColor(Color.BLACK);
+									if (color != Color.BLACK)
+									{
+										view.setBackgroundTintList(ColorStateList.valueOf(color));
+									}
+								}
+							});
+						}
+					}
+
+					@Override
+					public void onBitmapFailed(Drawable errorDrawable)
+					{
+					}
+
+					@Override
+					public void onPrepareLoad(Drawable placeHolderDrawable)
+					{
+
+					}
+				});
+			}
+		}
+	}
+
+	@BindingAdapter("decoration")
+	public static void setDecoration(RecyclerView view, RecyclerView.ItemDecoration itemDecoration)
+	{
+		view.invalidateItemDecorations();
+		if(itemDecoration != null)
+		{
+			view.addItemDecoration(itemDecoration);
 		}
 	}
 
@@ -160,6 +228,10 @@ public final class Bindings
 		if (timestamp != null)
 		{
 			view.setText(getDate(timestamp));
+		}
+		else
+		{
+			view.setText(null);
 		}
 	}
 }

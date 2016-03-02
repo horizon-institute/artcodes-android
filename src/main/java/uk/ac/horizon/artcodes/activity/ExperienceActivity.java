@@ -1,7 +1,7 @@
 /*
  * Artcodes recognises a different marker scheme that allows the
  * creation of aesthetically pleasing, even beautiful, codes.
- * Copyright (C) 2013-2015  The University of Nottingham
+ * Copyright (C) 2013-2016  The University of Nottingham
  *
  *     This program is free software: you can redistribute it and/or modify
  *     it under the terms of the GNU Affero General Public License as published
@@ -46,7 +46,7 @@ import uk.ac.horizon.artcodes.R;
 import uk.ac.horizon.artcodes.account.Account;
 import uk.ac.horizon.artcodes.databinding.AccountItemBinding;
 import uk.ac.horizon.artcodes.databinding.ExperienceBinding;
-import uk.ac.horizon.artcodes.databinding.LocationBinding;
+import uk.ac.horizon.artcodes.databinding.LocationItemBinding;
 import uk.ac.horizon.artcodes.model.Availability;
 import uk.ac.horizon.artcodes.model.Experience;
 import uk.ac.horizon.artcodes.server.LoadCallback;
@@ -90,16 +90,31 @@ public class ExperienceActivity extends ExperienceActivityBase
 			{
 				if (binding.experienceDescription.getLineCount() > 1)
 				{
-					binding.experienceDescription.getViewTreeObserver().removeOnGlobalLayoutListener(this);
-					Layout layout = binding.experienceDescription.getLayout();
+					if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.JELLY_BEAN)
+					{
+						binding.experienceDescription.getViewTreeObserver().removeOnGlobalLayoutListener(this);
+					}
+					final Layout layout = binding.experienceDescription.getLayout();
 					if (layout != null)
 					{
-						int lines = layout.getLineCount();
-						if (lines > 0)
+						final int lines = layout.getLineCount();
+						int ellipsisCount = 0;
+						for (int index = 0; index < lines; index++)
 						{
-							int ellipsisCount = layout.getEllipsisCount(lines - 1);
-							if (ellipsisCount == 0)
+							ellipsisCount += layout.getEllipsisCount(index);
+						}
+
+						Log.i("Ellipsis", "Lines = " + lines + ", ellipsis = " + ellipsisCount);
+						if (ellipsisCount == 0)
+						{
+							binding.experienceDescriptionMore.setVisibility(View.GONE);
+						}
+						else
+						{
+							final int lineChars = layout.getLineStart(1);
+							if (ellipsisCount < (lineChars * 2))
 							{
+								binding.experienceDescription.setMaxLines(Integer.MAX_VALUE);
 								binding.experienceDescriptionMore.setVisibility(View.GONE);
 							}
 							else
@@ -109,6 +124,10 @@ public class ExperienceActivity extends ExperienceActivityBase
 						}
 					}
 				}
+				else
+				{
+					binding.experienceDescriptionMore.setVisibility(View.GONE);
+				}
 			}
 		});
 
@@ -117,7 +136,7 @@ public class ExperienceActivity extends ExperienceActivityBase
 		{
 			if (availability.getName() != null && availability.getLat() != null && availability.getLon() != null)
 			{
-				final LocationBinding locationBinding = LocationBinding.inflate(getLayoutInflater(), binding.experienceLocations, false);
+				final LocationItemBinding locationBinding = LocationItemBinding.inflate(getLayoutInflater(), binding.experienceLocations, false);
 				locationBinding.setAvailability(availability);
 				locationBinding.getRoot().setOnClickListener(new View.OnClickListener()
 				{
@@ -134,7 +153,21 @@ public class ExperienceActivity extends ExperienceActivityBase
 			}
 		}
 
-		if(updateActions())
+//		if(experience.getOriginalID() != null)
+//		{
+//			getServer().loadExperience(experience.getOriginalID(), new LoadCallback<Experience>()
+//			{
+//				@Override
+//				public void loaded(Experience item)
+//				{
+//					TextView view = new TextView(ExperienceActivity.this);
+//					view.setText("Copy of " + item.getName());
+//					binding.experienceLocations.addView(view);
+//				}
+//			});
+//		}
+
+		if (updateActions())
 		{
 			LocalBroadcastManager.getInstance(this).registerReceiver(new BroadcastReceiver()
 			{
@@ -149,35 +182,6 @@ public class ExperienceActivity extends ExperienceActivityBase
 			}, new IntentFilter(getUri()));
 		}
 		updateStarred();
-	}
-
-	private boolean updateActions()
-	{
-		boolean copiable = false;
-		boolean editable = false;
-		boolean saving = false;
-		for (Account account : getServer().getAccounts())
-		{
-			if (account.canEdit(getUri()))
-			{
-				editable = true;
-			}
-			else
-			{
-				copiable = true;
-			}
-
-			if (account.isSaving(getUri()))
-			{
-				saving = true;
-			}
-		}
-
-		setVisible(binding.experienceEditButton, editable);
-		setVisible(binding.experienceCopyButton, copiable);
-		setVisible(binding.saveProgress, saving);
-		setVisible(binding.buttonBar, !saving);
-		return saving;
 	}
 
 	public void readDescription(View view)
@@ -251,8 +255,13 @@ public class ExperienceActivity extends ExperienceActivityBase
 					public void onClick(View v)
 					{
 						dialog.dismiss();
-						// TODO !!
 						final Experience experience = getExperience();
+						if (experience.getId() != null && (experience.getId().startsWith("http://") || experience.getId().startsWith("https://")))
+						{
+							experience.setOriginalID(experience.getId());
+						}
+						experience.setId(null);
+						experience.setName(getString(R.string.copy_of, experience.getName()));
 						account.saveExperience(experience);
 						ExperienceActivity.start(ExperienceActivity.this, experience);
 					}
@@ -287,7 +296,37 @@ public class ExperienceActivity extends ExperienceActivityBase
 		if (getSupportActionBar() != null)
 		{
 			getSupportActionBar().setDisplayHomeAsUpEnabled(true);
+			getSupportActionBar().setDisplayShowTitleEnabled(false);
 		}
+	}
+
+	private boolean updateActions()
+	{
+		boolean copiable = false;
+		boolean editable = false;
+		boolean saving = false;
+		for (Account account : getServer().getAccounts())
+		{
+			if (account.canEdit(getUri()))
+			{
+				editable = true;
+			}
+			else
+			{
+				copiable = true;
+			}
+
+			if (account.isSaving(getUri()))
+			{
+				saving = true;
+			}
+		}
+
+		setVisible(binding.experienceEditButton, editable);
+		setVisible(binding.experienceCopyButton, copiable);
+		setVisible(binding.saveProgress, saving);
+		setVisible(binding.buttonBar, !saving);
+		return saving;
 	}
 
 	private Account getAccount()

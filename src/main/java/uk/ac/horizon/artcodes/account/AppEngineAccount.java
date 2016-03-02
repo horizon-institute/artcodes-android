@@ -1,7 +1,7 @@
 /*
  * Artcodes recognises a different marker scheme that allows the
  * creation of aesthetically pleasing, even beautiful, codes.
- * Copyright (C) 2013-2015  The University of Nottingham
+ * Copyright (C) 2013-2016  The University of Nottingham
  *
  *     This program is free software: you can redistribute it and/or modify
  *     it under the terms of the GNU Affero General Public License as published
@@ -36,7 +36,10 @@ import java.util.List;
 import java.util.Map;
 import java.util.UUID;
 
+import okhttp3.FormBody;
+import okhttp3.Headers;
 import okhttp3.Request;
+import okhttp3.RequestBody;
 import okhttp3.Response;
 import uk.ac.horizon.artcodes.Artcodes;
 import uk.ac.horizon.artcodes.GoogleAnalytics;
@@ -117,16 +120,18 @@ public class AppEngineAccount implements Account
 					try
 					{
 						String url = uri.replace(httpRoot, httpsRoot);
-						final Request.Builder builder = new Request.Builder()
+						final Request request = new Request.Builder()
 								.get()
-								.url(url);
-						authenticate(builder);
-						final Request request = builder.build();
+								.url(url)
+								.headers(getHeaders())
+								.build();
+
 						final Response response = Artcodes.httpClient.newCall(request).execute();
 
 						if (validResponse(request, response))
 						{
 							callback.onLoaded(response.body().charStream());
+							response.body().close();
 						}
 					}
 					catch (Exception e)
@@ -174,12 +179,12 @@ public class AppEngineAccount implements Account
 			{
 				try
 				{
-					final Request.Builder builder = new Request.Builder();
-					builder.url(experience.getId());
-					builder.delete();
-					authenticate(builder);
+					final Request request = new Request.Builder()
+							.delete()
+							.url(experience.getId())
+							.headers(getHeaders())
+							.build();
 
-					final Request request = builder.build();
 					final Response response = Artcodes.httpClient.newCall(request).execute();
 					if (validResponse(request, response))
 					{
@@ -241,6 +246,67 @@ public class AppEngineAccount implements Account
 		return false;
 	}
 
+	@Override
+	public boolean logScan(final String uri)
+	{
+		if (uri != null && (uri.startsWith("http:") || (uri.startsWith("https:"))))
+		{
+			new Thread(new Runnable()
+			{
+				@Override
+				public void run()
+				{
+					try
+					{
+						final RequestBody body = new FormBody.Builder()
+								.add("experience", uri)
+								.build();
+
+						final Request request = new Request.Builder()
+								.post(body)
+								.url("https://aestheticodes.appspot.com/interaction")
+								.headers(getHeaders())
+								.build();
+
+						final Response response = Artcodes.httpClient.newCall(request).execute();
+						if (validResponse(request, response))
+						{
+							// TODO
+						}
+					}
+					catch (Exception e)
+					{
+						GoogleAnalytics.trackException(e);
+					}
+				}
+			}).start();
+			return true;
+		}
+		return false;
+	}
+
+	Headers getHeaders()
+	{
+		final Headers.Builder headers = new Headers.Builder();
+
+		headers.set("User-Agent", Artcodes.userAgent);
+
+		try
+		{
+			String token = getToken();
+			if (token != null)
+			{
+				headers.set("Authorization", "Bearer " + token);
+			}
+		}
+		catch (Exception e)
+		{
+			GoogleAnalytics.trackException(e);
+		}
+
+		return headers.build();
+	}
+
 	Gson getGson()
 	{
 		return gson;
@@ -279,21 +345,6 @@ public class AppEngineAccount implements Account
 		return true;
 	}
 
-	void authenticate(Request.Builder builder)
-	{
-		try
-		{
-			String token = getToken();
-			if (token != null)
-			{
-				builder.header("Authorization", "Bearer " + token);
-			}
-		}
-		catch (Exception e)
-		{
-			GoogleAnalytics.trackException(e);
-		}
-	}
 
 	private String getToken() throws IOException, GoogleAuthException
 	{

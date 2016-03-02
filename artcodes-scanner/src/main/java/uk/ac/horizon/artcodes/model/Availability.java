@@ -1,7 +1,7 @@
 /*
  * Artcodes recognises a different marker scheme that allows the
  * creation of aesthetically pleasing, even beautiful, codes.
- * Copyright (C) 2013-2015  The University of Nottingham
+ * Copyright (C) 2013-2016  The University of Nottingham
  *
  *     This program is free software: you can redistribute it and/or modify
  *     it under the terms of the GNU Affero General Public License as published
@@ -69,12 +69,12 @@ public class Availability extends BaseObservable
 		return lat;
 	}
 
-	public void setLat(double lat)
+	public void setLat(Double lat)
 	{
 		this.lat = lat;
 	}
 
-	public void setLat(Double lat)
+	public void setLat(double lat)
 	{
 		this.lat = lat;
 	}
@@ -84,12 +84,12 @@ public class Availability extends BaseObservable
 		return lon;
 	}
 
-	public void setLon(double lon)
+	public void setLon(Double lon)
 	{
 		this.lon = lon;
 	}
 
-	public void setLon(Double lon)
+	public void setLon(double lon)
 	{
 		this.lon = lon;
 	}

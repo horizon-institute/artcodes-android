@@ -3,7 +3,7 @@
 <!--
   ~ Artcodes recognises a different marker scheme that allows the
   ~ creation of aesthetically pleasing, even beautiful, codes.
-  ~ Copyright (C) 2013-2015  The University of Nottingham
+  ~ Copyright (C) 2013-2016  The University of Nottingham
   ~
   ~     This program is free software: you can redistribute it and/or modify
   ~     it under the terms of the GNU Affero General Public License as published
@@ -23,118 +23,156 @@
         xmlns:tools="http://schemas.android.com/tools"
         tools:context=".activities.ScannerActivity">
 
-    <data>
+	<data>
 
-        <import type="android.view.View"/>
+		<import type="android.view.View"/>
 
-        <variable
-            name="experience"
-            type="uk.ac.horizon.artcodes.model.Experience"/>
+		<variable
+			name="detector"
+			type="uk.ac.horizon.artcodes.detect.ArtcodeDetector"/>
 
-        <variable
-            name="buffers"
-            type="uk.ac.horizon.artcodes.scanner.ImageBuffers"/>
-    </data>
+		<variable
+			name="experience"
+			type="uk.ac.horizon.artcodes.model.Experience"/>
+	</data>
 
-    <FrameLayout
-        android:id="@+id/content_frame"
-        android:layout_width="match_parent"
-        android:layout_height="match_parent">
+	<FrameLayout
+		android:id="@+id/content_frame"
+		android:layout_width="match_parent"
+		android:layout_height="match_parent">
 
-        <SurfaceView
-            android:id="@+id/cameraSurface"
-            android:layout_width="fill_parent"
-            android:layout_height="fill_parent"/>
+		<uk.ac.horizon.artcodes.camera.CameraView
+			android:id="@+id/cameraView"
+			android:layout_width="fill_parent"
+			android:layout_height="fill_parent"
+			app:detector="@{detector}"/>
 
-        <LinearLayout
-            android:layout_width="fill_parent"
-            android:layout_height="fill_parent"
-            android:onClick="hideMenu"
-            android:orientation="vertical">
+		<LinearLayout
+			android:layout_width="fill_parent"
+			android:layout_height="fill_parent"
+			android:onClick="hideMenu"
+			android:orientation="vertical">
 
-            <android.support.v7.widget.Toolbar
-                android:id="@+id/toolbar"
-                android:layout_width="fill_parent"
-                android:layout_height="100dp"
-                android:layout_gravity="top"
-                android:background="@color/viewfinder_mask"
-                android:fitsSystemWindows="true"
-                android:title="@{experience.name}"
-                app:height="@{buffers.borderTop}"/>
+			<FrameLayout
+				android:layout_width="match_parent"
+				android:layout_height="100dp"
+				android:elevation="2dp"
+				android:background="@color/viewfinder_mask"
+				tools:ignore="UnusedAttribute"
+				app:height="@{detector.margin}">
+				<android.support.v7.widget.Toolbar
+					android:id="@+id/toolbar"
+					android:layout_width="fill_parent"
+					android:layout_height="wrap_content"
+					android:title="@{experience.name}"
+					app:theme="@style/ThemeOverlay.AppCompat.Dark.ActionBar"
+					app:navigationIcon="@drawable/ic_arrow_back_white_24dp"/>
+			</FrameLayout>
 
-            <android.support.design.widget.CoordinatorLayout
-                android:layout_width="fill_parent"
-                android:layout_height="0dp"
-                android:layout_weight="1">
 
-                <ImageView
-                    android:layout_width="match_parent"
-                    android:layout_height="match_parent"
-                    android:scaleType="fitXY"
-                    app:imageBitmap="@{buffers.overlayBitmap}"
-                    tools:ignore="ContentDescription"/>
+			<FrameLayout
+				android:layout_width="fill_parent"
+				android:layout_height="0dp"
+				android:layout_weight="1">
 
-                <LinearLayout
-                    android:id="@+id/settingsMenu"
-                    android:layout_width="match_parent"
-                    android:layout_height="wrap_content"
-                    android:layout_gravity="bottom"
-                    android:animateLayoutChanges="true"
-                    android:background="@color/settings_mask"
-                    android:gravity="center"
-                    android:orientation="vertical"
-                    android:visibility="invisible"
-                    tools:visibility="visible">
+				<ImageView
+					android:layout_width="match_parent"
+					android:layout_height="match_parent"
+					android:scaleType="fitXY"
+					app:imageBitmap="@{detector.overlay}"
+					tools:ignore="ContentDescription"/>
 
-                    <TextView
-                        android:id="@+id/settingsFeedback"
-                        android:layout_width="match_parent"
-                        android:layout_height="wrap_content"
-                        android:gravity="center_horizontal"
-                        android:padding="8dp"
-                        android:visibility="gone"/>
+				<LinearLayout
+					android:layout_width="wrap_content"
+					android:layout_height="wrap_content"
+					android:layout_gravity="center"
+					android:gravity="center_horizontal"
+					android:orientation="vertical"
+					android:visibility="@{detector != null &amp;&amp; detector.configured ? View.GONE : View.VISIBLE}">
 
-                    <LinearLayout
-                        android:id="@+id/settingsSwitches"
-                        android:layout_width="200dp"
-                        android:layout_height="wrap_content"
-                        android:gravity="center"
-                        android:orientation="horizontal">
-                    </LinearLayout>
-                </LinearLayout>
+					<ImageView
+						android:layout_width="wrap_content"
+						android:layout_height="wrap_content"
+						android:scaleType="center"
+						android:src="@drawable/ic_photo_camera_144dp"
+						android:tint="#222"
+						tools:ignore="ContentDescription"/>
 
-                <ImageButton
-                    android:id="@+id/settingsMenuButton"
-                    android:layout_width="48dp"
-                    android:layout_height="48dp"
-                    android:layout_gravity="bottom|end"
-                    android:layout_marginBottom="8dp"
-                    android:layout_marginEnd="8dp"
-                    android:layout_marginRight="8dp"
-                    android:background="@drawable/camera_floating_action_button"
-                    android:contentDescription="@string/display_menu"
-                    android:onClick="showMenu"
-                    android:src="@drawable/ic_more_horiz_24dp"
-                    android:tint="#FFF"/>
-            </android.support.design.widget.CoordinatorLayout>
+					<TextView
+						android:layout_width="wrap_content"
+						android:layout_height="wrap_content"
+						android:text="@string/camera_error"
+						android:textAppearance="@style/TextAppearance.AppCompat.Medium"/>
 
-            <FrameLayout
-                android:orientation="vertical"
-                android:id="@+id/bottomView"
-                android:layout_width="match_parent"
-                android:layout_height="100dp"
-                app:height="@{buffers.borderBottom}"
-                android:background="@color/viewfinder_mask"
-                android:paddingBottom="@dimen/nav_padding">
+				</LinearLayout>
 
-                <ProgressBar
-                    android:layout_width="wrap_content"
-                    android:layout_height="wrap_content"
-                    android:indeterminateTint="#555"
-                    android:indeterminateTintMode="src_in"
-                    android:id="@+id/progressBar"
-                    android:layout_gravity="center"/>
-            </FrameLayout>
-        </LinearLayout>
-    </FrameLayout>
+				<LinearLayout
+					android:id="@+id/settingsMenu"
+					android:layout_width="match_parent"
+					android:layout_height="wrap_content"
+					android:layout_gravity="bottom"
+					android:animateLayoutChanges="true"
+					android:background="@color/settings_mask"
+					android:gravity="center"
+					android:orientation="vertical"
+					android:visibility="invisible"
+					tools:visibility="visible">
+
+					<TextView
+						android:id="@+id/settingsFeedback"
+						android:layout_width="match_parent"
+						android:layout_height="wrap_content"
+						android:gravity="center_horizontal"
+						android:padding="8dp"
+						android:textAppearance="@style/TextAppearance.AppCompat.Medium"
+						android:visibility="gone"/>
+
+					<LinearLayout
+						android:id="@+id/settingsSwitches"
+						android:layout_width="300dp"
+						android:layout_height="wrap_content"
+						android:gravity="center"
+						android:orientation="horizontal">
+					</LinearLayout>
+				</LinearLayout>
+
+				<ImageButton
+					android:id="@+id/settingsMenuButton"
+					android:layout_width="48dp"
+					android:layout_height="48dp"
+					android:layout_gravity="bottom|end"
+					android:layout_marginBottom="16dp"
+					android:layout_marginEnd="16dp"
+					android:layout_marginRight="16dp"
+					android:background="@drawable/camera_floating_action_button"
+					android:elevation="2dp"
+					android:contentDescription="@string/display_menu"
+					android:onClick="showMenu"
+					android:src="@drawable/ic_more_horiz_24dp"
+					android:tint="#FFF"
+					tools:ignore="UnusedAttribute"/>
+			</FrameLayout>
+
+			<FrameLayout
+				android:id="@+id/bottomView"
+				android:layout_width="match_parent"
+				android:layout_height="100dp"
+				android:background="@color/viewfinder_mask"
+				android:elevation="2dp"
+				android:orientation="vertical"
+				android:paddingBottom="@dimen/nav_padding"
+				app:height="@{detector.margin}"
+				tools:ignore="UnusedAttribute">
+
+				<ProgressBar
+					android:id="@+id/progressBar"
+					android:layout_width="wrap_content"
+					android:layout_height="wrap_content"
+					android:layout_gravity="center"
+					android:indeterminateTintMode="src_in"
+					android:visibility="@{detector != null &amp;&amp; detector.running ? View.VISIBLE : View.GONE}"
+					tools:ignore="UnusedAttribute"/>
+			</FrameLayout>
+		</LinearLayout>
+	</FrameLayout>
 </layout>

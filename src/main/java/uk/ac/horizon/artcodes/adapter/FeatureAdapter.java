@@ -1,7 +1,7 @@
 /*
  * Artcodes recognises a different marker scheme that allows the
  * creation of aesthetically pleasing, even beautiful, codes.
- * Copyright (C) 2013-2015  The University of Nottingham
+ * Copyright (C) 2013-2016  The University of Nottingham
  *
  *     This program is free software: you can redistribute it and/or modify
  *     it under the terms of the GNU Affero General Public License as published
@@ -21,7 +21,6 @@ package uk.ac.horizon.artcodes.adapter;
 
 import android.content.Context;
 import android.support.v7.util.SortedList;
-import android.support.v7.widget.RecyclerView;
 import android.support.v7.widget.util.SortedListAdapterCallback;
 import android.view.LayoutInflater;
 import android.view.ViewGroup;
@@ -30,31 +29,18 @@ import android.widget.CompoundButton;
 import com.google.common.collect.Ordering;
 
 import uk.ac.horizon.artcodes.Feature;
-import uk.ac.horizon.artcodes.databinding.FeatureBinding;
+import uk.ac.horizon.artcodes.databinding.FeatureItemBinding;
 
-public class FeatureAdapter extends RecyclerView.Adapter<FeatureAdapter.FeatureViewHolder>
+public class FeatureAdapter extends ListAdapter<FeatureItemBinding>
 {
-	public class FeatureViewHolder extends RecyclerView.ViewHolder
-	{
-		private FeatureBinding binding;
-
-		public FeatureViewHolder(FeatureBinding binding)
-		{
-			super(binding.getRoot());
-			this.binding = binding;
-		}
-	}
-
 	private static final Ordering<String> CASE_INSENSITIVE_NULL_SAFE_ORDER =
 			Ordering.from(String.CASE_INSENSITIVE_ORDER).nullsLast();
 	private final SortedList<Feature> features;
-	private final Context context;
 
 	public FeatureAdapter(Context context)
 	{
-		super();
-		this.context = context;
-		features = new SortedList<>(Feature.class, new SortedListAdapterCallback<Feature>(this)
+		super(context);
+		features = new SortedList<>(Feature.class, new SortedListAdapterCallback<Feature>(adapter)
 		{
 			@Override
 			public boolean areContentsTheSame(Feature oldItem, Feature newItem)
@@ -82,17 +68,17 @@ public class FeatureAdapter extends RecyclerView.Adapter<FeatureAdapter.FeatureV
 	}
 
 	@Override
-	public int getItemCount()
+	public FeatureItemBinding createBinding(final ViewGroup parent, final int viewType)
 	{
-		return features.size();
+		return FeatureItemBinding.inflate(LayoutInflater.from(parent.getContext()), parent, false);
 	}
 
 	@Override
-	public void onBindViewHolder(FeatureViewHolder holder, int position)
+	public void bind(final int position, final FeatureItemBinding binding)
 	{
 		final Feature feature = features.get(position);
-		holder.binding.setFeature(feature);
-		holder.binding.featureSwitch.setOnCheckedChangeListener(new CompoundButton.OnCheckedChangeListener()
+		binding.setFeature(feature);
+		binding.featureSwitch.setOnCheckedChangeListener(new CompoundButton.OnCheckedChangeListener()
 		{
 			@Override
 			public void onCheckedChanged(CompoundButton buttonView, boolean isChecked)
@@ -103,8 +89,8 @@ public class FeatureAdapter extends RecyclerView.Adapter<FeatureAdapter.FeatureV
 	}
 
 	@Override
-	public FeatureViewHolder onCreateViewHolder(ViewGroup parent, int viewType)
+	public int getViewCount()
 	{
-		return new FeatureViewHolder(FeatureBinding.inflate(LayoutInflater.from(parent.getContext()), parent, false));
+		return features.size();
 	}
 }

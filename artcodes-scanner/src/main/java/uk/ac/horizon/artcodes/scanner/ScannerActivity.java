@@ -1,7 +1,7 @@
 /*
  * Artcodes recognises a different marker scheme that allows the
  * creation of aesthetically pleasing, even beautiful, codes.
- * Copyright (C) 2013-2015  The University of Nottingham
+ * Copyright (C) 2013-2016  The University of Nottingham
  *
  *     This program is free software: you can redistribute it and/or modify
  *     it under the terms of the GNU Affero General Public License as published
@@ -16,26 +16,39 @@
  *     You should have received a copy of the GNU Affero General Public License
  *     along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
+
 package uk.ac.horizon.artcodes.scanner;
 
 import android.Manifest;
+import android.content.Context;
 import android.content.Intent;
 import android.content.pm.PackageManager;
+import android.content.res.ColorStateList;
+import android.content.res.Configuration;
+import android.content.res.Resources;
+import android.content.res.TypedArray;
 import android.databinding.DataBindingUtil;
+import android.graphics.Color;
+import android.graphics.drawable.Drawable;
 import android.net.Uri;
 import android.os.Build;
 import android.os.Bundle;
+import android.support.annotation.ColorInt;
+import android.support.annotation.DrawableRes;
 import android.support.annotation.NonNull;
 import android.support.v4.app.ActivityCompat;
 import android.support.v4.content.ContextCompat;
+import android.support.v4.graphics.drawable.DrawableCompat;
 import android.support.v7.app.AppCompatActivity;
+import android.util.DisplayMetrics;
 import android.util.Log;
 import android.view.View;
 import android.view.WindowManager;
-import android.widget.ImageButton;
+import android.widget.ImageView;
 import android.widget.LinearLayout;
 
 import com.google.common.collect.HashMultiset;
+import com.google.common.collect.Lists;
 import com.google.common.collect.Multiset;
 
 import java.util.Collection;
@@ -43,22 +56,22 @@ import java.util.HashSet;
 import java.util.List;
 
 import uk.ac.horizon.artcodes.model.Experience;
+import uk.ac.horizon.artcodes.animator.TextAnimator;
+import uk.ac.horizon.artcodes.animator.VisibilityAnimator;
 import uk.ac.horizon.artcodes.scanner.databinding.ScannerBinding;
-import uk.ac.horizon.artcodes.scanner.detect.ExperienceFrameProcessor;
-import uk.ac.horizon.artcodes.scanner.detect.MarkerDetectionHandler;
-import uk.ac.horizon.artcodes.scanner.process.ImageProcessorSetting;
+import uk.ac.horizon.artcodes.detect.ArtcodeDetector;
+import uk.ac.horizon.artcodes.detect.MarkerDetectionHandler;
+import uk.ac.horizon.artcodes.detect.DetectorSetting;
 
 public class ScannerActivity extends AppCompatActivity implements MarkerDetectionHandler
 {
-	private static final int CAMERA_PERMISSION_REQUEST = 47;
-	protected static final int REQUIRED = 5;
+	protected static final int REQUIRED = 10;
 	protected static final int MAX = REQUIRED * 4;
-	private final ImageBuffers buffers = new ImageBuffers();
+	private static final int CAMERA_PERMISSION_REQUEST = 47;
 	private final Multiset<String> markerCounts = HashMultiset.create();
 	protected ScannerBinding binding;
-	// TODO Use binding variables?
-	protected Scanner scanner;
-	protected Experience experience;
+	private ArtcodeDetector detector;
+	private Experience experience;
 	private VisibilityAnimator menuAnimator;
 	private TextAnimator textAnimator;
 
@@ -72,17 +85,20 @@ public class ScannerActivity extends AppCompatActivity implements MarkerDetectio
 	{
 		super.onCreate(savedInstanceState);
 		getWindow().addFlags(WindowManager.LayoutParams.FLAG_KEEP_SCREEN_ON);
-		if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.JELLY_BEAN)
+		getWindow().addFlags(WindowManager.LayoutParams.FLAG_FULLSCREEN);
+
+		if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.KITKAT)
 		{
 			getWindow().getDecorView().setSystemUiVisibility(View.SYSTEM_UI_FLAG_LAYOUT_HIDE_NAVIGATION | View.SYSTEM_UI_FLAG_LAYOUT_STABLE);
 		}
 
-		scanner = new Scanner(this);
 		binding = DataBindingUtil.setContentView(this, R.layout.scanner);
-		binding.setBuffers(buffers);
-		binding.cameraSurface.getHolder().addCallback(scanner);
 		binding.progressBar.setVisibility(View.INVISIBLE);
 		setSupportActionBar(binding.toolbar);
+		if(getSupportActionBar() != null)
+		{
+			getSupportActionBar().setDisplayShowTitleEnabled(false);
+		}
 
 		if (ContextCompat.checkSelfPermission(this, Manifest.permission.CAMERA) != PackageManager.PERMISSION_GRANTED)
 		{
@@ -91,6 +107,8 @@ public class ScannerActivity extends AppCompatActivity implements MarkerDetectio
 
 		menuAnimator = new VisibilityAnimator(binding.settingsMenu, binding.settingsMenuButton);
 		textAnimator = new TextAnimator(binding.settingsFeedback);
+
+		Log.i("NAV", "Nav bar on bottom = " + isSystemBarOnBottom(this));
 	}
 
 	@Override
@@ -113,23 +131,6 @@ public class ScannerActivity extends AppCompatActivity implements MarkerDetectio
 			}
 		}
 	}
-
-	private void startScanning()
-	{
-		List<ImageProcessorSetting> settings;
-		if (experience != null)
-		{
-			Log.i("a", "Start Scanning");
-			settings = scanner.setFrameProcessor(new ExperienceFrameProcessor(buffers, experience, this));
-			binding.progressBar.setVisibility(View.VISIBLE);
-		}
-		else
-		{
-			settings = scanner.setFrameProcessor(null);
-		}
-		createSettingsUI(settings);
-	}
-
 
 	public void onMarkersDetected(Collection<String> markers)
 	{
@@ -156,12 +157,12 @@ public class ScannerActivity extends AppCompatActivity implements MarkerDetectio
 	public void loaded(Experience experience)
 	{
 		this.experience = experience;
-		binding.setExperience(experience);
 		startScanning();
 	}
 
 	public void showMenu(View view)
 	{
+		createSettingsUI(detector.getSettings());
 		menuAnimator.showView();
 	}
 
@@ -190,6 +191,21 @@ public class ScannerActivity extends AppCompatActivity implements MarkerDetectio
 		return experience;
 	}
 
+	private void startScanning()
+	{
+		if (experience != null)
+		{
+			Log.i("a", "Start Scanning");
+			detector = new ArtcodeDetector(experience, this);
+			binding.setExperience(experience);
+			binding.setDetector(detector);
+		}
+		else
+		{
+			binding.setDetector(null);
+		}
+	}
+
 	private void onCodeDetected(String markerCode)
 	{
 		Log.i("Marker", "MarkerDisplay Detected: " + markerCode);
@@ -209,30 +225,86 @@ public class ScannerActivity extends AppCompatActivity implements MarkerDetectio
 		}
 	}
 
-	private void createSettingsUI(List<ImageProcessorSetting> settings)
+	private static boolean isSystemBarOnBottom(Context ctxt)
+	{
+		final Resources res = ctxt.getResources();
+		final Configuration cfg = res.getConfiguration();
+		final DisplayMetrics dm = res.getDisplayMetrics();
+		boolean canMove = (dm.widthPixels != dm.heightPixels &&
+				cfg.smallestScreenWidthDp < 600);
+
+		return (!canMove || dm.widthPixels < dm.heightPixels);
+	}
+
+	private Drawable getTintedDrawable(@DrawableRes int drawable, @ColorInt int color)
+	{
+		final Drawable original = ContextCompat.getDrawable(this, drawable);
+		if(original != null)
+		{
+			final Drawable wrapDrawable = DrawableCompat.wrap(original);
+			DrawableCompat.setTint(wrapDrawable, color);
+			return wrapDrawable;
+		}
+		return null;
+	}
+
+	private void createSettingsUI(List<DetectorSetting> settings)
 	{
 		binding.settingsSwitches.removeAllViews();
-		if (settings != null)
+		if (settings != null && !settings.isEmpty())
 		{
-			for (final ImageProcessorSetting setting : settings)
+			final int padding = getResources().getDimensionPixelSize(R.dimen.setting_padding);
+			List<DetectorSetting> settingList = settings;
+			if (getResources().getConfiguration().orientation == Configuration.ORIENTATION_LANDSCAPE)
 			{
-				final View view = getLayoutInflater().inflate(R.layout.setting_button, binding.settingsSwitches, false);
-				final ImageButton button = (ImageButton)view.findViewById(R.id.button);
+				settingList = Lists.reverse(settings);
+			}
+			for (final DetectorSetting setting : settingList)
+			{
+				final ImageView button = new ImageView(this);
+				button.setContentDescription(getString(setting.getText()));
+				final int[] attrs = new int[]{android.R.attr.selectableItemBackground};
+				final TypedArray ta = obtainStyledAttributes(attrs);
+				final Drawable drawableFromTheme = ta.getDrawable(0);
+				ta.recycle();
+				if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.LOLLIPOP)
+				{
+					button.setImageResource(setting.getIcon());
+					button.setImageTintList(ColorStateList.valueOf(Color.WHITE));
+					button.setBackground(drawableFromTheme);
+				}
+				else
+				{
+					button.setImageDrawable(getTintedDrawable(setting.getIcon(), Color.WHITE));
+					//noinspection deprecation
+					button.setBackgroundDrawable(drawableFromTheme);
+				}
+
 				button.setOnClickListener(new View.OnClickListener()
 				{
 					@Override
 					public void onClick(View v)
 					{
 						setting.nextValue();
-						button.setImageResource(setting.getIcon());
+						if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.LOLLIPOP)
+						{
+							button.setImageResource(setting.getIcon());
+						}
+						else
+						{
+							button.setImageDrawable(getTintedDrawable(setting.getIcon(), Color.WHITE));
+						}
+						button.setContentDescription(getString(setting.getText()));
 						textAnimator.setText(setting.getText());
 					}
 				});
-				button.setImageResource(setting.getIcon());
 				final LinearLayout.LayoutParams params = new LinearLayout.LayoutParams(LinearLayout.LayoutParams.WRAP_CONTENT, LinearLayout.LayoutParams.WRAP_CONTENT, 1);
+				params.weight = 1;
 				button.setLayoutParams(params);
 				binding.settingsSwitches.addView(button);
+				button.setPadding(padding, padding, padding, padding);
 			}
+
 		}
 
 		if (binding.settingsSwitches.getChildCount() > 0)

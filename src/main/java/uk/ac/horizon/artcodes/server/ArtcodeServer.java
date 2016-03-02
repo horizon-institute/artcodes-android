@@ -1,7 +1,7 @@
 /*
  * Artcodes recognises a different marker scheme that allows the
  * creation of aesthetically pleasing, even beautiful, codes.
- * Copyright (C) 2013-2015  The University of Nottingham
+ * Copyright (C) 2013-2016  The University of Nottingham
  *
  *     This program is free software: you can redistribute it and/or modify
  *     it under the terms of the GNU Affero General Public License as published
@@ -27,7 +27,6 @@ import java.util.Map;
 import uk.ac.horizon.artcodes.account.Account;
 import uk.ac.horizon.artcodes.model.Action;
 import uk.ac.horizon.artcodes.model.Experience;
-import uk.ac.horizon.artcodes.scanner.Scanner;
 
 public interface ArtcodeServer
 {
@@ -51,5 +50,5 @@ public interface ArtcodeServer
 
 	void loadStarred(LoadCallback<List<String>> callback);
 
-	void logScan(String uri, Action action, Scanner adapter);
+	void logScan(String uri, Action action);
 }

@@ -2,7 +2,7 @@
 <!--
   ~ Artcodes recognises a different marker scheme that allows the
   ~ creation of aesthetically pleasing, even beautiful, codes.
-  ~ Copyright (C) 2013-2015  The University of Nottingham
+  ~ Copyright (C) 2013-2016  The University of Nottingham
   ~
   ~     This program is free software: you can redistribute it and/or modify
   ~     it under the terms of the GNU Affero General Public License as published
@@ -22,24 +22,24 @@
         xmlns:tools="http://schemas.android.com/tools"
         tools:context="uk.ac.horizon.artcodes.activity.ArtcodeActivity">
 
-    <data>
+	<data>
 
-        <import type="android.view.View"/>
+		<import type="android.view.View"/>
 
-        <variable
-            name="action"
-            type="uk.ac.horizon.artcodes.model.Action"/>
-    </data>
+		<variable
+			name="action"
+			type="uk.ac.horizon.artcodes.model.Action"/>
+	</data>
 
-    <Button
-        style="@style/Widget.AppCompat.ActionButton"
-        android:layout_width="match_parent"
-        android:layout_height="match_parent"
-        android:padding="16dp"
-        android:text="@{action.name ?? action.displayUrl}"
-        android:textAppearance="@style/TextAppearance.AppCompat.Title"
-        android:visibility="invisible"
-        android:textColor="@color/apptheme_accent_light"
-        tools:text="Marker Blah"
-        tools:visibility="visible"/>
+	<Button
+		style="@style/Widget.AppCompat.ActionButton"
+		android:layout_width="match_parent"
+		android:layout_height="match_parent"
+		android:padding="16dp"
+		android:text="@{action.name ?? action.displayUrl}"
+		android:textAppearance="@style/TextAppearance.AppCompat.Title"
+		android:textColor="@color/apptheme_accent_light"
+		android:visibility="invisible"
+		tools:text="Marker Blah"
+		tools:visibility="visible"/>
 </layout>

@@ -1,7 +1,7 @@
 /*
  * Artcodes recognises a different marker scheme that allows the
  * creation of aesthetically pleasing, even beautiful, codes.
- * Copyright (C) 2013-2015  The University of Nottingham
+ * Copyright (C) 2013-2016  The University of Nottingham
  *
  *     This program is free software: you can redistribute it and/or modify
  *     it under the terms of the GNU Affero General Public License as published
@@ -22,7 +22,6 @@ package uk.ac.horizon.artcodes.fragment;
 import android.os.Bundle;
 import android.support.annotation.Nullable;
 import android.support.v4.app.Fragment;
-import android.support.v7.widget.LinearLayoutManager;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -33,7 +32,7 @@ import uk.ac.horizon.artcodes.Feature;
 import uk.ac.horizon.artcodes.GoogleAnalytics;
 import uk.ac.horizon.artcodes.R;
 import uk.ac.horizon.artcodes.adapter.FeatureAdapter;
-import uk.ac.horizon.artcodes.databinding.FeatureListBinding;
+import uk.ac.horizon.artcodes.databinding.ListBinding;
 
 public class FeatureListFragment extends Fragment
 {
@@ -41,11 +40,9 @@ public class FeatureListFragment extends Fragment
 	@Override
 	public View onCreateView(LayoutInflater inflater, ViewGroup container, Bundle savedInstanceState)
 	{
-		FeatureListBinding binding = FeatureListBinding.inflate(inflater, container, false);
-
-		binding.list.setLayoutManager(new LinearLayoutManager(getActivity()));
+		ListBinding binding = ListBinding.inflate(inflater, container, false);
 		final FeatureAdapter adapter = new FeatureAdapter(getActivity());
-		binding.list.setAdapter(adapter);
+		binding.setAdapter(adapter);
 
 		final R.bool features = new R.bool();
 		final Field[] fields = features.getClass().getDeclaredFields();

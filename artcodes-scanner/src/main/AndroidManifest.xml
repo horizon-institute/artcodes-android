@@ -2,7 +2,7 @@
 <!--
   ~ Artcodes recognises a different marker scheme that allows the
   ~ creation of aesthetically pleasing, even beautiful, codes.
-  ~ Copyright (C) 2013-2015  The University of Nottingham
+  ~ Copyright (C) 2013-2016  The University of Nottingham
   ~
   ~     This program is free software: you can redistribute it and/or modify
   ~     it under the terms of the GNU Affero General Public License as published
@@ -20,24 +20,43 @@
 <manifest package="uk.ac.horizon.artcodes.scanner"
           xmlns:android="http://schemas.android.com/apk/res/android">
 
-    <uses-permission android:name="android.permission.CAMERA"/>
+	<uses-permission android:name="android.permission.CAMERA"/>
 
-    <uses-feature
-        android:name="android.hardware.camera"
-        android:required="false"/>
-    <uses-feature
-        android:name="android.hardware.camera.any"
-        android:required="false"/>
-    <uses-feature
-        android:name="android.hardware.camera.front"
-        android:required="false"/>
-    <uses-feature
-        android:name="android.hardware.camera.autofocus"
-        android:required="false"/>
-    <uses-feature
-        android:name="android.hardware.camera.flash"
-        android:required="false"/>
-    <uses-feature android:name="android.hardware.touchscreen"/>
+	<uses-feature
+		android:name="android.hardware.camera"
+		android:required="false"/>
+	<uses-feature
+		android:name="android.hardware.camera.any"
+		android:required="false"/>
+	<uses-feature
+		android:name="android.hardware.camera.front"
+		android:required="false"/>
+	<uses-feature
+		android:name="android.hardware.camera.autofocus"
+		android:required="false"/>
+	<uses-feature
+		android:name="android.hardware.camera.flash"
+		android:required="false"/>
+	<uses-feature android:name="android.hardware.touchscreen"/>
 
+	<application>
+		<activity
+			android:name=".ScannerActivity"
+			android:theme="@style/Theme.Artcodes.Camera">
+			<intent-filter>
+				<action android:name="uk.ac.horizon.aestheticodes.SCAN"/>
+
+				<category android:name="android.intent.category.DEFAULT"/>
+			</intent-filter>
+			<intent-filter>
+				<action android:name="android.intent.action.VIEW"/>
+
+				<category android:name="android.intent.category.DEFAULT"/>
+				<category android:name="android.intent.category.BROWSABLE"/>
+
+				<data android:scheme="@string/artcode_scan_scheme"/>
+			</intent-filter>
+		</activity>
+	</application>
 </manifest>
-            
+

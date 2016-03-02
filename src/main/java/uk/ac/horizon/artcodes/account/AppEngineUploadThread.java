@@ -1,7 +1,7 @@
 /*
  * Artcodes recognises a different marker scheme that allows the
  * creation of aesthetically pleasing, even beautiful, codes.
- * Copyright (C) 2013-2015  The University of Nottingham
+ * Copyright (C) 2013-2016  The University of Nottingham
  *
  *     This program is free software: you can redistribute it and/or modify
  *     it under the terms of the GNU Affero General Public License as published
@@ -38,8 +38,7 @@ import uk.ac.horizon.artcodes.Artcodes;
 import uk.ac.horizon.artcodes.GoogleAnalytics;
 import uk.ac.horizon.artcodes.model.Experience;
 
-
-public class AppEngineUploadThread extends Thread
+class AppEngineUploadThread extends Thread
 {
 	private static final String rootHTTP = "http://aestheticodes.appspot.com/experience";
 	private static final String rootHTTPS = "https://aestheticodes.appspot.com/experience";
@@ -93,7 +92,7 @@ public class AppEngineUploadThread extends Thread
 				builder.url(rootHTTPS);
 				builder.post(RequestBody.create(MEDIA_TYPE_JSON, account.getGson().toJson(experience)));
 			}
-			account.authenticate(builder);
+			builder.headers(account.getHeaders());
 
 			final Request request = builder.build();
 			final Response response = Artcodes.httpClient.newCall(request).execute();
@@ -101,6 +100,7 @@ public class AppEngineUploadThread extends Thread
 			if (account.validResponse(request, response))
 			{
 				Experience saved = account.getGson().fromJson(response.body().charStream(), Experience.class);
+				response.body().close();
 
 				SharedPreferences.Editor editor = account.getContext().getSharedPreferences(Account.class.getName(), Context.MODE_PRIVATE).edit();
 				editor.putString(saved.getId(), account.getId()).apply();
@@ -193,13 +193,12 @@ public class AppEngineUploadThread extends Thread
 				boolean success = exists(url);
 				if (!success)
 				{
-					Request.Builder builder = new Request.Builder();
-					builder.url(url);
-					builder.post(imageBody);
+					Request request = new Request.Builder()
+							.url(url)
+							.put(imageBody)
+							.headers(account.getHeaders())
+							.build();
 
-					account.authenticate(builder);
-
-					Request request = builder.build();
 					Response response = Artcodes.httpClient.newCall(request).execute();
 					success = account.validResponse(request, response);
 				}

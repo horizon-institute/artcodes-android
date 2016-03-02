@@ -1,7 +1,7 @@
 /*
  * Artcodes recognises a different marker scheme that allows the
  * creation of aesthetically pleasing, even beautiful, codes.
- * Copyright (C) 2013-2015  The University of Nottingham
+ * Copyright (C) 2013-2016  The University of Nottingham
  *
  *     This program is free software: you can redistribute it and/or modify
  *     it under the terms of the GNU Affero General Public License as published
@@ -24,18 +24,15 @@ import android.support.annotation.Nullable;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
-import android.widget.AdapterView;
 
 import java.util.ArrayList;
 import java.util.List;
 
 import uk.ac.horizon.artcodes.R;
 import uk.ac.horizon.artcodes.databinding.ExperienceEditColourBinding;
-import uk.ac.horizon.artcodes.scanner.FrameProcessor;
-import uk.ac.horizon.artcodes.scanner.ImageBuffers;
-import uk.ac.horizon.artcodes.scanner.Scanner;
-import uk.ac.horizon.artcodes.scanner.process.ImageProcessor;
-import uk.ac.horizon.artcodes.scanner.process.RGBGreyscaler;
+import uk.ac.horizon.artcodes.detect.Detector;
+import uk.ac.horizon.artcodes.detect.ImageBuffers;
+import uk.ac.horizon.artcodes.process.ImageProcessor;
 
 public class ExperienceEditColourFragment extends ExperienceEditFragment
 {
@@ -43,9 +40,8 @@ public class ExperienceEditColourFragment extends ExperienceEditFragment
 	private final List<ImageProcessor> presets = new ArrayList<>();
 	private final ImageBuffers buffers = new ImageBuffers();
 	private ExperienceEditColourBinding binding;
-	private Scanner scanner;
 	private ImageProcessor filter;
-	private FrameProcessor frameProcessor;
+	private Detector detector;
 
 	@Override
 	public int getTitleResource()
@@ -58,40 +54,40 @@ public class ExperienceEditColourFragment extends ExperienceEditFragment
 	public View onCreateView(final LayoutInflater inflater, ViewGroup container, Bundle savedInstanceState)
 	{
 		binding = ExperienceEditColourBinding.inflate(inflater, container, false);
-		scanner = new Scanner(getActivity());
-
-		binding.cameraSurface.getHolder().addCallback(scanner);
-		binding.setBuffers(buffers);
-
-		//presets.add(new IntensityGreyscaler());
-		presets.add(new RGBGreyscaler(RGBGreyscaler.Channel.red));
-		presets.add(new RGBGreyscaler(RGBGreyscaler.Channel.green));
-		presets.add(new RGBGreyscaler(RGBGreyscaler.Channel.blue));
-		// TODO Add cmy/cmyk/custom?
-
-		frameProcessor = new FrameProcessor(buffers);
-		scanner.setFrameProcessor(frameProcessor);
-
-		binding.colourPresetSpinner.setOnItemSelectedListener(new AdapterView.OnItemSelectedListener()
-		{
-			@Override
-			public void onItemSelected(AdapterView<?> adapterView, View view, int i, long l)
-			{
-				//String[] names = getResources().getStringArray(R.array.colourPresetNames);
-				if (i < presets.size())
-				{
-					synchronized (lockObject)
-					{
-						//experience.setGreyscaleOptions(presets.get(i));
-					}
-				}
-			}
-
-			@Override
-			public void onNothingSelected(AdapterView<?> adapterView)
-			{
-			}
-		});
+//		scanner = new Scanner(getActivity());
+//
+//		binding.cameraSurface.getHolder().addCallback(scanner);
+//		binding.setBuffers(buffers);
+//
+//		//presets.add(new IntensityGreyscaler());
+//		presets.add(new RGBGreyscaler(RGBGreyscaler.Channel.red));
+//		presets.add(new RGBGreyscaler(RGBGreyscaler.Channel.green));
+//		presets.add(new RGBGreyscaler(RGBGreyscaler.Channel.blue));
+//		// TODO Add cmy/cmyk/custom?
+//
+//		detector = new Detector(buffers);
+//		scanner.setFrameProcessor(detector);
+//
+//		binding.colourPresetSpinner.setOnItemSelectedListener(new AdapterView.OnItemSelectedListener()
+//		{
+//			@Override
+//			public void onItemSelected(AdapterView<?> adapterView, View view, int i, long l)
+//			{
+//				//String[] names = getResources().getStringArray(R.array.colourPresetNames);
+//				if (i < presets.size())
+//				{
+//					synchronized (lockObject)
+//					{
+//						//experience.setGreyscaleOptions(presets.get(i));
+//					}
+//				}
+//			}
+//
+//			@Override
+//			public void onNothingSelected(AdapterView<?> adapterView)
+//			{
+//			}
+//		});
 
 		return binding.getRoot();
 	}

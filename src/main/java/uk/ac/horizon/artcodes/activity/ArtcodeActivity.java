@@ -1,7 +1,7 @@
 /*
  * Artcodes recognises a different marker scheme that allows the
  * creation of aesthetically pleasing, even beautiful, codes.
- * Copyright (C) 2013-2015  The University of Nottingham
+ * Copyright (C) 2013-2016  The University of Nottingham
  *
  *     This program is free software: you can redistribute it and/or modify
  *     it under the terms of the GNU Affero General Public License as published
@@ -20,10 +20,13 @@ package uk.ac.horizon.artcodes.activity;
 
 import android.content.Context;
 import android.content.Intent;
+import android.content.res.ColorStateList;
 import android.net.Uri;
+import android.os.Build;
 import android.os.Bundle;
 import android.support.customtabs.CustomTabsIntent;
 import android.support.v4.app.NavUtils;
+import android.support.v4.app.TaskStackBuilder;
 import android.support.v4.content.ContextCompat;
 import android.util.Log;
 import android.view.MenuItem;
@@ -37,11 +40,11 @@ import java.util.List;
 import uk.ac.horizon.artcodes.Artcodes;
 import uk.ac.horizon.artcodes.GoogleAnalytics;
 import uk.ac.horizon.artcodes.R;
+import uk.ac.horizon.artcodes.animator.VisibilityAnimator;
 import uk.ac.horizon.artcodes.databinding.ScannerActionBinding;
 import uk.ac.horizon.artcodes.model.Action;
 import uk.ac.horizon.artcodes.model.Experience;
 import uk.ac.horizon.artcodes.scanner.ScannerActivity;
-import uk.ac.horizon.artcodes.scanner.VisibilityAnimator;
 import uk.ac.horizon.artcodes.server.ArtcodeServer;
 import uk.ac.horizon.artcodes.server.LoadCallback;
 
@@ -56,7 +59,10 @@ public class ArtcodeActivity extends ScannerActivity implements LoadCallback<Exp
 	{
 		Intent intent = new Intent(context, ArtcodeActivity.class);
 		intent.putExtra("experience", new Gson().toJson(experience));
-		context.startActivity(intent);
+
+		TaskStackBuilder.create(context)
+				.addNextIntentWithParentStack(intent)
+				.startActivities();
 	}
 
 	@Override
@@ -68,6 +74,11 @@ public class ArtcodeActivity extends ScannerActivity implements LoadCallback<Exp
 		binding.bottomView.addView(actionBinding.getRoot());
 		actionAnimator = new VisibilityAnimator(actionBinding.getRoot());
 
+		if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.LOLLIPOP)
+		{
+			binding.progressBar.setIndeterminateTintList(ColorStateList.valueOf(ContextCompat.getColor(this, R.color.apptheme_accent)));
+		}
+
 		if (getSupportActionBar() != null)
 		{
 			getSupportActionBar().setDisplayHomeAsUpEnabled(true);
@@ -77,13 +88,12 @@ public class ArtcodeActivity extends ScannerActivity implements LoadCallback<Exp
 	@Override
 	public boolean onOptionsItemSelected(MenuItem item)
 	{
-		switch (item.getItemId())
+		if (item.getItemId() == android.R.id.home)
 		{
-			case android.R.id.home:
-				Intent intent = new Intent(this, ExperienceActivity.class);
-				intent.putExtra("experience", new Gson().toJson(getExperience()));
-				NavUtils.navigateUpTo(this, intent);
-				return true;
+			final Intent intent = new Intent(this, ExperienceActivity.class);
+			intent.putExtra("experience", new Gson().toJson(getExperience()));
+			NavUtils.navigateUpTo(this, intent);
+			return true;
 		}
 		return super.onOptionsItemSelected(item);
 	}
@@ -113,7 +123,7 @@ public class ArtcodeActivity extends ScannerActivity implements LoadCallback<Exp
 	{
 		int best = 0;
 		Action selected = null;
-		for (Action action : experience.getActions())
+		for (Action action : getExperience().getActions())
 		{
 			if (action.getMatch() == Action.Match.any)
 			{
@@ -135,7 +145,7 @@ public class ArtcodeActivity extends ScannerActivity implements LoadCallback<Exp
 				{
 					int count = markers.count(code);
 					min = Math.min(min, count);
-					total += count;
+					total += (count * 2);
 				}
 
 				if (min > REQUIRED && total > best)
@@ -200,10 +210,11 @@ public class ArtcodeActivity extends ScannerActivity implements LoadCallback<Exp
 
 	private void onActionChanged(final Action action)
 	{
-		Log.i("action", ""+action);
+		Log.i("action", "" + action);
 		if (action != null)
 		{
-			getServer().logScan(experience.getId(), action, scanner);
+			final Experience experience = getExperience();
+			getServer().logScan(experience.getId(), action);
 			GoogleAnalytics.trackEvent("Action", "Scanned", experience.getId(), action.getName());
 
 			actionBinding.setAction(action);

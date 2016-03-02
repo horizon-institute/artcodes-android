@@ -1,7 +1,7 @@
 /*
  * Artcodes recognises a different marker scheme that allows the
  * creation of aesthetically pleasing, even beautiful, codes.
- * Copyright (C) 2013-2015  The University of Nottingham
+ * Copyright (C) 2013-2016  The University of Nottingham
  *
  *     This program is free software: you can redistribute it and/or modify
  *     it under the terms of the GNU Affero General Public License as published
@@ -28,41 +28,41 @@ import android.location.LocationManager;
 import android.os.Bundle;
 import android.support.annotation.NonNull;
 import android.support.annotation.Nullable;
+import android.support.v4.app.Fragment;
 import android.support.v4.content.ContextCompat;
-import android.support.v7.widget.LinearLayoutManager;
 import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 
-import java.util.List;
-import java.util.Map;
-
-import uk.ac.horizon.artcodes.Feature;
 import uk.ac.horizon.artcodes.GoogleAnalytics;
 import uk.ac.horizon.artcodes.R;
-import uk.ac.horizon.artcodes.adapter.SectionedExperienceAdapter;
-import uk.ac.horizon.artcodes.databinding.ExperienceRecommendBinding;
-import uk.ac.horizon.artcodes.model.Experience;
-import uk.ac.horizon.artcodes.server.LoadCallback;
+import uk.ac.horizon.artcodes.activity.NavigationActivity;
+import uk.ac.horizon.artcodes.adapter.ExperienceGroupAdapter;
+import uk.ac.horizon.artcodes.databinding.ListBinding;
 
 public class ExperienceRecommendFragment extends ArtcodeFragmentBase
 {
 	private static final int LOCATION_PERMISSION_REQUEST = 87;
-	private static final int RECENT_MAX = 3;
-	private SectionedExperienceAdapter adapter;
-	private ExperienceRecommendBinding binding;
 
-	@Nullable
+	private ExperienceGroupAdapter adapter;
+
+	@NonNull
 	@Override
 	public View onCreateView(final LayoutInflater inflater, ViewGroup container, Bundle savedInstanceState)
 	{
-		binding = ExperienceRecommendBinding.inflate(inflater, container, false);
-		binding.list.setLayoutManager(new LinearLayoutManager(getActivity()));
-		adapter = new SectionedExperienceAdapter(getActivity());
-		binding.list.setAdapter(adapter);
-		adapter.setShowHeaderItem(Feature.get(getActivity(), R.bool.feature_show_welcome).isEnabled());
-		binding.progress.setEnabled(false);
+		ListBinding binding = ListBinding.inflate(inflater, container, false);
+		adapter = new ExperienceGroupAdapter(getActivity(), getServer());
+		binding.setAdapter(adapter);
+		return binding.getRoot();
+	}
+
+	@Override
+	public void onResume()
+	{
+		super.onResume();
+		GoogleAnalytics.trackScreen("View Recommended");
+		getActivity().setTitle(R.string.nav_home);
 
 		if (ContextCompat.checkSelfPermission(getContext(), Manifest.permission.ACCESS_FINE_LOCATION) == PackageManager.PERMISSION_GRANTED)
 		{
@@ -72,46 +72,59 @@ public class ExperienceRecommendFragment extends ArtcodeFragmentBase
 		{
 			requestPermissions(new String[]{Manifest.permission.ACCESS_FINE_LOCATION}, LOCATION_PERMISSION_REQUEST);
 		}
-
-		return binding.getRoot();
 	}
 
 	@Override
-	public void onResume()
+	public void onRequestPermissionsResult(int requestCode, @NonNull String[] permissions, @NonNull int[] grantResults)
 	{
-		super.onResume();
-		GoogleAnalytics.trackScreen("View Recommended");
+		switch (requestCode)
+		{
+			case LOCATION_PERMISSION_REQUEST:
+			{
+				loadExperiences();
+			}
+		}
 	}
 
 	private void loadExperiences()
 	{
-		binding.progress.addPending();
-		getServer().loadRecent(new LoadCallback<List<String>>()
-		{
-			@Override
-			public void loaded(List<String> item)
-			{
-				updateGroup("recent", item.subList(0, Math.min(RECENT_MAX, item.size())));
-				binding.progress.removePending();
-			}
-		});
-
-		binding.progress.addPending();
-		getServer().loadRecommended(new LoadCallback<Map<String, List<String>>>()
-		{
-			@Override
-			public void loaded(Map<String, List<String>> item)
-			{
-				// Why? ((NavigationActivity) getActivity()).updateAccounts();
-				for (String group : item.keySet())
-				{
-					updateGroup(group, item.get(group));
-				}
-				binding.progress.removePending();
-			}
-		}, getLocation());
+		loadLocal();
+		adapter.loadStarted();
+		getServer().loadRecommended(adapter.getCallback(), getLocation());
 	}
 
+	private void navigateTo(Fragment fragment)
+	{
+		if(getActivity() instanceof NavigationActivity)
+		{
+			NavigationActivity activity = (NavigationActivity) getActivity();
+			activity.navigate(fragment, true);
+		}
+	}
+
+	private void loadLocal()
+	{
+		adapter.loadStarted();
+		getServer().loadRecent(adapter.getCallback("recent", new View.OnClickListener()
+		{
+			@Override
+			public void onClick(final View v)
+			{
+				navigateTo(new ExperienceRecentFragment());
+			}
+		}));
+		adapter.loadStarted();
+		getServer().loadStarred(adapter.getCallback("starred", new View.OnClickListener()
+		{
+			@Override
+			public void onClick(final View v)
+			{
+				navigateTo(new ExperienceStarFragment());
+			}
+		}));
+	}
+
+	@Nullable
 	private Location getLocation()
 	{
 		if (ContextCompat.checkSelfPermission(getContext(), Manifest.permission.ACCESS_FINE_LOCATION) == PackageManager.PERMISSION_GRANTED)
@@ -140,37 +153,5 @@ public class ExperienceRecommendFragment extends ArtcodeFragmentBase
 
 		}
 		return null;
-	}
-
-	@Override
-	public void onRequestPermissionsResult(int requestCode, @NonNull String[] permissions, @NonNull int[] grantResults)
-	{
-		switch (requestCode)
-		{
-			case LOCATION_PERMISSION_REQUEST:
-			{
-				loadExperiences();
-			}
-		}
-	}
-
-	private void updateGroup(final String group, List<String> ids)
-	{
-		int index = 0;
-		for (final String uri : ids)
-		{
-			final int experienceIndex = index;
-			binding.progress.addPending();
-			getServer().loadExperience(uri, new LoadCallback<Experience>()
-			{
-				@Override
-				public void loaded(final Experience experience)
-				{
-					binding.progress.removePending();
-					adapter.addExperience(experience, group, experienceIndex);
-				}
-			});
-			index++;
-		}
 	}
 }

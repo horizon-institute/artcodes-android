@@ -2,7 +2,7 @@
 <!--
   ~ Artcodes recognises a different marker scheme that allows the
   ~ creation of aesthetically pleasing, even beautiful, codes.
-  ~ Copyright (C) 2013-2015  The University of Nottingham
+  ~ Copyright (C) 2013-2016  The University of Nottingham
   ~
   ~     This program is free software: you can redistribute it and/or modify
   ~     it under the terms of the GNU Affero General Public License as published
@@ -19,6 +19,20 @@
   -->
 <resources>
 
-    <style name="Theme.Artcodes.Camera" parent="Theme.AppCompat.NoActionBar">
-    </style>
+	<style name="Theme.Artcodes.Camera" parent="Theme.AppCompat.NoActionBar">
+		<item name="drawerArrowStyle">@style/Widget.Artcodes.DrawerArrowToggle</item>
+	</style>
+
+	<style name="Widget.Artcodes.DrawerArrowToggle" parent="Widget.AppCompat.DrawerArrowToggle">
+		<item name="color">@android:color/white</item>
+	</style>
+
+
+	<style name="TextAppearance.Widget.Artcodes.Toolbar.Title" parent="TextAppearance.Widget.AppCompat.Toolbar.Title">
+		<item name="android:textColor">@android:color/white</item>
+		<item name="android:shadowColor">#000</item>
+		<item name="android:shadowRadius">1.5</item>
+		<item name="android:shadowDx">1</item>
+		<item name="android:shadowDy">1</item>
+	</style>
 </resources>

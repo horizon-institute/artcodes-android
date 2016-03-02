@@ -1,7 +1,7 @@
 /*
  * Artcodes recognises a different marker scheme that allows the
  * creation of aesthetically pleasing, even beautiful, codes.
- * Copyright (C) 2013-2015  The University of Nottingham
+ * Copyright (C) 2013-2016  The University of Nottingham
  *
  *     This program is free software: you can redistribute it and/or modify
  *     it under the terms of the GNU Affero General Public License as published
@@ -20,35 +20,28 @@
 package uk.ac.horizon.artcodes.fragment;
 
 import android.os.Bundle;
-import android.support.annotation.Nullable;
-import android.support.v7.widget.LinearLayoutManager;
+import android.support.annotation.NonNull;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 
-import java.util.List;
-
 import uk.ac.horizon.artcodes.GoogleAnalytics;
+import uk.ac.horizon.artcodes.R;
 import uk.ac.horizon.artcodes.adapter.ExperienceAdapter;
-import uk.ac.horizon.artcodes.databinding.ExperienceStarBinding;
-import uk.ac.horizon.artcodes.model.Experience;
-import uk.ac.horizon.artcodes.server.LoadCallback;
+import uk.ac.horizon.artcodes.adapter.ExperienceSortedListAdapter;
+import uk.ac.horizon.artcodes.databinding.ListBinding;
 
 public class ExperienceStarFragment extends ArtcodeFragmentBase
 {
-	private ExperienceStarBinding binding;
 	private ExperienceAdapter adapter;
 
-	@Nullable
+	@NonNull
 	@Override
-	public View onCreateView(LayoutInflater inflater, ViewGroup container, Bundle savedInstanceState)
+	public View onCreateView(final LayoutInflater inflater, ViewGroup container, Bundle savedInstanceState)
 	{
-		binding = ExperienceStarBinding.inflate(inflater, container, false);
-		//binding.list.setHasFixedSize(true);
-		binding.list.setLayoutManager(new LinearLayoutManager(getActivity()));
-		adapter = new ExperienceAdapter(getActivity());
-		binding.list.setAdapter(adapter);
-
+		ListBinding binding = ListBinding.inflate(inflater, container, false);
+		adapter = new ExperienceSortedListAdapter(getActivity(), getServer());
+		binding.setAdapter(adapter);
 		return binding.getRoot();
 	}
 
@@ -57,27 +50,8 @@ public class ExperienceStarFragment extends ArtcodeFragmentBase
 	{
 		super.onResume();
 		GoogleAnalytics.trackScreen("View Starred");
-		binding.progress.addPending();
-		getServer().loadStarred(new LoadCallback<List<String>>()
-		{
-			@Override
-			public void loaded(List<String> item)
-			{
-				for (String uri : item)
-				{
-					binding.progress.addPending();
-					getServer().loadExperience(uri, new LoadCallback<Experience>()
-					{
-						@Override
-						public void loaded(Experience item)
-						{
-							binding.progress.removePending();
-							adapter.loaded(item);
-						}
-					});
-				}
-				binding.progress.removePending();
-			}
-		});
+		getActivity().setTitle(R.string.nav_starred);
+		adapter.loadStarted();
+		getServer().loadStarred(adapter);
 	}
 }
