@@ -57,7 +57,7 @@ public class LocalAccount implements Account
 	@Override
 	public String toString()
 	{
-		return getName();
+		return getDisplayName();
 	}
 
 	@Override
@@ -132,9 +132,15 @@ public class LocalAccount implements Account
 	}
 
 	@Override
-	public String getName()
+	public String getDisplayName()
 	{
 		return context.getString(R.string.device);
+	}
+
+	@Override
+	public void setDisplayName(final String displayName)
+	{
+
 	}
 
 	@Override
@@ -155,6 +161,12 @@ public class LocalAccount implements Account
 	public boolean logScan(String uri)
 	{
 		return false;
+	}
+
+	@Override
+	public boolean isLocal()
+	{
+		return true;
 	}
 
 	@Override

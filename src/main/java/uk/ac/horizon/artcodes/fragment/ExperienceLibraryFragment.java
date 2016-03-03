@@ -35,6 +35,8 @@ import android.view.View;
 import android.view.ViewGroup;
 import android.widget.FrameLayout;
 
+import com.google.android.gms.auth.UserRecoverableAuthException;
+
 import uk.ac.horizon.artcodes.GoogleAnalytics;
 import uk.ac.horizon.artcodes.R;
 import uk.ac.horizon.artcodes.account.Account;
@@ -107,9 +109,27 @@ public class ExperienceLibraryFragment extends ArtcodeFragmentBase
 	{
 		super.onResume();
 		GoogleAnalytics.trackScreen("View Library");
-		getActivity().setTitle(getAccount().getName());
+		final Account account = getAccount();
+		getActivity().setTitle(account.getDisplayName());
 		adapter.loadStarted();
-		getAccount().loadLibrary(adapter);
+		new Thread(new Runnable()
+		{
+			@Override
+			public void run()
+			{
+				try
+				{
+					account.validates();
+
+					account.loadLibrary(adapter);
+				}
+				catch (UserRecoverableAuthException e)
+				{
+					startActivityForResult(e.getIntent(), 1);
+				}
+			}
+		}).start();
+
 	}
 
 	private Account getAccount()

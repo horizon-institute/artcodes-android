@@ -37,11 +37,15 @@ public interface Account
 
 	String getId();
 
-	String getName();
+	String getDisplayName();
+
+	void setDisplayName(String displayName);
 
 	boolean canEdit(String uri);
 
 	boolean isSaving(String uri);
+
+	boolean isLocal();
 
 	boolean logScan(String uri);
 

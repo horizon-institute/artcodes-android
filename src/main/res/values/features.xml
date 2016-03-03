@@ -23,6 +23,7 @@
 	<bool name="feature_log_scanned_images">true</bool>
 	<bool name="feature_history">false</bool>
 	<bool name="feature_auto_upload">true</bool>
+	<bool name="feature_action_permission_ui">false</bool>
 	<bool name="feature_edit_colour">false</bool>
 	<bool name="feature_edit_features">false</bool>
 </resources>

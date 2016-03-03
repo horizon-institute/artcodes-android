@@ -26,6 +26,7 @@ import android.view.ViewGroup;
 
 import java.util.List;
 
+import uk.ac.horizon.artcodes.GoogleAnalytics;
 import uk.ac.horizon.artcodes.activity.ArtcodeActivity;
 import uk.ac.horizon.artcodes.activity.ExperienceActivity;
 import uk.ac.horizon.artcodes.databinding.ExperienceCardBinding;
@@ -65,7 +66,7 @@ public abstract class ExperienceAdapter extends GridAdapter<ExperienceCardBindin
 			}
 		});
 	}
-
+	
 	public abstract Experience getExperience(int position);
 
 	@Override

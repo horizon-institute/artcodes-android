@@ -26,6 +26,7 @@ import android.databinding.DataBindingUtil;
 import android.os.Bundle;
 import android.os.Handler;
 import android.os.Looper;
+import android.support.annotation.NonNull;
 import android.support.design.widget.NavigationView;
 import android.support.v4.app.Fragment;
 import android.support.v4.view.GravityCompat;
@@ -38,9 +39,16 @@ import android.view.View;
 import android.widget.BaseAdapter;
 import android.widget.HeaderViewListAdapter;
 import android.widget.ListView;
-import com.google.android.gms.auth.GoogleAuthUtil;
+
 import com.google.android.gms.auth.UserRecoverableAuthException;
-import com.google.android.gms.common.AccountPicker;
+import com.google.android.gms.auth.api.Auth;
+import com.google.android.gms.auth.api.signin.GoogleSignInOptions;
+import com.google.android.gms.auth.api.signin.GoogleSignInResult;
+import com.google.android.gms.common.ConnectionResult;
+import com.google.android.gms.common.api.GoogleApiClient;
+
+import java.util.List;
+
 import uk.ac.horizon.artcodes.Feature;
 import uk.ac.horizon.artcodes.R;
 import uk.ac.horizon.artcodes.account.Account;
@@ -52,11 +60,10 @@ import uk.ac.horizon.artcodes.fragment.ExperienceStarFragment;
 import uk.ac.horizon.artcodes.fragment.FeatureListFragment;
 import uk.ac.horizon.artcodes.server.LoadCallback;
 
-import java.util.List;
-
 public class NavigationActivity extends ArtcodeActivityBase implements
 		NavigationView.OnNavigationItemSelectedListener
 {
+	private static final int REQUEST_CODE_SIGN_IN = 63;
 	private static final int REQUEST_CODE_PICK_ACCOUNT = 67;
 	private static final long DRAWER_CLOSE_DELAY_MS = 250;
 	private static final String NAV_ITEM_ID = "navItemId";
@@ -66,7 +73,7 @@ public class NavigationActivity extends ArtcodeActivityBase implements
 	private ActionBarDrawerToggle drawerToggle;
 	private MenuItem selected;
 
-	private String accountName;
+	private GoogleApiClient apiClient;
 
 	@Override
 	public void onBackPressed()
@@ -142,8 +149,15 @@ public class NavigationActivity extends ArtcodeActivityBase implements
 		for (int index = 0; index < accounts.size(); index++)
 		{
 			Account account = accounts.get(index);
-			MenuItem menuItem = subMenu.add(R.id.navigation, index, Menu.NONE, account.getName());
-			menuItem.setIcon(R.drawable.ic_folder_24dp);
+			MenuItem menuItem = subMenu.add(R.id.navigation, index, Menu.NONE, account.getDisplayName());
+			if (account.getId().equals("local"))
+			{
+				menuItem.setIcon(R.drawable.ic_folder_24dp);
+			}
+			else
+			{
+				menuItem.setIcon(R.drawable.ic_cloud_24dp);
+			}
 			menuItem.setCheckable(true);
 		}
 
@@ -187,7 +201,7 @@ public class NavigationActivity extends ArtcodeActivityBase implements
 
 	public void navigate(Fragment fragment, boolean addToBackStack)
 	{
-		if(addToBackStack)
+		if (addToBackStack)
 		{
 			getSupportFragmentManager().beginTransaction()
 					.replace(R.id.content, fragment)
@@ -205,20 +219,30 @@ public class NavigationActivity extends ArtcodeActivityBase implements
 	@Override
 	protected void onActivityResult(int requestCode, int resultCode, Intent data)
 	{
-		if (resultCode == RESULT_OK)
+		if (requestCode == REQUEST_CODE_PICK_ACCOUNT)
 		{
-			if (data != null)
+			if (resultCode == RESULT_OK)
 			{
-				if (data.hasExtra(AccountManager.KEY_ACCOUNT_NAME))
+				if (data != null)
 				{
-					accountName = data.getStringExtra(AccountManager.KEY_ACCOUNT_NAME);
+					if (data.hasExtra(AccountManager.KEY_ACCOUNT_NAME))
+					{
+						String accountName = data.getStringExtra(AccountManager.KEY_ACCOUNT_NAME);
+
+						if (accountName != null)
+						{
+							tryGoogleAccount(accountName, null);
+						}
+					}
 				}
 			}
-
-			Log.i("account", "Account = " + accountName);
-			if (accountName != null)
+		}
+		else if (requestCode == REQUEST_CODE_SIGN_IN)
+		{
+			final GoogleSignInResult result = Auth.GoogleSignInApi.getSignInResultFromIntent(data);
+			if (result.getSignInAccount() != null)
 			{
-				tryGoogleAccount(accountName);
+				tryGoogleAccount(result.getSignInAccount().getEmail(), result.getSignInAccount().getDisplayName());
 			}
 		}
 	}
@@ -227,7 +251,7 @@ public class NavigationActivity extends ArtcodeActivityBase implements
 	protected void onCreate(final Bundle savedInstanceState)
 	{
 		super.onCreate(savedInstanceState);
-		if(Feature.get(this, R.bool.feature_show_welcome).isEnabled())
+		if (Feature.get(this, R.bool.feature_show_welcome).isEnabled())
 		{
 			startActivity(new Intent(this, AboutArtcodesActivity.class));
 			return;
@@ -288,6 +312,25 @@ public class NavigationActivity extends ArtcodeActivityBase implements
 		}
 
 		navigate(item, false);
+
+		final GoogleSignInOptions gso = new GoogleSignInOptions.Builder(GoogleSignInOptions.DEFAULT_SIGN_IN)
+				.requestIdToken(getString(R.string.oauth_client_id))
+				.requestEmail()
+				.requestProfile()
+				.build();
+
+		apiClient = new GoogleApiClient.Builder(this)
+				.enableAutoManage(this, new GoogleApiClient.OnConnectionFailedListener()
+				{
+					@Override
+					public void onConnectionFailed(@NonNull final ConnectionResult connectionResult)
+					{
+						Log.i("Signin", "Failed " + connectionResult);
+					}
+				})
+				.addApi(Auth.GOOGLE_SIGN_IN_API, gso)
+				.build();
+
 	}
 
 	@Override
@@ -300,7 +343,7 @@ public class NavigationActivity extends ArtcodeActivityBase implements
 		}
 	}
 
-	private void tryGoogleAccount(final String name)
+	private void tryGoogleAccount(final String name, final String displayName)
 	{
 		new Thread(new Runnable()
 		{
@@ -312,6 +355,7 @@ public class NavigationActivity extends ArtcodeActivityBase implements
 					final Account account = getServer().createAccount("google:" + name);
 					if (account.validates())
 					{
+						account.setDisplayName(displayName);
 						getServer().add(account);
 						new Handler(Looper.getMainLooper()).post(new Runnable()
 						{
@@ -341,6 +385,13 @@ public class NavigationActivity extends ArtcodeActivityBase implements
 		}).start();
 	}
 
+	private void selectAccount()
+	{
+		apiClient.clearDefaultAccountAndReconnect();
+		Intent signInIntent = Auth.GoogleSignInApi.getSignInIntent(apiClient);
+		startActivityForResult(signInIntent, REQUEST_CODE_SIGN_IN);
+	}
+
 	private void navigate(MenuItem item, boolean addToBackStack)
 	{
 		switch (item.getItemId())
@@ -366,7 +417,7 @@ public class NavigationActivity extends ArtcodeActivityBase implements
 				break;
 
 			case R.id.nav_addaccount:
-				startActivityForResult(AccountPicker.newChooseAccountIntent(null, null, new String[]{GoogleAuthUtil.GOOGLE_ACCOUNT_TYPE}, true, null, null, null, null), REQUEST_CODE_PICK_ACCOUNT);
+				selectAccount();
 				break;
 
 			default:

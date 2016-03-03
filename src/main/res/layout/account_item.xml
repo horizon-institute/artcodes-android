@@ -40,7 +40,7 @@
 			android:layout_width="wrap_content"
 			android:layout_height="wrap_content"
 			android:layout_margin="16dp"
-			android:src="@drawable/ic_folder_24dp"
+			android:src="@{account.local ? @drawable/ic_folder_24dp : @drawable/ic_cloud_24dp}"
 			android:tint="@color/ic_tint"
 			tools:ignore="ContentDescription"/>
 
@@ -51,7 +51,7 @@
 			android:layout_marginRight="16dp"
 			android:layout_weight="1"
 			android:singleLine="true"
-			android:text="@{account.name}"
+			android:text="@{account.displayName}"
 			android:textAppearance="@style/TextAppearance.AppCompat"
 			tools:text="Test"/>
 	</LinearLayout>

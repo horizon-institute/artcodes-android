@@ -161,7 +161,7 @@ public class ExperienceActivity extends ExperienceActivityBase
 //				public void loaded(Experience item)
 //				{
 //					TextView view = new TextView(ExperienceActivity.this);
-//					view.setText("Copy of " + item.getName());
+//					view.setText("Copy of " + item.getDisplayName());
 //					binding.experienceLocations.addView(view);
 //				}
 //			});

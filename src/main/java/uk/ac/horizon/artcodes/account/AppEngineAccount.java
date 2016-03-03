@@ -87,6 +87,12 @@ public class AppEngineAccount implements Account
 	}
 
 	@Override
+	public boolean isLocal()
+	{
+		return false;
+	}
+
+	@Override
 	public void loadLibrary(final LoadCallback<List<String>> callback)
 	{
 		load("https://aestheticodes.appspot.com/experiences", new JsonCallback<>(new TypeToken<List<String>>()
@@ -107,9 +113,24 @@ public class AppEngineAccount implements Account
 		}));
 	}
 
+	public void setDisplayName(String displayName)
+	{
+		context.getSharedPreferences(Account.class.getName(), Context.MODE_PRIVATE).edit()
+				.putString(getId(), displayName)
+				.apply();
+	}
+
 	@Override
 	public boolean load(final String uri, final URILoaderCallback callback)
 	{
+		AppEngineUploadThread uploadThread = uploadThreads.get(uri);
+		if (uploadThread != null)
+		{
+			Experience experience = uploadThread.getExperience();
+			callback.onLoaded(new StringReader(gson.toJson(experience)));
+			return true;
+		}
+
 		if (uri.startsWith(httpRoot) || uri.startsWith(httpsRoot))
 		{
 			new Thread(new Runnable()
@@ -140,14 +161,6 @@ public class AppEngineAccount implements Account
 					}
 				}
 			}).start();
-			return true;
-		}
-
-		AppEngineUploadThread uploadThread = uploadThreads.get(uri);
-		if (uploadThread != null)
-		{
-			Experience experience = uploadThread.getExperience();
-			callback.onLoaded(new StringReader(gson.toJson(experience)));
 			return true;
 		}
 		return false;
@@ -218,9 +231,9 @@ public class AppEngineAccount implements Account
 	}
 
 	@Override
-	public String getName()
+	public String getDisplayName()
 	{
-		return name;
+		return context.getSharedPreferences(Account.class.getName(), Context.MODE_PRIVATE).getString(getId(), name);
 	}
 
 	@Override
