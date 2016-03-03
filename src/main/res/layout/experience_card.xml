@@ -84,7 +84,9 @@
 					android:text="@{experience.name}"
 					android:textAppearance="@style/TextAppearance.AppCompat"
 					android:textColor="#000"
-					tools:text="Artcodes"/>
+					tools:text="Artcodes"
+					android:maxLines="3"
+					android:ellipsize="end"/>
 
 				<ImageView
 					android:id="@+id/scanButton"
