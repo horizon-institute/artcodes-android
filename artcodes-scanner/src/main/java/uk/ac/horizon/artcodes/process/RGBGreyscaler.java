@@ -64,6 +64,11 @@ public class RGBGreyscaler implements ImageProcessor
 		Imgproc.cvtColor(buffers.getTemp(), buffers.getImage(), Imgproc.COLOR_BGR2GRAY);
 	}
 
+	public Channel getChannel()
+	{
+		return channel;
+	}
+
 	@Override
 	public void getSettings(List<DetectorSetting> settings)
 	{

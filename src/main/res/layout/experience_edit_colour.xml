@@ -21,26 +21,34 @@
 
 <layout xmlns:android="http://schemas.android.com/apk/res/android"
         xmlns:tools="http://schemas.android.com/tools"
+        xmlns:app="http://schemas.android.com/apk/res-auto"
         tools:context=".activities.ExperienceEditActivity">
 
 	<data>
 
 		<import type="android.view.View"/>
+
+		<variable
+			name="detector"
+			type="uk.ac.horizon.artcodes.detect.Detector"/>
 	</data>
 
 	<FrameLayout
+		android:id="@+id/content_frame"
 		android:layout_width="match_parent"
 		android:layout_height="match_parent">
 
-		<SurfaceView
-			android:id="@+id/cameraSurface"
+		<uk.ac.horizon.artcodes.camera.CameraView
+			android:id="@+id/cameraView"
 			android:layout_width="fill_parent"
-			android:layout_height="fill_parent"/>
+			android:layout_height="fill_parent"
+			app:detector="@{detector}"/>
 
 		<ImageView
 			android:layout_width="match_parent"
 			android:layout_height="match_parent"
 			android:scaleType="fitXY"
+			app:imageBitmap="@{detector.overlay}"
 			tools:ignore="ContentDescription"/>
 
 		<LinearLayout

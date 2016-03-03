@@ -24,6 +24,7 @@ import android.databinding.Bindable;
 import android.graphics.Bitmap;
 import android.util.Log;
 
+import org.opencv.android.OpenCVLoader;
 import org.opencv.core.Rect;
 
 import java.util.ArrayList;
@@ -35,6 +36,14 @@ import uk.ac.horizon.artcodes.scanner.BR;
 
 public class Detector extends BaseObservable
 {
+	static
+	{
+		if (!OpenCVLoader.initDebug())
+		{
+			Log.e("OpenCV", "Error Initializing OpenCV");
+		}
+	}
+
 	protected final List<ImageProcessor> pipeline = new ArrayList<>();
 	protected final List<DetectorSetting> settings = new ArrayList<>();
 	protected final ImageBuffers buffers = new ImageBuffers();
@@ -123,6 +132,6 @@ public class Detector extends BaseObservable
 
 	protected Rect createROI(int imageWidth, int imageHeight, int surfaceWidth, int surfaceHeight)
 	{
-		return null;
+		return new Rect(0, 0, imageWidth, imageHeight);
 	}
 }

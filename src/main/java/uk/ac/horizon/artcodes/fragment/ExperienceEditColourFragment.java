@@ -24,6 +24,9 @@ import android.support.annotation.Nullable;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
+import android.widget.AdapterView;
+import android.widget.BaseAdapter;
+import android.widget.TextView;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -31,18 +34,11 @@ import java.util.List;
 import uk.ac.horizon.artcodes.R;
 import uk.ac.horizon.artcodes.databinding.ExperienceEditColourBinding;
 import uk.ac.horizon.artcodes.detect.Detector;
-import uk.ac.horizon.artcodes.detect.ImageBuffers;
 import uk.ac.horizon.artcodes.process.ImageProcessor;
+import uk.ac.horizon.artcodes.process.RGBGreyscaler;
 
 public class ExperienceEditColourFragment extends ExperienceEditFragment
 {
-	private final Object lockObject = new Object();
-	private final List<ImageProcessor> presets = new ArrayList<>();
-	private final ImageBuffers buffers = new ImageBuffers();
-	private ExperienceEditColourBinding binding;
-	private ImageProcessor filter;
-	private Detector detector;
-
 	@Override
 	public int getTitleResource()
 	{
@@ -53,41 +49,69 @@ public class ExperienceEditColourFragment extends ExperienceEditFragment
 	@Override
 	public View onCreateView(final LayoutInflater inflater, ViewGroup container, Bundle savedInstanceState)
 	{
-		binding = ExperienceEditColourBinding.inflate(inflater, container, false);
-//		scanner = new Scanner(getActivity());
-//
-//		binding.cameraSurface.getHolder().addCallback(scanner);
-//		binding.setBuffers(buffers);
-//
-//		//presets.add(new IntensityGreyscaler());
-//		presets.add(new RGBGreyscaler(RGBGreyscaler.Channel.red));
-//		presets.add(new RGBGreyscaler(RGBGreyscaler.Channel.green));
-//		presets.add(new RGBGreyscaler(RGBGreyscaler.Channel.blue));
-//		// TODO Add cmy/cmyk/custom?
-//
-//		detector = new Detector(buffers);
-//		scanner.setFrameProcessor(detector);
-//
-//		binding.colourPresetSpinner.setOnItemSelectedListener(new AdapterView.OnItemSelectedListener()
-//		{
-//			@Override
-//			public void onItemSelected(AdapterView<?> adapterView, View view, int i, long l)
-//			{
-//				//String[] names = getResources().getStringArray(R.array.colourPresetNames);
-//				if (i < presets.size())
-//				{
-//					synchronized (lockObject)
-//					{
-//						//experience.setGreyscaleOptions(presets.get(i));
-//					}
-//				}
-//			}
-//
-//			@Override
-//			public void onNothingSelected(AdapterView<?> adapterView)
-//			{
-//			}
-//		});
+		final ExperienceEditColourBinding binding = ExperienceEditColourBinding.inflate(inflater, container, false);
+
+		final List<ImageProcessor> presets = new ArrayList<>();
+		// TODO presets.add(new IntensityGreyscaler());
+		presets.add(new RGBGreyscaler(RGBGreyscaler.Channel.red));
+		presets.add(new RGBGreyscaler(RGBGreyscaler.Channel.green));
+		presets.add(new RGBGreyscaler(RGBGreyscaler.Channel.blue));
+
+		final Detector detector = new Detector();
+		binding.setDetector(detector);
+
+		binding.colourPresetSpinner.setAdapter(new BaseAdapter()
+		{
+			@Override
+			public int getCount()
+			{
+				return presets.size();
+			}
+
+			@Override
+			public Object getItem(final int position)
+			{
+				return presets.get(position);
+			}
+
+			@Override
+			public long getItemId(final int position)
+			{
+				return 0;
+			}
+
+			@Override
+			public View getView(final int position, final View convertView, final ViewGroup parent)
+			{
+				View view = convertView;
+				if(!(view instanceof TextView))
+				{
+					view = new TextView(parent.getContext());
+				}
+
+				ImageProcessor processor = presets.get(position);
+				if(processor instanceof RGBGreyscaler)
+				{
+					((TextView)view).setText(((RGBGreyscaler)processor).getChannel().toString());
+				}
+
+
+				return view;
+			}
+		});
+		binding.colourPresetSpinner.setOnItemSelectedListener(new AdapterView.OnItemSelectedListener()
+		{
+			@Override
+			public void onItemSelected(AdapterView<?> adapterView, View view, int i, long l)
+			{
+				// TODO
+			}
+
+			@Override
+			public void onNothingSelected(AdapterView<?> adapterView)
+			{
+			}
+		});
 
 		return binding.getRoot();
 	}

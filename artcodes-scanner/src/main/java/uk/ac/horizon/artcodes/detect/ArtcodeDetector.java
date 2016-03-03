@@ -24,7 +24,6 @@ import android.databinding.BindingAdapter;
 import android.util.Log;
 import android.view.View;
 
-import org.opencv.android.OpenCVLoader;
 import org.opencv.core.Rect;
 
 import uk.ac.horizon.artcodes.model.Experience;
@@ -35,14 +34,6 @@ import uk.ac.horizon.artcodes.scanner.BR;
 
 public class ArtcodeDetector extends Detector
 {
-	static
-	{
-		if (!OpenCVLoader.initDebug())
-		{
-			Log.e("OpenCV", "Error Initializing OpenCV");
-		}
-	}
-
 	private int margin = 100;
 
 	@BindingAdapter("height")
