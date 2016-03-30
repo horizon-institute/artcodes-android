@@ -39,6 +39,7 @@ public class Action extends BaseObservable
 	private String name;
 	private String description;
 	private String image;
+	private String owner;
 	private boolean showDetail = false;
 
 	public List<String> getCodes()
@@ -50,6 +51,11 @@ public class Action extends BaseObservable
 	public String getDescription()
 	{
 		return description;
+	}
+
+	public String getOwner()
+	{
+		return owner;
 	}
 
 	public void setDescription(String description)
@@ -92,6 +98,11 @@ public class Action extends BaseObservable
 	public String getUrl()
 	{
 		return url;
+	}
+
+	public void setOwner(String owner)
+	{
+		this.owner = owner;
 	}
 
 	public void setUrl(String url)

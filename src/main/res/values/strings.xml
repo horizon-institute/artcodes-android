@@ -163,5 +163,8 @@
 	<string name="about_artcodes_2">Every Artcode has a numerical code which corresponds to the number of blobs and regions of the Artcode. Here, yhe leftmost region contains 2 blobs, the two center regions contain 3 blobs each and the two regions on the right have 1 blob each. So, this Artcode has the code 1:1:2:3:3.</string>
 	<string name="about_artcodes_3">Experiences link those codes to web pages, so that when an Artcode is scanned it will take you to the associated web page.</string>
 	<string name="about_artcodes_3_button">Learn to Draw Artcodes</string>
+	<string name="search">Search</string>
+	<string name="action_editable">Editable in copies</string>
+	<string name="search_empty">No experiences found matching \"%s\"</string>
 
 </resources>

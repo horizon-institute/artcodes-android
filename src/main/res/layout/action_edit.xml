@@ -26,142 +26,172 @@
 
 	<data>
 
-		<import type="android.view.View"/>
+		<import type="android.view.View" />
 
 		<variable
-			name="action"
-			type="uk.ac.horizon.artcodes.model.Action"/>
+				name="action"
+				type="uk.ac.horizon.artcodes.model.Action" />
 
 		<variable
-			name="actionEditor"
-			type="uk.ac.horizon.artcodes.ui.ActionEditor"/>
+				name="actionEditor"
+				type="uk.ac.horizon.artcodes.ui.ActionEditor" />
 	</data>
 
 	<LinearLayout
-		android:layout_width="wrap_content"
-		android:layout_height="wrap_content"
-		android:orientation="vertical">
+			android:layout_width="wrap_content"
+			android:layout_height="wrap_content"
+			android:orientation="vertical">
 
 		<android.support.v7.widget.Toolbar
-			android:layout_width="match_parent"
-			android:layout_height="wrap_content"
-			android:background="?attr/colorPrimary"
-			android:theme="@style/ThemeOverlay.Toolbar">
+				android:layout_width="match_parent"
+				android:layout_height="wrap_content"
+				android:background="?attr/colorPrimary"
+				android:theme="@style/ThemeOverlay.Toolbar">
 
 			<EditText
-				android:id="@+id/action_name"
-				style="@style/Base.Widget.AppCompat.EditText"
-				android:layout_width="match_parent"
-				android:layout_height="match_parent"
-				android:background="@android:color/transparent"
-				android:hint="@string/action_name"
-				android:inputType="text"
-				android:paddingBottom="16dp"
-				android:paddingTop="16dp"
-				android:singleLine="true"
-				android:textAppearance="@style/TextAppearance.AppCompat.Medium"
-				app:textWatcher="@{actionEditor.nameWatcher}"
-				tools:text="Action Name"/>
+					android:id="@+id/action_name"
+					style="@style/Base.Widget.AppCompat.EditText"
+					android:layout_width="match_parent"
+					android:layout_height="match_parent"
+					android:background="@android:color/transparent"
+					android:hint="@string/action_name"
+					android:inputType="text"
+					android:paddingBottom="16dp"
+					android:paddingTop="16dp"
+					android:singleLine="true"
+					android:textAppearance="@style/TextAppearance.AppCompat.Medium"
+					app:textWatcher="@{actionEditor.nameWatcher}"
+					tools:text="Action Name" />
 		</android.support.v7.widget.Toolbar>
 
 		<ScrollView
-			android:layout_width="match_parent"
-			android:layout_height="0dp"
-			android:layout_weight="1">
+				android:layout_width="match_parent"
+				android:layout_height="0dp"
+				android:layout_weight="1">
 
 			<LinearLayout
-				android:layout_width="match_parent"
-				android:layout_height="wrap_content"
-				android:orientation="vertical">
-
-				<LinearLayout
 					android:layout_width="match_parent"
 					android:layout_height="wrap_content"
-					android:background="?attr/selectableItemBackground"
-					android:gravity="center_vertical"
-					android:orientation="horizontal">
-
-					<ImageView
-						android:layout_width="wrap_content"
-						android:layout_height="wrap_content"
-						android:layout_margin="16dp"
-						android:src="@drawable/ic_public_black_24dp"
-						android:tint="@color/ic_tint"
-						tools:ignore="ContentDescription"/>
-
-					<EditText
-						android:layout_width="match_parent"
-						android:layout_height="wrap_content"
-						android:layout_gravity="center_vertical"
-						android:layout_marginLeft="16dp"
-						android:layout_marginRight="16dp"
-						android:hint="@string/URL"
-						android:inputType="textUri"
-						android:textAppearance="@style/TextAppearance.AppCompat"
-						app:textWatcher="@{actionEditor.urlWatcher}"
-						tools:text="www.cs.nott.ac.uk"/>
-				</LinearLayout>
-
-				<LinearLayout
-					android:id="@+id/selectLayout"
-					android:layout_width="match_parent"
-					android:layout_height="wrap_content"
-					android:background="?attr/selectableItemBackground"
-					android:gravity="center_vertical"
-					android:orientation="horizontal">
-
-					<ImageView
-						android:layout_width="wrap_content"
-						android:layout_height="wrap_content"
-						android:layout_gravity="top"
-						android:layout_margin="16dp"
-						android:src="@drawable/ic_ungroup_work_black_24dp"
-						android:tint="@color/ic_tint"
-						tools:ignore="ContentDescription"/>
-
-					<TextView
-						android:layout_width="wrap_content"
-						android:layout_height="wrap_content"
-						android:layout_marginLeft="20dp"
-						android:layout_marginRight="20dp"
-						android:text="@string/match_any"/>
-				</LinearLayout>
-
-				<LinearLayout
-					android:id="@+id/marker_codes"
-					android:layout_width="match_parent"
-					android:layout_height="match_parent"
 					android:orientation="vertical">
 
+				<LinearLayout
+						android:layout_width="match_parent"
+						android:layout_height="wrap_content"
+						android:background="?attr/selectableItemBackground"
+						android:gravity="center_vertical"
+						android:orientation="horizontal">
+
+					<ImageView
+							android:layout_width="wrap_content"
+							android:layout_height="wrap_content"
+							android:layout_margin="16dp"
+							android:src="@drawable/ic_public_black_24dp"
+							android:tint="@color/ic_tint"
+							tools:ignore="ContentDescription" />
+
+					<EditText
+							android:layout_width="match_parent"
+							android:layout_height="wrap_content"
+							android:layout_gravity="center_vertical"
+							android:layout_marginLeft="16dp"
+							android:layout_marginRight="16dp"
+							android:hint="@string/URL"
+							android:inputType="textUri"
+							android:textAppearance="@style/TextAppearance.AppCompat"
+							app:textWatcher="@{actionEditor.urlWatcher}"
+							tools:text="www.cs.nott.ac.uk" />
 				</LinearLayout>
 
 				<LinearLayout
-					android:layout_width="match_parent"
-					android:layout_height="wrap_content"
-					android:background="?attr/selectableItemBackground"
-					android:gravity="center_vertical"
-					android:orientation="horizontal">
+						android:id="@+id/editableLayout"
+						android:layout_width="match_parent"
+						android:layout_height="wrap_content"
+						android:background="?attr/selectableItemBackground"
+						android:gravity="center_vertical"
+						android:orientation="horizontal">
 
 					<ImageView
-						android:layout_width="wrap_content"
+							android:layout_width="wrap_content"
+							android:layout_height="wrap_content"
+							android:layout_gravity="top"
+							android:layout_margin="16dp"
+							android:src="@drawable/ic_edit_24dp"
+							android:tint="@color/ic_tint"
+							tools:ignore="ContentDescription" />
+
+					<android.support.v7.widget.SwitchCompat
+							android:layout_width="match_parent"
+							android:layout_height="wrap_content"
+							android:text="@string/action_editable"
+							app:switchPadding="16dp"
+							app:switchTextAppearance="@style/TextAppearance.AppCompat"
+							android:paddingTop="16dp"
+							android:paddingBottom="16dp"
+							android:paddingLeft="20dp"
+							android:paddingRight="20dp"/>
+				</LinearLayout>
+
+				<LinearLayout
+						android:id="@+id/selectLayout"
+						android:layout_width="match_parent"
 						android:layout_height="wrap_content"
-						android:layout_margin="16dp"
-						android:src="@drawable/ic_looks_one_black_24dp"
-						android:tint="@color/ic_tint"
-						tools:ignore="ContentDescription"/>
+						android:background="?attr/selectableItemBackground"
+						android:gravity="center_vertical"
+						android:orientation="horizontal">
+
+					<ImageView
+							android:layout_width="wrap_content"
+							android:layout_height="wrap_content"
+							android:layout_gravity="top"
+							android:layout_margin="16dp"
+							android:src="@drawable/ic_ungroup_work_black_24dp"
+							android:tint="@color/ic_tint"
+							tools:ignore="ContentDescription" />
+
+					<TextView
+							android:layout_width="wrap_content"
+							android:layout_height="wrap_content"
+							android:layout_marginLeft="20dp"
+							android:layout_marginRight="20dp"
+							android:text="@string/match_any" />
+				</LinearLayout>
+
+				<LinearLayout
+						android:id="@+id/marker_codes"
+						android:layout_width="match_parent"
+						android:layout_height="match_parent"
+						android:orientation="vertical">
+
+				</LinearLayout>
+
+				<LinearLayout
+						android:id="@+id/newCodeLayout"
+						android:layout_width="match_parent"
+						android:layout_height="wrap_content"
+						android:background="?attr/selectableItemBackground"
+						android:gravity="center_vertical"
+						android:orientation="horizontal">
+
+					<ImageView
+							android:layout_width="wrap_content"
+							android:layout_height="wrap_content"
+							android:layout_margin="16dp"
+							android:src="@drawable/ic_looks_one_black_24dp"
+							android:tint="@color/ic_tint"
+							tools:ignore="ContentDescription" />
 
 					<EditText
-						android:id="@+id/edit_marker_code"
-						android:layout_width="0dp"
-						android:layout_height="wrap_content"
-						android:layout_marginLeft="16dp"
-						android:layout_marginRight="16dp"
-						android:layout_weight="1"
-						android:digits="0123456789:"
-						android:hint="@string/newMarkerCode"
-						android:inputType="time"
-						android:singleLine="true"
-						android:textAppearance="@style/TextAppearance.AppCompat"/>
+							android:id="@+id/edit_marker_code"
+							android:layout_width="0dp"
+							android:layout_height="wrap_content"
+							android:layout_marginLeft="16dp"
+							android:layout_marginRight="16dp"
+							android:layout_weight="1"
+							android:digits="0123456789:"
+							android:hint="@string/newMarkerCode"
+							android:inputType="time"
+							android:singleLine="true"
+							android:textAppearance="@style/TextAppearance.AppCompat" />
 				</LinearLayout>
 			</LinearLayout>
 		</ScrollView>

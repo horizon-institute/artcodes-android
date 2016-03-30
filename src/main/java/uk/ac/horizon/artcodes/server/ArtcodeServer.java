@@ -25,6 +25,7 @@ import java.util.List;
 import java.util.Map;
 
 import uk.ac.horizon.artcodes.account.Account;
+import uk.ac.horizon.artcodes.adapter.ExperienceAdapter;
 import uk.ac.horizon.artcodes.model.Action;
 import uk.ac.horizon.artcodes.model.Experience;
 
@@ -51,4 +52,6 @@ public interface ArtcodeServer
 	void loadStarred(LoadCallback<List<String>> callback);
 
 	void logScan(String uri, Action action);
+
+	void search(String query, LoadCallback<List<String>> callback);
 }

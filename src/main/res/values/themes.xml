@@ -28,9 +28,9 @@
 		<item name="colorPrimaryDark">@color/apptheme_primary_dark</item>
 		<item name="colorAccent">@color/apptheme_accent</item>
 
-		<item name="android:timePickerDialogTheme">@style/AlertDialogCustom</item>
-		<item name="android:datePickerDialogTheme">@style/AlertDialogCustom</item>
-		<item name="android:alertDialogTheme">@style/AlertDialogCustom</item>
+		<item name="android:timePickerDialogTheme" tools:ignore="NewApi">@style/Theme.Artcodes.Dialog</item>
+		<item name="android:datePickerDialogTheme" tools:ignore="NewApi">@style/Theme.Artcodes.Dialog</item>
+		<item name="alertDialogTheme">@style/Theme.Artcodes.Dialog</item>
 	</style>
 
 	<style name="Theme.Artcodes.Transparent" parent="Theme.Artcodes">
@@ -66,7 +66,7 @@
 		<item name="textAllCaps">true</item>
 	</style>
 
-	<style name="AlertDialogCustom" parent="Theme.AppCompat.Light.Dialog.Alert">
+	<style name="Theme.Artcodes.Dialog" parent="Theme.AppCompat.Light.Dialog.Alert">
 		<item name="colorPrimary">@color/apptheme_primary</item>
 		<item name="colorAccent">@color/apptheme_accent</item>
 	</style>

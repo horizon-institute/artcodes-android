@@ -20,6 +20,8 @@
 package uk.ac.horizon.artcodes.activity;
 
 import android.accounts.AccountManager;
+import android.app.SearchManager;
+import android.content.Context;
 import android.content.Intent;
 import android.content.res.Configuration;
 import android.databinding.DataBindingUtil;
@@ -30,9 +32,12 @@ import android.support.annotation.NonNull;
 import android.support.design.widget.NavigationView;
 import android.support.v4.app.Fragment;
 import android.support.v4.view.GravityCompat;
+import android.support.v4.view.MenuItemCompat;
 import android.support.v7.app.ActionBarDrawerToggle;
+import android.support.v7.widget.SearchView;
 import android.util.Log;
 import android.view.Menu;
+import android.view.MenuInflater;
 import android.view.MenuItem;
 import android.view.SubMenu;
 import android.view.View;
@@ -56,6 +61,7 @@ import uk.ac.horizon.artcodes.databinding.NavigationBinding;
 import uk.ac.horizon.artcodes.fragment.ExperienceLibraryFragment;
 import uk.ac.horizon.artcodes.fragment.ExperienceRecentFragment;
 import uk.ac.horizon.artcodes.fragment.ExperienceRecommendFragment;
+import uk.ac.horizon.artcodes.fragment.ExperienceSearchFragment;
 import uk.ac.horizon.artcodes.fragment.ExperienceStarFragment;
 import uk.ac.horizon.artcodes.fragment.FeatureListFragment;
 import uk.ac.horizon.artcodes.server.LoadCallback;
@@ -72,6 +78,9 @@ public class NavigationActivity extends ArtcodeActivityBase implements
 	private NavigationBinding binding;
 	private ActionBarDrawerToggle drawerToggle;
 	private MenuItem selected;
+
+	private static final String FRAGMENT_TAG = "fragment";
+	private static final Handler searchHandler = new Handler();
 
 	private GoogleApiClient apiClient;
 
@@ -199,20 +208,114 @@ public class NavigationActivity extends ArtcodeActivityBase implements
 		});
 	}
 
+	@Override
+	protected void onNewIntent(Intent intent)
+	{
+		Log.i("a", "New intent " + intent);
+		super.onNewIntent(intent);
+	}
+
 	public void navigate(Fragment fragment, boolean addToBackStack)
 	{
 		if (addToBackStack)
 		{
 			getSupportFragmentManager().beginTransaction()
-					.replace(R.id.content, fragment)
+					.replace(R.id.content, fragment, FRAGMENT_TAG)
 					.addToBackStack(null)
 					.commit();
 		}
 		else
 		{
 			getSupportFragmentManager().beginTransaction()
-					.replace(R.id.content, fragment)
+					.replace(R.id.content, fragment, FRAGMENT_TAG)
 					.commit();
+		}
+	}
+
+	@Override
+	public boolean onCreateOptionsMenu(Menu menu)
+	{
+		final MenuInflater inflater = getMenuInflater();
+		inflater.inflate(R.menu.search_menu, menu);
+
+		final MenuItem searchItem = menu.findItem(R.id.search);
+		final SearchView searchView = (SearchView) searchItem.getActionView();
+		final SearchManager searchManager = (SearchManager) getSystemService(Context.SEARCH_SERVICE);
+		searchView.setSearchableInfo(searchManager.getSearchableInfo(getComponentName()));
+		searchView.setOnQueryTextListener(new SearchView.OnQueryTextListener()
+		{
+			private Runnable delayedAction = null;
+
+			@Override
+			public boolean onQueryTextSubmit(String query)
+			{
+				search(query);
+				return true;
+			}
+
+			@Override
+			public boolean onQueryTextChange(final String newText)
+			{
+				if (delayedAction != null)
+				{
+					searchHandler.removeCallbacks(delayedAction);
+					delayedAction = null;
+				}
+
+				if (newText.trim().length() > 3)
+				{
+					delayedAction = new Runnable()
+					{
+						@Override
+						public void run()
+						{
+							search(newText);
+						}
+					};
+
+					searchHandler.postDelayed(delayedAction, 1000);
+				}
+				return true;
+			}
+		});
+		MenuItemCompat.setOnActionExpandListener(searchItem, new MenuItemCompat.OnActionExpandListener()
+		{
+			@Override
+			public boolean onMenuItemActionExpand(final MenuItem item)
+			{
+				return true;
+			}
+
+			@Override
+			public boolean onMenuItemActionCollapse(final MenuItem item)
+			{
+				Log.i("a", "Closed");
+				Fragment fragment = getSupportFragmentManager().findFragmentByTag(FRAGMENT_TAG);
+				if (fragment instanceof ExperienceSearchFragment)
+				{
+					getSupportFragmentManager().popBackStack();
+				}
+				return true;
+			}
+		});
+
+		return true;
+
+	}
+
+	private void search(String query)
+	{
+		Fragment fragment = getSupportFragmentManager().findFragmentByTag(FRAGMENT_TAG);
+		if (fragment instanceof ExperienceSearchFragment)
+		{
+			((ExperienceSearchFragment) fragment).search(query);
+		}
+		else
+		{
+			ExperienceSearchFragment experienceSearchFragment = new ExperienceSearchFragment();
+			experienceSearchFragment.setArguments(new Bundle());
+			experienceSearchFragment.getArguments().putString("query", query);
+			navigate(experienceSearchFragment, true);
 		}
 	}
 
@@ -330,6 +433,7 @@ public class NavigationActivity extends ArtcodeActivityBase implements
 				})
 				.addApi(Auth.GOOGLE_SIGN_IN_API, gso)
 				.build();
+		apiClient.connect();
 
 	}
 

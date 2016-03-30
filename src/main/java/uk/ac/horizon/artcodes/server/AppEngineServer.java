@@ -22,21 +22,20 @@ package uk.ac.horizon.artcodes.server;
 import android.content.Context;
 import android.content.SharedPreferences;
 import android.location.Location;
+import android.net.Uri;
 import android.util.Log;
-
 import com.google.common.reflect.TypeToken;
 import com.google.gson.Gson;
-
-import java.util.ArrayList;
-import java.util.List;
-import java.util.Map;
-
 import uk.ac.horizon.artcodes.ExperienceParser;
 import uk.ac.horizon.artcodes.account.Account;
 import uk.ac.horizon.artcodes.account.AppEngineAccount;
 import uk.ac.horizon.artcodes.account.LocalAccount;
 import uk.ac.horizon.artcodes.model.Action;
 import uk.ac.horizon.artcodes.model.Experience;
+
+import java.util.ArrayList;
+import java.util.List;
+import java.util.Map;
 
 public class AppEngineServer implements ArtcodeServer
 {
@@ -187,6 +186,18 @@ public class AppEngineServer implements ArtcodeServer
 		}
 	}
 
+	@Override
+	public void search(String query, LoadCallback<List<String>> callback)
+	{
+		String url = Uri.parse("https://aestheticodes.appspot.com/search")
+				.buildUpon()
+				.appendQueryParameter("q", query)
+				.build().toString();
+		load(url, new JsonCallback<>(new TypeToken<List<String>>()
+		{
+		}.getType(), gson, context, callback));
+	}
+
 	private void load(String uri, URILoaderCallback callback)
 	{
 		SharedPreferences preferences = context.getSharedPreferences(Account.class.getName(), Context.MODE_PRIVATE);
@@ -222,6 +233,7 @@ public class AppEngineServer implements ArtcodeServer
 		{
 		}.getType());
 	}
+
 
 	private void saveIDs(Class<?> clazz, String name, List<String> ids)
 	{

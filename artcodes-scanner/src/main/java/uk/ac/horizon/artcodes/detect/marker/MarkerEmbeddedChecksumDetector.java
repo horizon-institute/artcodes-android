@@ -19,7 +19,6 @@
 
 package uk.ac.horizon.artcodes.detect.marker;
 
-
 import org.opencv.core.Mat;
 import org.opencv.core.MatOfPoint;
 

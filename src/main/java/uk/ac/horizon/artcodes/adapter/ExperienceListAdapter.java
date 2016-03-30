@@ -52,6 +52,8 @@ public class ExperienceListAdapter extends ExperienceAdapter
 	@Override
 	public void loaded(final List<String> item)
 	{
+		experiences.clear();
+		adapter.notifyDataSetChanged();
 		for (int index = 0; index < item.size(); index++)
 		{
 			final int experienceIndex = index;
