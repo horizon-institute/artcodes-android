@@ -42,7 +42,7 @@ public class ExperienceSearchFragment extends ArtcodeFragmentBase
 	public View onCreateView(final LayoutInflater inflater, ViewGroup container, Bundle savedInstanceState)
 	{
 		binding = ListBinding.inflate(inflater, container, false);
-		binding.emptyIcon.setImageResource(R.drawable.ic_warning_black_144dp);
+		//adapter.setEmptyIcon(R.drawable.ic_warning_black_144dp);
 		adapter = new ExperienceListAdapter(getActivity(), getServer());
 		binding.setAdapter(adapter);
 		return binding.getRoot();
@@ -72,7 +72,7 @@ public class ExperienceSearchFragment extends ArtcodeFragmentBase
 			if (!queryString.isEmpty() && (this.query == null || !this.query.equals(queryString)))
 			{
 				adapter.loadStarted();
-				binding.emptyText.setText(getString(R.string.search_empty, queryString));
+				adapter.setEmptyMessage(getString(R.string.search_empty, queryString));
 				getServer().search(queryString, adapter);
 				this.query = queryString;
 			}

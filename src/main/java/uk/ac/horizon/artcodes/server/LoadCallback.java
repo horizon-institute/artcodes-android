@@ -22,4 +22,5 @@ package uk.ac.horizon.artcodes.server;
 public interface LoadCallback<T>
 {
 	void loaded(T item);
+	void error(Throwable e);
 }

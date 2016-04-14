@@ -166,5 +166,6 @@
 	<string name="search">Search</string>
 	<string name="action_editable">Editable in copies</string>
 	<string name="search_empty">No experiences found matching \"%s\"</string>
+    <string name="connection_error">Connection Error</string>
 
 </resources>

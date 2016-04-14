@@ -16,51 +16,28 @@
  *     You should have received a copy of the GNU Affero General Public License
  *     along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
-buildscript {
-	repositories {
-		jcenter()
-	}
-	dependencies {
-		classpath 'com.android.tools.build:gradle:2.1.0-beta1'
-	}
-}
 
-apply plugin: 'idea'
-apply plugin: 'com.android.library'
+package uk.ac.horizon.artcodes.server;
 
-repositories {
-	jcenter()
-	maven { url 'https://raw.github.com/vRallev/mvn-repo/master/' }
-}
+import java.net.UnknownHostException;
 
-dependencies {
-	compile 'com.android.support:appcompat-v7:23.2.0'
-	compile 'com.google.code.gson:gson:2.6.2'
-	compile 'com.google.guava:guava:19.0'
-	compile 'org.opencv:opencv-android:2.4.8'
-	testCompile 'junit:junit:4.12'
-}
+import uk.ac.horizon.artcodes.databinding.ListBinding;
 
-android {
-	compileSdkVersion 23
-	buildToolsVersion "23.0.2"
+public abstract class ListLoadCallback<T> implements LoadCallback<T>
+{
+	private final ListBinding binding;
 
-	dataBinding {
-		enabled = true
+	protected ListLoadCallback(ListBinding binding)
+	{
+		this.binding = binding;
 	}
 
-	defaultConfig {
-		minSdkVersion 15
-		targetSdkVersion 23
-		versionCode 400029
-		versionName '3.0'
-	}
-
-	lintOptions {
-		abortOnError false
-	}
-	compileOptions {
-		sourceCompatibility JavaVersion.VERSION_1_7
-		targetCompatibility JavaVersion.VERSION_1_7
+	@Override
+	public void error(Throwable error)
+	{
+		if(error instanceof UnknownHostException)
+		{
+			// Connection Error
+		}
 	}
 }

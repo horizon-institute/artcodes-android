@@ -114,8 +114,20 @@ public class ArtcodeActivity extends ScannerActivity implements LoadCallback<Exp
 					item.add(0, experience.getId());
 					getServer().saveRecent(item);
 				}
+
+				@Override
+				public void error(Throwable e)
+				{
+					GoogleAnalytics.trackException(e);
+				}
 			});
 		}
+	}
+
+	@Override
+	public void error(Throwable e)
+	{
+		GoogleAnalytics.trackException(e);
 	}
 
 	@Override
@@ -224,22 +236,12 @@ public class ArtcodeActivity extends ScannerActivity implements LoadCallback<Exp
 				public void onClick(View v)
 				{
 					GoogleAnalytics.trackEvent("Action", "Opened", experience.getId(), action.getName());
-					if (action.getShowDetail())
-					{
-						ActionActivity.start(ArtcodeActivity.this, action);
-					}
-					else
-					{
-						CustomTabsIntent.Builder builder = new CustomTabsIntent.Builder();
-						// TODO Warmup urls
-						//builder.setSession(session);
-						builder.setToolbarColor(ContextCompat.getColor(ArtcodeActivity.this, R.color.apptheme_primary));
-						//builder.setStartAnimations(this, R.anim.slide_in_right, R.anim.slide_out_left);
-						//builder.setExitAnimations(this, R.anim.slide_in_left, R.anim.slide_out_right);
-
-						CustomTabsIntent customTabsIntent = builder.build();
-						customTabsIntent.launchUrl(ArtcodeActivity.this, Uri.parse(action.getUrl()));
-					}
+					CustomTabsIntent.Builder builder = new CustomTabsIntent.Builder();
+					// TODO Warmup urls
+					//builder.setSession(session);
+					builder.setToolbarColor(ContextCompat.getColor(ArtcodeActivity.this, R.color.apptheme_primary));
+					CustomTabsIntent customTabsIntent = builder.build();
+					customTabsIntent.launchUrl(ArtcodeActivity.this, Uri.parse(action.getUrl()));
 				}
 			});
 			runOnUiThread(new Runnable()

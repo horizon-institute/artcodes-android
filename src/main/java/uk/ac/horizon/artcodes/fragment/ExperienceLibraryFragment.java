@@ -70,11 +70,10 @@ public class ExperienceLibraryFragment extends ArtcodeFragmentBase
 		ListBinding binding = ListBinding.inflate(inflater, container, false);
 		adapter = new ExperienceSortedListAdapter(getActivity(), getServer());
 		adapter.setFabPadding(true);
+		adapter.setEmptyIcon(R.drawable.ic_folder_144dp);
+		adapter.setEmptyMessage(getString(R.string.empty));
+		adapter.setEmptyDetail(getString(R.string.emptyHint));
 		binding.setAdapter(adapter);
-
-		binding.emptyIcon.setImageResource(R.drawable.ic_folder_144dp);
-		binding.emptyText.setText(R.string.empty);
-		binding.emptyDetail.setText(R.string.emptyHint);
 
 		final FloatingActionButton fab = new FloatingActionButton(getContext());
 		fab.setImageDrawable(getTintedDrawable(R.drawable.ic_add_24dp, Color.WHITE));

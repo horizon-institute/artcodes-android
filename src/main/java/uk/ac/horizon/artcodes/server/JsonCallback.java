@@ -27,8 +27,6 @@ import com.google.gson.Gson;
 import java.io.Reader;
 import java.lang.reflect.Type;
 
-import uk.ac.horizon.artcodes.GoogleAnalytics;
-
 public class JsonCallback<T> implements URILoaderCallback
 {
 	private final Handler mainHandler;
@@ -62,6 +60,6 @@ public class JsonCallback<T> implements URILoaderCallback
 	@Override
 	public void onError(Exception e)
 	{
-		GoogleAnalytics.trackException(e);
+		callback.error(e);
 	}
 }

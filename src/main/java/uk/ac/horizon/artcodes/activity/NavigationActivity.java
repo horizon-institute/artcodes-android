@@ -55,6 +55,7 @@ import com.google.android.gms.common.api.GoogleApiClient;
 import java.util.List;
 
 import uk.ac.horizon.artcodes.Feature;
+import uk.ac.horizon.artcodes.GoogleAnalytics;
 import uk.ac.horizon.artcodes.R;
 import uk.ac.horizon.artcodes.account.Account;
 import uk.ac.horizon.artcodes.databinding.NavigationBinding;
@@ -193,6 +194,12 @@ public class NavigationActivity extends ArtcodeActivityBase implements
 					recent.setVisible(!item.isEmpty());
 				}
 			}
+
+			@Override
+			public void error(Throwable e)
+			{
+				GoogleAnalytics.trackException(e);
+			}
 		});
 		getServer().loadStarred(new LoadCallback<List<String>>()
 		{
@@ -204,6 +211,12 @@ public class NavigationActivity extends ArtcodeActivityBase implements
 				{
 					starred.setVisible(!item.isEmpty());
 				}
+			}
+
+			@Override
+			public void error(Throwable e)
+			{
+				GoogleAnalytics.trackException(e);
 			}
 		});
 	}

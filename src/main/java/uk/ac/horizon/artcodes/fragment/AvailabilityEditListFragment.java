@@ -149,7 +149,7 @@ public class AvailabilityEditListFragment extends ExperienceEditFragment
 			int index = getExperience().getAvailabilities().size() - 1;
 			Log.i("Added", "Added Availability at " + index);
 			adapter.notifyItemInserted(index);
-			notifyPropertyChanged(BR.empty);
+			notifyPropertyChanged(BR.showError);
 			AvailabilityEditDialogFragment.show(getFragmentManager(), AvailabilityEditListFragment.this, index);
 		}
 
@@ -163,7 +163,7 @@ public class AvailabilityEditListFragment extends ExperienceEditFragment
 			final Availability availability = getExperience().getAvailabilities().get(index);
 			getExperience().getAvailabilities().remove(index);
 			adapter.notifyItemRemoved(index);
-			notifyPropertyChanged(BR.empty);
+			notifyPropertyChanged(BR.showError);
 			Snackbar.make(getView(), R.string.action_deleted, Snackbar.LENGTH_LONG)
 					.setAction(R.string.action_delete_undo, new View.OnClickListener()
 					{
@@ -204,10 +204,10 @@ public class AvailabilityEditListFragment extends ExperienceEditFragment
 	public View onCreateView(LayoutInflater inflater, ViewGroup container, Bundle savedInstanceState)
 	{
 		ListBinding binding = ListBinding.inflate(inflater, container, false);
-		binding.emptyIcon.setImageResource(R.drawable.ic_lock_black_144dp);
-		binding.emptyText.setText(R.string.availability_private);
-
 		adapter = new AvailabilityAdapter(getActivity());
+		adapter.setEmptyIcon(R.drawable.ic_lock_black_144dp);
+		adapter.setEmptyMessage(getString(R.string.availability_private));
+
 		binding.setAdapter(adapter);
 
 		ItemTouchHelper.SimpleCallback simpleItemTouchCallback = new ItemTouchHelper.SimpleCallback(0, ItemTouchHelper.LEFT | ItemTouchHelper.RIGHT)

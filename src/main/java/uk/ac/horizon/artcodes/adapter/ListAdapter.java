@@ -23,12 +23,14 @@ import android.content.Context;
 import android.databinding.BaseObservable;
 import android.databinding.Bindable;
 import android.databinding.ViewDataBinding;
+import android.support.annotation.DrawableRes;
 import android.support.v7.widget.LinearLayoutManager;
 import android.support.v7.widget.RecyclerView;
 import android.util.Log;
 import android.view.ViewGroup;
 
 import uk.ac.horizon.artcodes.BR;
+import uk.ac.horizon.artcodes.R;
 
 public abstract class ListAdapter<T extends ViewDataBinding> extends BaseObservable
 {
@@ -44,6 +46,14 @@ public abstract class ListAdapter<T extends ViewDataBinding> extends BaseObserva
 	}
 
 	private int loading = 0;
+	private String emptyMessage;
+	private int emptyIcon = R.drawable.ic_warning_black_144dp;
+	private String errorMessage;
+	private String emptyDetail = "";
+	private int errorIcon = R.drawable.ic_warning_black_144dp;
+
+
+	private boolean error = false;
 	protected final Context context;
 	protected final RecyclerView.Adapter<BindViewHolder<T>> adapter = new RecyclerView.Adapter<BindViewHolder<T>>()
 	{
@@ -72,7 +82,11 @@ public abstract class ListAdapter<T extends ViewDataBinding> extends BaseObserva
 		}
 	};
 
-	protected ListAdapter(final Context context) {this.context = context;}
+	protected ListAdapter(final Context context)
+	{
+		this.context = context;
+		this.emptyMessage = context.getString(R.string.empty);
+	}
 
 	@Bindable
 	public RecyclerView.Adapter getAdapter()
@@ -92,6 +106,24 @@ public abstract class ListAdapter<T extends ViewDataBinding> extends BaseObserva
 
 	public abstract int getViewCount();
 
+	public void setEmptyMessage(String message)
+	{
+		this.emptyMessage = message;
+		notifyPropertyChanged(BR.errorMessage);
+	}
+
+	public void setEmptyIcon(@DrawableRes int icon)
+	{
+		this.emptyIcon = icon;
+		notifyPropertyChanged(BR.errorIcon);
+	}
+
+	public void setEmptyDetail(String message)
+	{
+		this.emptyDetail = message;
+		notifyPropertyChanged(BR.errorDetail);
+	}
+
 	@Bindable
 	public RecyclerView.ItemDecoration getDecoration()
 	{
@@ -99,9 +131,28 @@ public abstract class ListAdapter<T extends ViewDataBinding> extends BaseObserva
 	}
 
 	@Bindable
-	public boolean isEmpty()
+	public boolean getShowError()
 	{
 		return !isLoading() && getViewCount() == 0;
+	}
+
+	@Bindable
+	public String getErrorMessage()
+	{
+		return error ? errorMessage : emptyMessage;
+	}
+
+	@DrawableRes
+	@Bindable
+	public int getErrorIcon()
+	{
+		return error ? errorIcon : emptyIcon;
+	}
+
+	@Bindable
+	public String getErrorDetail()
+	{
+		return error ? "" : emptyDetail;
 	}
 
 	@Bindable
@@ -116,7 +167,7 @@ public abstract class ListAdapter<T extends ViewDataBinding> extends BaseObserva
 		if (loading == 1)
 		{
 			notifyPropertyChanged(BR.loading);
-			notifyPropertyChanged(BR.empty);
+			notifyPropertyChanged(BR.showError);
 		}
 	}
 
@@ -125,18 +176,27 @@ public abstract class ListAdapter<T extends ViewDataBinding> extends BaseObserva
 		return 0;
 	}
 
+	protected void showError(String errorMessage)
+	{
+		error = true;
+		this.errorMessage = errorMessage;
+		notifyPropertyChanged(BR.errorIcon);
+		notifyPropertyChanged(BR.errorMessage);
+		notifyPropertyChanged(BR.showError);
+	}
+
 	public void loadFinished()
 	{
 		loading--;
 		if (loading <= 0)
 		{
-			if(loading < 0)
+			if (loading < 0)
 			{
 				Log.i("a", "Attempted to finish a load that never started");
 			}
 			loading = 0;
 			notifyPropertyChanged(BR.loading);
-			notifyPropertyChanged(BR.empty);
+			notifyPropertyChanged(BR.showError);
 		}
 	}
 }

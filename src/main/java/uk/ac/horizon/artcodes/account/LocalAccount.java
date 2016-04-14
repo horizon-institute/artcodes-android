@@ -80,7 +80,7 @@ public class LocalAccount implements Account
 		}
 		catch (Exception e)
 		{
-			// TODO callback.onError(e);
+			callback.error(e);
 		}
 	}
 

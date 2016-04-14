@@ -90,7 +90,7 @@ public class ActionEditListFragment extends ExperienceEditFragment
 			final Action action = actions.get(index);
 			actions.remove(index);
 			adapter.notifyItemRemoved(index);
-			notifyPropertyChanged(BR.empty);
+			notifyPropertyChanged(BR.showError);
 			Snackbar.make(getView(), R.string.action_deleted, Snackbar.LENGTH_LONG)
 					.setAction(R.string.action_delete_undo, new View.OnClickListener()
 					{
@@ -115,7 +115,7 @@ public class ActionEditListFragment extends ExperienceEditFragment
 			getExperience().getActions().add(action);
 			int index = getExperience().getActions().size() - 1;
 			adapter.notifyItemInserted(index);
-			notifyPropertyChanged(BR.empty);
+			notifyPropertyChanged(BR.showError);
 			ActionEditDialogFragment.show(getFragmentManager(), ActionEditListFragment.this, index);
 		}
 	}
@@ -134,10 +134,11 @@ public class ActionEditListFragment extends ExperienceEditFragment
 	{
 		ListBinding binding = ListBinding.inflate(inflater, container, false);
 		adapter = new ActionAdapter(getActivity());
+		adapter.setEmptyIcon(R.drawable.ic_warning_black_144dp);
+		adapter.setEmptyMessage(getString(R.string.no_actions));
+		adapter.setEmptyDetail(getString(R.string.no_actions_action));
+
 		binding.setAdapter(adapter);
-		binding.emptyIcon.setImageResource(R.drawable.ic_warning_black_144dp);
-		binding.emptyText.setText(R.string.no_actions);
-		binding.emptyDetail.setText(R.string.no_actions_action);
 
 		ItemTouchHelper.SimpleCallback simpleItemTouchCallback = new ItemTouchHelper.SimpleCallback(0, ItemTouchHelper.LEFT | ItemTouchHelper.RIGHT)
 		{

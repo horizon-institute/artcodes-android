@@ -69,7 +69,6 @@
 					app:navigationIcon="@drawable/ic_arrow_back_white_24dp"/>
 			</FrameLayout>
 
-
 			<FrameLayout
 				android:layout_width="fill_parent"
 				android:layout_height="0dp"

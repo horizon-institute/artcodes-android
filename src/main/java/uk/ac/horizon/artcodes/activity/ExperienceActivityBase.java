@@ -26,6 +26,7 @@ import android.util.Log;
 
 import com.google.gson.Gson;
 
+import uk.ac.horizon.artcodes.GoogleAnalytics;
 import uk.ac.horizon.artcodes.model.Experience;
 import uk.ac.horizon.artcodes.server.LoadCallback;
 
@@ -90,5 +91,11 @@ public abstract class ExperienceActivityBase extends ArtcodeActivityBase impleme
 				}
 			}
 		}
+	}
+
+	@Override
+	public void error(Throwable e)
+	{
+		GoogleAnalytics.trackException(e);
 	}
 }

@@ -110,6 +110,12 @@ public class AppEngineAccount implements Account
 				editor.apply();
 				callback.loaded(item);
 			}
+
+			@Override
+			public void error(Throwable e)
+			{
+				callback.error(e);
+			}
 		}));
 	}
 

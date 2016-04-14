@@ -26,7 +26,7 @@ import android.view.ViewGroup;
 
 import java.util.List;
 
-import uk.ac.horizon.artcodes.GoogleAnalytics;
+import uk.ac.horizon.artcodes.R;
 import uk.ac.horizon.artcodes.activity.ArtcodeActivity;
 import uk.ac.horizon.artcodes.activity.ExperienceActivity;
 import uk.ac.horizon.artcodes.databinding.ExperienceCardBinding;
@@ -73,5 +73,12 @@ public abstract class ExperienceAdapter extends GridAdapter<ExperienceCardBindin
 	public ExperienceCardBinding createBinding(final ViewGroup parent, final int viewType)
 	{
 		return ExperienceCardBinding.inflate(LayoutInflater.from(parent.getContext()), parent, false);
+	}
+
+	@Override
+	public void error(Throwable e)
+	{
+		loadFinished();
+		showError(context.getString(R.string.connection_error));
 	}
 }

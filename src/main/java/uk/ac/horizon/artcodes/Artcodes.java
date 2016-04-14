@@ -41,9 +41,12 @@ public final class Artcodes extends Application
 		GoogleAnalytics.initialize(this);
 
 		server = new AppEngineServer(this);
-		OkHttpClient.Builder builder = new OkHttpClient.Builder();
-		builder.cache(new Cache(getCacheDir(), cacheSize));
-		httpClient = builder.build();
+		if(httpClient == null)
+		{
+			httpClient = new OkHttpClient.Builder()
+					.cache(new Cache(getCacheDir(), cacheSize))
+					.build();
+		}
 	}
 
 	public ArtcodeServer getServer()

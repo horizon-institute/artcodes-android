@@ -228,6 +228,12 @@ public class ExperienceActivity extends ExperienceActivityBase
 				}
 				updateStarred();
 			}
+
+			@Override
+			public void error(Throwable e)
+			{
+				GoogleAnalytics.trackException(e);
+			}
 		});
 	}
 
@@ -370,6 +376,12 @@ public class ExperienceActivity extends ExperienceActivityBase
 					binding.experienceFavouriteButton.setText(R.string.star);
 					binding.experienceFavouriteButton.setCompoundDrawablesWithIntrinsicBounds(0, R.drawable.ic_star_border_black_24dp, 0, 0);
 				}
+			}
+
+			@Override
+			public void error(Throwable e)
+			{
+				GoogleAnalytics.trackException(e);
 			}
 		});
 	}

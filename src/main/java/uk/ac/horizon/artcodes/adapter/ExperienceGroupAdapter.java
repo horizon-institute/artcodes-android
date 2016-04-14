@@ -31,6 +31,7 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
+import uk.ac.horizon.artcodes.R;
 import uk.ac.horizon.artcodes.activity.ArtcodeActivity;
 import uk.ac.horizon.artcodes.activity.ExperienceActivity;
 import uk.ac.horizon.artcodes.databinding.ExperienceCardBinding;
@@ -113,6 +114,13 @@ public class ExperienceGroupAdapter extends GridAdapter
 						{
 							loadFinished();
 							add(experienceIndex, experience);
+						}
+
+						@Override
+						public void error(Throwable e)
+						{
+							showError(context.getString(R.string.connection_error));
+							loadFinished();
 						}
 					});
 				}
@@ -333,6 +341,13 @@ public class ExperienceGroupAdapter extends GridAdapter
 				group.setIds(item);
 				loadFinished();
 			}
+
+			@Override
+			public void error(Throwable e)
+			{
+				showError(context.getString(R.string.connection_error));
+				loadFinished();
+			}
 		};
 	}
 
@@ -348,6 +363,13 @@ public class ExperienceGroupAdapter extends GridAdapter
 					Group group = getGroup(name);
 					group.setIds(item.get(name));
 				}
+				loadFinished();
+			}
+
+			@Override
+			public void error(Throwable e)
+			{
+				showError(context.getString(R.string.connection_error));
 				loadFinished();
 			}
 		};

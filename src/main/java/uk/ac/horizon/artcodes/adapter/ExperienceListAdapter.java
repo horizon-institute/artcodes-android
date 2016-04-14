@@ -24,6 +24,7 @@ import android.util.SparseArray;
 
 import java.util.List;
 
+import uk.ac.horizon.artcodes.R;
 import uk.ac.horizon.artcodes.model.Experience;
 import uk.ac.horizon.artcodes.server.ArtcodeServer;
 import uk.ac.horizon.artcodes.server.LoadCallback;
@@ -67,6 +68,13 @@ public class ExperienceListAdapter extends ExperienceAdapter
 					loadFinished();
 					experiences.put(experienceIndex, item);
 					adapter.notifyItemInserted(experiences.indexOfValue(item));
+				}
+
+				@Override
+				public void error(Throwable e)
+				{
+					showError(context.getString(R.string.connection_error));
+					loadFinished();
 				}
 			});
 		}
