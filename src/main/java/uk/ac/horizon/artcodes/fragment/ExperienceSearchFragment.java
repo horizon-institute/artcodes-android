@@ -44,6 +44,7 @@ public class ExperienceSearchFragment extends ArtcodeFragmentBase
 		binding = ListBinding.inflate(inflater, container, false);
 		//adapter.setEmptyIcon(R.drawable.ic_warning_black_144dp);
 		adapter = new ExperienceListAdapter(getActivity(), getServer());
+		adapter.setEmptyIcon(R.drawable.ic_search_144dp);
 		binding.setAdapter(adapter);
 		return binding.getRoot();
 	}
