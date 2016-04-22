@@ -17,7 +17,7 @@
  *     along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-package uk.ac.horizon.artcodes.detect;
+package uk.ac.horizon.artcodes.detect.marker;
 
 import java.util.Collection;
 

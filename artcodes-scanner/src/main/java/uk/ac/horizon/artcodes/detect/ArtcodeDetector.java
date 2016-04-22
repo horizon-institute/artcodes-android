@@ -26,15 +26,54 @@ import android.view.View;
 
 import org.opencv.core.Rect;
 
-import uk.ac.horizon.artcodes.model.Experience;
-import uk.ac.horizon.artcodes.process.TileThresholder;
-import uk.ac.horizon.artcodes.detect.marker.MarkerDetector;
+import java.util.HashMap;
+import java.util.Map;
 
+import uk.ac.horizon.artcodes.detect.marker.MarkerAreaOrderDetector;
+import uk.ac.horizon.artcodes.detect.marker.MarkerDetectionHandler;
+import uk.ac.horizon.artcodes.detect.marker.MarkerDetector;
+import uk.ac.horizon.artcodes.detect.marker.MarkerEmbeddedChecksumDetector;
+import uk.ac.horizon.artcodes.model.Experience;
+import uk.ac.horizon.artcodes.process.ImageProcessor;
+import uk.ac.horizon.artcodes.process.ImageProcessorFactory;
+import uk.ac.horizon.artcodes.process.RGBGreyscaler;
+import uk.ac.horizon.artcodes.process.TileThresholder;
 import uk.ac.horizon.artcodes.scanner.BR;
 
 public class ArtcodeDetector extends Detector
 {
+	private static final Map<String, ImageProcessorFactory> factoryRegistry = new HashMap<>();
+
+	static
+	{
+		register(new MarkerDetector.Factory());
+		register(new MarkerEmbeddedChecksumDetector.Factory());
+		register(new MarkerAreaOrderDetector.Factory());
+		register(new TileThresholder.Factory());
+		register(new RGBGreyscaler.RedFactory());
+		register(new RGBGreyscaler.BlueFactory());
+		register(new RGBGreyscaler.GreenFactory());
+	}
+
 	private int margin = 100;
+
+	public ArtcodeDetector(Experience experience, MarkerDetectionHandler handler)
+	{
+		for (String processorName : experience.getPipeline())
+		{
+			ImageProcessor processor = getProcessor(processorName, experience, handler);
+			if (processor != null)
+			{
+				pipeline.add(processor);
+			}
+		}
+
+		if (pipeline.isEmpty())
+		{
+			pipeline.add(new TileThresholder());
+			pipeline.add(new MarkerDetector(experience, handler));
+		}
+	}
 
 	@BindingAdapter("height")
 	public static void bindHeight(View view, Integer height)
@@ -56,18 +95,27 @@ public class ArtcodeDetector extends Detector
 		}
 	}
 
-	public ArtcodeDetector(Experience experience, MarkerDetectionHandler handler)
+	private static void register(ImageProcessorFactory factory)
 	{
-		// TODO Construct pipeline
-		//for (String processor : experience.getPipeline())
-		//{
-		//}
+		factoryRegistry.put(factory.getName(), factory);
+	}
 
-		if (pipeline.isEmpty())
+	private static ImageProcessor getProcessor(String string, Experience experience, MarkerDetectionHandler handler)
+	{
+		ImageProcessorFactory factory = factoryRegistry.get(string);
+		if (factory != null)
 		{
-			pipeline.add(new TileThresholder());
-			pipeline.add(new MarkerDetector(experience, handler));
+			try
+			{
+				return factory.create(experience, handler);
+			}
+			catch (Exception e)
+			{
+
+			}
 		}
+
+		return null;
 	}
 
 	@Bindable

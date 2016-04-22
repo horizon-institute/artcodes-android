@@ -23,6 +23,8 @@ import java.util.List;
 
 import uk.ac.horizon.artcodes.detect.DetectorSetting;
 import uk.ac.horizon.artcodes.detect.ImageBuffers;
+import uk.ac.horizon.artcodes.detect.marker.MarkerDetectionHandler;
+import uk.ac.horizon.artcodes.model.Experience;
 
 public class CmyGreyscaler implements ImageProcessor
 {

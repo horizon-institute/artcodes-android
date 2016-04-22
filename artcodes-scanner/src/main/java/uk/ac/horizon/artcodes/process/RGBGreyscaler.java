@@ -26,9 +26,50 @@ import java.util.List;
 
 import uk.ac.horizon.artcodes.detect.DetectorSetting;
 import uk.ac.horizon.artcodes.detect.ImageBuffers;
+import uk.ac.horizon.artcodes.detect.marker.MarkerDetectionHandler;
+import uk.ac.horizon.artcodes.model.Experience;
 
 public class RGBGreyscaler implements ImageProcessor
 {
+	public static class RedFactory implements ImageProcessorFactory
+	{
+		public String getName()
+		{
+			return "filterRed";
+		}
+
+		public ImageProcessor create(Experience experience, MarkerDetectionHandler handler)
+		{
+			return new RGBGreyscaler(Channel.red);
+		}
+	}
+
+	public static class BlueFactory implements ImageProcessorFactory
+	{
+		public String getName()
+		{
+			return "filterBlue";
+		}
+
+		public ImageProcessor create(Experience experience, MarkerDetectionHandler handler)
+		{
+			return new RGBGreyscaler(Channel.blue);
+		}
+	}
+
+	public static class GreenFactory implements ImageProcessorFactory
+	{
+		public String getName()
+		{
+			return "filterGreen";
+		}
+
+		public ImageProcessor create(Experience experience, MarkerDetectionHandler handler)
+		{
+			return new RGBGreyscaler(Channel.green);
+		}
+	}
+
 	public enum Channel
 	{
 		red, green, blue

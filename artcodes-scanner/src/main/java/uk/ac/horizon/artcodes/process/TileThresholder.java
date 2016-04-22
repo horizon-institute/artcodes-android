@@ -27,10 +27,25 @@ import java.util.List;
 
 import uk.ac.horizon.artcodes.detect.DetectorSetting;
 import uk.ac.horizon.artcodes.detect.ImageBuffers;
+import uk.ac.horizon.artcodes.detect.marker.MarkerDetectionHandler;
+import uk.ac.horizon.artcodes.model.Experience;
 import uk.ac.horizon.artcodes.scanner.R;
 
 public class TileThresholder implements ImageProcessor
 {
+	public static class Factory implements ImageProcessorFactory
+	{
+		public String getName()
+		{
+			return "tile";
+		}
+
+		public ImageProcessor create(Experience experience, MarkerDetectionHandler handler)
+		{
+			return new TileThresholder();
+		}
+	}
+
 	private enum Display
 	{
 		none, greyscale, threshold;

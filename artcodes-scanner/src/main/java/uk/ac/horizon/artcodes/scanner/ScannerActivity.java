@@ -60,7 +60,7 @@ import uk.ac.horizon.artcodes.animator.TextAnimator;
 import uk.ac.horizon.artcodes.animator.VisibilityAnimator;
 import uk.ac.horizon.artcodes.scanner.databinding.ScannerBinding;
 import uk.ac.horizon.artcodes.detect.ArtcodeDetector;
-import uk.ac.horizon.artcodes.detect.MarkerDetectionHandler;
+import uk.ac.horizon.artcodes.detect.marker.MarkerDetectionHandler;
 import uk.ac.horizon.artcodes.detect.DetectorSetting;
 
 public class ScannerActivity extends AppCompatActivity implements MarkerDetectionHandler

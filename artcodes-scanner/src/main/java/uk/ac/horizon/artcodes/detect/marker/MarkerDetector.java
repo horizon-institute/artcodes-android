@@ -38,13 +38,26 @@ import java.util.List;
 import uk.ac.horizon.artcodes.model.Action;
 import uk.ac.horizon.artcodes.model.Experience;
 import uk.ac.horizon.artcodes.detect.ImageBuffers;
+import uk.ac.horizon.artcodes.process.ImageProcessorFactory;
 import uk.ac.horizon.artcodes.scanner.R;
-import uk.ac.horizon.artcodes.detect.MarkerDetectionHandler;
 import uk.ac.horizon.artcodes.process.ImageProcessor;
 import uk.ac.horizon.artcodes.detect.DetectorSetting;
 
 public class MarkerDetector implements ImageProcessor
 {
+	public static class Factory implements ImageProcessorFactory
+	{
+		public String getName()
+		{
+			return "detect";
+		}
+
+		public ImageProcessor create(Experience experience, MarkerDetectionHandler handler)
+		{
+			return new MarkerDetector(experience, handler);
+		}
+	}
+
 	private enum CodeDisplay
 	{
 		hidden, visible;

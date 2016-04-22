@@ -26,10 +26,24 @@ import java.util.ArrayList;
 import java.util.List;
 
 import uk.ac.horizon.artcodes.model.Experience;
-import uk.ac.horizon.artcodes.detect.MarkerDetectionHandler;
+import uk.ac.horizon.artcodes.process.ImageProcessor;
+import uk.ac.horizon.artcodes.process.ImageProcessorFactory;
 
 public class MarkerEmbeddedChecksumDetector extends MarkerDetector
 {
+	public static class Factory implements ImageProcessorFactory
+	{
+		public String getName()
+		{
+			return "detectEmbedded";
+		}
+
+		public ImageProcessor create(Experience experience, MarkerDetectionHandler handler)
+		{
+			return new MarkerEmbeddedChecksumDetector(experience, handler);
+		}
+	}
+
 	public MarkerEmbeddedChecksumDetector(Experience experience, MarkerDetectionHandler handler)
 	{
 		super(experience, handler);
