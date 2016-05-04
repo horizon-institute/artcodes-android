@@ -92,6 +92,8 @@ public class MarkerDetector implements ImageProcessor
 	protected final int minRegions;
 	protected final int maxRegions;
 	protected final int maxRegionValue;
+	protected final int maxEmptyRegions;
+	protected final boolean ignoreEmptyRegions;
 
 	private final MarkerDetectionHandler handler;
 
@@ -104,6 +106,7 @@ public class MarkerDetector implements ImageProcessor
 		int minRegionCount = 100;
 		int maxRegionCount = 3;
 		int checksum = 0;
+		int maxEmptyRegions = 0;
 		for (Action action : experience.getActions())
 		{
 			for (String code : action.getCodes())
@@ -112,6 +115,7 @@ public class MarkerDetector implements ImageProcessor
 				String[] values = code.split(":");
 				minRegionCount = Math.min(minRegionCount, values.length);
 				maxRegionCount = Math.max(maxRegionCount, values.length);
+				int emptyRegions = 0;
 				for (String value : values)
 				{
 					try
@@ -119,12 +123,17 @@ public class MarkerDetector implements ImageProcessor
 						int codeValue = Integer.parseInt(value);
 						maxValue = Math.max(maxValue, codeValue);
 						total += codeValue;
+						if (codeValue==0)
+						{
+							++emptyRegions;
+						}
 					}
 					catch (Exception e)
 					{
 						Log.w("", e.getMessage(), e);
 					}
 				}
+				maxEmptyRegions = Math.max(maxEmptyRegions, emptyRegions);
 
 				if (total > 0)
 				{
@@ -141,6 +150,8 @@ public class MarkerDetector implements ImageProcessor
 		this.minRegions = minRegionCount;
 		this.maxRegions = maxRegionCount;
 		this.checksum = checksum;
+		this.maxEmptyRegions = maxEmptyRegions;
+		this.ignoreEmptyRegions = maxEmptyRegions == 0;
 		Log.i("detect", "Regions " + minRegionCount + "-" + maxRegionCount + ", <" + maxValue + ", checksum " + checksum);
 	}
 
@@ -326,7 +337,11 @@ public class MarkerDetector implements ImageProcessor
 			final MarkerRegion region = createRegionForNode(currentNodeIndex, contours, hierarchy);
 			if (region != null)
 			{
-				if (regions == null)
+				if (this.ignoreEmptyRegions && region.value==0)
+				{
+					continue;
+				}
+				else if (regions == null)
 				{
 					regions = new ArrayList<>();
 				}
@@ -336,6 +351,10 @@ public class MarkerDetector implements ImageProcessor
 				}
 
 				regions.add(region);
+			}
+			else
+			{
+				return null; // The region is not valid.
 			}
 		}
 
@@ -352,9 +371,9 @@ public class MarkerDetector implements ImageProcessor
 		// Find the first dot index:
 		double[] nodes = hierarchy.get(0, regionIndex);
 		int currentNodeIndex = (int) nodes[FIRST_NODE];
-		if (currentNodeIndex < 0)
+		if (currentNodeIndex < 0 && !(this.ignoreEmptyRegions || this.maxEmptyRegions>0))
 		{
-			return null; // There are no dots in this region.
+			return null; // There are no dots in this region, and empty regions are not allowed.
 		}
 
 		// Count all the dots and check if they are leaf nodes in the hierarchy:
@@ -417,12 +436,17 @@ public class MarkerDetector implements ImageProcessor
 			return false; // Too long
 		}
 
+		int numberOfEmptyRegions = 0;
 		for (MarkerRegion region : regions)
 		{
 			//check if leaves are using in accepted range.
 			if (region.value > maxRegionValue)
 			{
 				return false; // value is too Big
+			}
+			else if (region.value==0 && ++numberOfEmptyRegions>this.maxEmptyRegions)
+			{
+				return false; // too many empty regions
 			}
 		}
 
