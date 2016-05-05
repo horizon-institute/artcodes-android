@@ -354,7 +354,6 @@ public class MarkerDetector implements ImageProcessor
 				}
 				else if (regions.size() >= maxRegions)
 				{
-					Log.i("detect", "region to big");
 					return null;
 				}
 
