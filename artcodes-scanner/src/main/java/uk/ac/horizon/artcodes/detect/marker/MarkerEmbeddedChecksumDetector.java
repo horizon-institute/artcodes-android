@@ -58,7 +58,11 @@ public class MarkerEmbeddedChecksumDetector extends MarkerDetector
 			final MarkerRegion region = createRegionForNode(currentNodeIndex, contours, hierarchy);
 			if (region != null)
 			{
-				if (regions == null)
+				if (this.ignoreEmptyRegions && region.value==0)
+				{
+					continue;
+				}
+				else if (regions == null)
 				{
 					regions = new ArrayList<>();
 				}
@@ -76,6 +80,10 @@ public class MarkerEmbeddedChecksumDetector extends MarkerDetector
 				{
 					return null;
 				}
+			}
+			else
+			{
+				return null;
 			}
 		}
 
@@ -133,11 +141,22 @@ public class MarkerEmbeddedChecksumDetector extends MarkerDetector
 		}
 
 		// Find weighted sum of code, e.g. 1:1:2:4:4 -> 1*1 + 1*2 + 2*3 + 4*4 + 4*5 = 45
+		// Although do not use weights/values divisible by 7
+		// e.g. transform values 1,2,3,4,5,6,7,8, 9,10,11,12,13,14,15... to
+		//                       1,2,3,4,5,6,8,9,10,11,12,13,15,16,17
+		int embeddedChecksumModValue = 7;
 		int weightedSum = 0;
+		int weight = 1;
 		for (int i = 0; i < regions.size(); ++i)
 		{
-			weightedSum += regions.get(i).value * (i + 1);
+			int value = regions.get(i).value;
+			value += (value+value/embeddedChecksumModValue)/embeddedChecksumModValue;
+			if (weight%embeddedChecksumModValue==0)
+			{
+				++weight;
+			}
+			weightedSum += value * weight++;
 		}
-		return checksumRegion.value == (weightedSum % 7 == 0 ? 7 : weightedSum % 7);
+		return checksumRegion.value == (weightedSum - 1) % 7 + 1;
 	}
 }
