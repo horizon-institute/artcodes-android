@@ -20,5 +20,5 @@
 
 <resources>
 	<color name="settings_mask">#3000</color>
-	<color name="viewfinder_mask">#B000</color>
+	<color name="viewfinder_mask">#bb000000</color>
 </resources>

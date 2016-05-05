@@ -32,14 +32,15 @@
 	</data>
 
 	<Button
-		style="@style/Widget.AppCompat.ActionButton"
-		android:layout_width="match_parent"
-		android:layout_height="match_parent"
-		android:padding="16dp"
-		android:text="@{action.name ?? action.displayUrl}"
-		android:textAppearance="@style/TextAppearance.AppCompat.Title"
-		android:textColor="@color/apptheme_accent_light"
-		android:visibility="invisible"
-		tools:text="Marker Blah"
-		tools:visibility="visible"/>
+        style="@style/Widget.AppCompat.ActionButton"
+        android:layout_width="match_parent"
+        android:layout_height="match_parent"
+        android:padding="16dp"
+        android:text="@{action.name ?? action.displayUrl}"
+        android:textAppearance="@style/TextAppearance.AppCompat.Title"
+        android:textColor="@color/apptheme_accent_light"
+        android:visibility="invisible"
+        tools:text="Marker Blah"
+        tools:visibility="visible"
+        android:background="@color/viewfinder_mask"/>
 </layout>

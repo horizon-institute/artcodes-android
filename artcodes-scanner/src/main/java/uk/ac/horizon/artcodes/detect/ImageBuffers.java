@@ -55,6 +55,7 @@ public class ImageBuffers
 	public byte[] createBuffer(int imageWidth, int imageHeight, int imageDepth)
 	{
 		buffer = new byte[imageWidth * imageHeight * imageDepth / 8];
+		// TODO Change depth based on image processors used?
 		cameraImage = new Mat(imageHeight, imageWidth, CvType.CV_8UC1);
 		return buffer;
 	}

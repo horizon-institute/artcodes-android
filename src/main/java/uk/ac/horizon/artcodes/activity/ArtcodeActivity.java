@@ -184,9 +184,8 @@ public class ArtcodeActivity extends ScannerActivity implements LoadCallback<Exp
 	}
 
 	@Override
-	protected void onPostCreate(Bundle savedInstanceState)
+	protected void loadExperience(Bundle savedInstanceState)
 	{
-		super.onPostCreate(savedInstanceState);
 		if (savedInstanceState != null && savedInstanceState.containsKey("experience"))
 		{
 

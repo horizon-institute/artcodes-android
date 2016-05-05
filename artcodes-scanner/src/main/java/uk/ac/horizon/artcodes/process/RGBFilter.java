@@ -29,18 +29,18 @@ import uk.ac.horizon.artcodes.detect.ImageBuffers;
 import uk.ac.horizon.artcodes.detect.marker.MarkerDetectionHandler;
 import uk.ac.horizon.artcodes.model.Experience;
 
-public class RGBGreyscaler implements ImageProcessor
+public class RGBFilter implements ImageProcessor
 {
 	public static class RedFactory implements ImageProcessorFactory
 	{
 		public String getName()
 		{
-			return "filterRed";
+			return "filter:red";
 		}
 
 		public ImageProcessor create(Experience experience, MarkerDetectionHandler handler)
 		{
-			return new RGBGreyscaler(Channel.red);
+			return new RGBFilter(Channel.red);
 		}
 	}
 
@@ -48,12 +48,12 @@ public class RGBGreyscaler implements ImageProcessor
 	{
 		public String getName()
 		{
-			return "filterBlue";
+			return "filter:blue";
 		}
 
 		public ImageProcessor create(Experience experience, MarkerDetectionHandler handler)
 		{
-			return new RGBGreyscaler(Channel.blue);
+			return new RGBFilter(Channel.blue);
 		}
 	}
 
@@ -61,12 +61,12 @@ public class RGBGreyscaler implements ImageProcessor
 	{
 		public String getName()
 		{
-			return "filterGreen";
+			return "filter:green";
 		}
 
 		public ImageProcessor create(Experience experience, MarkerDetectionHandler handler)
 		{
-			return new RGBGreyscaler(Channel.green);
+			return new RGBFilter(Channel.green);
 		}
 	}
 
@@ -77,7 +77,7 @@ public class RGBGreyscaler implements ImageProcessor
 
 	private final Channel channel;
 
-	public RGBGreyscaler(Channel channel)
+	public RGBFilter(Channel channel)
 	{
 		this.channel = channel;
 	}

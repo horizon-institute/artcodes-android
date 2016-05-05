@@ -17,20 +17,15 @@
  *     along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-package uk.ac.horizon.artcodes.model;
+package uk.ac.horizon.artcodes.detect.marker;
 
 import org.junit.Test;
 
-public class ExperienceTests
+public class DetectTest
 {
 	@Test
-	public void test()
+	public void testImage()
 	{
-		Experience experience = new Experience();
-		//experience.setChecksumModulo(3);
-		// TODO
-		//experience.setMinRegions(4);
-		//experience.setMaxRegions(4);
-		//experience.setMaxRegionValue(6);
+
 	}
 }

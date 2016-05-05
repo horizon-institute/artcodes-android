@@ -32,7 +32,6 @@ import android.support.v4.app.FragmentPagerAdapter;
 import android.support.v4.app.NavUtils;
 import android.support.v4.view.ViewPager;
 import android.support.v7.app.AlertDialog;
-import android.view.Menu;
 import android.view.MenuItem;
 import android.view.View;
 
@@ -106,6 +105,22 @@ public class ExperienceEditActivity extends ExperienceActivityBase
 		context.startActivity(intent);
 	}
 
+	public void nextPage(View view)
+	{
+		binding.viewpager.setCurrentItem(binding.viewpager.getCurrentItem() + 1);
+	}
+
+	public void prevPage(View view)
+	{
+		binding.viewpager.setCurrentItem(Math.max(0, binding.viewpager.getCurrentItem() - 1));
+	}
+
+	public void saveExperience(View view)
+	{
+		Experience experience = getExperience();
+		getAccount().saveExperience(experience);
+		ExperienceActivity.start(this, experience);
+	}
 
 	public void editIcon(View view)
 	{
@@ -155,12 +170,12 @@ public class ExperienceEditActivity extends ExperienceActivityBase
 		this.account = account;
 	}
 
-	@Override
-	public boolean onCreateOptionsMenu(Menu menu)
-	{
-		getMenuInflater().inflate(R.menu.save_menu, menu);
-		return super.onCreateOptionsMenu(menu);
-	}
+//	@Override
+//	public boolean onCreateOptionsMenu(Menu menu)
+//	{
+//		getMenuInflater().inflate(R.menu.save_menu, menu);
+//		return super.onCreateOptionsMenu(menu);
+//	}
 
 	@Override
 	public boolean onOptionsItemSelected(MenuItem item)
@@ -171,9 +186,7 @@ public class ExperienceEditActivity extends ExperienceActivityBase
 				NavUtils.navigateUpTo(this, createCancelIntent());
 				return true;
 			case R.id.save:
-				Experience experience = getExperience();
-				getAccount().saveExperience(experience);
-				ExperienceActivity.start(this, experience);
+				saveExperience(null);
 				return true;
 		}
 		return super.onOptionsItemSelected(item);
@@ -186,11 +199,19 @@ public class ExperienceEditActivity extends ExperienceActivityBase
 
 		if (experience.getId() == null)
 		{
-			binding.actionBar.setVisibility(View.GONE);
+			binding.deleteButton.setVisibility(View.GONE);
+			binding.tabs.setVisibility(View.GONE);
+			binding.saveButton.setVisibility(View.GONE);
+			binding.prevButton.setVisibility(View.GONE);
+			binding.nextButton.setVisibility(View.VISIBLE);
 		}
 		else
 		{
-			binding.actionBar.setVisibility(View.VISIBLE);
+			binding.deleteButton.setVisibility(View.VISIBLE);
+			binding.tabs.setVisibility(View.VISIBLE);
+			binding.saveButton.setVisibility(View.VISIBLE);
+			binding.prevButton.setVisibility(View.GONE);
+			binding.nextButton.setVisibility(View.GONE);
 		}
 
 		GoogleAnalytics.trackScreen("Edit Experience", experience.getId());
@@ -263,6 +284,30 @@ public class ExperienceEditActivity extends ExperienceActivityBase
 				else
 				{
 					binding.add.hide();
+				}
+
+				Experience experience = getExperience();
+				if(experience == null || experience.getId() == null)
+				{
+
+					if(position == 0)
+					{
+						binding.saveButton.setVisibility(View.GONE);
+						binding.prevButton.setVisibility(View.GONE);
+						binding.nextButton.setVisibility(View.VISIBLE);
+					}
+					else if(position == adapter.getCount() - 1)
+					{
+						binding.saveButton.setVisibility(View.VISIBLE);
+						binding.prevButton.setVisibility(View.VISIBLE);
+						binding.nextButton.setVisibility(View.GONE);
+					}
+					else
+					{
+						binding.saveButton.setVisibility(View.GONE);
+						binding.prevButton.setVisibility(View.VISIBLE);
+						binding.nextButton.setVisibility(View.VISIBLE);
+					}
 				}
 			}
 

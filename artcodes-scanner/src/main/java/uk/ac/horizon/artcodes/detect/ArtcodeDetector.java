@@ -36,7 +36,7 @@ import uk.ac.horizon.artcodes.detect.marker.MarkerEmbeddedChecksumDetector;
 import uk.ac.horizon.artcodes.model.Experience;
 import uk.ac.horizon.artcodes.process.ImageProcessor;
 import uk.ac.horizon.artcodes.process.ImageProcessorFactory;
-import uk.ac.horizon.artcodes.process.RGBGreyscaler;
+import uk.ac.horizon.artcodes.process.RedFilter;
 import uk.ac.horizon.artcodes.process.TileThresholder;
 import uk.ac.horizon.artcodes.scanner.BR;
 
@@ -50,9 +50,9 @@ public class ArtcodeDetector extends Detector
 		register(new MarkerEmbeddedChecksumDetector.Factory());
 		register(new MarkerAreaOrderDetector.Factory());
 		register(new TileThresholder.Factory());
-		register(new RGBGreyscaler.RedFactory());
-		register(new RGBGreyscaler.BlueFactory());
-		register(new RGBGreyscaler.GreenFactory());
+		register(new RedFilter.Factory());
+		//register(new RGBFilter.BlueFactory());
+		//register(new RGBFilter.GreenFactory());
 	}
 
 	private int margin = 100;

@@ -20,12 +20,10 @@
 package uk.ac.horizon.artcodes.scanner;
 
 import android.Manifest;
-import android.content.Context;
 import android.content.Intent;
 import android.content.pm.PackageManager;
 import android.content.res.ColorStateList;
 import android.content.res.Configuration;
-import android.content.res.Resources;
 import android.content.res.TypedArray;
 import android.databinding.DataBindingUtil;
 import android.graphics.Color;
@@ -40,7 +38,6 @@ import android.support.v4.app.ActivityCompat;
 import android.support.v4.content.ContextCompat;
 import android.support.v4.graphics.drawable.DrawableCompat;
 import android.support.v7.app.AppCompatActivity;
-import android.util.DisplayMetrics;
 import android.util.Log;
 import android.view.View;
 import android.view.WindowManager;
@@ -50,22 +47,23 @@ import android.widget.LinearLayout;
 import com.google.common.collect.HashMultiset;
 import com.google.common.collect.Lists;
 import com.google.common.collect.Multiset;
+import com.google.gson.Gson;
 
 import java.util.Collection;
 import java.util.HashSet;
 import java.util.List;
 
-import uk.ac.horizon.artcodes.model.Experience;
 import uk.ac.horizon.artcodes.animator.TextAnimator;
 import uk.ac.horizon.artcodes.animator.VisibilityAnimator;
-import uk.ac.horizon.artcodes.scanner.databinding.ScannerBinding;
 import uk.ac.horizon.artcodes.detect.ArtcodeDetector;
-import uk.ac.horizon.artcodes.detect.marker.MarkerDetectionHandler;
 import uk.ac.horizon.artcodes.detect.DetectorSetting;
+import uk.ac.horizon.artcodes.detect.marker.MarkerDetectionHandler;
+import uk.ac.horizon.artcodes.model.Experience;
+import uk.ac.horizon.artcodes.scanner.databinding.ScannerBinding;
 
 public class ScannerActivity extends AppCompatActivity implements MarkerDetectionHandler
 {
-	protected static final int REQUIRED = 10;
+	protected static final int REQUIRED = 20;
 	protected static final int MAX = REQUIRED * 4;
 	private static final int CAMERA_PERMISSION_REQUEST = 47;
 	private final Multiset<String> markerCounts = HashMultiset.create();
@@ -95,7 +93,7 @@ public class ScannerActivity extends AppCompatActivity implements MarkerDetectio
 		binding = DataBindingUtil.setContentView(this, R.layout.scanner);
 		binding.progressBar.setVisibility(View.INVISIBLE);
 		setSupportActionBar(binding.toolbar);
-		if(getSupportActionBar() != null)
+		if (getSupportActionBar() != null)
 		{
 			getSupportActionBar().setDisplayShowTitleEnabled(false);
 		}
@@ -107,8 +105,6 @@ public class ScannerActivity extends AppCompatActivity implements MarkerDetectio
 
 		menuAnimator = new VisibilityAnimator(binding.settingsMenu, binding.settingsMenuButton);
 		textAnimator = new TextAnimator(binding.settingsFeedback);
-
-		Log.i("NAV", "Nav bar on bottom = " + isSystemBarOnBottom(this));
 	}
 
 	@Override
@@ -225,21 +221,34 @@ public class ScannerActivity extends AppCompatActivity implements MarkerDetectio
 		}
 	}
 
-	private static boolean isSystemBarOnBottom(Context ctxt)
+	protected void loadExperience(Bundle savedInstanceState)
 	{
-		final Resources res = ctxt.getResources();
-		final Configuration cfg = res.getConfiguration();
-		final DisplayMetrics dm = res.getDisplayMetrics();
-		boolean canMove = (dm.widthPixels != dm.heightPixels &&
-				cfg.smallestScreenWidthDp < 600);
+		if (savedInstanceState != null && savedInstanceState.containsKey("experience"))
+		{
 
-		return (!canMove || dm.widthPixels < dm.heightPixels);
+			loaded(new Gson().fromJson(savedInstanceState.getString("experience"), Experience.class));
+		}
+		else
+		{
+			Intent intent = getIntent();
+			if (intent.hasExtra("experience"))
+			{
+				loaded(new Gson().fromJson(intent.getStringExtra("experience"), Experience.class));
+			}
+		}
+	}
+
+	@Override
+	protected void onPostCreate(Bundle savedInstanceState)
+	{
+		super.onPostCreate(savedInstanceState);
+		loadExperience(savedInstanceState);
 	}
 
 	private Drawable getTintedDrawable(@DrawableRes int drawable, @ColorInt int color)
 	{
 		final Drawable original = ContextCompat.getDrawable(this, drawable);
-		if(original != null)
+		if (original != null)
 		{
 			final Drawable wrapDrawable = DrawableCompat.wrap(original);
 			DrawableCompat.setTint(wrapDrawable, color);

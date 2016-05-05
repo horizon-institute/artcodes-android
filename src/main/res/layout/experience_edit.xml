@@ -24,70 +24,101 @@
         xmlns:tools="http://schemas.android.com/tools"
         tools:context=".activities.ExperienceEditActivity">
 
-	<android.support.design.widget.CoordinatorLayout
-		android:layout_width="match_parent"
-		android:layout_height="match_parent">
+    <LinearLayout
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:orientation="vertical">
 
-		<LinearLayout
-			android:layout_width="match_parent"
-			android:layout_height="wrap_content"
-			android:orientation="vertical">
+        <android.support.design.widget.CoordinatorLayout
+            android:layout_width="match_parent"
+            android:layout_height="0dp"
+            android:layout_weight="1">
 
-			<android.support.v7.widget.Toolbar
-				android:id="@+id/toolbar"
-				android:layout_width="match_parent"
-				android:layout_height="wrap_content"
-				android:background="?attr/colorPrimary"
-				android:elevation="4dp"
-				android:theme="@style/ThemeOverlay.AppCompat.Dark"
-				tools:ignore="UnusedAttribute"/>
+            <LinearLayout
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:orientation="vertical">
 
-			<android.support.design.widget.TabLayout
-				android:id="@+id/tabs"
-				android:layout_width="match_parent"
-				android:layout_height="wrap_content"
-				android:background="?attr/colorPrimary"
-				android:elevation="4dp"
-				android:theme="@style/ThemeOverlay.AppCompat.Dark"
-				app:tabIndicatorColor="@android:color/white"
-				tools:ignore="UnusedAttribute"/>
+                <android.support.v7.widget.Toolbar
+                    android:id="@+id/toolbar"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:background="?attr/colorPrimary"
+                    android:elevation="4dp"
+                    android:theme="@style/ThemeOverlay.AppCompat.Dark"
+                    tools:ignore="UnusedAttribute"/>
 
-			<android.support.v4.view.ViewPager
-				android:id="@+id/viewpager"
-				android:layout_width="match_parent"
-				android:layout_height="0dp"
-				android:layout_weight="1"/>
+                <android.support.design.widget.TabLayout
+                    android:id="@+id/tabs"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:background="?attr/colorPrimary"
+                    android:elevation="4dp"
+                    android:theme="@style/ThemeOverlay.AppCompat.Dark"
+                    app:tabIndicatorColor="@android:color/white"
+                    tools:ignore="UnusedAttribute"/>
 
-			<LinearLayout
-				android:id="@+id/actionBar"
-				android:layout_width="match_parent"
-				android:layout_height="wrap_content"
-				android:background="#EEE"
-				android:elevation="2dp"
-				android:orientation="horizontal"
-				tools:ignore="UnusedAttribute">
+                <android.support.v4.view.ViewPager
+                    android:id="@+id/viewpager"
+                    android:layout_width="match_parent"
+                    android:layout_height="0dp"
+                    android:layout_weight="1"/>
 
-				<ImageButton
-					style="@style/Widget.AppCompat.ActionButton"
-					android:layout_width="wrap_content"
-					android:layout_height="wrap_content"
-					android:contentDescription="@string/delete"
-					android:onClick="deleteExperience"
-					android:src="@drawable/ic_delete_24dp"/>
-			</LinearLayout>
-		</LinearLayout>
 
-		<android.support.design.widget.FloatingActionButton
-			android:id="@+id/add"
-			android:layout_width="wrap_content"
-			android:layout_height="wrap_content"
-			android:layout_gravity="bottom|end"
-			android:layout_margin="@dimen/padding"
-			android:elevation="4dp"
-			android:src="@drawable/ic_add_24dp"
-			android:tint="#FFF"
-			android:visibility="gone"
-			app:pressedTranslationZ="8dp"
-			tools:ignore="UnusedAttribute"/>
-	</android.support.design.widget.CoordinatorLayout>
+            </LinearLayout>
+
+            <android.support.design.widget.FloatingActionButton
+                android:id="@+id/add"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_gravity="bottom|end"
+                android:layout_margin="@dimen/padding"
+                android:elevation="4dp"
+                android:src="@drawable/ic_add_24dp"
+                android:tint="#FFF"
+                android:visibility="gone"
+                app:pressedTranslationZ="8dp"
+                tools:ignore="UnusedAttribute"/>
+        </android.support.design.widget.CoordinatorLayout>
+
+        <FrameLayout
+            android:layout_width="match_parent"
+            android:layout_height="match_parent">
+
+            <ImageButton
+                android:id="@+id/deleteButton"
+                style="@style/Widget.AppCompat.ActionButton"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:contentDescription="@string/delete"
+                android:onClick="deleteExperience"
+                android:src="@drawable/ic_delete_24dp"/>
+
+            <ImageButton
+                android:id="@+id/prevButton"
+                style="@style/Widget.AppCompat.ActionButton"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:onClick="prevPage"
+                android:src="@drawable/ic_chevron_left_24dp"/>
+
+            <ImageButton
+                android:id="@+id/nextButton"
+                style="@style/Widget.AppCompat.ActionButton"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_gravity="right"
+                android:onClick="nextPage"
+                android:src="@drawable/ic_chevron_right_24dp"/>
+
+            <Button
+                android:id="@+id/saveButton"
+                style="@style/Widget.AppCompat.Button.Borderless"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_gravity="right"
+                android:onClick="saveExperience"
+                android:text="@string/save"/>
+        </FrameLayout>
+    </LinearLayout>
 </layout>

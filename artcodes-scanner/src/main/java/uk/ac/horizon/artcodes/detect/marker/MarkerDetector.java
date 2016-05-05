@@ -101,7 +101,7 @@ public class MarkerDetector implements ImageProcessor
 	public MarkerDetector(Experience experience, MarkerDetectionHandler handler)
 	{
 		int maxValue = 3;
-		int minRegionCount = 100;
+		int minRegionCount = 20;
 		int maxRegionCount = 3;
 		int checksum = 0;
 		for (Action action : experience.getActions())
@@ -136,6 +136,13 @@ public class MarkerDetector implements ImageProcessor
 		}
 
 		this.handler = handler;
+
+		if(minRegionCount == 20 && maxRegionCount == 3)
+		{
+			minRegionCount = 3;
+			maxRegionCount = 20;
+			maxValue = 20;
+		}
 
 		this.maxRegionValue = maxValue;
 		this.minRegions = minRegionCount;
@@ -173,7 +180,7 @@ public class MarkerDetector implements ImageProcessor
 				if (marker != null)
 				{
 					final String markerCode = getCodeKey(marker);
-					if (validCodes.contains(markerCode))
+					if (validCodes.isEmpty() || validCodes.contains(markerCode))
 					{
 						foundMarkers.add(markerCode);
 
@@ -332,10 +339,15 @@ public class MarkerDetector implements ImageProcessor
 				}
 				else if (regions.size() >= maxRegions)
 				{
+					Log.i("detect", "region to big");
 					return null;
 				}
 
 				regions.add(region);
+			}
+			else
+			{
+				return null;
 			}
 		}
 

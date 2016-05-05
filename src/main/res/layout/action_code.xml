@@ -23,32 +23,16 @@
         xmlns:tools="http://schemas.android.com/tools"
         tools:context=".activities.ExperienceEditActivity">
 
-	<LinearLayout
-		android:layout_width="match_parent"
-		android:layout_height="wrap_content"
-		android:background="?attr/selectableItemBackground"
-		android:gravity="center_vertical"
-		android:orientation="horizontal">
-
-		<ImageView
-			android:layout_width="wrap_content"
-			android:layout_height="wrap_content"
-			android:layout_margin="16dp"
-			android:src="@drawable/ic_looks_one_black_24dp"
-			android:tint="@color/ic_tint"
-			tools:ignore="ContentDescription"/>
-
-		<EditText
-			android:id="@+id/edit_marker_code"
-			android:layout_width="0dp"
-			android:layout_height="wrap_content"
-			android:layout_marginLeft="16dp"
-			android:layout_marginRight="16dp"
-			android:layout_weight="1"
-			android:digits="0123456789:"
-			android:hint="@string/markerCode"
-			android:inputType="time"
-			android:singleLine="true"
-			android:textAppearance="@style/TextAppearance.AppCompat"/>
-	</LinearLayout>
+    <EditText
+        android:id="@+id/edit_marker_code"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_marginLeft="16dp"
+        android:layout_marginRight="16dp"
+        android:digits="0123456789:"
+        android:hint="@string/markerCode"
+        android:inputType="time"
+        android:singleLine="true"
+        android:textAppearance="@style/TextAppearance.AppCompat"
+        android:gravity="right"/>
 </layout>

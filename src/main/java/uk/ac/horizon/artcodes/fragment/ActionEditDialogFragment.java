@@ -19,21 +19,25 @@
 
 package uk.ac.horizon.artcodes.fragment;
 
+import android.app.Activity;
 import android.app.Dialog;
-import android.content.DialogInterface;
+import android.content.Intent;
 import android.os.Bundle;
 import android.support.annotation.NonNull;
 import android.support.v4.app.DialogFragment;
 import android.support.v4.app.FragmentManager;
 import android.support.v7.app.AlertDialog;
 import android.text.InputFilter;
+import android.view.View;
 
-import uk.ac.horizon.artcodes.R;
+import java.util.Collections;
+
 import uk.ac.horizon.artcodes.activity.ExperienceActivityBase;
 import uk.ac.horizon.artcodes.databinding.ActionCodeBinding;
 import uk.ac.horizon.artcodes.databinding.ActionEditBinding;
 import uk.ac.horizon.artcodes.model.Action;
 import uk.ac.horizon.artcodes.model.Experience;
+import uk.ac.horizon.artcodes.scanner.ScannerActivity;
 import uk.ac.horizon.artcodes.ui.ActionEditor;
 import uk.ac.horizon.artcodes.ui.MarkerFormat;
 import uk.ac.horizon.artcodes.ui.SimpleTextWatcher;
@@ -41,6 +45,7 @@ import uk.ac.horizon.artcodes.ui.SimpleTextWatcher;
 public class ActionEditDialogFragment extends DialogFragment
 {
 	private static final int ACTION_EDIT_DIALOG = 193;
+	private static final int SCAN_CODE_REQUEST = 931;
 	private ActionEditBinding binding;
 
 	static void show(FragmentManager fragmentManager, ActionEditListFragment fragment, int num)
@@ -61,8 +66,8 @@ public class ActionEditDialogFragment extends DialogFragment
 	public Dialog onCreateDialog(Bundle savedInstanceState) throws NullPointerException
 	{
 		binding = ActionEditBinding.inflate(getActivity().getLayoutInflater());
-		binding.editMarkerCode.setFilters(new InputFilter[]{new MarkerFormat(getExperience(), null)});
-		binding.editMarkerCode.addTextChangedListener(new SimpleTextWatcher()
+		binding.newMarkerCode.setFilters(new InputFilter[]{new MarkerFormat(getExperience(), null)});
+		binding.newMarkerCode.addTextChangedListener(new SimpleTextWatcher()
 		{
 			@Override
 			public String getText()
@@ -75,7 +80,7 @@ public class ActionEditDialogFragment extends DialogFragment
 			{
 				if (!value.isEmpty())
 				{
-					binding.editMarkerCode.setText("");
+					binding.newMarkerCode.setText("");
 					Action action = getAction();
 					action.getCodes().add(value);
 
@@ -85,13 +90,25 @@ public class ActionEditDialogFragment extends DialogFragment
 			}
 		});
 
-		// Use the Builder class for convenient dialog construction
-		final AlertDialog.Builder builder = new AlertDialog.Builder(getActivity());
-		builder.setView(binding.getRoot());
-		builder.setNegativeButton(R.string.delete, new DialogInterface.OnClickListener()
+		binding.scanButton.setOnClickListener(new View.OnClickListener()
 		{
 			@Override
-			public void onClick(DialogInterface dialog, int which)
+			public void onClick(View v)
+			{
+				Intent intent = new Intent(getActivity(), ScannerActivity.class);
+				intent.putExtra("experience", "{\"name\":\"Scan Code\"}");
+				startActivityForResult(intent, SCAN_CODE_REQUEST);
+			}
+		});
+
+		final AlertDialog.Builder builder = new AlertDialog.Builder(getActivity());
+		builder.setView(binding.getRoot());
+		final Dialog dialog = builder.create();
+
+		binding.deleteButton.setOnClickListener(new View.OnClickListener()
+		{
+			@Override
+			public void onClick(View v)
 			{
 				if (getArguments().containsKey("action"))
 				{
@@ -108,24 +125,41 @@ public class ActionEditDialogFragment extends DialogFragment
 				}
 			}
 		});
-		builder.setPositiveButton(R.string.close, new DialogInterface.OnClickListener()
+		binding.doneButton.setOnClickListener(new View.OnClickListener()
 		{
 			@Override
-			public void onClick(DialogInterface dialog, int which)
+			public void onClick(View v)
 			{
-				dialog.dismiss();
 				if (getArguments().containsKey("action"))
 				{
-					dialog.dismiss();
 					final int index = getArguments().getInt("action");
 					if (getTargetFragment() instanceof ActionEditListFragment)
 					{
 						((ActionEditListFragment) getTargetFragment()).getAdapter().actionUpdated(index);
 					}
 				}
+				dialog.dismiss();
 			}
 		});
-		return builder.create();
+
+		return dialog;
+	}
+
+	@Override
+	public void onActivityResult(int requestCode, int resultCode, Intent data)
+	{
+		super.onActivityResult(requestCode, resultCode, data);
+		if (requestCode == SCAN_CODE_REQUEST && resultCode == Activity.RESULT_OK)
+		{
+			String code = data.getStringExtra("marker");
+			Action action = getAction();
+			if (code != null && !action.getCodes().contains(code))
+			{
+				action.getCodes().add(code);
+				ActionCodeBinding codeBinding = createCodeBinding(binding, action, action.getCodes().size() - 1);
+				codeBinding.editMarkerCode.requestFocus();
+			}
+		}
 	}
 
 	@Override
@@ -171,7 +205,8 @@ public class ActionEditDialogFragment extends DialogFragment
 
 	private void updateCodes(final ActionEditBinding binding, final Action action)
 	{
-		binding.markerCodes.removeAllViews();
+		binding.markerCodeList.removeAllViews();
+		Collections.sort(action.getCodes());
 		for (int index = 0; index < action.getCodes().size(); index++)
 		{
 			createCodeBinding(binding, action, index);
@@ -181,7 +216,7 @@ public class ActionEditDialogFragment extends DialogFragment
 	private ActionCodeBinding createCodeBinding(final ActionEditBinding binding, final Action action, final int codeIndex)
 	{
 		final String code = action.getCodes().get(codeIndex);
-		final ActionCodeBinding codeBinding = ActionCodeBinding.inflate(getActivity().getLayoutInflater(), binding.markerCodes, false);
+		final ActionCodeBinding codeBinding = ActionCodeBinding.inflate(getActivity().getLayoutInflater(), binding.markerCodeList, false);
 		codeBinding.editMarkerCode.setText(code);
 		codeBinding.editMarkerCode.setFilters(new InputFilter[]{new MarkerFormat(getExperience(), code)});
 		codeBinding.editMarkerCode.addTextChangedListener(new SimpleTextWatcher()
@@ -198,8 +233,8 @@ public class ActionEditDialogFragment extends DialogFragment
 				if (value.isEmpty())
 				{
 					action.getCodes().remove(codeIndex);
-					binding.markerCodes.removeView(codeBinding.getRoot());
-					binding.editMarkerCode.requestFocus();
+					updateCodes(binding, action);
+					binding.newMarkerCode.requestFocus();
 				}
 				else
 				{
@@ -207,7 +242,7 @@ public class ActionEditDialogFragment extends DialogFragment
 				}
 			}
 		});
-		binding.markerCodes.addView(codeBinding.getRoot());
+		binding.markerCodeList.addView(codeBinding.getRoot());
 		return codeBinding;
 	}
 }

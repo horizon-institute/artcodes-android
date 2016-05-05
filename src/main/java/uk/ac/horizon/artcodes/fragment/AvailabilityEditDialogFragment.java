@@ -95,10 +95,13 @@ public class AvailabilityEditDialogFragment extends DialogFragment
 		// Use the Builder class for convenient dialog construction
 		AlertDialog.Builder builder = new AlertDialog.Builder(getActivity());
 		builder.setView(binding.getRoot());
-		builder.setNegativeButton(R.string.delete, new DialogInterface.OnClickListener()
+
+		final Dialog dialog = builder.create();
+
+		binding.deleteButton.setOnClickListener(new View.OnClickListener()
 		{
 			@Override
-			public void onClick(DialogInterface dialog, int which)
+			public void onClick(View v)
 			{
 				if (getArguments().containsKey("availability"))
 				{
@@ -115,10 +118,11 @@ public class AvailabilityEditDialogFragment extends DialogFragment
 				}
 			}
 		});
-		builder.setPositiveButton(R.string.close, new DialogInterface.OnClickListener()
+
+		binding.doneButton.setOnClickListener(new View.OnClickListener()
 		{
 			@Override
-			public void onClick(DialogInterface dialog, int which)
+			public void onClick(View v)
 			{
 				dialog.dismiss();
 				if (getArguments().containsKey("availability"))
@@ -131,7 +135,8 @@ public class AvailabilityEditDialogFragment extends DialogFragment
 				}
 			}
 		});
-		return builder.create();
+
+		return dialog;
 	}
 
 	@Override

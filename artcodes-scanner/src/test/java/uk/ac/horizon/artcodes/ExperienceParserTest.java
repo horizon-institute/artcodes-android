@@ -25,6 +25,8 @@ import com.google.gson.Gson;
 
 import org.junit.Test;
 
+import java.io.File;
+import java.io.FileReader;
 import java.io.IOException;
 
 import uk.ac.horizon.artcodes.model.Action;
@@ -49,45 +51,44 @@ public class ExperienceParserTest
 	}
 
 	@Test
-	public void testParseOld() throws IOException
+	public void loadingParseTest() throws IOException
 	{
-//		URL url = getClass().getResource("test_old.json");
-//		assert url != null;
-//
-//		final JsonParser<Experience> parser = new ExperienceParserFactory(null).parserFor(Experience.class);
-//		Experience experience = parser.parse(new FileReader(new File(url.getFile())));
-//
-//		assert experience.getName().equals("Test");
-//		assert !experience.getActions().isEmpty();
+		ClassLoader classLoader = getClass().getClassLoader();
+		File file = new File(classLoader.getResource("test.json").getFile());
+		System.out.println(file.getAbsolutePath());
+
+		Gson gson = ExperienceParser.createGson(null);
+
+		Experience experience = gson.fromJson(new FileReader(file), Experience.class);
+
+		assert experience.getName().equals("Test");
+
+		//Experience experience = new Experience();
+		//experience.setChecksumModulo(3);
+		// TODO
+		//experience.setMinRegions(4);
+		//experience.setMaxRegions(4);
+		//experience.setMaxRegionValue(6);
 	}
 
 	@Test
-	public void testParser() throws IOException
+	public void loadingOldParseTest() throws IOException
 	{
-//		URL url = getClass().getResource("test.json");
-//		assert url != null;
-//
-//		final JsonParser<Experience> parser = new ExperienceParserFactory(null).parserFor(Experience.class);
-//		Experience experience = parser.parse(new FileReader(new File(url.getFile())));
-//
-//		assert experience.getName().equals("Test");
-//		assert !experience.getActions().isEmpty();
-	}
+		ClassLoader classLoader = getClass().getClassLoader();
+		File file = new File(classLoader.getResource("test_old.json").getFile());
+		System.out.println(file.getAbsolutePath());
 
-	@Test
-	public void testThresholderExperienceParse()
-	{
-		Experience experience = new Experience();
-		//experience.getProcessors().clear();
-		//experience.getProcessors().add(new TileThresholder());
+		Gson gson = ExperienceParser.createGson(null);
 
-		final Gson gson = ExperienceParser.createGson(null);
+		Experience experience = gson.fromJson(new FileReader(file), Experience.class);
 
-		String json = gson.toJson(experience);
-		System.out.println(json);
+		assert experience.getName().equals("Test");
 
-		Experience parsed = gson.fromJson(json, Experience.class);
-		assert parsed != null;
-		//assert parsed.getProcessors().get(0).getClass().equals(TileThresholder.class);
+		//Experience experience = new Experience();
+		//experience.setChecksumModulo(3);
+		// TODO
+		//experience.setMinRegions(4);
+		//experience.setMaxRegions(4);
+		//experience.setMaxRegionValue(6);
 	}
 }
