@@ -87,9 +87,14 @@ public class MarkerEmbeddedChecksumDetector extends MarkerDetector
 			}
 		}
 
-		if (isValidRegionList(regions, checksumRegion))
+		if (regions!=null)
 		{
-			return new Marker(nodeIndex, regions, checksumRegion);
+			Marker marker = new MarkerWithEmbeddedChecksum(nodeIndex, regions, checksumRegion);
+			sortCode(marker);
+			if (isValidRegionList(marker))
+			{
+				return marker;
+			}
 		}
 
 		return null;
@@ -133,30 +138,34 @@ public class MarkerEmbeddedChecksumDetector extends MarkerDetector
 				isValidDot((int) nodes[FIRST_NODE], hierarchy);// the child is a leaf
 	}
 
-	private boolean isValidRegionList(List<MarkerRegion> regions, MarkerRegion checksumRegion)
+	@Override
+	protected boolean hasValidChecksum(Marker marker)
 	{
-		if (checksumRegion == null)
+		if (marker instanceof MarkerWithEmbeddedChecksum)
 		{
-			return isValidRegionList(regions);
-		}
-
-		// Find weighted sum of code, e.g. 1:1:2:4:4 -> 1*1 + 1*2 + 2*3 + 4*4 + 4*5 = 45
-		// Although do not use weights/values divisible by 7
-		// e.g. transform values 1,2,3,4,5,6,7,8, 9,10,11,12,13,14,15... to
-		//                       1,2,3,4,5,6,8,9,10,11,12,13,15,16,17
-		int embeddedChecksumModValue = 7;
-		int weightedSum = 0;
-		int weight = 1;
-		for (int i = 0; i < regions.size(); ++i)
-		{
-			int value = regions.get(i).value;
-			value += (value+value/embeddedChecksumModValue)/embeddedChecksumModValue;
-			if (weight%embeddedChecksumModValue==0)
+			MarkerWithEmbeddedChecksum markerEc = (MarkerWithEmbeddedChecksum) marker;
+			if (markerEc.checksumRegion != null)
 			{
-				++weight;
+				// Find weighted sum of code, e.g. 1:1:2:4:4 -> 1*1 + 1*2 + 2*3 + 4*4 + 4*5 = 45
+				// Although do not use weights/values divisible by 7
+				// e.g. transform values 1,2,3,4,5,6,7,8, 9,10,11,12,13,14,15... to
+				//                       1,2,3,4,5,6,8,9,10,11,12,13,15,16,17
+				int embeddedChecksumModValue = 7;
+				int weightedSum = 0;
+				int weight = 1;
+				for (int i = 0; i < markerEc.regions.size(); ++i)
+				{
+					int value = markerEc.regions.get(i).value;
+					value += (value+value/embeddedChecksumModValue)/embeddedChecksumModValue;
+					if (weight%embeddedChecksumModValue==0)
+					{
+						++weight;
+					}
+					weightedSum += value * weight++;
+				}
+				return markerEc.checksumRegion.value == (weightedSum - 1) % 7 + 1;
 			}
-			weightedSum += value * weight++;
 		}
-		return checksumRegion.value == (weightedSum - 1) % 7 + 1;
+		return super.hasValidChecksum(marker);
 	}
 }

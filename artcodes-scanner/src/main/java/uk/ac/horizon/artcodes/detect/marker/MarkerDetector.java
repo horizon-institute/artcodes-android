@@ -365,9 +365,14 @@ public class MarkerDetector implements ImageProcessor
 			}
 		}
 
-		if (isValidRegionList(regions))
+		if (regions!=null)
 		{
-			return new Marker(nodeIndex, regions, null);
+			Marker marker = new Marker(nodeIndex, regions);
+			sortCode(marker);
+			if (isValidRegionList(marker))
+			{
+				return marker;
+			}
 		}
 
 		return null;
@@ -428,23 +433,23 @@ public class MarkerDetector implements ImageProcessor
 	/**
 	 * Override this method to change validation method.
 	 */
-	protected boolean isValidRegionList(List<MarkerRegion> regions)
+	protected boolean isValidRegionList(Marker marker)
 	{
-		if (regions == null)
+		if (marker.regions == null)
 		{
 			return false; // No CodeDisplay
 		}
-		else if (regions.size() < minRegions)
+		else if (marker.regions.size() < minRegions)
 		{
 			return false; // Too Short
 		}
-		else if (regions.size() > maxRegions)
+		else if (marker.regions.size() > maxRegions)
 		{
 			return false; // Too long
 		}
 
 		int numberOfEmptyRegions = 0;
-		for (MarkerRegion region : regions)
+		for (MarkerRegion region : marker.regions)
 		{
 			//check if leaves are using in accepted range.
 			if (region.value > maxRegionValue)
@@ -457,7 +462,7 @@ public class MarkerDetector implements ImageProcessor
 			}
 		}
 
-		return hasValidChecksum(regions);
+		return hasValidChecksum(marker);
 	}
 
 	/**
@@ -467,14 +472,14 @@ public class MarkerDetector implements ImageProcessor
 	 * @return true if the number of leaves are divisible by the checksum value
 	 * otherwise false.
 	 */
-	protected boolean hasValidChecksum(List<MarkerRegion> regions)
+	protected boolean hasValidChecksum(Marker marker)
 	{
 		if (checksum <= 1)
 		{
 			return true;
 		}
 		int numberOfLeaves = 0;
-		for (MarkerRegion region : regions)
+		for (MarkerRegion region : marker.regions)
 		{
 			numberOfLeaves += region.value;
 		}

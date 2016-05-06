@@ -21,14 +21,13 @@ package uk.ac.horizon.artcodes.detect.marker;
 
 import java.util.List;
 
-class Marker
+class MarkerWithEmbeddedChecksum extends Marker
 {
-	public final int markerIndex;
-	public final List<MarkerRegion> regions;
+    public final MarkerRegion checksumRegion;
 
-	public Marker(int markerIndex, List<MarkerRegion> regions)
-	{
-		this.markerIndex = markerIndex;
-		this.regions = regions;
-	}
+    public MarkerWithEmbeddedChecksum(int markerIndex, List<MarkerRegion> regions, MarkerRegion checksumRegion)
+    {
+        super(markerIndex, regions);
+        this.checksumRegion = checksumRegion;
+    }
 }
