@@ -42,7 +42,6 @@ public class ExperienceSearchFragment extends ArtcodeFragmentBase
 	public View onCreateView(final LayoutInflater inflater, ViewGroup container, Bundle savedInstanceState)
 	{
 		binding = ListBinding.inflate(inflater, container, false);
-		//adapter.setEmptyIcon(R.drawable.ic_warning_black_144dp);
 		adapter = new ExperienceListAdapter(getActivity(), getServer());
 		adapter.setEmptyIcon(R.drawable.ic_search_144dp);
 		binding.setAdapter(adapter);

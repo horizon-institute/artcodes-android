@@ -119,7 +119,7 @@ public class ExperienceEditActivity extends ExperienceActivityBase
 	{
 		Experience experience = getExperience();
 		getAccount().saveExperience(experience);
-		ExperienceActivity.start(this, experience);
+		NavUtils.navigateUpTo(this, ExperienceActivity.intent(this, experience));
 	}
 
 	public void editIcon(View view)

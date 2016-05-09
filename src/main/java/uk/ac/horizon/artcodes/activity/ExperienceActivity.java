@@ -57,9 +57,14 @@ public class ExperienceActivity extends ExperienceActivityBase
 
 	public static void start(Context context, Experience experience)
 	{
+		context.startActivity(intent(context, experience));
+	}
+
+	public static Intent intent(Context context, Experience experience)
+	{
 		Intent intent = new Intent(context, ExperienceActivity.class);
 		intent.putExtra("experience", new Gson().toJson(experience));
-		context.startActivity(intent);
+		return intent;
 	}
 
 	public void editExperience(View view)

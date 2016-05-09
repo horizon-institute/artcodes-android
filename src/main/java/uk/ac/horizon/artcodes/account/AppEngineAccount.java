@@ -44,6 +44,7 @@ import okhttp3.Response;
 import uk.ac.horizon.artcodes.Artcodes;
 import uk.ac.horizon.artcodes.GoogleAnalytics;
 import uk.ac.horizon.artcodes.model.Experience;
+import uk.ac.horizon.artcodes.server.HTTPException;
 import uk.ac.horizon.artcodes.server.JsonCallback;
 import uk.ac.horizon.artcodes.server.LoadCallback;
 import uk.ac.horizon.artcodes.server.URILoaderCallback;
@@ -155,11 +156,9 @@ public class AppEngineAccount implements Account
 
 						final Response response = Artcodes.httpClient.newCall(request).execute();
 
-						if (validResponse(request, response))
-						{
-							callback.onLoaded(response.body().charStream());
-							response.body().close();
-						}
+						validateResponse(request, response);
+						callback.onLoaded(response.body().charStream());
+						response.body().close();
 					}
 					catch (Exception e)
 					{
@@ -205,10 +204,7 @@ public class AppEngineAccount implements Account
 							.build();
 
 					final Response response = Artcodes.httpClient.newCall(request).execute();
-					if (validResponse(request, response))
-					{
-						// TODO
-					}
+					validateResponse(request, response);
 				}
 				catch (Exception e)
 				{
@@ -288,10 +284,7 @@ public class AppEngineAccount implements Account
 								.build();
 
 						final Response response = Artcodes.httpClient.newCall(request).execute();
-						if (validResponse(request, response))
-						{
-							// TODO
-						}
+						validateResponse(request, response);
 					}
 					catch (Exception e)
 					{
@@ -336,7 +329,7 @@ public class AppEngineAccount implements Account
 		return context;
 	}
 
-	boolean validResponse(Request request, Response response)
+	void validateResponse(Request request, Response response) throws IOException
 	{
 		if (response.code() == 401)
 		{
@@ -354,14 +347,12 @@ public class AppEngineAccount implements Account
 					GoogleAnalytics.trackException(e);
 				}
 			}
-			return false;
+			throw new HTTPException(response.code(), response.message());
 		}
 		else if (response.code() != 200)
 		{
-			Log.w("", "Response " + response.code() + ": " + response.message());
-			return false;
+			throw new HTTPException(response.code(), response.message());
 		}
-		return true;
 	}
 
 

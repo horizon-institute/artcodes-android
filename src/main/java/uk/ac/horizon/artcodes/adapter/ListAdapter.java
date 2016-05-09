@@ -176,6 +176,14 @@ public abstract class ListAdapter<T extends ViewDataBinding> extends BaseObserva
 		return 0;
 	}
 
+	protected void showEmpty()
+	{
+		error = false;
+		notifyPropertyChanged(BR.errorIcon);
+		notifyPropertyChanged(BR.errorMessage);
+		notifyPropertyChanged(BR.showError);
+	}
+
 	protected void showError(String errorMessage)
 	{
 		error = true;

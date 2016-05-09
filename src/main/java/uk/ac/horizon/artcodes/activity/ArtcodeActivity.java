@@ -57,11 +57,13 @@ public class ArtcodeActivity extends ScannerActivity implements LoadCallback<Exp
 
 	public static void start(Context context, Experience experience)
 	{
-		Intent intent = new Intent(context, ArtcodeActivity.class);
-		intent.putExtra("experience", new Gson().toJson(experience));
-
+		final String experienceJSON = new Gson().toJson(experience);
 		TaskStackBuilder.create(context)
-				.addNextIntentWithParentStack(intent)
+				.addNextIntent(new Intent(context, NavigationActivity.class))
+				.addNextIntent(new Intent(context, ExperienceActivity.class)
+						.putExtra("experience", experienceJSON))
+				.addNextIntent(new Intent(context, ArtcodeActivity.class)
+						.putExtra("experience", experienceJSON))
 				.startActivities();
 	}
 
@@ -90,9 +92,8 @@ public class ArtcodeActivity extends ScannerActivity implements LoadCallback<Exp
 	{
 		if (item.getItemId() == android.R.id.home)
 		{
-			final Intent intent = new Intent(this, ExperienceActivity.class);
-			intent.putExtra("experience", new Gson().toJson(getExperience()));
-			NavUtils.navigateUpTo(this, intent);
+			final Experience experience = getExperience();
+			NavUtils.navigateUpTo(this, ExperienceActivity.intent(this, experience));
 			return true;
 		}
 		return super.onOptionsItemSelected(item);

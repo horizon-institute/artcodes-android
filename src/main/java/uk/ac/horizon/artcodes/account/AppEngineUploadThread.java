@@ -97,19 +97,17 @@ class AppEngineUploadThread extends Thread
 			final Request request = builder.build();
 			final Response response = Artcodes.httpClient.newCall(request).execute();
 
-			if (account.validResponse(request, response))
-			{
-				Experience saved = account.getGson().fromJson(response.body().charStream(), Experience.class);
-				response.body().close();
+			account.validateResponse(request, response);
+			Experience saved = account.getGson().fromJson(response.body().charStream(), Experience.class);
+			response.body().close();
 
-				SharedPreferences.Editor editor = account.getContext().getSharedPreferences(Account.class.getName(), Context.MODE_PRIVATE).edit();
-				editor.putString(saved.getId(), account.getId()).apply();
+			SharedPreferences.Editor editor = account.getContext().getSharedPreferences(Account.class.getName(), Context.MODE_PRIVATE).edit();
+			editor.putString(saved.getId(), account.getId()).apply();
 
-				tempFile.delete();
-				Intent intent = new Intent(experience.getId());
-				intent.putExtra("experience", account.getGson().toJson(saved));
-				LocalBroadcastManager.getInstance(account.getContext()).sendBroadcast(intent);
-			}
+			tempFile.delete();
+			Intent intent = new Intent(experience.getId());
+			intent.putExtra("experience", account.getGson().toJson(saved));
+			LocalBroadcastManager.getInstance(account.getContext()).sendBroadcast(intent);
 		}
 		catch (Exception e)
 		{
@@ -190,8 +188,7 @@ class AppEngineUploadThread extends Thread
 				final String hash = imageBody.getHash();
 				final String url = "https://aestheticodes.appspot.com/image/" + hash;
 
-				boolean success = exists(url);
-				if (!success)
+				if (!exists(url))
 				{
 					Request request = new Request.Builder()
 							.url(url)
@@ -200,22 +197,19 @@ class AppEngineUploadThread extends Thread
 							.build();
 
 					Response response = Artcodes.httpClient.newCall(request).execute();
-					success = account.validResponse(request, response);
+					account.validateResponse(request, response);
 				}
 
-				if (success)
+				if (imageURI.equals(experience.getImage()))
 				{
-					if (imageURI.equals(experience.getImage()))
-					{
-						experience.setImage(url);
-					}
-
-					if (imageURI.equals(experience.getIcon()))
-					{
-						experience.setIcon(url);
-					}
-					Log.i("upload", imageURI + " is now " + url);
+					experience.setImage(url);
 				}
+
+				if (imageURI.equals(experience.getIcon()))
+				{
+					experience.setIcon(url);
+				}
+				Log.i("upload", imageURI + " is now " + url);
 			}
 			catch (Exception e)
 			{

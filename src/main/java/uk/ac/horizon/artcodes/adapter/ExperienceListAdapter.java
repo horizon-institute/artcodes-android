@@ -47,7 +47,7 @@ public class ExperienceListAdapter extends ExperienceAdapter
 	@Override
 	public Experience getExperience(final int position)
 	{
-		return experiences.get(position);
+		return experiences.valueAt(position);
 	}
 
 	@Override
@@ -55,6 +55,7 @@ public class ExperienceListAdapter extends ExperienceAdapter
 	{
 		experiences.clear();
 		adapter.notifyDataSetChanged();
+		showEmpty();
 		for (int index = 0; index < item.size(); index++)
 		{
 			final int experienceIndex = index;
