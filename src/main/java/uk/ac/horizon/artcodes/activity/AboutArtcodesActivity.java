@@ -26,7 +26,6 @@ import android.support.annotation.Nullable;
 import android.support.v4.app.Fragment;
 import android.support.v4.app.FragmentManager;
 import android.support.v4.app.FragmentPagerAdapter;
-import android.support.v4.app.NavUtils;
 import android.support.v4.view.ViewPager;
 import android.view.View;
 
@@ -77,7 +76,7 @@ public class AboutArtcodesActivity extends ArtcodeActivityBase
 
 	public void finish(View view)
 	{
-		NavUtils.navigateUpFromSameTask(this);
+		startActivity(new Intent(this, NavigationActivity.class));
 		Feature.get(this, R.bool.feature_show_welcome).setEnabled(false);
 	}
 
