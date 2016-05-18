@@ -333,8 +333,8 @@ public class ExperienceActivity extends ExperienceActivityBase
 			}
 		}
 
-		setVisible(binding.experienceEditButton, editable);
-		setVisible(binding.experienceCopyButton, copiable);
+		setVisible(binding.editButton, editable);
+		setVisible(binding.copyButton, copiable);
 		setVisible(binding.saveProgress, saving);
 		setVisible(binding.buttonBar, !saving);
 		return saving;
@@ -373,13 +373,13 @@ public class ExperienceActivity extends ExperienceActivityBase
 			{
 				if (item.contains(getUri()))
 				{
-					binding.experienceFavouriteButton.setText(R.string.unstar);
-					binding.experienceFavouriteButton.setCompoundDrawablesWithIntrinsicBounds(0, R.drawable.ic_star_black_24dp, 0, 0);
+					binding.starButton.setText(R.string.unstar);
+					binding.starButton.setCompoundDrawablesWithIntrinsicBounds(0, R.drawable.ic_star_black_24dp, 0, 0);
 				}
 				else
 				{
-					binding.experienceFavouriteButton.setText(R.string.star);
-					binding.experienceFavouriteButton.setCompoundDrawablesWithIntrinsicBounds(0, R.drawable.ic_star_border_black_24dp, 0, 0);
+					binding.starButton.setText(R.string.star);
+					binding.starButton.setCompoundDrawablesWithIntrinsicBounds(0, R.drawable.ic_star_border_black_24dp, 0, 0);
 				}
 			}
 

@@ -21,7 +21,8 @@
 <layout xmlns:android="http://schemas.android.com/apk/res/android"
         xmlns:app="http://schemas.android.com/apk/res-auto"
         xmlns:tools="http://schemas.android.com/tools"
-        tools:context="uk.ac.horizon.artcodes.activity.ExperienceSelectActivity">
+        tools:context="uk.ac.horizon.artcodes.activity.ExperienceSelectActivity"
+        tools:keep="@layout/experience_card">
 
 	<data>
 

@@ -26,6 +26,6 @@ public class DetectTest
 	@Test
 	public void testImage()
 	{
-
+		// TODO
 	}
 }

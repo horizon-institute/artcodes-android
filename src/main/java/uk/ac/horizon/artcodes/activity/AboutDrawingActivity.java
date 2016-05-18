@@ -73,19 +73,16 @@ public class AboutDrawingActivity extends ArtcodeActivityBase
 
 	private AboutBinding binding;
 
+	@SuppressWarnings("UnusedParameters")
 	public void finish(View view)
 	{
 		NavUtils.navigateUpFromSameTask(this);
 	}
 
+	@SuppressWarnings("UnusedParameters")
 	public void nextPage(View view)
 	{
 		binding.viewpager.setCurrentItem(binding.viewpager.getCurrentItem() + 1);
-	}
-
-	public void more(View view)
-	{
-		// TODO
 	}
 
 	@Override

@@ -111,7 +111,7 @@ public class ArtcodeDetector extends Detector
 			}
 			catch (Exception e)
 			{
-
+				Log.w("detector", e.getMessage(), e);
 			}
 		}
 

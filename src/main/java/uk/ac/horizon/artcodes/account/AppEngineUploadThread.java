@@ -104,7 +104,10 @@ class AppEngineUploadThread extends Thread
 			SharedPreferences.Editor editor = account.getContext().getSharedPreferences(Account.class.getName(), Context.MODE_PRIVATE).edit();
 			editor.putString(saved.getId(), account.getId()).apply();
 
-			tempFile.delete();
+			if(!tempFile.delete())
+			{
+				Log.w("upload", "Temp file not deleted");
+			}
 			Intent intent = new Intent(experience.getId());
 			intent.putExtra("experience", account.getGson().toJson(saved));
 			LocalBroadcastManager.getInstance(account.getContext()).sendBroadcast(intent);

@@ -36,9 +36,9 @@ import uk.ac.horizon.artcodes.server.LoadCallback;
 
 public abstract class ExperienceAdapter extends GridAdapter<ExperienceCardBinding> implements LoadCallback<List<String>>
 {
-	protected final ArtcodeServer server;
+	final ArtcodeServer server;
 
-	public ExperienceAdapter(Context context, final ArtcodeServer server)
+	ExperienceAdapter(Context context, final ArtcodeServer server)
 	{
 		super(context);
 		this.server = server;
@@ -67,7 +67,7 @@ public abstract class ExperienceAdapter extends GridAdapter<ExperienceCardBindin
 		});
 	}
 	
-	public abstract Experience getExperience(int position);
+	protected abstract Experience getExperience(int position);
 
 	@Override
 	public ExperienceCardBinding createBinding(final ViewGroup parent, final int viewType)

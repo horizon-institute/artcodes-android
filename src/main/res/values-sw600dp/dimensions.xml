@@ -19,6 +19,8 @@
   -->
 
 <resources>
+    <dimen name="columnWidth">250dp</dimen>
+
 	<dimen name="padding">24dp</dimen>
 
 	<dimen name="detail_edge_margin">32dp</dimen>

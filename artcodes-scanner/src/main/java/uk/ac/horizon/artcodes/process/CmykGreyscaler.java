@@ -31,7 +31,7 @@ public class CmykGreyscaler implements ImageProcessor
 	private final float cMultiplier, mMultiplier, yMultiplier, kMultiplier;
 	private final int singleChannel;
 
-	public CmykGreyscaler(double hueShift, double cMultiplier, double mMultiplier, double yMultiplier, double kMultiplier, boolean invert)
+	public CmykGreyscaler(double cMultiplier, double mMultiplier, double yMultiplier, double kMultiplier)
 	{
 		super();
 		Log.i("greyscale", "Creating CmykGreyscaler");

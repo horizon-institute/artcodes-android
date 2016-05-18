@@ -22,17 +22,10 @@ package uk.ac.horizon.artcodes.ui;
 import android.text.InputFilter;
 import android.text.Spanned;
 
-import uk.ac.horizon.artcodes.model.Experience;
-
 public class MarkerFormat implements InputFilter
 {
-	private final Experience experience;
-	private final String code;
-
-	public MarkerFormat(Experience experience, String code)
+	public MarkerFormat()
 	{
-		this.experience = experience;
-		this.code = code;
 	}
 
 	@Override

@@ -24,7 +24,6 @@
         xmlns:tools="http://schemas.android.com/tools">
 
 	<data>
-
 		<import type="android.view.View"/>
 
 		<variable
@@ -194,7 +193,7 @@
 					android:paddingRight="16dp">
 
 					<Button
-						android:id="@+id/experience_edit_button"
+						android:id="@+id/editButton"
 						style="@style/Widget.AppCompat.ActionButton"
 						android:layout_width="wrap_content"
 						android:layout_height="wrap_content"
@@ -208,7 +207,7 @@
 						android:text="@string/edit"/>
 
 					<Button
-						android:id="@+id/experience_copy_button"
+						android:id="@+id/copyButton"
 						style="@style/Widget.AppCompat.ActionButton"
 						android:layout_width="wrap_content"
 						android:layout_height="wrap_content"
@@ -222,7 +221,7 @@
 						android:text="@string/copy"/>
 
 					<Button
-						android:id="@+id/experience_favourite_button"
+						android:id="@+id/starButton"
 						style="@style/Widget.AppCompat.ActionButton"
 						android:layout_width="wrap_content"
 						android:layout_height="wrap_content"
@@ -235,8 +234,22 @@
 						android:padding="8dp"
 						android:text="@string/star"/>
 
+                    <Button
+                        android:id="@+id/scanHistoryButton"
+                        style="@style/Widget.AppCompat.ActionButton"
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:layout_weight="1"
+                        android:background="?attr/selectableItemBackground"
+                        android:drawablePadding="4dp"
+                        android:drawableTop="@drawable/ic_history_black_24dp"
+                        android:gravity="center"
+                        android:onClick="startExperienceHistory"
+                        android:padding="8dp"
+                        android:text="@string/scan_history"/>
+
 					<Button
-						android:id="@+id/experience_share_button"
+						android:id="@+id/shareButton"
 						style="@style/Widget.AppCompat.ActionButton"
 						android:layout_width="wrap_content"
 						android:layout_height="wrap_content"

@@ -33,7 +33,6 @@ import uk.ac.horizon.artcodes.databinding.ListBinding;
 
 public class ExperienceSearchFragment extends ArtcodeFragmentBase
 {
-	private ListBinding binding;
 	private ExperienceAdapter adapter;
 	private String query;
 
@@ -41,7 +40,7 @@ public class ExperienceSearchFragment extends ArtcodeFragmentBase
 	@Override
 	public View onCreateView(final LayoutInflater inflater, ViewGroup container, Bundle savedInstanceState)
 	{
-		binding = ListBinding.inflate(inflater, container, false);
+		final ListBinding binding = ListBinding.inflate(inflater, container, false);
 		adapter = new ExperienceListAdapter(getActivity(), getServer());
 		adapter.setEmptyIcon(R.drawable.ic_search_144dp);
 		binding.setAdapter(adapter);

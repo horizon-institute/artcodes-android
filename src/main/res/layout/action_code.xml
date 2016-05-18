@@ -34,5 +34,5 @@
         android:inputType="time"
         android:singleLine="true"
         android:textAppearance="@style/TextAppearance.AppCompat"
-        android:gravity="right"/>
+        android:gravity="end"/>
 </layout>

@@ -19,7 +19,9 @@
   -->
 
 <layout
-	xmlns:android="http://schemas.android.com/apk/res/android">
+    xmlns:tools="http://schemas.android.com/tools"
+    xmlns:android="http://schemas.android.com/apk/res/android"
+    tools:keep="@layout/feature_item">
 
 	<data>
 		<variable

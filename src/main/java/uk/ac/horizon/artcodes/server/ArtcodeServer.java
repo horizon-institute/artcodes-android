@@ -25,7 +25,6 @@ import java.util.List;
 import java.util.Map;
 
 import uk.ac.horizon.artcodes.account.Account;
-import uk.ac.horizon.artcodes.adapter.ExperienceAdapter;
 import uk.ac.horizon.artcodes.model.Action;
 import uk.ac.horizon.artcodes.model.Experience;
 

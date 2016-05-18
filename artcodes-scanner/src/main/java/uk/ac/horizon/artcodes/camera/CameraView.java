@@ -327,10 +327,6 @@ public class CameraView extends SurfaceView
 				public void run()
 				{
 					createCamera();
-					if (camera == null)
-					{
-						// TODO Display error
-					}
 				}
 			});
 		}

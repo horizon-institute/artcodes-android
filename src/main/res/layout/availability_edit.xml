@@ -21,7 +21,8 @@
 <layout xmlns:android="http://schemas.android.com/apk/res/android"
         xmlns:app="http://schemas.android.com/apk/res-auto"
         xmlns:tools="http://schemas.android.com/tools"
-        tools:context=".activities.ExperienceEditActivity">
+        tools:context=".activities.ExperienceEditActivity"
+        tools:keep="@layout/availability_edit">
 
     <data>
 
@@ -190,6 +191,7 @@
                 android:layout_height="wrap_content"
                 android:src="@drawable/ic_delete_24dp"
                 android:id="@+id/delete_button"
+                android:contentDescription="@string/delete"
                 android:padding="16dp"/>
 
             <ImageButton
@@ -198,7 +200,8 @@
                 android:layout_height="wrap_content"
                 android:src="@drawable/ic_check_24dp"
                 android:id="@+id/done_button"
-                android:layout_gravity="right"
+                android:contentDescription="@string/done"
+                android:layout_gravity="end"
                 android:padding="16dp"/>
         </FrameLayout>
     </LinearLayout>

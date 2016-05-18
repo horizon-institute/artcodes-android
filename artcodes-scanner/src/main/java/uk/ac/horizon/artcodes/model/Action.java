@@ -40,7 +40,7 @@ public class Action extends BaseObservable
 	private String description;
 	private String image;
 	private String owner;
-	private boolean showDetail = false;
+	//private boolean showDetail = false;
 
 	public List<String> getCodes()
 	{
@@ -89,10 +89,10 @@ public class Action extends BaseObservable
 		this.name = name;
 	}
 
-	public boolean getShowDetail()
-	{
-		return showDetail;
-	}
+//	public boolean getShowDetail()
+//	{
+//		return showDetail;
+//	}
 
 	@Bindable
 	public String getUrl()
@@ -118,6 +118,11 @@ public class Action extends BaseObservable
 			return url.substring(HTTP_PREFIX.length());
 		}
 		return url;
+	}
+
+	public void setMatch(Match match)
+	{
+		this.match = match;
 	}
 
 	@Override

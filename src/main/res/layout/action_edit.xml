@@ -210,10 +210,11 @@
                     android:drawableStart="@drawable/ic_add_a_photo_24dp"
                     android:drawablePadding="36dp"
                     android:padding="16dp"
-                    android:text="Scan Code"
+                    android:text="@string/scan_artcode"
                     android:drawableTint="#000"
                     android:gravity="center_vertical"
-                    android:id="@+id/scanButton"/>
+                    android:id="@+id/scanButton"
+                    tools:ignore="UnusedAttribute"/>
             </LinearLayout>
         </ScrollView>
 

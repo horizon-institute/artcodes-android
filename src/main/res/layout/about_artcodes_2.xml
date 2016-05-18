@@ -33,7 +33,7 @@
 		android:layout_height="wrap_content"
 		android:layout_margin="16dp"
 		android:adjustViewBounds="true"
-		android:contentDescription="@string/about_artcodes1_image"
+		android:contentDescription="@string/about_artcodes_2_image"
 		android:src="@drawable/about_artcodes_2"/>
 
 	<TextView

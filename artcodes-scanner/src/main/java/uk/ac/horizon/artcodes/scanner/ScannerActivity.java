@@ -73,6 +73,7 @@ public class ScannerActivity extends AppCompatActivity implements MarkerDetectio
 	private VisibilityAnimator menuAnimator;
 	private TextAnimator textAnimator;
 
+	@SuppressWarnings("UnusedParameters")
 	public void hideMenu(View view)
 	{
 		menuAnimator.hideView();
@@ -156,6 +157,7 @@ public class ScannerActivity extends AppCompatActivity implements MarkerDetectio
 		startScanning();
 	}
 
+	@SuppressWarnings("UnusedParameters")
 	public void showMenu(View view)
 	{
 		createSettingsUI(detector.getSettings());

@@ -50,7 +50,7 @@ public abstract class ListAdapter<T extends ViewDataBinding> extends BaseObserva
 	private int emptyIcon = R.drawable.ic_warning_black_144dp;
 	private String errorMessage;
 	private String emptyDetail = "";
-	private int errorIcon = R.drawable.ic_warning_black_144dp;
+	private static final int errorIcon = R.drawable.ic_warning_black_144dp;
 
 
 	private boolean error = false;

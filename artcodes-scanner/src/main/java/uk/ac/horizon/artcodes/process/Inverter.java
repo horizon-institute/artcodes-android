@@ -28,11 +28,6 @@ import uk.ac.horizon.artcodes.detect.ImageBuffers;
 
 public class Inverter implements ImageProcessor
 {
-	public String getPrefix()
-	{
-		return "invert";
-	}
-
 	@Override
 	public void process(ImageBuffers buffers)
 	{

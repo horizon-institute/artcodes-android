@@ -66,7 +66,7 @@ public class ActionEditDialogFragment extends DialogFragment
 	public Dialog onCreateDialog(Bundle savedInstanceState) throws NullPointerException
 	{
 		binding = ActionEditBinding.inflate(getActivity().getLayoutInflater());
-		binding.newMarkerCode.setFilters(new InputFilter[]{new MarkerFormat(getExperience(), null)});
+		binding.newMarkerCode.setFilters(new InputFilter[]{new MarkerFormat()});
 		binding.newMarkerCode.addTextChangedListener(new SimpleTextWatcher()
 		{
 			@Override
@@ -218,7 +218,7 @@ public class ActionEditDialogFragment extends DialogFragment
 		final String code = action.getCodes().get(codeIndex);
 		final ActionCodeBinding codeBinding = ActionCodeBinding.inflate(getActivity().getLayoutInflater(), binding.markerCodeList, false);
 		codeBinding.editMarkerCode.setText(code);
-		codeBinding.editMarkerCode.setFilters(new InputFilter[]{new MarkerFormat(getExperience(), code)});
+		codeBinding.editMarkerCode.setFilters(new InputFilter[]{new MarkerFormat()});
 		codeBinding.editMarkerCode.addTextChangedListener(new SimpleTextWatcher()
 		{
 			@Override

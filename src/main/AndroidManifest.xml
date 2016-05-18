@@ -132,6 +132,11 @@
                 android:name="android.app.searchable"
                 android:resource="@xml/searchable"/>
         </activity>
+
+        <activity
+            android:name=".activity.ExperienceHistoryActivity">
+        </activity>
+
         <activity
             android:name=".activity.ExperienceEditActivity"
             android:windowSoftInputMode="stateUnchanged">

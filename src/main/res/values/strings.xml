@@ -52,16 +52,13 @@
 	<string name="checksumModulo_embedded_value">Embedded Checksum %d</string>
 	<string name="checksumModulo_desc">A code is only valid if the total of all its values are divisible by the checksum.</string>
 	<string name="embeddedChecksum">Embedded Checksum</string>
-
 	<string name="markerDeleteConfirmTitle">Delete Marker %s?</string>
 	<string name="markerDeleteConfirmMessage">Marker %s will be permanently deleted</string>
-
 	<string name="experienceDeleteConfirm">Delete %s?</string>
 	<string name="save">Save</string>
 	<string name="save_to">Save to %s</string>
 	<string name="deleteConfirm">Delete</string>
 	<string name="deleteCancel">Cancel</string>
-
 	<string name="open_in_browser">Open in Browser</string>
 	<string name="experience_add">Add Experience</string>
 	<string name="experiences">Experiences</string>
@@ -96,13 +93,7 @@
 	<string name="marker_config">Marker Configuration</string>
 	<string name="close">close</string>
 	<string name="nav_home">Recommended</string>
-	<string name="nav_library">My Library</string>
-	<string name="favourites">Favourites</string>
-	<string name="favourite">Favourite</string>
 	<string name="device">Device</string>
-	<string name="artcodeServer">Artcode Server</string>
-	<string name="save_google">Save to Artcode Server</string>
-	<string name="save_local">Save to Device</string>
 	<string name="nearby">Nearby</string>
 	<string name="unstar">Unstar</string>
 	<string name="star">Star</string>
@@ -119,7 +110,7 @@
 	<string name="fragment_colour">Colour</string>
 	<string name="nav_features">Features</string>
 	<string name="nav_addaccount">Add Account</string>
-	<string name="navigation_libraries">Libraries</string>
+	<string name="nav_libraries">Libraries</string>
 	<string name="server">Server (%s)</string>
 	<string name="availability_private">Private</string>
 	<string name="read_more">Read More</string>
@@ -135,20 +126,9 @@
 	<string name="available_between_near">Available %1$s near %2$s</string>
 	<string name="match_any">Triggered by matching any of these codes</string>
 	<string name="match_all">Triggered by matching all of these codes</string>
-	<string name="about_artcodes1">An Artcode is a set of connected regions, with blobs floating inside the regions.</string>
-	<string name="about_artcodes2_1">Region: An enclosed space</string>
-	<string name="about_artcodes2_2">All regions need to be connected</string>
-	<string name="about_artcodes3_1">Blob: A solid shape within a region</string>
-	<string name="about_artcodes3_2">Code: Number of values represent the number of regions. Each value represents the number of blobs in each region</string>
-	<string name="about_artcodes3_3">This Artcode has the code 1:1:2:3:3</string>
-	<string name="about_artcodes4">These rules can now be translated into an artcode as seen here. 5 regions with \'noise\' both inside regions and as part of the boundary. Each region with the corresponding blobs floating within.</string>
 	<string name="done">Done</string>
 	<string name="skip">Skip</string>
 	<string name="next_page">Next Page</string>
-	<string name="about_artcodes_title">What is Artcodes?</string>
-	<string name="about_artcodes2_1_1">You can add noise to add detail to a region</string>
-	<string name="about_artcodes3_4">A blob can not touch the edge of a region</string>
-	<string name="about_artcodes1_image">An artcode</string>
 	<string name="nav_recent">Recent</string>
 	<string name="no_actions">No Actions</string>
 	<string name="no_actions_action">Tap the + button to create an action</string>
@@ -161,11 +141,13 @@
 	<string name="about_artcodes_1_title">Create beautiful codes with Artcodes</string>
 	<string name="about_artcodes_1">Artcodes allow everyone to become a coder. By drawing visually beautiful images, you can link them to websites to showcase how interaction can become fun and beautiful.</string>
 	<string name="about_artcodes_2">Every Artcode has a numerical code which corresponds to the number of blobs and regions of the Artcode. Here, yhe leftmost region contains 2 blobs, the two center regions contain 3 blobs each and the two regions on the right have 1 blob each. So, this Artcode has the code 1:1:2:3:3.</string>
+    <string name="about_artcodes_2_image">An artcode</string>
 	<string name="about_artcodes_3">Experiences link those codes to web pages, so that when an Artcode is scanned it will take you to the associated web page.</string>
 	<string name="about_artcodes_3_button">Learn to Draw Artcodes</string>
 	<string name="search">Search</string>
 	<string name="action_editable">Editable in copies</string>
 	<string name="search_empty">No experiences found matching \"%s\"</string>
     <string name="connection_error">Connection Error</string>
-
+    <string name="scan_artcode">Scan Artcode</string>
+    <string name="prev_page">Previous Page</string>
 </resources>

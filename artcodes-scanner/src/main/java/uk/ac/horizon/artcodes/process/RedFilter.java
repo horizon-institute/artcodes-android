@@ -62,7 +62,7 @@ public class RedFilter implements ImageProcessor
 
 				byte y1 = data[0];
 				byte y2 = data[2];
-				byte u = data[1];
+				//byte u = data[1];
 				byte v = data[2];
 
 				byte rcomp = (byte)(1.14 * v);

@@ -32,7 +32,7 @@
 		android:layout_width="match_parent"
 		android:layout_height="match_parent"
 		android:layout_margin="16dp"
-		android:contentDescription="@string/about_artcodes1_image"
+		android:contentDescription="@string/about_artcodes_2_image"
 		android:src="@drawable/about_artcodes_2"
 		android:layout_weight="1"/>
 

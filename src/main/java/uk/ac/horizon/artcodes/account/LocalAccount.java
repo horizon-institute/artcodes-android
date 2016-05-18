@@ -218,7 +218,10 @@ public class LocalAccount implements Account
 		try
 		{
 			File file = new File(URI.create(experience.getId()));
-			file.delete();
+			if(!file.delete())
+			{
+				Log.w("local", "Experience " + experience.getId() + " not deleted");
+			}
 		}
 		catch (Exception e)
 		{

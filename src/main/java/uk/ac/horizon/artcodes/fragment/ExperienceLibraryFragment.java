@@ -69,7 +69,7 @@ public class ExperienceLibraryFragment extends ArtcodeFragmentBase
 	{
 		ListBinding binding = ListBinding.inflate(inflater, container, false);
 		adapter = new ExperienceSortedListAdapter(getActivity(), getServer());
-		adapter.setFabPadding(true);
+		adapter.enableFABPadding();
 		adapter.setEmptyIcon(R.drawable.ic_folder_144dp);
 		adapter.setEmptyMessage(getString(R.string.empty));
 		adapter.setEmptyDetail(getString(R.string.emptyHint));

@@ -84,9 +84,9 @@ public abstract class GridAdapter<T extends ViewDataBinding> extends ListAdapter
 		return 1;
 	}
 
-	public void setFabPadding(boolean value)
+	public void enableFABPadding()
 	{
-		this.fabPadding = value;
+		this.fabPadding = true;
 	}
 
 	protected void columnsChanged()

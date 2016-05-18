@@ -46,11 +46,6 @@ public class HueShifter implements ImageProcessor
 		this.hueShift = hueShift;
 	}
 
-	public String getPrefix()
-	{
-		return "hue";
-	}
-
 	public int getHueShift()
 	{
 		return hueShift;
