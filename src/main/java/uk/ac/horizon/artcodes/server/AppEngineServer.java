@@ -24,18 +24,21 @@ import android.content.SharedPreferences;
 import android.location.Location;
 import android.net.Uri;
 import android.util.Log;
+
 import com.google.common.reflect.TypeToken;
 import com.google.gson.Gson;
+
+import java.util.ArrayList;
+import java.util.List;
+import java.util.Map;
+
 import uk.ac.horizon.artcodes.ExperienceParser;
 import uk.ac.horizon.artcodes.account.Account;
 import uk.ac.horizon.artcodes.account.AppEngineAccount;
 import uk.ac.horizon.artcodes.account.LocalAccount;
 import uk.ac.horizon.artcodes.model.Action;
 import uk.ac.horizon.artcodes.model.Experience;
-
-import java.util.ArrayList;
-import java.util.List;
-import java.util.Map;
+import uk.ac.horizon.artcodes.model.ScanEvent;
 
 public class AppEngineServer implements ArtcodeServer
 {
@@ -122,24 +125,6 @@ public class AppEngineServer implements ArtcodeServer
 	public List<Account> getAccounts()
 	{
 		return accounts;
-//		final IDList ids = new IDList(context, Account.class, "accounts");
-//		final List<Account> accounts = new ArrayList<>();
-//		if (ids.isEmpty())
-//		{
-//			accounts.add(new LocalAccount(context, gson));
-//		}
-//		else
-//		{
-//			for (String id : ids)
-//			{
-//				Account account = getAccount(id);
-//				if (account != null)
-//				{
-//					accounts.add(account);
-//				}
-//			}
-//		}
-//		return accounts;
 	}
 
 	@Override
@@ -175,8 +160,33 @@ public class AppEngineServer implements ArtcodeServer
 	}
 
 	@Override
-	public void logScan(String uri, Action action)
+	public void logScan(final String uri, final Action action)
 	{
+		final SharedPreferences preferences = context.getSharedPreferences("History", Context.MODE_PRIVATE);
+		final String historyJSON = preferences.getString(uri, "[]");
+		final List<ScanEvent> history = gson.fromJson(historyJSON, new TypeToken<List<ScanEvent>>()
+		{
+		}.getType());
+
+		// Only log scan event if an identical scan hasn't happened recently
+		if(!history.isEmpty())
+		{
+			final ScanEvent lastEvent = history.get(history.size() - 1);
+			if(System.currentTimeMillis() - lastEvent.getTimestamp() < 1000)
+			{
+				String lastAction = gson.toJson(lastEvent.getAction());
+				String currentAction = gson.toJson(action);
+				if(currentAction.equals(lastAction))
+				{
+					return;
+				}
+			}
+		}
+
+		history.add(new ScanEvent(action));
+
+		preferences.edit().putString(uri, gson.toJson(history)).apply();
+
 		for (Account account : accounts)
 		{
 			if (account.logScan(uri))
@@ -184,6 +194,16 @@ public class AppEngineServer implements ArtcodeServer
 				break;
 			}
 		}
+	}
+
+	@Override
+	public List<ScanEvent> getScanHistory(String id)
+	{
+		final SharedPreferences preferences = context.getSharedPreferences("History", Context.MODE_PRIVATE);
+		final String historyJSON = preferences.getString(id, "[]");
+		return gson.fromJson(historyJSON, new TypeToken<List<ScanEvent>>()
+		{
+		}.getType());
 	}
 
 	@Override

@@ -22,7 +22,42 @@ package uk.ac.horizon.artcodes.model;
 public class ScanEvent
 {
 	private long timestamp;
-	private String uri;
-	private String image;
 	private Action action;
+
+	public ScanEvent()
+	{
+
+	}
+
+	public ScanEvent(Action action)
+	{
+		this.action = action;
+		this.timestamp = System.currentTimeMillis();
+	}
+
+	public long getTimestamp()
+	{
+		return timestamp;
+	}
+
+	public Action getAction()
+	{
+		return action;
+	}
+
+	public String getName()
+	{
+		if(action != null)
+		{
+			if(action.getName() != null)
+			{
+				return action.getName();
+			}
+			else
+			{
+				return action.getUrl();
+			}
+		}
+		return "Unknown";
+	}
 }

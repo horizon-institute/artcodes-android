@@ -49,6 +49,7 @@ import uk.ac.horizon.artcodes.databinding.ExperienceBinding;
 import uk.ac.horizon.artcodes.databinding.LocationItemBinding;
 import uk.ac.horizon.artcodes.model.Availability;
 import uk.ac.horizon.artcodes.model.Experience;
+import uk.ac.horizon.artcodes.model.ScanEvent;
 import uk.ac.horizon.artcodes.server.LoadCallback;
 
 public class ExperienceActivity extends ExperienceActivityBase
@@ -82,11 +83,6 @@ public class ExperienceActivity extends ExperienceActivityBase
 		super.loaded(experience);
 		GoogleAnalytics.trackScreen("View Experience", experience.getId());
 		binding.setExperience(experience);
-
-//		if (Feature.get(this, R.bool.feature_history).isEnabled())
-//		{
-//			binding.experienceHistoryButton.setVisibility(View.VISIBLE);
-//		}
 
 		binding.experienceDescription.getViewTreeObserver().addOnGlobalLayoutListener(new ViewTreeObserver.OnGlobalLayoutListener()
 		{
@@ -333,6 +329,8 @@ public class ExperienceActivity extends ExperienceActivityBase
 			}
 		}
 
+		final List<ScanEvent> history = getServer().getScanHistory(getUri());
+		setVisible(binding.scanHistoryButton, history != null && !history.isEmpty());
 		setVisible(binding.editButton, editable);
 		setVisible(binding.copyButton, copiable);
 		setVisible(binding.saveProgress, saving);

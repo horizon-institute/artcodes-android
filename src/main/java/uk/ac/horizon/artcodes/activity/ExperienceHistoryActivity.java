@@ -21,13 +21,24 @@ package uk.ac.horizon.artcodes.activity;
 
 import android.content.Context;
 import android.content.Intent;
+import android.os.Bundle;
+import android.support.annotation.Nullable;
+import android.support.v4.app.NavUtils;
+import android.support.v7.widget.Toolbar;
+import android.view.MenuItem;
+import android.view.ViewGroup;
 
 import com.google.gson.Gson;
 
+import uk.ac.horizon.artcodes.R;
+import uk.ac.horizon.artcodes.adapter.ScanEventAdapter;
+import uk.ac.horizon.artcodes.databinding.ListBinding;
 import uk.ac.horizon.artcodes.model.Experience;
 
 public class ExperienceHistoryActivity extends ExperienceActivityBase
 {
+	private ScanEventAdapter adapter;
+
 	public static void start(Context context, Experience experience)
 	{
 		Intent intent = new Intent(context, ExperienceHistoryActivity.class);
@@ -36,11 +47,45 @@ public class ExperienceHistoryActivity extends ExperienceActivityBase
 	}
 
 	@Override
-	public void loaded(Experience experience)
+	protected void onCreate(@Nullable Bundle savedInstanceState)
 	{
-		// TODO
-		super.loaded(experience);
+		super.onCreate(savedInstanceState);
+
+		setContentView(R.layout.container);
+
+		final Toolbar toolbar = (Toolbar)findViewById(R.id.toolbar);
+		setSupportActionBar(toolbar);
+		if(getSupportActionBar() != null)
+		{
+			getSupportActionBar().setDisplayHomeAsUpEnabled(true);
+		}
+
+		final ViewGroup content = (ViewGroup)findViewById(R.id.content);
+
+		final ListBinding binding = ListBinding.inflate(getLayoutInflater(), content, false);
+		adapter = new ScanEventAdapter(this);
+		binding.setAdapter(adapter);
+
+		content.addView(binding.getRoot());
 	}
 
+	@Override
+	public boolean onOptionsItemSelected(MenuItem item)
+	{
+		switch (item.getItemId())
+		{
+			case android.R.id.home:
+				NavUtils.navigateUpTo(this, ExperienceActivity.intent(this, getExperience()));
+				return true;
+		}
+		return super.onOptionsItemSelected(item);
+	}
 
+	@Override
+	public void loaded(Experience experience)
+	{
+		super.loaded(experience);
+
+		adapter.setHistory(getServer().getScanHistory(experience.getId()));
+	}
 }

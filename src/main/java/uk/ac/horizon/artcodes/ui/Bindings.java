@@ -47,6 +47,7 @@ public final class Bindings
 {
 	private static final SimpleDateFormat dateFormat = new SimpleDateFormat("d MMMM", Locale.US);
 	private static final SimpleDateFormat dateFormatYear = new SimpleDateFormat("d MMMM yyyy", Locale.US);
+	private static final SimpleDateFormat timeFormat = new SimpleDateFormat("h:mm a", Locale.US);
 
 	@BindingAdapter("imageUrl")
 	public static void bindImageURL(final ImageView view, final String url)
@@ -221,6 +222,53 @@ public final class Bindings
 		}
 		return null;
 	}
+
+	public static String getTime(Long timestamp)
+	{
+		if (timestamp != null)
+		{
+			long now = System.currentTimeMillis();
+			Date nowDate = new Date(now);
+			Date date = new Date(timestamp);
+
+			String today = dateFormat.format(nowDate);
+			String dateString = dateFormat.format(date);
+			if(!today.equals(dateString))
+			{
+				return timeFormat.format(date) + " " + getDate(timestamp);
+			}
+
+			long difference = now - timestamp;
+			if(difference < 120000)
+			{
+				return "Just Now";
+			}
+			else if(difference < 3600000)
+			{
+				int minutes = (int) (difference / 60000);
+				return minutes + " mins ago";
+			}
+			else
+			{
+				return timeFormat.format(date);
+			}
+		}
+		return null;
+	}
+
+	@BindingAdapter("time")
+	public static void bindTime(TextView view, Long timestamp)
+	{
+		if (timestamp != null)
+		{
+			view.setText(getTime(timestamp));
+		}
+		else
+		{
+			view.setText(null);
+		}
+	}
+
 
 	@BindingAdapter("date")
 	public static void bindDate(TextView view, Long timestamp)
