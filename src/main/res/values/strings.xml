@@ -112,7 +112,7 @@
 	<string name="nav_addaccount">Add Account</string>
 	<string name="nav_libraries">Libraries</string>
 	<string name="server">Server (%s)</string>
-	<string name="availability_private">Private</string>
+	<string name="availability_private">Unlisted</string>
 	<string name="read_more">Read More</string>
 	<string name="scan_history">Scan History</string>
 	<string name="available_public">Public</string>
@@ -150,4 +150,5 @@
     <string name="connection_error">Connection Error</string>
     <string name="scan_artcode">Scan Artcode</string>
     <string name="prev_page">Previous Page</string>
+    <string name="next">Next</string>
 </resources>
