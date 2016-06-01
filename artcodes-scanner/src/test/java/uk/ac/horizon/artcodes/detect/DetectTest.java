@@ -22,13 +22,17 @@ package uk.ac.horizon.artcodes.detect;
 import com.google.gson.Gson;
 
 import org.junit.Test;
+import org.opencv.core.Mat;
+import org.opencv.core.MatOfPoint;
 
 import java.io.File;
 import java.io.FileReader;
 import java.io.IOException;
+import java.util.ArrayList;
 import java.util.Collection;
 
 import uk.ac.horizon.artcodes.ExperienceParser;
+import uk.ac.horizon.artcodes.detect.marker.Marker;
 import uk.ac.horizon.artcodes.detect.marker.MarkerDetectionHandler;
 import uk.ac.horizon.artcodes.model.Experience;
 
@@ -48,7 +52,7 @@ public class DetectTest
 		ArtcodeDetector detector = new ArtcodeDetector(experience, new MarkerDetectionHandler()
 		{
 			@Override
-			public void onMarkersDetected(Collection<String> markers)
+			public void onMarkersDetected(Collection<Marker> markers, ArrayList<MatOfPoint> contours, Mat hierarchy)
 			{
 
 			}
