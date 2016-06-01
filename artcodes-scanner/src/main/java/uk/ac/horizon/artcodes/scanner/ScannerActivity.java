@@ -44,29 +44,22 @@ import android.view.WindowManager;
 import android.widget.ImageView;
 import android.widget.LinearLayout;
 
-import com.google.common.collect.HashMultiset;
 import com.google.common.collect.Lists;
-import com.google.common.collect.Multiset;
 import com.google.gson.Gson;
 
-import java.util.Collection;
-import java.util.HashSet;
 import java.util.List;
 
 import uk.ac.horizon.artcodes.animator.TextAnimator;
 import uk.ac.horizon.artcodes.animator.VisibilityAnimator;
 import uk.ac.horizon.artcodes.detect.ArtcodeDetector;
 import uk.ac.horizon.artcodes.detect.DetectorSetting;
-import uk.ac.horizon.artcodes.detect.marker.MarkerDetectionHandler;
+import uk.ac.horizon.artcodes.detect.marker.MarkerCodeDetectionHandler;
 import uk.ac.horizon.artcodes.model.Experience;
 import uk.ac.horizon.artcodes.scanner.databinding.ScannerBinding;
 
-public class ScannerActivity extends AppCompatActivity implements MarkerDetectionHandler
+public class ScannerActivity extends AppCompatActivity
 {
-	protected static final int REQUIRED = 20;
-	protected static final int MAX = REQUIRED * 4;
 	private static final int CAMERA_PERMISSION_REQUEST = 47;
-	private final Multiset<String> markerCounts = HashMultiset.create();
 	protected ScannerBinding binding;
 	private ArtcodeDetector detector;
 	private Experience experience;
@@ -129,28 +122,6 @@ public class ScannerActivity extends AppCompatActivity implements MarkerDetectio
 		}
 	}
 
-	public void onMarkersDetected(Collection<String> markers)
-	{
-		final Collection<String> removals = new HashSet<>(markerCounts.elementSet());
-
-		for (String marker : markers)
-		{
-			final int count = markerCounts.count(marker);
-			if (count > MAX)
-			{
-				markerCounts.setCount(marker, MAX);
-			}
-
-			//increase occurrence if this marker is already in the list.
-			markerCounts.add(marker);
-			removals.remove(marker);
-		}
-
-		markerCounts.removeAll(removals);
-
-		onMarkersDetected(markerCounts);
-	}
-
 	public void loaded(Experience experience)
 	{
 		this.experience = experience;
@@ -164,26 +135,6 @@ public class ScannerActivity extends AppCompatActivity implements MarkerDetectio
 		menuAnimator.showView();
 	}
 
-	protected void onMarkersDetected(Multiset<String> markers)
-	{
-		int best = 0;
-		String selected = null;
-		for (String code : markers.elementSet())
-		{
-			int count = markers.count(code);
-			if (count > best)
-			{
-				selected = code;
-				best = count;
-			}
-		}
-
-		if (selected != null || best >= REQUIRED)
-		{
-			onCodeDetected(selected);
-		}
-	}
-
 	protected Experience getExperience()
 	{
 		return experience;
@@ -194,7 +145,7 @@ public class ScannerActivity extends AppCompatActivity implements MarkerDetectio
 		if (experience != null)
 		{
 			Log.i("a", "Start Scanning");
-			detector = new ArtcodeDetector(experience, this);
+			detector = this.getNewDetector(experience);
 			binding.setExperience(experience);
 			binding.setDetector(detector);
 		}
@@ -326,5 +277,16 @@ public class ScannerActivity extends AppCompatActivity implements MarkerDetectio
 		{
 			binding.settingsMenuButton.setVisibility(View.GONE);
 		}
+	}
+
+	protected ArtcodeDetector getNewDetector(Experience experience) {
+		return new ArtcodeDetector(experience, new MarkerCodeDetectionHandler(new MarkerCodeDetectionHandler.CodeDetectionHandler()
+		{
+			@Override
+			public void onMarkerCodeDetected(String code)
+			{
+				onCodeDetected(code);
+			}
+		}));
 	}
 }

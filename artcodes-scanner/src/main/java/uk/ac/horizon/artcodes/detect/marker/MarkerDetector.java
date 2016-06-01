@@ -35,13 +35,13 @@ import java.util.Comparator;
 import java.util.HashSet;
 import java.util.List;
 
+import uk.ac.horizon.artcodes.detect.DetectorSetting;
+import uk.ac.horizon.artcodes.detect.ImageBuffers;
 import uk.ac.horizon.artcodes.model.Action;
 import uk.ac.horizon.artcodes.model.Experience;
-import uk.ac.horizon.artcodes.detect.ImageBuffers;
+import uk.ac.horizon.artcodes.process.ImageProcessor;
 import uk.ac.horizon.artcodes.process.ImageProcessorFactory;
 import uk.ac.horizon.artcodes.scanner.R;
-import uk.ac.horizon.artcodes.process.ImageProcessor;
-import uk.ac.horizon.artcodes.detect.DetectorSetting;
 
 public class MarkerDetector implements ImageProcessor
 {
@@ -183,7 +183,7 @@ public class MarkerDetector implements ImageProcessor
 		}
 		try
 		{
-			final List<String> foundMarkers = new ArrayList<>();
+			final List<Marker> foundMarkers = new ArrayList<>();
 			Imgproc.findContours(buffers.getImage(), contours, hierarchy, Imgproc.RETR_TREE, Imgproc.CHAIN_APPROX_NONE);
 			for (int i = 0; i < contours.size(); i++)
 			{
@@ -193,7 +193,7 @@ public class MarkerDetector implements ImageProcessor
 					final String markerCode = getCodeKey(marker);
 					if (validCodes.isEmpty() || validCodes.contains(markerCode))
 					{
-						foundMarkers.add(markerCode);
+						foundMarkers.add(marker);
 
 						if (outlineDisplay != OutlineDisplay.none)
 						{
@@ -229,7 +229,7 @@ public class MarkerDetector implements ImageProcessor
 			}
 
 			buffers.setDetected(!foundMarkers.isEmpty());
-			handler.onMarkersDetected(foundMarkers);
+			handler.onMarkersDetected(foundMarkers, contours, hierarchy);
 		}
 		finally
 		{

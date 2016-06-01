@@ -19,9 +19,13 @@
 
 package uk.ac.horizon.artcodes.detect.marker;
 
+import org.opencv.core.Mat;
+import org.opencv.core.MatOfPoint;
+
+import java.util.ArrayList;
 import java.util.Collection;
 
 public interface MarkerDetectionHandler
 {
-	void onMarkersDetected(Collection<String> markers);
+	void onMarkersDetected(Collection<Marker> markers, ArrayList<MatOfPoint> contours, Mat hierarchy);
 }

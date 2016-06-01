@@ -35,6 +35,7 @@ import android.view.View;
 import com.google.common.collect.Multiset;
 import com.google.gson.Gson;
 
+import java.util.Collection;
 import java.util.List;
 
 import uk.ac.horizon.artcodes.Artcodes;
@@ -42,6 +43,9 @@ import uk.ac.horizon.artcodes.GoogleAnalytics;
 import uk.ac.horizon.artcodes.R;
 import uk.ac.horizon.artcodes.animator.VisibilityAnimator;
 import uk.ac.horizon.artcodes.databinding.ScannerActionBinding;
+import uk.ac.horizon.artcodes.detect.ArtcodeDetector;
+import uk.ac.horizon.artcodes.detect.marker.Marker;
+import uk.ac.horizon.artcodes.detect.marker.MarkerActionDetectionHandler;
 import uk.ac.horizon.artcodes.model.Action;
 import uk.ac.horizon.artcodes.model.Experience;
 import uk.ac.horizon.artcodes.scanner.ScannerActivity;
@@ -132,59 +136,6 @@ public class ArtcodeActivity extends ScannerActivity implements LoadCallback<Exp
 	}
 
 	@Override
-	protected void onMarkersDetected(Multiset<String> markers)
-	{
-		int best = 0;
-		Action selected = null;
-		for (Action action : getExperience().getActions())
-		{
-			if (action.getMatch() == Action.Match.any)
-			{
-				for (String code : action.getCodes())
-				{
-					int count = markers.count(code);
-					if (count > best)
-					{
-						selected = action;
-						best = count;
-					}
-				}
-			}
-			else if (action.getMatch() == Action.Match.all)
-			{
-				int min = MAX;
-				int total = 0;
-				for (String code : action.getCodes())
-				{
-					int count = markers.count(code);
-					min = Math.min(min, count);
-					total += (count * 2);
-				}
-
-				if (min > REQUIRED && total > best)
-				{
-					best = total;
-					selected = action;
-				}
-			}
-		}
-
-		if (selected == null || best < REQUIRED)
-		{
-			if (action != null)
-			{
-				action = null;
-				onActionChanged(null);
-			}
-		}
-		else if (selected != action)
-		{
-			action = selected;
-			onActionChanged(action);
-		}
-	}
-
-	@Override
 	protected void loadExperience(Bundle savedInstanceState)
 	{
 		if (savedInstanceState != null && savedInstanceState.containsKey("experience"))
@@ -266,5 +217,18 @@ public class ArtcodeActivity extends ScannerActivity implements LoadCallback<Exp
 				}
 			});
 		}
+	}
+
+	@Override
+	protected ArtcodeDetector getNewDetector(Experience experience)
+	{
+		return new ArtcodeDetector(experience, new MarkerActionDetectionHandler(new MarkerActionDetectionHandler.ActionDetectionHandler()
+		{
+			@Override
+			public void onMarkerActionDetected(Action detectedAction, Collection<Marker> detectedMarkers, Action asPartOfFutureAction)
+			{
+				onActionChanged(detectedAction);
+			}
+		}, experience));
 	}
 }

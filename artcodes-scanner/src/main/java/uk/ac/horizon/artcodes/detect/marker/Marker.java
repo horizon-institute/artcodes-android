@@ -21,7 +21,7 @@ package uk.ac.horizon.artcodes.detect.marker;
 
 import java.util.List;
 
-class Marker
+public class Marker
 {
 	public final int markerIndex;
 	public final List<MarkerRegion> regions;
@@ -30,5 +30,24 @@ class Marker
 	{
 		this.markerIndex = markerIndex;
 		this.regions = regions;
+	}
+
+	@Override
+	public int hashCode()
+	{
+		return toString().hashCode();
+	}
+
+	@Override
+	public String toString()
+	{
+		StringBuilder sb = new StringBuilder(this.regions.size()*2);
+		for (MarkerRegion region : this.regions)
+		{
+			sb.append(region.value);
+			sb.append(':');
+		}
+		sb.deleteCharAt(sb.length()-1);
+		return sb.toString();
 	}
 }
