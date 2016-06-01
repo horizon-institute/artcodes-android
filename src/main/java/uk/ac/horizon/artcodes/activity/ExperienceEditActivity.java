@@ -54,11 +54,11 @@ import uk.ac.horizon.artcodes.model.Experience;
 
 public class ExperienceEditActivity extends ExperienceActivityBase
 {
-	public class ExperienceEditPagerAdapter extends FragmentPagerAdapter
+	private class ExperienceEditPagerAdapter extends FragmentPagerAdapter
 	{
 		private final List<ExperienceEditFragment> fragments = new ArrayList<>();
 
-		public ExperienceEditPagerAdapter(FragmentManager fm)
+		private ExperienceEditPagerAdapter(FragmentManager fm)
 		{
 			super(fm);
 

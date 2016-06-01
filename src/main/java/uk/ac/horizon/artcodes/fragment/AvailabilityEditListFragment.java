@@ -48,12 +48,12 @@ public class AvailabilityEditListFragment extends ExperienceEditFragment
 	{
 		private List<Availability> availabilities = new ArrayList<>();
 
-		public AvailabilityAdapter(Context context)
+		private AvailabilityAdapter(Context context)
 		{
 			super(context);
 		}
 
-		public void setAvailabilities(List<Availability> availabilities)
+		private void setAvailabilities(List<Availability> availabilities)
 		{
 			this.availabilities = availabilities;
 			adapter.notifyDataSetChanged();
@@ -153,12 +153,12 @@ public class AvailabilityEditListFragment extends ExperienceEditFragment
 			AvailabilityEditDialogFragment.show(getFragmentManager(), AvailabilityEditListFragment.this, index);
 		}
 
-		public void availabilityUpdated(final int index)
+		void availabilityUpdated(final int index)
 		{
 			adapter.notifyItemChanged(index);
 		}
 
-		public void deleteAvailability(final int index)
+		void deleteAvailability(final int index)
 		{
 			final Availability availability = getExperience().getAvailabilities().get(index);
 			getExperience().getAvailabilities().remove(index);

@@ -54,7 +54,7 @@ public class AvailabilityEditDialogFragment extends DialogFragment
 	private static final int PLACE_PICKER_REQUEST = 119;
 	private AvailabilityEditBinding binding;
 
-	public static void show(FragmentManager fragmentManager, AvailabilityEditListFragment fragment, int num)
+	static void show(FragmentManager fragmentManager, AvailabilityEditListFragment fragment, int num)
 	{
 		final AvailabilityEditDialogFragment dialog = new AvailabilityEditDialogFragment();
 		final Bundle args = new Bundle();
