@@ -55,6 +55,7 @@ import uk.ac.horizon.artcodes.server.LoadCallback;
 public class ExperienceActivity extends ExperienceActivityBase
 {
 	private ExperienceBinding binding;
+	private Experience originalExperience;
 
 	public static void start(Context context, Experience experience)
 	{
@@ -66,6 +67,11 @@ public class ExperienceActivity extends ExperienceActivityBase
 		Intent intent = new Intent(context, ExperienceActivity.class);
 		intent.putExtra("experience", new Gson().toJson(experience));
 		return intent;
+	}
+
+	public void openOriginalExperience(View view)
+	{
+		ExperienceActivity.start(this, originalExperience);
 	}
 
 	public void editExperience(View view)
@@ -154,19 +160,24 @@ public class ExperienceActivity extends ExperienceActivityBase
 			}
 		}
 
-//		if(experience.getOriginalID() != null)
-//		{
-//			getServer().loadExperience(experience.getOriginalID(), new LoadCallback<Experience>()
-//			{
-//				@Override
-//				public void loaded(Experience item)
-//				{
-//					TextView view = new TextView(ExperienceActivity.this);
-//					view.setText("Copy of " + item.getDisplayName());
-//					binding.experienceLocations.addView(view);
-//				}
-//			});
-//		}
+		if(experience.getOriginalID() != null)
+		{
+			getServer().loadExperience(experience.getOriginalID(), new LoadCallback<Experience>()
+			{
+				@Override
+				public void loaded(Experience item)
+				{
+					originalExperience = item;
+					binding.setOriginalExperience(item);
+				}
+
+				@Override
+				public void error(Throwable e)
+				{
+
+				}
+			});
+		}
 
 		if (updateActions())
 		{
