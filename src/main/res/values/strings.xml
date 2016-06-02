@@ -110,7 +110,7 @@
 	<string name="fragment_colour">Colour</string>
 	<string name="nav_features">Features</string>
 	<string name="nav_addaccount">Add Account</string>
-	<string name="nav_libraries">Libraries</string>
+	<string name="nav_libraries">My Experiences</string>
 	<string name="server">Server (%s)</string>
 	<string name="availability_private">Unlisted</string>
 	<string name="read_more">Read More</string>

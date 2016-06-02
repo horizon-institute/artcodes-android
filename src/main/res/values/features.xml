@@ -20,6 +20,7 @@
 
 <resources>
 	<bool name="feature_show_welcome">true</bool>
+    <bool name="feature_show_local">false</bool>
 	<bool name="feature_log_scanned_images">true</bool>
 	<bool name="feature_history">false</bool>
 	<bool name="feature_auto_upload">true</bool>

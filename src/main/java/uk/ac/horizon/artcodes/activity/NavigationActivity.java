@@ -144,7 +144,7 @@ public class NavigationActivity extends ArtcodeActivityBase implements
 		return super.onOptionsItemSelected(item);
 	}
 
-	public void updateAccounts()
+	private void updateAccounts()
 	{
 		final Menu menu = binding.navigation.getMenu();
 		final MenuItem libraries = menu.findItem(R.id.nav_libraries);
@@ -155,11 +155,11 @@ public class NavigationActivity extends ArtcodeActivityBase implements
 			subMenu.removeItem(subMenu.getItem(0).getItemId());
 		}
 
-		List<Account> accounts = getServer().getAccounts();
+		final List<Account> accounts = getServer().getAccounts();
 		for (int index = 0; index < accounts.size(); index++)
 		{
-			Account account = accounts.get(index);
-			MenuItem menuItem = subMenu.add(R.id.navigation, index, Menu.NONE, account.getDisplayName());
+			final Account account = accounts.get(index);
+			final MenuItem menuItem = subMenu.add(R.id.navigation, index, Menu.NONE, account.getDisplayName());
 			if (account.getId().equals("local"))
 			{
 				menuItem.setIcon(R.drawable.ic_folder_24dp);
@@ -170,6 +170,9 @@ public class NavigationActivity extends ArtcodeActivityBase implements
 			}
 			menuItem.setCheckable(true);
 		}
+
+		final MenuItem menuItem = subMenu.add(R.id.navigation, R.id.nav_addaccount, Menu.NONE, R.string.nav_addaccount);
+		menuItem.setIcon(R.drawable.ic_add_24dp);
 
 		for (int i = 0, count = binding.navigation.getChildCount(); i < count; i++)
 		{
@@ -188,7 +191,7 @@ public class NavigationActivity extends ArtcodeActivityBase implements
 			@Override
 			public void loaded(List<String> item)
 			{
-				MenuItem recent = menu.findItem(R.id.nav_recent);
+				final MenuItem recent = menu.findItem(R.id.nav_recent);
 				if (recent != null)
 				{
 					recent.setVisible(!item.isEmpty());
@@ -206,7 +209,7 @@ public class NavigationActivity extends ArtcodeActivityBase implements
 			@Override
 			public void loaded(List<String> item)
 			{
-				MenuItem starred = menu.findItem(R.id.nav_starred);
+				final MenuItem starred = menu.findItem(R.id.nav_starred);
 				if (starred != null)
 				{
 					starred.setVisible(!item.isEmpty());

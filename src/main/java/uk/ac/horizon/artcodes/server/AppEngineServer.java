@@ -33,6 +33,8 @@ import java.util.List;
 import java.util.Map;
 
 import uk.ac.horizon.artcodes.ExperienceParser;
+import uk.ac.horizon.artcodes.Feature;
+import uk.ac.horizon.artcodes.R;
 import uk.ac.horizon.artcodes.account.Account;
 import uk.ac.horizon.artcodes.account.AppEngineAccount;
 import uk.ac.horizon.artcodes.account.LocalAccount;
@@ -48,6 +50,7 @@ public class AppEngineServer implements ArtcodeServer
 	private static final String prefix = "google:";
 	private final Context context;
 	private final Gson gson;
+	private final LocalAccount localAccount;
 	private final List<Account> accounts = new ArrayList<>();
 
 	public AppEngineServer(Context context)
@@ -55,15 +58,25 @@ public class AppEngineServer implements ArtcodeServer
 		this.context = context;
 		this.gson = ExperienceParser.createGson(context);
 		final List<String> accountIDs = loadIDs(Account.class, accounts_tag);
+
+		localAccount = new LocalAccount(context, gson);
+
 		if (!accountIDs.contains("local"))
 		{
-			accountIDs.add("local");
-			saveIDs(Account.class, accounts_tag, accountIDs);
+			if(Feature.get(context, R.bool.feature_show_local).isEnabled())
+			{
+				accountIDs.add("local");
+				saveIDs(Account.class, accounts_tag, accountIDs);
+			}
 		}
 
 		for (String accountID : accountIDs)
 		{
-			accounts.add(createAccount(accountID));
+			Account account = createAccount(accountID);
+			if(account != null)
+			{
+				accounts.add(account);
+			}
 		}
 	}
 
@@ -76,7 +89,10 @@ public class AppEngineServer implements ArtcodeServer
 		}
 		else if (id.equals("local"))
 		{
-			return new LocalAccount(context, gson);
+			if(Feature.get(context, R.bool.feature_show_local).isEnabled())
+			{
+				return localAccount;
+			}
 		}
 		return null;
 	}
@@ -89,7 +105,7 @@ public class AppEngineServer implements ArtcodeServer
 			return;
 		}
 
-		accounts.add(accounts.size() - 1, account);
+		accounts.add(Math.max(accounts.size() - 1, 0), account);
 		List<String> accountIDs = new ArrayList<>();
 		for (Account accountItem : accounts)
 		{
@@ -241,7 +257,8 @@ public class AppEngineServer implements ArtcodeServer
 				return;
 			}
 		}
-		Log.w("", "Failed to find loader for " + uri);
+
+		localAccount.load(uri, callback);
 	}
 
 	private List<String> loadIDs(Class<?> clazz, String name)
