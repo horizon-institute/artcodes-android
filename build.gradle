@@ -90,22 +90,15 @@ android {
 		abortOnError false
 	}
 
-	splits {
-		abi {
-			enable true
-			reset()
-			include 'x86', 'armeabi', 'armeabi-v7a', 'mips'
-		}
-	}
-	// map for the version code
-	project.ext.versionCodes = [armeabi: 1, 'armeabi-v7a': 2, mips: 3, x86: 4]
-	android.applicationVariants.all { variant ->
-		// assign different version code for each output
-		variant.outputs.each { output ->
-			output.versionCodeOverride =
-					project.ext.versionCodes.get(output.getFilter(com.android.build.OutputFile.ABI), 0) + (defaultConfig.versionCode * 10)
-		}
-	}
+    splits {
+        abi {
+            enable true
+            reset()
+            include 'x86', 'x86_64', 'armeabi', 'armeabi-v7a', 'mips', 'mips64', 'arm64-v8a'
+            universalApk false
+        }
+    }
+
 	compileOptions {
 		sourceCompatibility JavaVersion.VERSION_1_7
 		targetCompatibility JavaVersion.VERSION_1_7

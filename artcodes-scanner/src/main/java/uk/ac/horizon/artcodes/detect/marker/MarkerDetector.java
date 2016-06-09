@@ -221,8 +221,8 @@ public class MarkerDetector implements ImageProcessor
 						{
 							Mat overlay = buffers.getOverlay();
 							Rect bounds = Imgproc.boundingRect(contours.get(i));
-							Core.putText(overlay, markerCode, bounds.tl(), Core.FONT_HERSHEY_SIMPLEX, 1, outlineColour, 5);
-							Core.putText(overlay, markerCode, bounds.tl(), Core.FONT_HERSHEY_SIMPLEX, 1, detectedColour, 3);
+							Imgproc.putText(overlay, markerCode, bounds.tl(), Core.FONT_HERSHEY_SIMPLEX, 1, outlineColour, 5);
+							Imgproc.putText(overlay, markerCode, bounds.tl(), Core.FONT_HERSHEY_SIMPLEX, 1, detectedColour, 3);
 						}
 					}
 				}
