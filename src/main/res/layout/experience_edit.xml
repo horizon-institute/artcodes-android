@@ -98,29 +98,31 @@
                 android:id="@+id/prevButton"
                 style="@style/Widget.AppCompat.ActionButton"
                 android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:onClick="prevPage"
+                android:layout_height="match_parent"
                 android:contentDescription="@string/prev_page"
+                android:onClick="prevPage"
                 android:src="@drawable/ic_chevron_left_24dp"/>
-
-            <ImageButton
-                android:id="@+id/nextButton"
-                style="@style/Widget.AppCompat.ActionButton"
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:layout_gravity="end"
-                android:onClick="nextPage"
-                android:contentDescription="@string/next_page"
-                android:src="@drawable/ic_chevron_right_24dp"/>
 
             <Button
                 android:id="@+id/saveButton"
-                style="@style/Widget.AppCompat.Button.Borderless"
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
+                style="?borderlessButtonStyle"
+                android:layout_width="100dp"
+                android:layout_height="match_parent"
                 android:layout_gravity="end"
                 android:onClick="saveExperience"
-                android:text="@string/save"/>
+                android:text="@string/save"
+                android:visibility="gone"/>
+
+            <Button
+                android:id="@+id/nextButton"
+                style="?borderlessButtonStyle"
+                android:layout_width="wrap_content"
+                android:layout_height="match_parent"
+                android:layout_gravity="end"
+                android:drawableEnd="@drawable/ic_chevron_right_24dp"
+                android:drawableRight="@drawable/ic_chevron_right_24dp"
+                android:onClick="nextPage"
+                android:text="@string/next"/>
         </FrameLayout>
     </LinearLayout>
 </layout>

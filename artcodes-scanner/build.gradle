@@ -45,10 +45,6 @@ android {
     compileSdkVersion 23
     buildToolsVersion "23.0.3"
 
-    dataBinding {
-        enabled = true
-    }
-
     defaultConfig {
         minSdkVersion 15
         targetSdkVersion 23

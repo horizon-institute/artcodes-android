@@ -19,13 +19,10 @@
 
 package uk.ac.horizon.artcodes.model;
 
-import android.databinding.BaseObservable;
-import android.databinding.Bindable;
-
 import java.util.ArrayList;
 import java.util.List;
 
-public class Action extends BaseObservable
+public class Action
 {
 	public enum Match
 	{
@@ -47,7 +44,6 @@ public class Action extends BaseObservable
 		return codes;
 	}
 
-	@Bindable
 	public String getDescription()
 	{
 		return description;
@@ -78,7 +74,6 @@ public class Action extends BaseObservable
 		return match;
 	}
 
-	@Bindable
 	public String getName()
 	{
 		return name;
@@ -94,7 +89,6 @@ public class Action extends BaseObservable
 //		return showDetail;
 //	}
 
-	@Bindable
 	public String getUrl()
 	{
 		return url;
@@ -110,7 +104,6 @@ public class Action extends BaseObservable
 		this.url = url;
 	}
 
-	@Bindable
 	public String getDisplayUrl()
 	{
 		if (url != null && url.startsWith(HTTP_PREFIX))

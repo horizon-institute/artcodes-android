@@ -49,7 +49,7 @@ public class ExperienceEditor extends BaseObservable
 				if (!value.equals(experience.getDescription()))
 				{
 					experience.setDescription(value);
-					experience.notifyPropertyChanged(BR.description);
+					//experience.notifyPropertyChanged(BR.description);
 				}
 			}
 		};
@@ -71,7 +71,7 @@ public class ExperienceEditor extends BaseObservable
 				if (!value.equals(experience.getName()))
 				{
 					experience.setName(value);
-					experience.notifyPropertyChanged(BR.name);
+					//experience.notifyPropertyChanged(BR.name);
 				}
 			}
 		};

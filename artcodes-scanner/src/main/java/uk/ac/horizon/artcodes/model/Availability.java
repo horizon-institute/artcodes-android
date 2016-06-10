@@ -19,12 +19,7 @@
 
 package uk.ac.horizon.artcodes.model;
 
-import android.databinding.BaseObservable;
-import android.databinding.Bindable;
-
-import uk.ac.horizon.artcodes.scanner.BR;
-
-public class Availability extends BaseObservable
+public class Availability
 {
 	private Double lat;
 	private Double lon;
@@ -48,7 +43,6 @@ public class Availability extends BaseObservable
 		this.address = address;
 	}
 
-	@Bindable
 	public Long getEnd()
 	{
 		return end;
@@ -57,7 +51,7 @@ public class Availability extends BaseObservable
 	public void setEnd(Long end)
 	{
 		this.end = end;
-		notifyPropertyChanged(BR.end);
+		//notifyPropertyChanged(BR.end);
 		if (start != null && end != null && end < start)
 		{
 			setStart(end);
@@ -94,7 +88,6 @@ public class Availability extends BaseObservable
 		this.lon = lon;
 	}
 
-	@Bindable
 	public String getName()
 	{
 		return name;
@@ -103,10 +96,9 @@ public class Availability extends BaseObservable
 	public void setName(String name)
 	{
 		this.name = name;
-		notifyPropertyChanged(BR.name);
+		//notifyPropertyChanged(BR.name);
 	}
 
-	@Bindable
 	public Long getStart()
 	{
 		return start;
@@ -115,7 +107,7 @@ public class Availability extends BaseObservable
 	public void setStart(Long start)
 	{
 		this.start = start;
-		notifyPropertyChanged(BR.start);
+		//notifyPropertyChanged(BR.start);
 		if (start != null && end != null && end < start)
 		{
 			setEnd(start);

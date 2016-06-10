@@ -45,6 +45,18 @@ public class VisibilityAnimator
 		this.center = center;
 	}
 
+	public void setViewVisible(boolean visible)
+	{
+		if(visible)
+		{
+			view.setVisibility(View.VISIBLE);
+		}
+		else
+		{
+			view.setVisibility(View.GONE);
+		}
+	}
+
 	public void hideView()
 	{
 		if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.LOLLIPOP)

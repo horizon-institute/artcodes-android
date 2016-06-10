@@ -18,15 +18,10 @@
  */
 package uk.ac.horizon.artcodes.model;
 
-import android.databinding.BaseObservable;
-import android.databinding.Bindable;
-
 import java.util.ArrayList;
 import java.util.List;
 
-import uk.ac.horizon.artcodes.scanner.BR;
-
-public class Experience extends BaseObservable
+public class Experience
 {
 	public enum Status
 	{
@@ -69,7 +64,6 @@ public class Experience extends BaseObservable
 		this.callback = callback;
 	}
 
-	@Bindable
 	public String getDescription()
 	{
 		return description;
@@ -85,7 +79,6 @@ public class Experience extends BaseObservable
 		return pipeline;
 	}
 
-	@Bindable
 	public String getIcon()
 	{
 		return icon;
@@ -94,7 +87,7 @@ public class Experience extends BaseObservable
 	public void setIcon(String icon)
 	{
 		this.icon = icon;
-		notifyPropertyChanged(BR.icon);
+		//notifyPropertyChanged(BR.icon);
 	}
 
 	public String getId()
@@ -107,7 +100,6 @@ public class Experience extends BaseObservable
 		this.id = id;
 	}
 
-	@Bindable
 	public String getImage()
 	{
 		return image;
@@ -116,10 +108,9 @@ public class Experience extends BaseObservable
 	public void setImage(String image)
 	{
 		this.image = image;
-		notifyPropertyChanged(BR.image);
+		//notifyPropertyChanged(BR.image);
 	}
 
-	@Bindable
 	public String getName()
 	{
 		return name;

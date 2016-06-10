@@ -25,7 +25,6 @@ import android.content.pm.PackageManager;
 import android.content.res.ColorStateList;
 import android.content.res.Configuration;
 import android.content.res.TypedArray;
-import android.databinding.DataBindingUtil;
 import android.graphics.Color;
 import android.graphics.drawable.Drawable;
 import android.net.Uri;
@@ -38,11 +37,15 @@ import android.support.v4.app.ActivityCompat;
 import android.support.v4.content.ContextCompat;
 import android.support.v4.graphics.drawable.DrawableCompat;
 import android.support.v7.app.AppCompatActivity;
+import android.support.v7.widget.Toolbar;
 import android.util.Log;
 import android.view.View;
+import android.view.ViewGroup;
 import android.view.WindowManager;
 import android.widget.ImageView;
 import android.widget.LinearLayout;
+import android.widget.ProgressBar;
+import android.widget.TextView;
 
 import com.google.common.collect.Lists;
 import com.google.gson.Gson;
@@ -51,20 +54,23 @@ import java.util.List;
 
 import uk.ac.horizon.artcodes.animator.TextAnimator;
 import uk.ac.horizon.artcodes.animator.VisibilityAnimator;
+import uk.ac.horizon.artcodes.camera.CameraView;
 import uk.ac.horizon.artcodes.detect.ArtcodeDetector;
+import uk.ac.horizon.artcodes.detect.DetectorCallback;
 import uk.ac.horizon.artcodes.detect.DetectorSetting;
 import uk.ac.horizon.artcodes.detect.marker.MarkerCodeDetectionHandler;
 import uk.ac.horizon.artcodes.model.Experience;
-import uk.ac.horizon.artcodes.scanner.databinding.ScannerBinding;
 
 public class ScannerActivity extends AppCompatActivity
 {
 	private static final int CAMERA_PERMISSION_REQUEST = 47;
-	protected ScannerBinding binding;
+	private LinearLayout settingIcons;
+	protected ProgressBar progressBar;
 	private ArtcodeDetector detector;
 	private Experience experience;
 	private VisibilityAnimator menuAnimator;
 	private TextAnimator textAnimator;
+	private CameraView cameraView;
 
 	@SuppressWarnings("UnusedParameters")
 	public void hideMenu(View view)
@@ -84,9 +90,14 @@ public class ScannerActivity extends AppCompatActivity
 			getWindow().getDecorView().setSystemUiVisibility(View.SYSTEM_UI_FLAG_LAYOUT_HIDE_NAVIGATION | View.SYSTEM_UI_FLAG_LAYOUT_STABLE);
 		}
 
-		binding = DataBindingUtil.setContentView(this, R.layout.scanner);
-		binding.progressBar.setVisibility(View.INVISIBLE);
-		setSupportActionBar(binding.toolbar);
+		setContentView(R.layout.scanner);
+
+		settingIcons = (LinearLayout) findViewById(R.id.settingsSwitches);
+		progressBar = (ProgressBar) findViewById(R.id.progressBar);
+		cameraView = (CameraView) findViewById(R.id.cameraView);
+
+		Toolbar toolbar = (Toolbar) findViewById(R.id.toolbar);
+		setSupportActionBar(toolbar);
 		if (getSupportActionBar() != null)
 		{
 			getSupportActionBar().setDisplayShowTitleEnabled(false);
@@ -97,8 +108,9 @@ public class ScannerActivity extends AppCompatActivity
 			ActivityCompat.requestPermissions(this, new String[]{Manifest.permission.CAMERA}, CAMERA_PERMISSION_REQUEST);
 		}
 
-		menuAnimator = new VisibilityAnimator(binding.settingsMenu, binding.settingsMenuButton);
-		textAnimator = new TextAnimator(binding.settingsFeedback);
+		menuAnimator = new VisibilityAnimator(findViewById(R.id.settingsMenu), findViewById(R.id.settingsMenuButton));
+		TextView settingsFeedback = (TextView) findViewById(R.id.settingsFeedback);
+		textAnimator = new TextAnimator(settingsFeedback);
 	}
 
 	@Override
@@ -146,12 +158,63 @@ public class ScannerActivity extends AppCompatActivity
 		{
 			Log.i("a", "Start Scanning");
 			detector = this.getNewDetector(experience);
-			binding.setExperience(experience);
-			binding.setDetector(detector);
+			detector.setCallback(new DetectorCallback()
+			{
+				@Override
+				public void detectionStart(final int margin)
+				{
+					runOnUiThread(new Runnable()
+					{
+						@Override
+						public void run()
+						{
+							View errorView = findViewById(R.id.cameraError);
+							if (errorView != null)
+							{
+								errorView.setVisibility(View.GONE);
+							}
+							progressBar.setVisibility(View.VISIBLE);
+							if(getResources().getConfiguration().orientation == Configuration.ORIENTATION_PORTRAIT)
+							{
+								View topView = findViewById(R.id.topView);
+								if(topView != null)
+								{
+									topView.setLayoutParams(new LinearLayout.LayoutParams(ViewGroup.LayoutParams.MATCH_PARENT, margin));
+								}
+								View bottomView = findViewById(R.id.bottomView);
+								if(bottomView != null)
+								{
+									bottomView.setLayoutParams(new LinearLayout.LayoutParams(ViewGroup.LayoutParams.MATCH_PARENT, margin));
+								}
+							}
+							else
+							{
+								View topView = findViewById(R.id.topView);
+								if(topView != null)
+								{
+									topView.setLayoutParams(new LinearLayout.LayoutParams(margin, ViewGroup.LayoutParams.MATCH_PARENT));
+								}
+								View bottomView = findViewById(R.id.bottomView);
+								if(bottomView != null)
+								{
+									bottomView.setLayoutParams(new LinearLayout.LayoutParams(margin, ViewGroup.LayoutParams.MATCH_PARENT));
+								}
+							}
+						}
+					});
+				}
+			});
+			detector.setOverlay((ImageView) findViewById(R.id.overlay));
+			if (getSupportActionBar() != null)
+			{
+				getSupportActionBar().setDisplayShowTitleEnabled(true);
+				getSupportActionBar().setTitle(experience.getName());
+			}
+			cameraView.setDetector(detector);
 		}
 		else
 		{
-			binding.setDetector(null);
+			cameraView.setDetector(null);
 		}
 	}
 
@@ -212,7 +275,7 @@ public class ScannerActivity extends AppCompatActivity
 
 	private void createSettingsUI(List<DetectorSetting> settings)
 	{
-		binding.settingsSwitches.removeAllViews();
+		settingIcons.removeAllViews();
 		if (settings != null && !settings.isEmpty())
 		{
 			final int padding = getResources().getDimensionPixelSize(R.dimen.setting_padding);
@@ -263,23 +326,17 @@ public class ScannerActivity extends AppCompatActivity
 				final LinearLayout.LayoutParams params = new LinearLayout.LayoutParams(LinearLayout.LayoutParams.WRAP_CONTENT, LinearLayout.LayoutParams.WRAP_CONTENT, 1);
 				params.weight = 1;
 				button.setLayoutParams(params);
-				binding.settingsSwitches.addView(button);
+				settingIcons.addView(button);
 				button.setPadding(padding, padding, padding, padding);
 			}
 
 		}
 
-		if (binding.settingsSwitches.getChildCount() > 0)
-		{
-			binding.settingsMenuButton.setVisibility(View.VISIBLE);
-		}
-		else
-		{
-			binding.settingsMenuButton.setVisibility(View.GONE);
-		}
+		menuAnimator.setViewVisible(settingIcons.getChildCount() > 0);
 	}
 
-	protected ArtcodeDetector getNewDetector(Experience experience) {
+	protected ArtcodeDetector getNewDetector(Experience experience)
+	{
 		return new ArtcodeDetector(experience, new MarkerCodeDetectionHandler(new MarkerCodeDetectionHandler.CodeDetectionHandler()
 		{
 			@Override

@@ -123,7 +123,7 @@ public class MarkerDetector implements ImageProcessor
 						int codeValue = Integer.parseInt(value);
 						maxValue = Math.max(maxValue, codeValue);
 						total += codeValue;
-						if (codeValue==0)
+						if (codeValue == 0)
 						{
 							++emptyRegions;
 						}
@@ -146,7 +146,7 @@ public class MarkerDetector implements ImageProcessor
 
 		this.handler = handler;
 
-		if(minRegionCount == 20 && maxRegionCount == 3)
+		if (minRegionCount == 20 && maxRegionCount == 3)
 		{
 			minRegionCount = 3;
 			maxRegionCount = 20;
@@ -344,7 +344,7 @@ public class MarkerDetector implements ImageProcessor
 			final MarkerRegion region = createRegionForNode(currentNodeIndex, contours, hierarchy);
 			if (region != null)
 			{
-				if (this.ignoreEmptyRegions && region.value==0)
+				if (this.ignoreEmptyRegions && region.value == 0)
 				{
 					continue;
 				}
@@ -365,7 +365,7 @@ public class MarkerDetector implements ImageProcessor
 			}
 		}
 
-		if (regions!=null)
+		if (regions != null)
 		{
 			Marker marker = new Marker(nodeIndex, regions);
 			sortCode(marker);
@@ -383,7 +383,7 @@ public class MarkerDetector implements ImageProcessor
 		// Find the first dot index:
 		double[] nodes = hierarchy.get(0, regionIndex);
 		int currentNodeIndex = (int) nodes[FIRST_NODE];
-		if (currentNodeIndex < 0 && !(this.ignoreEmptyRegions || this.maxEmptyRegions>0))
+		if (currentNodeIndex < 0 && !(this.ignoreEmptyRegions || this.maxEmptyRegions > 0))
 		{
 			return null; // There are no dots in this region, and empty regions are not allowed.
 		}
@@ -456,7 +456,7 @@ public class MarkerDetector implements ImageProcessor
 			{
 				return false; // value is too Big
 			}
-			else if (region.value==0 && ++numberOfEmptyRegions>this.maxEmptyRegions)
+			else if (region.value == 0 && ++numberOfEmptyRegions > this.maxEmptyRegions)
 			{
 				return false; // too many empty regions
 			}

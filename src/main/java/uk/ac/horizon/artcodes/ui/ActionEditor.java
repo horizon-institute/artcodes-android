@@ -51,13 +51,13 @@ public class ActionEditor
 					if (action.getName() != null)
 					{
 						action.setName(null);
-						action.notifyPropertyChanged(BR.name);
+						//action.notifyPropertyChanged(BR.name);
 					}
 				}
 				else if (!value.equals(action.getName()))
 				{
 					action.setName(value);
-					action.notifyPropertyChanged(BR.name);
+					//action.notifyPropertyChanged(BR.name);
 				}
 			}
 		};
@@ -81,8 +81,8 @@ public class ActionEditor
 					if (action.getUrl() != null)
 					{
 						action.setUrl(null);
-						action.notifyPropertyChanged(BR.url);
-						action.notifyPropertyChanged(BR.displayUrl);
+						//action.notifyPropertyChanged(BR.url);
+						//action.notifyPropertyChanged(BR.displayUrl);
 					}
 				}
 				else
@@ -96,8 +96,8 @@ public class ActionEditor
 					if (!urlValue.equals(action.getUrl()))
 					{
 						action.setUrl(urlValue);
-						action.notifyPropertyChanged(BR.url);
-						action.notifyPropertyChanged(BR.displayUrl);
+						//action.notifyPropertyChanged(BR.url);
+						//action.notifyPropertyChanged(BR.displayUrl);
 					}
 				}
 			}

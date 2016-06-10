@@ -19,10 +19,9 @@
 
 package uk.ac.horizon.artcodes.detect;
 
-import android.databinding.BaseObservable;
-import android.databinding.Bindable;
 import android.graphics.Bitmap;
 import android.util.Log;
+import android.widget.ImageView;
 
 import org.opencv.android.OpenCVLoader;
 import org.opencv.core.Rect;
@@ -32,9 +31,8 @@ import java.util.List;
 
 import uk.ac.horizon.artcodes.camera.CameraInfo;
 import uk.ac.horizon.artcodes.process.ImageProcessor;
-import uk.ac.horizon.artcodes.scanner.BR;
 
-public class Detector extends BaseObservable
+public class Detector
 {
 	static
 	{
@@ -47,41 +45,26 @@ public class Detector extends BaseObservable
 	protected final List<ImageProcessor> pipeline = new ArrayList<>();
 	protected final List<DetectorSetting> settings = new ArrayList<>();
 	protected final ImageBuffers buffers = new ImageBuffers();
-	private boolean running = false;
-	private boolean configured = false;
-	private Bitmap overlay;
+	private ImageView overlay;
+	protected DetectorCallback callback;
 
 	public Detector()
 	{
 	}
 
-	@Bindable
-	public boolean isSettingsEmpty()
+	public void setCallback(DetectorCallback callback)
 	{
-		return settings.isEmpty();
+		this.callback = callback;
 	}
 
-	@Bindable
-	public boolean isRunning()
+	public void setOverlay(ImageView overlay)
 	{
-		return running;
-	}
-
-	@Bindable
-	public boolean isConfigured()
-	{
-		return configured;
+		this.overlay = overlay;
 	}
 
 	public void setData(final byte[] data)
 	{
 		buffers.setImage(data);
-		if (!running)
-		{
-			running = true;
-			notifyPropertyChanged(BR.running);
-		}
-
 		try
 		{
 			for (ImageProcessor imageProcessor : pipeline)
@@ -89,8 +72,22 @@ public class Detector extends BaseObservable
 				imageProcessor.process(buffers);
 			}
 
-			overlay = buffers.createOverlayBitmap();
-			notifyPropertyChanged(BR.overlay);
+			if(overlay != null)
+			{
+				final Bitmap overlayBitmap = buffers.createOverlayBitmap();
+				if(overlayBitmap != null)
+				{
+					overlay.post(new Runnable()
+					{
+						@Override
+						public void run()
+						{
+
+							overlay.setImageBitmap(overlayBitmap);
+						}
+					});
+				}
+			}
 		}
 		catch (Exception e)
 		{
@@ -107,12 +104,6 @@ public class Detector extends BaseObservable
 		}
 	}
 
-	@Bindable
-	public Bitmap getOverlay()
-	{
-		return overlay;
-	}
-
 	public List<DetectorSetting> getSettings()
 	{
 		return settings;
@@ -125,13 +116,15 @@ public class Detector extends BaseObservable
 		buffers.setRotation(info.getRotation());
 		buffers.setFrontFacing(info.isFrontFacing());
 		createSettings();
-		configured = true;
-		notifyPropertyChanged(BR.configured);
 		return buffer;
 	}
 
 	protected Rect createROI(int imageWidth, int imageHeight, int surfaceWidth, int surfaceHeight)
 	{
+		if(callback != null)
+		{
+			callback.detectionStart(100);
+		}
 		return new Rect(0, 0, imageWidth, imageHeight);
 	}
 }

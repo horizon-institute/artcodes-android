@@ -63,8 +63,8 @@ public class ExperienceEditActivity extends ExperienceActivityBase
 			super(fm);
 
 			fragments.add(new ExperienceEditInfoFragment());
-			fragments.add(new AvailabilityEditListFragment());
 			fragments.add(new ActionEditListFragment());
+			fragments.add(new AvailabilityEditListFragment());
 			if (Feature.get(getApplicationContext(), R.bool.feature_edit_colour).isEnabled())
 			{
 				fragments.add(new ExperienceEditColourFragment());

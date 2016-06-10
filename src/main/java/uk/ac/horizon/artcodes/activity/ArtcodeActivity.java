@@ -31,8 +31,8 @@ import android.support.v4.content.ContextCompat;
 import android.util.Log;
 import android.view.MenuItem;
 import android.view.View;
+import android.view.ViewGroup;
 
-import com.google.common.collect.Multiset;
 import com.google.gson.Gson;
 
 import java.util.Collection;
@@ -57,8 +57,6 @@ public class ArtcodeActivity extends ScannerActivity implements LoadCallback<Exp
 	private ScannerActionBinding actionBinding;
 	private VisibilityAnimator actionAnimator;
 
-	private Action action;
-
 	public static void start(Context context, Experience experience)
 	{
 		final String experienceJSON = new Gson().toJson(experience);
@@ -76,13 +74,17 @@ public class ArtcodeActivity extends ScannerActivity implements LoadCallback<Exp
 	{
 		super.onCreate(savedInstanceState);
 
-		actionBinding = ScannerActionBinding.inflate(getLayoutInflater(), binding.bottomView, false);
-		binding.bottomView.addView(actionBinding.getRoot());
-		actionAnimator = new VisibilityAnimator(actionBinding.getRoot());
+		ViewGroup bottomView = (ViewGroup)findViewById(R.id.bottomView);
+		if(bottomView != null)
+		{
+			actionBinding = ScannerActionBinding.inflate(getLayoutInflater(), bottomView, false);
+			bottomView.addView(actionBinding.getRoot());
+			actionAnimator = new VisibilityAnimator(actionBinding.getRoot());
+		}
 
 		if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.LOLLIPOP)
 		{
-			binding.progressBar.setIndeterminateTintList(ColorStateList.valueOf(ContextCompat.getColor(this, R.color.apptheme_accent)));
+			progressBar.setIndeterminateTintList(ColorStateList.valueOf(ContextCompat.getColor(this, R.color.apptheme_accent)));
 		}
 
 		if (getSupportActionBar() != null)
@@ -201,7 +203,7 @@ public class ArtcodeActivity extends ScannerActivity implements LoadCallback<Exp
 				public void run()
 				{
 					actionAnimator.showView();
-					binding.progressBar.setVisibility(View.INVISIBLE);
+					progressBar.setVisibility(View.INVISIBLE);
 				}
 			});
 		}
@@ -213,7 +215,7 @@ public class ArtcodeActivity extends ScannerActivity implements LoadCallback<Exp
 				public void run()
 				{
 					actionAnimator.hideView();
-					binding.progressBar.setVisibility(View.VISIBLE);
+					progressBar.setVisibility(View.VISIBLE);
 				}
 			});
 		}

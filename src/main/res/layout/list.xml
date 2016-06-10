@@ -50,7 +50,7 @@
 				android:layout_width="wrap_content"
 				android:layout_height="wrap_content"
 				android:layout_gravity="center_horizontal"
-				android:tint="#DDD"
+				android:tint="#BBB"
 				tools:imageResource="@{adapter.errorIcon}"
                 tools:src="@drawable/ic_warning_black_144dp"
                 tools:ignore="ContentDescription" />
@@ -63,7 +63,7 @@
 				android:layout_marginRight="64dp"
 				android:gravity="center_horizontal"
 				android:textAppearance="@style/TextAppearance.AppCompat.Medium"
-				android:textColor="#CCC"
+				android:textColor="#AAA"
 				android:text="@{adapter.errorMessage}"
                 tools:text="@string/empty"/>
 
@@ -76,7 +76,7 @@
 				android:layout_marginRight="64dp"
 				android:gravity="center_horizontal"
 				android:textAppearance="@style/TextAppearance.AppCompat.Small"
-				android:textColor="#CCC"
+				android:textColor="#BBB"
                 android:text="@{adapter.errorDetail}"
 				tools:text="@string/no_actions_action"/>
 		</LinearLayout>
