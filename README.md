@@ -10,7 +10,7 @@ Adding Artcodes to your project
 Add artcodes to your build.gradle dependencies:
 
 ```gradle
-compile 'uk.ac.horizon.artcodes:artcodes-scanner:3.2.0'
+compile 'uk.ac.horizon.artcodes:artcodes-scanner:3.3.0'
 ```
 
 ------------------------------------
