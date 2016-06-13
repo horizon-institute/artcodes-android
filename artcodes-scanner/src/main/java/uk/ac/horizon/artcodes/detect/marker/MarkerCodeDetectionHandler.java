@@ -21,6 +21,7 @@ package uk.ac.horizon.artcodes.detect.marker;
 
 import com.google.common.collect.HashMultiset;
 import com.google.common.collect.Multiset;
+import com.google.common.collect.Multisets;
 
 import org.opencv.core.Mat;
 import org.opencv.core.MatOfPoint;
@@ -28,8 +29,6 @@ import org.opencv.core.MatOfPoint;
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.HashSet;
-
-import uk.ac.horizon.artcodes.model.Action;
 
 public class MarkerCodeDetectionHandler implements MarkerDetectionHandler
 {
@@ -44,6 +43,7 @@ public class MarkerCodeDetectionHandler implements MarkerDetectionHandler
 
     protected static final int REQUIRED = 20;
     protected static final int MAX = REQUIRED * 4;
+	protected static final int OCCURENCES = 2;
 
     protected final Multiset<String> markerCounts = HashMultiset.create();
     private CodeDetectionHandler markerCodeHandler;
@@ -94,11 +94,11 @@ public class MarkerCodeDetectionHandler implements MarkerDetectionHandler
             }
 
             //increase occurrence if this marker is already in the list.
-            markerCounts.add(markerCode);
+            markerCounts.add(markerCode, OCCURENCES);
             removals.remove(markerCode);
         }
 
-        markerCounts.removeAll(removals);
+	    Multisets.removeOccurrences(markerCounts, removals);
 
         return markerCounts;
     }
