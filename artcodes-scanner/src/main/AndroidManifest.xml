@@ -39,7 +39,8 @@
 		android:required="false"/>
 	<uses-feature android:name="android.hardware.touchscreen"/>
 
-	<application>
+	<application
+        android:supportsRtl="true">
 		<activity
 			android:name=".ScannerActivity"
 			android:theme="@style/Theme.Artcodes.Camera">

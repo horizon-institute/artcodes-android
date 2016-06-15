@@ -19,10 +19,6 @@
   -->
 
 <resources>
-    <string name="noCameraTitle">Camera Unavailable</string>
-    <string name="noCameraMessage">Please try restarting your device.</string>
-    <string name="noCameraButton">OK</string>
-
     <string name="camera_front">Front camera</string>
     <string name="camera_rear">Rear camera</string>
 
@@ -37,8 +33,6 @@
     <string name="draw_marker_outline">Marker outlines visible</string>
     <string name="draw_marker_regions">Marker and region outlines visible</string>
     <string name="display_menu">Display Menu</string>
-
-    <string name="loading">Loading…</string>
 
     <string name="artcode_scan_scheme">x-artcode-scan</string>
     <string name="camera_error">Error finding camera</string>

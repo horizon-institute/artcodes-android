@@ -20,10 +20,6 @@
 
 <resources>
 	<dimen name="nav_padding">0dp</dimen>
-	<dimen name="fab_padding">16dp</dimen>
-
-	<dimen name="scanner_toolbar">48dp</dimen>
-	<dimen name="scanner_toolbar_padding">0dp</dimen>
 
 	<dimen name="setting_padding">24dp</dimen>
 </resources>
