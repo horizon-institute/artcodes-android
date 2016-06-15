@@ -39,6 +39,7 @@ import android.support.v4.graphics.drawable.DrawableCompat;
 import android.support.v7.app.AppCompatActivity;
 import android.support.v7.widget.Toolbar;
 import android.util.Log;
+import android.view.MenuItem;
 import android.view.View;
 import android.view.ViewGroup;
 import android.view.WindowManager;
@@ -152,6 +153,21 @@ public class ScannerActivity extends AppCompatActivity
 		return experience;
 	}
 
+	@Override
+	public boolean onOptionsItemSelected(MenuItem item)
+	{
+		if (item.getItemId() == android.R.id.home)
+		{
+			if (getCallingActivity() != null)
+			{
+				setResult(RESULT_CANCELED);
+				finish();
+				return true;
+			}
+		}
+		return super.onOptionsItemSelected(item);
+	}
+
 	private void startScanning()
 	{
 		if (experience != null)
@@ -174,15 +190,15 @@ public class ScannerActivity extends AppCompatActivity
 								errorView.setVisibility(View.GONE);
 							}
 							progressBar.setVisibility(View.VISIBLE);
-							if(getResources().getConfiguration().orientation == Configuration.ORIENTATION_PORTRAIT)
+							if (getResources().getConfiguration().orientation == Configuration.ORIENTATION_PORTRAIT)
 							{
 								View topView = findViewById(R.id.topView);
-								if(topView != null)
+								if (topView != null)
 								{
 									topView.setLayoutParams(new LinearLayout.LayoutParams(ViewGroup.LayoutParams.MATCH_PARENT, margin));
 								}
 								View bottomView = findViewById(R.id.bottomView);
-								if(bottomView != null)
+								if (bottomView != null)
 								{
 									bottomView.setLayoutParams(new LinearLayout.LayoutParams(ViewGroup.LayoutParams.MATCH_PARENT, margin));
 								}
@@ -190,12 +206,12 @@ public class ScannerActivity extends AppCompatActivity
 							else
 							{
 								View topView = findViewById(R.id.topView);
-								if(topView != null)
+								if (topView != null)
 								{
 									topView.setLayoutParams(new LinearLayout.LayoutParams(margin, ViewGroup.LayoutParams.MATCH_PARENT));
 								}
 								View bottomView = findViewById(R.id.bottomView);
-								if(bottomView != null)
+								if (bottomView != null)
 								{
 									bottomView.setLayoutParams(new LinearLayout.LayoutParams(margin, ViewGroup.LayoutParams.MATCH_PARENT));
 								}
@@ -223,7 +239,7 @@ public class ScannerActivity extends AppCompatActivity
 		Log.i("Marker", "MarkerDisplay Detected: " + markerCode);
 		if (markerCode != null)
 		{
-			if (experience.getCallback() == null)
+			if (getCallingActivity() != null)
 			{
 				Intent intent = getIntent();
 				intent.putExtra("marker", markerCode);

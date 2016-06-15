@@ -30,7 +30,7 @@ public class Action
 	}
 
 	public static final String HTTP_PREFIX = "http://";
-	private List<String> codes = new ArrayList<>();
+	private final List<String> codes = new ArrayList<>();
 	private Match match = Match.any;
 	private String url;
 	private String name;

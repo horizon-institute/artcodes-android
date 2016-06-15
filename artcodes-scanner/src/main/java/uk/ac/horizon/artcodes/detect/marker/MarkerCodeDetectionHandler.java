@@ -46,7 +46,7 @@ public class MarkerCodeDetectionHandler implements MarkerDetectionHandler
 	protected static final int OCCURENCES = 2;
 
     protected final Multiset<String> markerCounts = HashMultiset.create();
-    private CodeDetectionHandler markerCodeHandler;
+    private final CodeDetectionHandler markerCodeHandler;
 
     public MarkerCodeDetectionHandler(CodeDetectionHandler markerCodeHandler)
     {

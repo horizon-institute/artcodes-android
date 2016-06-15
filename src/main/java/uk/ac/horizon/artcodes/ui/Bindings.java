@@ -76,46 +76,39 @@ public final class Bindings
 	{
 		if (url != null)
 		{
-			if (url.startsWith("content:") || url.startsWith("file:"))
+			Picasso.with(view.getContext()).load(url).into(new Target()
 			{
-				//view.setImageURI(Uri.parse(url));
-			}
-			else
-			{
-				Picasso.with(view.getContext()).load(url).into(new Target()
+				@Override
+				public void onBitmapLoaded(Bitmap bitmap, Picasso.LoadedFrom from)
 				{
-					@Override
-					public void onBitmapLoaded(Bitmap bitmap, Picasso.LoadedFrom from)
+					if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.LOLLIPOP)
 					{
-						if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.LOLLIPOP)
+						Palette.from(bitmap).generate(new Palette.PaletteAsyncListener()
 						{
-							Palette.from(bitmap).generate(new Palette.PaletteAsyncListener()
+							@TargetApi(Build.VERSION_CODES.LOLLIPOP)
+							public void onGenerated(Palette p)
 							{
-								@TargetApi(Build.VERSION_CODES.LOLLIPOP)
-								public void onGenerated(Palette p)
+								int color = p.getDarkMutedColor(Color.BLACK);
+								if (color != Color.BLACK)
 								{
-									int color = p.getDarkMutedColor(Color.BLACK);
-									if (color != Color.BLACK)
-									{
-										view.setBackgroundTintList(ColorStateList.valueOf(color));
-									}
+									view.setBackgroundTintList(ColorStateList.valueOf(color));
 								}
-							});
-						}
+							}
+						});
 					}
+				}
 
-					@Override
-					public void onBitmapFailed(Drawable errorDrawable)
-					{
-					}
+				@Override
+				public void onBitmapFailed(Drawable errorDrawable)
+				{
+				}
 
-					@Override
-					public void onPrepareLoad(Drawable placeHolderDrawable)
-					{
+				@Override
+				public void onPrepareLoad(Drawable placeHolderDrawable)
+				{
 
-					}
-				});
-			}
+				}
+			});
 		}
 	}
 
@@ -123,7 +116,7 @@ public final class Bindings
 	public static void setDecoration(RecyclerView view, RecyclerView.ItemDecoration itemDecoration)
 	{
 		view.invalidateItemDecorations();
-		if(itemDecoration != null)
+		if (itemDecoration != null)
 		{
 			view.addItemDecoration(itemDecoration);
 		}
@@ -233,17 +226,17 @@ public final class Bindings
 
 			String today = dateFormat.format(nowDate);
 			String dateString = dateFormat.format(date);
-			if(!today.equals(dateString))
+			if (!today.equals(dateString))
 			{
 				return timeFormat.format(date) + " " + getDate(timestamp);
 			}
 
 			long difference = now - timestamp;
-			if(difference < 120000)
+			if (difference < 120000)
 			{
 				return "Just Now";
 			}
-			else if(difference < 3600000)
+			else if (difference < 3600000)
 			{
 				int minutes = (int) (difference / 60000);
 				return minutes + " mins ago";

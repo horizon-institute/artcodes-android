@@ -20,7 +20,8 @@
 
 <layout xmlns:android="http://schemas.android.com/apk/res/android"
         xmlns:tools="http://schemas.android.com/tools"
-        tools:context="uk.ac.horizon.artcodes.activity.ArtcodeActivity">
+        tools:context="uk.ac.horizon.artcodes.activity.ArtcodeActivity"
+        tools:ignore="UnusedResources">
 
 	<data>
 

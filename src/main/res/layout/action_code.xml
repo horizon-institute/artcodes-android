@@ -21,7 +21,8 @@
 
 <layout xmlns:android="http://schemas.android.com/apk/res/android"
         xmlns:tools="http://schemas.android.com/tools"
-        tools:context=".activities.ExperienceEditActivity">
+        tools:context=".activities.ExperienceEditActivity"
+        tools:ignore="UnusedResources">
 
     <EditText
         android:id="@+id/edit_marker_code"
@@ -32,7 +33,7 @@
         android:digits="0123456789:"
         android:hint="@string/markerCode"
         android:inputType="time"
-        android:singleLine="true"
+        android:maxLines="1"
         android:textAppearance="@style/TextAppearance.AppCompat"
         android:gravity="end"/>
 </layout>

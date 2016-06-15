@@ -17,15 +17,23 @@
  *     along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-package uk.ac.horizon.artcodes.detect.marker;
+package uk.ac.horizon.artcodes;
 
-import org.junit.Test;
+import com.google.gson.Gson;
 
-public class DetectTest
+import java.io.File;
+import java.io.FileReader;
+import java.io.IOException;
+
+import uk.ac.horizon.artcodes.model.Experience;
+
+public class TestUtils
 {
-	@Test
-	public void testImage()
+	public static Experience loadExperience(String name) throws IOException
 	{
-		// TODO
+		final ClassLoader classLoader = TestUtils.class.getClassLoader();
+		final File file = new File(classLoader.getResource(name + ".json").getFile());
+		final Gson gson = ExperienceParser.createGson(null);
+		return gson.fromJson(new FileReader(file), Experience.class);
 	}
 }

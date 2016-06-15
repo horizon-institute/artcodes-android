@@ -22,13 +22,9 @@
 	<dimen name="columnWidth">180dp</dimen>
 	<dimen name="fabPad">80dp</dimen>
 
-	<integer name="custom_wrap_content">-2</integer>
-
 	<integer name="experience_description_max_lines">8</integer>
 
 	<dimen name="nav_padding">0dp</dimen>
-
-	<dimen name="detail_edge_margin">0dp</dimen>
 
 	<dimen name="action_button_min_width">56dp</dimen>
 	<dimen name="indeterminate_progress_size">32dp</dimen>

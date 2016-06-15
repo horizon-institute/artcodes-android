@@ -21,7 +21,7 @@ buildscript {
 		jcenter()
 	}
 	dependencies {
-		classpath 'com.android.tools.build:gradle:2.1.0'
+		classpath 'com.android.tools.build:gradle:2.1.2'
 	}
 }
 
@@ -48,7 +48,8 @@ dependencies {
 	compile 'com.google.android.gms:play-services-auth:8.4.0'
 	compile 'fr.avianey.com.viewpagerindicator:library:2.4.1@aar'
 	compile 'com.squareup.picasso:picasso:2.5.2'
-	compile 'com.squareup.okhttp3:okhttp:3.2.0'
+	compile 'com.squareup.okhttp3:okhttp:3.3.1'
+    testCompile 'junit:junit:4.12'
 }
 
 android {
@@ -79,7 +80,7 @@ android {
 
 	defaultConfig {
 		applicationId "uk.ac.horizon.aestheticodes"
-		versionName '3.2.3'
+		versionName '3.2.4'
 		versionCode 400056
 		minSdkVersion 15
 		targetSdkVersion 23
@@ -116,5 +117,5 @@ android {
 }
 
 task wrapper(type: Wrapper) {
-	gradleVersion = '2.11'
+	gradleVersion = '2.14'
 }

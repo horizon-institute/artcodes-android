@@ -22,7 +22,8 @@
 <layout xmlns:android="http://schemas.android.com/apk/res/android"
         xmlns:app="http://schemas.android.com/apk/res-auto"
         xmlns:tools="http://schemas.android.com/tools"
-        tools:context=".activities.ExperienceEditActivity">
+        tools:context=".activities.ExperienceEditActivity"
+        tools:ignore="UnusedResources">
 
     <data>
 
@@ -57,10 +58,10 @@
                 android:hint="@string/action_name"
                 android:inputType="text"
                 android:padding="16dp"
-                android:singleLine="true"
                 android:textAppearance="@style/TextAppearance.AppCompat.Medium"
                 app:textWatcher="@{actionEditor.nameWatcher}"
-                tools:text="Action Name"/>
+                tools:text="Action Name"
+                android:maxLines="1"/>
         </android.support.v7.widget.Toolbar>
 
         <ScrollView
@@ -195,9 +196,9 @@
                             android:digits="0123456789:"
                             android:hint="@string/newMarkerCode"
                             android:inputType="time"
-                            android:singleLine="true"
                             android:textAppearance="@style/TextAppearance.AppCompat"
-                            android:gravity="end"/>
+                            android:gravity="end"
+                            android:maxLines="1"/>
                     </LinearLayout>
                 </LinearLayout>
 

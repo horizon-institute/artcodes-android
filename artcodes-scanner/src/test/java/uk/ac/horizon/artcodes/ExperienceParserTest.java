@@ -23,10 +23,9 @@ import android.annotation.SuppressLint;
 
 import com.google.gson.Gson;
 
+import org.junit.Assert;
 import org.junit.Test;
 
-import java.io.File;
-import java.io.FileReader;
 import java.io.IOException;
 
 import uk.ac.horizon.artcodes.model.Action;
@@ -53,15 +52,8 @@ public class ExperienceParserTest
 	@Test
 	public void loadingParseTest() throws IOException
 	{
-		ClassLoader classLoader = getClass().getClassLoader();
-		File file = new File(classLoader.getResource("test.json").getFile());
-		System.out.println(file.getAbsolutePath());
-
-		Gson gson = ExperienceParser.createGson(null);
-
-		Experience experience = gson.fromJson(new FileReader(file), Experience.class);
-
-		assert experience.getName().equals("Test");
+		Experience experience = TestUtils.loadExperience("test");
+		Assert.assertTrue(experience.getName().equals("Test"));
 
 		//Experience experience = new Experience();
 		//experience.setChecksumModulo(3);
@@ -74,15 +66,8 @@ public class ExperienceParserTest
 	@Test
 	public void loadingOldParseTest() throws IOException
 	{
-		ClassLoader classLoader = getClass().getClassLoader();
-		File file = new File(classLoader.getResource("test_old.json").getFile());
-		System.out.println(file.getAbsolutePath());
-
-		Gson gson = ExperienceParser.createGson(null);
-
-		Experience experience = gson.fromJson(new FileReader(file), Experience.class);
-
-		assert experience.getName().equals("Test");
+		Experience experience = TestUtils.loadExperience("test_old");
+		Assert.assertTrue(experience.getName().equals("Test"));
 
 		//Experience experience = new Experience();
 		//experience.setChecksumModulo(3);

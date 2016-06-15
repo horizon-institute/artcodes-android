@@ -18,7 +18,7 @@
   ~     You should have received a copy of the GNU Affero General Public License
   ~     along with this program.  If not, see <http://www.gnu.org/licenses/>.
   -->
-<FrameLayout
+<merge
     xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:app="http://schemas.android.com/apk/res-auto"
     xmlns:tools="http://schemas.android.com/tools"
@@ -153,4 +153,4 @@
                 tools:ignore="UnusedAttribute"/>
         </FrameLayout>
     </LinearLayout>
-</FrameLayout>
+</merge>

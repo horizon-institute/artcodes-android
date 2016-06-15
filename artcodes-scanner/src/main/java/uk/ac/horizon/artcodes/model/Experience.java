@@ -18,6 +18,8 @@
  */
 package uk.ac.horizon.artcodes.model;
 
+import android.support.annotation.NonNull;
+
 import java.util.ArrayList;
 import java.util.List;
 
@@ -44,11 +46,13 @@ public class Experience
 	{
 	}
 
+	@NonNull
 	public List<Action> getActions()
 	{
 		return actions;
 	}
 
+	@NonNull
 	public List<Availability> getAvailabilities()
 	{
 		return availabilities;

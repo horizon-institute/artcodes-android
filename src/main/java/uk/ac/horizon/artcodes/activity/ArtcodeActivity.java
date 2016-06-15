@@ -74,8 +74,8 @@ public class ArtcodeActivity extends ScannerActivity implements LoadCallback<Exp
 	{
 		super.onCreate(savedInstanceState);
 
-		ViewGroup bottomView = (ViewGroup)findViewById(R.id.bottomView);
-		if(bottomView != null)
+		ViewGroup bottomView = (ViewGroup) findViewById(R.id.bottomView);
+		if (bottomView != null)
 		{
 			actionBinding = ScannerActionBinding.inflate(getLayoutInflater(), bottomView, false);
 			bottomView.addView(actionBinding.getRoot());

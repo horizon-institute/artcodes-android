@@ -21,9 +21,5 @@
 <resources>
     <dimen name="columnWidth">250dp</dimen>
 
-	<dimen name="padding">24dp</dimen>
-
-	<dimen name="detail_edge_margin">32dp</dimen>
-	<dimen name="detail_top_margin">-50dp</dimen>
-
+    <dimen name="padding">24dp</dimen>
 </resources>

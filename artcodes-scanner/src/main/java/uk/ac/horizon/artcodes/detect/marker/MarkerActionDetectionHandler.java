@@ -40,8 +40,8 @@ public class MarkerActionDetectionHandler extends MarkerCodeDetectionHandler
         void onMarkerActionDetected(Action detectedAction, Collection<Marker> detectedMarkers, Action asPartOfFutureAction);
     }
 
-    private ActionDetectionHandler markerActionHandler;
-    private Experience experience;
+    private final ActionDetectionHandler markerActionHandler;
+    private final Experience experience;
     private Action currentAction;
 
     public MarkerActionDetectionHandler(ActionDetectionHandler markerActionHandler, Experience experience)

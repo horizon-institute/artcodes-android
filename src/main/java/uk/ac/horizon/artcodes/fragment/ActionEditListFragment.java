@@ -46,7 +46,7 @@ public class ActionEditListFragment extends ExperienceEditFragment
 	{
 		private List<Action> actions = Collections.emptyList();
 
-		public ActionAdapter(Context context)
+		ActionAdapter(Context context)
 		{
 			super(context);
 		}
@@ -57,7 +57,7 @@ public class ActionEditListFragment extends ExperienceEditFragment
 			return actions.size();
 		}
 
-		public void setActions(List<Action> actions)
+		void setActions(List<Action> actions)
 		{
 			this.actions = actions;
 			adapter.notifyDataSetChanged();
@@ -85,7 +85,7 @@ public class ActionEditListFragment extends ExperienceEditFragment
 			});
 		}
 
-		public void deleteAction(final int index)
+		void deleteAction(final int index)
 		{
 			final Action action = actions.get(index);
 			actions.remove(index);
@@ -105,12 +105,12 @@ public class ActionEditListFragment extends ExperienceEditFragment
 					.show();
 		}
 
-		public void actionUpdated(final int index)
+		void actionUpdated(final int index)
 		{
 			adapter.notifyItemChanged(index);
 		}
 
-		public void addAction(Action action)
+		void addAction(Action action)
 		{
 			getExperience().getActions().add(action);
 			int index = getExperience().getActions().size() - 1;

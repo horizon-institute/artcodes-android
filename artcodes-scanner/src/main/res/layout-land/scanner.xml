@@ -18,7 +18,7 @@
   ~     You should have received a copy of the GNU Affero General Public License
   ~     along with this program.  If not, see <http://www.gnu.org/licenses/>.
   -->
-<FrameLayout
+<merge
     android:id="@+id/content_frame"
     xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:app="http://schemas.android.com/apk/res-auto"
@@ -133,7 +133,7 @@
             android:elevation="2dp"
             android:paddingEnd="@dimen/nav_padding"
             android:paddingRight="@dimen/nav_padding"
-            tools:ignore="UnusedAttribute">
+            tools:ignore="RtlSymmetry,UnusedAttribute">
 
             <ProgressBar
                 android:id="@+id/progressBar"
@@ -152,4 +152,4 @@
         android:theme="@style/ThemeOverlay.AppCompat.Dark"
         app:navigationIcon="@drawable/ic_arrow_back_white_24dp"
         app:titleTextAppearance="@style/TextAppearance.Widget.Artcodes.Toolbar.Title"/>
-</FrameLayout>
+</merge>

@@ -22,7 +22,6 @@ package uk.ac.horizon.artcodes.ui;
 import android.databinding.BaseObservable;
 
 import uk.ac.horizon.artcodes.model.Experience;
-import uk.ac.horizon.artcodes.BR;
 
 public class ExperienceEditor extends BaseObservable
 {

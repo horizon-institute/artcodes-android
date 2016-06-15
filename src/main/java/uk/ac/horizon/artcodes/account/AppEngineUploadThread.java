@@ -21,7 +21,6 @@ package uk.ac.horizon.artcodes.account;
 
 import android.content.Context;
 import android.content.Intent;
-import android.content.SharedPreferences;
 import android.net.Uri;
 import android.support.v4.content.LocalBroadcastManager;
 import android.util.Log;
@@ -101,10 +100,13 @@ class AppEngineUploadThread extends Thread
 			Experience saved = account.getGson().fromJson(response.body().charStream(), Experience.class);
 			response.body().close();
 
-			SharedPreferences.Editor editor = account.getContext().getSharedPreferences(Account.class.getName(), Context.MODE_PRIVATE).edit();
-			editor.putString(saved.getId(), account.getId()).apply();
+			account.getContext()
+					.getSharedPreferences(Account.class.getName(), Context.MODE_PRIVATE)
+					.edit()
+					.putString(saved.getId(), account.getId())
+					.apply();
 
-			if(!tempFile.delete())
+			if (!tempFile.delete())
 			{
 				Log.w("upload", "Temp file not deleted");
 			}

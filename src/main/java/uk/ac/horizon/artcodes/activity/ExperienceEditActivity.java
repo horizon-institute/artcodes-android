@@ -170,13 +170,6 @@ public class ExperienceEditActivity extends ExperienceActivityBase
 		this.account = account;
 	}
 
-//	@Override
-//	public boolean onCreateOptionsMenu(Menu menu)
-//	{
-//		getMenuInflater().inflate(R.menu.save_menu, menu);
-//		return super.onCreateOptionsMenu(menu);
-//	}
-
 	@Override
 	public boolean onOptionsItemSelected(MenuItem item)
 	{
@@ -184,9 +177,6 @@ public class ExperienceEditActivity extends ExperienceActivityBase
 		{
 			case android.R.id.home:
 				NavUtils.navigateUpTo(this, createCancelIntent());
-				return true;
-			case R.id.save:
-				saveExperience(null);
 				return true;
 		}
 		return super.onOptionsItemSelected(item);

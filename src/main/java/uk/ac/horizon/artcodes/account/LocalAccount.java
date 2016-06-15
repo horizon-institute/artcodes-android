@@ -109,9 +109,11 @@ public class LocalAccount implements Account
 			writer.flush();
 			writer.close();
 
-			final SharedPreferences.Editor editor = context.getSharedPreferences(Account.class.getName(), Context.MODE_PRIVATE).edit();
+			context.getSharedPreferences(Account.class.getName(), Context.MODE_PRIVATE)
+					.edit()
+					.putString(experience.getId(), getId())
+					.apply();
 			Log.i("local", experience.getId() + " = " + getId());
-			editor.putString(experience.getId(), getId()).apply();
 		}
 		catch (Exception e)
 		{
@@ -218,7 +220,7 @@ public class LocalAccount implements Account
 		try
 		{
 			File file = new File(URI.create(experience.getId()));
-			if(!file.delete())
+			if (!file.delete())
 			{
 				Log.w("local", "Experience " + experience.getId() + " not deleted");
 			}

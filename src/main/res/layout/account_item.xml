@@ -20,7 +20,8 @@
 
 <layout xmlns:android="http://schemas.android.com/apk/res/android"
         xmlns:tools="http://schemas.android.com/tools"
-        tools:context=".activities.ExperienceEditActivity">
+        tools:context=".activities.ExperienceEditActivity"
+        tools:ignore="UnusedResources">
 
 	<data>
 
@@ -45,14 +46,14 @@
 			tools:ignore="ContentDescription"/>
 
 		<TextView
-			android:layout_width="0dp"
-			android:layout_height="wrap_content"
-			android:layout_marginLeft="16dp"
-			android:layout_marginRight="16dp"
-			android:layout_weight="1"
-			android:singleLine="true"
-			android:text="@{account.displayName}"
-			android:textAppearance="@style/TextAppearance.AppCompat"
-			tools:text="Test"/>
+            android:layout_width="0dp"
+            android:layout_height="wrap_content"
+            android:layout_marginLeft="16dp"
+            android:layout_marginRight="16dp"
+            android:layout_weight="1"
+            android:text="@{account.displayName}"
+            android:textAppearance="@style/TextAppearance.AppCompat"
+            tools:text="Test"
+            android:maxLines="1"/>
 	</LinearLayout>
 </layout>

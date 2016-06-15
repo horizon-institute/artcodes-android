@@ -22,7 +22,6 @@ package uk.ac.horizon.artcodes.ui;
 import android.net.Uri;
 
 import uk.ac.horizon.artcodes.model.Action;
-import uk.ac.horizon.artcodes.BR;
 
 public class ActionEditor
 {

@@ -19,6 +19,7 @@
   -->
 
 <LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+              xmlns:tools="http://schemas.android.com/tools"
               android:orientation="vertical"
               android:layout_width="match_parent"
               android:layout_height="match_parent">
@@ -30,7 +31,8 @@
         android:theme="?attr/actionBarTheme"
         android:minHeight="?attr/actionBarSize"
         android:elevation="4dp"
-        android:id="@+id/toolbar"/>
+        android:id="@+id/toolbar"
+        tools:ignore="UnusedAttribute"/>
 
     <FrameLayout
         android:layout_width="match_parent"
