@@ -121,7 +121,30 @@ public class ExperienceParser
 										if (actionObject.has("code"))
 										{
 											JsonArray codeArray = new JsonArray();
-											codeArray.add(actionObject.get("code"));
+											String codeString = actionObject.get("code").getAsString();
+											if(codeString.contains("+"))
+											{
+												String[] codes = codeString.split("\\+");
+												for(String code: codes)
+												{
+													codeArray.add(new JsonPrimitive(code));
+												}
+												actionObject.addProperty("match", "all");
+											}
+											else if(codeString.contains(">"))
+											{
+												String[] codes = codeString.split(">");
+												for(String code: codes)
+												{
+													codeArray.add(new JsonPrimitive(code));
+												}
+												actionObject.addProperty("match", "sequence");
+											}
+											else
+											{
+												codeArray.add(codeString);
+												actionObject.addProperty("match", "any");
+											}
 											actionObject.add("codes", codeArray);
 										}
 									}

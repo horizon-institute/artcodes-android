@@ -1,20 +1,30 @@
 {
-	"markers": [
-		{
-			"code": "1:1:3:3:4",
-			"title": "Test Code",
-			"action": "http://www.aestheticodes.com"
-		}
-	],
-	"id": "Test",
-	"name": "Test",
-	"icon": "http://www.wornchaos.org/experiences/uk.ac.horizon.aestheticodes.default.png",
-	"description": "A simple experience for testing.",
-	"minRegions": 4,
-	"maxRegions": 4,
-	"maxEmptyRegions": 0,
-	"maxRegionValue": 6,
-	"validationRegions": 0,
-	"validationRegionValue": 1,
-	"checksumModulo": 3
+  "markers": [
+    {
+      "code": "1:1:3:3:4",
+      "title": "Test Code",
+      "action": "http://www.aestheticodes.com"
+    },
+    {
+      "code": "1:1:1:1:2+1:1:3:3:4",
+      "title": "Test Match All",
+      "action": "http://www.aestheticodes.com"
+    },
+    {
+      "code": "1:1:3:3:4>1:1:1:1:2",
+      "title": "Test Match Sequence",
+      "action": "http://www.aestheticodes.com"
+    }
+  ],
+  "id": "Test",
+  "name": "Test",
+  "icon": "http://www.wornchaos.org/experiences/uk.ac.horizon.aestheticodes.default.png",
+  "description": "A simple experience for testing.",
+  "minRegions": 4,
+  "maxRegions": 4,
+  "maxEmptyRegions": 0,
+  "maxRegionValue": 6,
+  "validationRegions": 0,
+  "validationRegionValue": 1,
+  "checksumModulo": 3
 }

@@ -68,6 +68,8 @@ public class ExperienceParserTest
 	{
 		Experience experience = TestUtils.loadExperience("test_old");
 		Assert.assertTrue(experience.getName().equals("Test"));
+		final Gson gson = ExperienceParser.createGson(null);
+		System.out.println(gson.toJson(experience));
 
 		//Experience experience = new Experience();
 		//experience.setChecksumModulo(3);
