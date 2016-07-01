@@ -158,6 +158,13 @@
                         android:layout_marginRight="20dp"
                         android:text="@string/match_any"/>
                 </LinearLayout>
+                <Spinner
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:id="@+id/match_spinner"
+                    android:layout_margin="16dp"
+                    android:visibility="gone"
+                    />
 
                 <LinearLayout
                     android:layout_width="match_parent"

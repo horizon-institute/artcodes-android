@@ -17,7 +17,7 @@
  *     along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-package uk.ac.horizon.artcodes.detect.marker;
+package uk.ac.horizon.artcodes.detect.handler;
 
 import com.google.common.collect.HashMultiset;
 import com.google.common.collect.Multiset;
@@ -25,25 +25,23 @@ import com.google.common.collect.Multisets;
 
 import org.opencv.core.Mat;
 import org.opencv.core.MatOfPoint;
+import org.opencv.core.Size;
 
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.HashSet;
 
+import uk.ac.horizon.artcodes.detect.handler.CodeDetectionHandler;
+import uk.ac.horizon.artcodes.detect.handler.MarkerDetectionHandler;
+import uk.ac.horizon.artcodes.detect.marker.Marker;
+import uk.ac.horizon.artcodes.detect.marker.MarkerWithEmbeddedChecksum;
+
 public class MarkerCodeDetectionHandler implements MarkerDetectionHandler
 {
-    public interface CodeDetectionHandler
-    {
-        /**
-         * Called when a marker is detected.
-         * @param code The code representation of the marker.
-         */
-        void onMarkerCodeDetected(String code);
-    }
 
     protected static final int REQUIRED = 20;
     protected static final int MAX = REQUIRED * 4;
-	protected static final int OCCURENCES = 2;
+	protected static final int OCCURRENCES = 2;
 
     protected final Multiset<String> markerCounts = HashMultiset.create();
     private final CodeDetectionHandler markerCodeHandler;
@@ -54,7 +52,7 @@ public class MarkerCodeDetectionHandler implements MarkerDetectionHandler
     }
 
     @Override
-    public void onMarkersDetected(Collection<Marker> markers, ArrayList<MatOfPoint> contours, Mat hierarchy)
+    public void onMarkersDetected(Collection<Marker> markers, ArrayList<MatOfPoint> contours, Mat hierarchy, Size sourceImageSize)
     {
         actOnMarkers(countMarkers(markers));
     }
@@ -94,7 +92,14 @@ public class MarkerCodeDetectionHandler implements MarkerDetectionHandler
             }
 
             //increase occurrence if this marker is already in the list.
-            markerCounts.add(markerCode, OCCURENCES);
+            if (marker instanceof MarkerWithEmbeddedChecksum)
+            {
+                markerCounts.add(markerCode, REQUIRED-1);
+            }
+            else
+            {
+                markerCounts.add(markerCode, OCCURRENCES);
+            }
             removals.remove(markerCode);
         }
 

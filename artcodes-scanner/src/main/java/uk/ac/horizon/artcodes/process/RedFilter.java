@@ -19,13 +19,15 @@
 
 package uk.ac.horizon.artcodes.process;
 
+import android.content.Context;
+
 import org.opencv.core.Size;
 
 import java.util.List;
 
 import uk.ac.horizon.artcodes.detect.DetectorSetting;
 import uk.ac.horizon.artcodes.detect.ImageBuffers;
-import uk.ac.horizon.artcodes.detect.marker.MarkerDetectionHandler;
+import uk.ac.horizon.artcodes.detect.handler.MarkerDetectionHandler;
 import uk.ac.horizon.artcodes.model.Experience;
 
 public class RedFilter implements ImageProcessor
@@ -37,7 +39,7 @@ public class RedFilter implements ImageProcessor
 			return "filter:red";
 		}
 
-		public ImageProcessor create(Experience experience, MarkerDetectionHandler handler)
+		public ImageProcessor create(Context context, Experience experience, MarkerDetectionHandler handler)
 		{
 			return new RedFilter();
 		}

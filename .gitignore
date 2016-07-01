@@ -7,3 +7,5 @@ build/
 
 src/main/res/values/keys.xml
 src/main/res/xml/app_tracker.xml
+
+*.keystore

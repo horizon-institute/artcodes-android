@@ -19,6 +19,7 @@
 
 package uk.ac.horizon.artcodes.detect.marker;
 
+import android.content.Context;
 import android.util.Log;
 
 import org.opencv.core.Core;
@@ -35,8 +36,10 @@ import java.util.Comparator;
 import java.util.HashSet;
 import java.util.List;
 
+import uk.ac.horizon.artcodes.Feature;
 import uk.ac.horizon.artcodes.detect.DetectorSetting;
 import uk.ac.horizon.artcodes.detect.ImageBuffers;
+import uk.ac.horizon.artcodes.detect.handler.MarkerDetectionHandler;
 import uk.ac.horizon.artcodes.model.Action;
 import uk.ac.horizon.artcodes.model.Experience;
 import uk.ac.horizon.artcodes.process.ImageProcessor;
@@ -45,6 +48,7 @@ import uk.ac.horizon.artcodes.scanner.R;
 
 public class MarkerDetector implements ImageProcessor
 {
+
 	public static class Factory implements ImageProcessorFactory
 	{
 		public String getName()
@@ -52,9 +56,9 @@ public class MarkerDetector implements ImageProcessor
 			return "detect";
 		}
 
-		public ImageProcessor create(Experience experience, MarkerDetectionHandler handler)
+		public ImageProcessor create(Context context, Experience experience, MarkerDetectionHandler handler)
 		{
-			return new MarkerDetector(experience, handler);
+			return new MarkerDetector(context, experience, handler);
 		}
 	}
 
@@ -100,8 +104,11 @@ public class MarkerDetector implements ImageProcessor
 	private CodeDisplay codeDisplay = CodeDisplay.hidden;
 	private OutlineDisplay outlineDisplay = OutlineDisplay.none;
 
-	public MarkerDetector(Experience experience, MarkerDetectionHandler handler)
+	private Context context;
+
+	public MarkerDetector(Context context, Experience experience, MarkerDetectionHandler handler)
 	{
+		this.context = context;
 		int maxValue = 3;
 		int minRegionCount = 20;
 		int maxRegionCount = 3;
@@ -177,7 +184,7 @@ public class MarkerDetector implements ImageProcessor
 		final ArrayList<MatOfPoint> contours = new ArrayList<>();
 		final Mat hierarchy = new Mat();
 		// Make sure the image is rotated before the contours are generated, if necessary
-		if (outlineDisplay != OutlineDisplay.none || codeDisplay == CodeDisplay.visible)
+		if (Feature.get(this.context, R.bool.feature_combined_markers).isEnabled() || outlineDisplay != OutlineDisplay.none || codeDisplay == CodeDisplay.visible)
 		{
 			buffers.getOverlay();
 		}
@@ -229,7 +236,7 @@ public class MarkerDetector implements ImageProcessor
 			}
 
 			buffers.setDetected(!foundMarkers.isEmpty());
-			handler.onMarkersDetected(foundMarkers, contours, hierarchy);
+			handler.onMarkersDetected(foundMarkers, contours, hierarchy, buffers.getImage().size());
 		}
 		finally
 		{

@@ -17,17 +17,26 @@
  *     along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-package uk.ac.horizon.artcodes.detect.marker;
+package uk.ac.horizon.artcodes.detect.handler;
 
+import org.opencv.core.Mat;
+import org.opencv.core.MatOfPoint;
+import org.opencv.core.Size;
+
+import java.util.ArrayList;
+import java.util.Collection;
 import java.util.List;
 
-public class MarkerWithEmbeddedChecksum extends Marker
-{
-    public final MarkerRegion checksumRegion;
+import uk.ac.horizon.artcodes.detect.marker.Marker;
+import uk.ac.horizon.artcodes.model.Action;
+import uk.ac.horizon.artcodes.model.MarkerImage;
 
-    public MarkerWithEmbeddedChecksum(int markerIndex, List<MarkerRegion> regions, MarkerRegion checksumRegion)
-    {
-        super(markerIndex, regions);
-        this.checksumRegion = checksumRegion;
-    }
+public interface CodeDetectionHandler
+{
+    /**
+     * Called when a marker is detected.
+     *
+     * @param code The code representation of the marker.
+     */
+    void onMarkerCodeDetected(String code);
 }

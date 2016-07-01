@@ -19,6 +19,8 @@
 
 package uk.ac.horizon.artcodes.process;
 
+import android.content.Context;
+
 import org.opencv.core.Mat;
 import org.opencv.core.Size;
 import org.opencv.imgproc.Imgproc;
@@ -27,7 +29,7 @@ import java.util.List;
 
 import uk.ac.horizon.artcodes.detect.DetectorSetting;
 import uk.ac.horizon.artcodes.detect.ImageBuffers;
-import uk.ac.horizon.artcodes.detect.marker.MarkerDetectionHandler;
+import uk.ac.horizon.artcodes.detect.handler.MarkerDetectionHandler;
 import uk.ac.horizon.artcodes.model.Experience;
 import uk.ac.horizon.artcodes.scanner.R;
 
@@ -40,7 +42,7 @@ public class TileThresholder implements ImageProcessor
 			return "tile";
 		}
 
-		public ImageProcessor create(Experience experience, MarkerDetectionHandler handler)
+		public ImageProcessor create(Context context, Experience experience, MarkerDetectionHandler handler)
 		{
 			return new TileThresholder();
 		}

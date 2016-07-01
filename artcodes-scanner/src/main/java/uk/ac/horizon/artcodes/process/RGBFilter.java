@@ -19,6 +19,8 @@
 
 package uk.ac.horizon.artcodes.process;
 
+import android.content.Context;
+
 import org.opencv.core.Size;
 import org.opencv.imgproc.Imgproc;
 
@@ -26,7 +28,7 @@ import java.util.List;
 
 import uk.ac.horizon.artcodes.detect.DetectorSetting;
 import uk.ac.horizon.artcodes.detect.ImageBuffers;
-import uk.ac.horizon.artcodes.detect.marker.MarkerDetectionHandler;
+import uk.ac.horizon.artcodes.detect.handler.MarkerDetectionHandler;
 import uk.ac.horizon.artcodes.model.Experience;
 
 public class RGBFilter implements ImageProcessor
@@ -38,7 +40,7 @@ public class RGBFilter implements ImageProcessor
 			return "filter:red";
 		}
 
-		public ImageProcessor create(Experience experience, MarkerDetectionHandler handler)
+		public ImageProcessor create(Context context, Experience experience, MarkerDetectionHandler handler)
 		{
 			return new RGBFilter(Channel.red);
 		}
@@ -51,7 +53,7 @@ public class RGBFilter implements ImageProcessor
 			return "filter:blue";
 		}
 
-		public ImageProcessor create(Experience experience, MarkerDetectionHandler handler)
+		public ImageProcessor create(Context context, Experience experience, MarkerDetectionHandler handler)
 		{
 			return new RGBFilter(Channel.blue);
 		}
@@ -64,7 +66,7 @@ public class RGBFilter implements ImageProcessor
 			return "filter:green";
 		}
 
-		public ImageProcessor create(Experience experience, MarkerDetectionHandler handler)
+		public ImageProcessor create(Context context, Experience experience, MarkerDetectionHandler handler)
 		{
 			return new RGBFilter(Channel.green);
 		}

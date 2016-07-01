@@ -60,7 +60,8 @@ import uk.ac.horizon.artcodes.camera.CameraView;
 import uk.ac.horizon.artcodes.detect.ArtcodeDetector;
 import uk.ac.horizon.artcodes.detect.DetectorCallback;
 import uk.ac.horizon.artcodes.detect.DetectorSetting;
-import uk.ac.horizon.artcodes.detect.marker.MarkerCodeDetectionHandler;
+import uk.ac.horizon.artcodes.detect.handler.CodeDetectionHandler;
+import uk.ac.horizon.artcodes.detect.handler.MarkerCodeDetectionHandler;
 import uk.ac.horizon.artcodes.model.Experience;
 
 public class ScannerActivity extends AppCompatActivity
@@ -360,7 +361,7 @@ public class ScannerActivity extends AppCompatActivity
 
 	protected ArtcodeDetector getNewDetector(Experience experience)
 	{
-		return new ArtcodeDetector(experience, new MarkerCodeDetectionHandler(new MarkerCodeDetectionHandler.CodeDetectionHandler()
+		return new ArtcodeDetector(this, experience, new MarkerCodeDetectionHandler(new CodeDetectionHandler()
 		{
 			@Override
 			public void onMarkerCodeDetected(String code)

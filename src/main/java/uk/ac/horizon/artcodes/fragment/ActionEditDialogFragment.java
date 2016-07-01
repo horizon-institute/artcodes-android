@@ -29,9 +29,13 @@ import android.support.v4.app.FragmentManager;
 import android.support.v7.app.AlertDialog;
 import android.text.InputFilter;
 import android.view.View;
+import android.widget.AdapterView;
+import android.widget.ArrayAdapter;
 
 import java.util.Collections;
 
+import uk.ac.horizon.artcodes.Feature;
+import uk.ac.horizon.artcodes.R;
 import uk.ac.horizon.artcodes.activity.ExperienceActivityBase;
 import uk.ac.horizon.artcodes.databinding.ActionCodeBinding;
 import uk.ac.horizon.artcodes.databinding.ActionEditBinding;
@@ -132,6 +136,12 @@ public class ActionEditDialogFragment extends DialogFragment
 			{
 				if (getArguments().containsKey("action"))
 				{
+					updateAction(); // make sure code is sorted
+					if (getAction().getCodes().size()==1)
+					{
+						// Actions with only 1 code can not be a group or sequence!
+						getAction().setMatch(Action.Match.any);
+					}
 					final int index = getArguments().getInt("action");
 					if (getTargetFragment() instanceof ActionEditListFragment)
 					{
@@ -141,6 +151,44 @@ public class ActionEditDialogFragment extends DialogFragment
 				dialog.dismiss();
 			}
 		});
+
+		ArrayAdapter<CharSequence> adapter = ArrayAdapter.createFromResource(this.getContext(), R.array.match_type_descriptions, R.layout.match_type_spinner_item);
+		binding.matchSpinner.setAdapter(adapter);
+		binding.matchSpinner.setOnItemSelectedListener(new AdapterView.OnItemSelectedListener()
+		{
+			@Override
+			public void onItemSelected(AdapterView<?> adapterView, View view, int i, long l)
+			{
+				if (getAction()!=null)
+				{
+					switch (i)
+					{
+						case 0:
+							getAction().setMatch(Action.Match.any);
+							break;
+						case 1:
+							getAction().setMatch(Action.Match.all);
+							break;
+						case 2:
+							getAction().setMatch(Action.Match.sequence);
+							break;
+					}
+				}
+			}
+
+			@Override
+			public void onNothingSelected(AdapterView<?> adapterView)
+			{
+
+			}
+		});
+
+
+		if (Feature.get(getContext(), R.bool.feature_combined_markers).isEnabled())
+		{
+			binding.selectLayout.setVisibility(View.GONE);
+			binding.matchSpinner.setVisibility(View.VISIBLE);
+		}
 
 		return dialog;
 	}
@@ -153,7 +201,7 @@ public class ActionEditDialogFragment extends DialogFragment
 		{
 			String code = data.getStringExtra("marker");
 			Action action = getAction();
-			if (code != null && !action.getCodes().contains(code))
+			if (code != null && (action.getMatch()==Action.Match.sequence || !action.getCodes().contains(code)))
 			{
 				action.getCodes().add(code);
 				ActionCodeBinding codeBinding = createCodeBinding(binding, action, action.getCodes().size() - 1);
@@ -201,15 +249,28 @@ public class ActionEditDialogFragment extends DialogFragment
 		binding.setActionEditor(new ActionEditor(action));
 
 		updateCodes(binding, action);
+		updateMatchType(binding, action);
 	}
 
 	private void updateCodes(final ActionEditBinding binding, final Action action)
 	{
 		binding.markerCodeList.removeAllViews();
-		Collections.sort(action.getCodes());
+		if (action!=null && action.getMatch()!=Action.Match.sequence)
+		{
+			// only sort codes if not a sequence!
+			Collections.sort(action.getCodes());
+		}
 		for (int index = 0; index < action.getCodes().size(); index++)
 		{
 			createCodeBinding(binding, action, index);
+		}
+	}
+
+	private void updateMatchType(final ActionEditBinding binding, final Action action)
+	{
+		if (action!=null)
+		{
+			binding.matchSpinner.setSelection(action.getMatch()==Action.Match.any?0:(action.getMatch()==Action.Match.all?1:2));
 		}
 	}
 

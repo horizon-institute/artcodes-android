@@ -19,6 +19,8 @@
 
 package uk.ac.horizon.artcodes.detect;
 
+import android.content.Context;
+import android.graphics.Bitmap;
 import android.util.Log;
 
 import org.opencv.core.Rect;
@@ -27,7 +29,7 @@ import java.util.HashMap;
 import java.util.Map;
 
 import uk.ac.horizon.artcodes.detect.marker.MarkerAreaOrderDetector;
-import uk.ac.horizon.artcodes.detect.marker.MarkerDetectionHandler;
+import uk.ac.horizon.artcodes.detect.handler.MarkerDetectionHandler;
 import uk.ac.horizon.artcodes.detect.marker.MarkerDetector;
 import uk.ac.horizon.artcodes.detect.marker.MarkerEmbeddedChecksumDetector;
 import uk.ac.horizon.artcodes.model.Experience;
@@ -51,11 +53,11 @@ public class ArtcodeDetector extends Detector
 		//register(new RGBFilter.GreenFactory());
 	}
 
-	public ArtcodeDetector(Experience experience, MarkerDetectionHandler handler)
+	public ArtcodeDetector(Context context, Experience experience, MarkerDetectionHandler handler)
 	{
 		for (String processorName : experience.getPipeline())
 		{
-			ImageProcessor processor = getProcessor(processorName, experience, handler);
+			ImageProcessor processor = getProcessor(context, processorName, experience, handler);
 			if (processor != null)
 			{
 				pipeline.add(processor);
@@ -65,7 +67,7 @@ public class ArtcodeDetector extends Detector
 		if (pipeline.isEmpty())
 		{
 			pipeline.add(new TileThresholder());
-			pipeline.add(new MarkerDetector(experience, handler));
+			pipeline.add(new MarkerDetector(context, experience, handler));
 		}
 	}
 
@@ -74,14 +76,14 @@ public class ArtcodeDetector extends Detector
 		factoryRegistry.put(factory.getName(), factory);
 	}
 
-	private static ImageProcessor getProcessor(String string, Experience experience, MarkerDetectionHandler handler)
+	private static ImageProcessor getProcessor(Context context, String string, Experience experience, MarkerDetectionHandler handler)
 	{
 		ImageProcessorFactory factory = factoryRegistry.get(string);
 		if (factory != null)
 		{
 			try
 			{
-				return factory.create(experience, handler);
+				return factory.create(context, experience, handler);
 			}
 			catch (Exception e)
 			{

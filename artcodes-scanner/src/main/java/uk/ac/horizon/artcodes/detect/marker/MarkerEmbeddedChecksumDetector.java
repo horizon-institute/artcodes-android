@@ -19,12 +19,15 @@
 
 package uk.ac.horizon.artcodes.detect.marker;
 
+import android.content.Context;
+
 import org.opencv.core.Mat;
 import org.opencv.core.MatOfPoint;
 
 import java.util.ArrayList;
 import java.util.List;
 
+import uk.ac.horizon.artcodes.detect.handler.MarkerDetectionHandler;
 import uk.ac.horizon.artcodes.model.Experience;
 import uk.ac.horizon.artcodes.process.ImageProcessor;
 import uk.ac.horizon.artcodes.process.ImageProcessorFactory;
@@ -38,15 +41,15 @@ public class MarkerEmbeddedChecksumDetector extends MarkerDetector
 			return "detectEmbedded";
 		}
 
-		public ImageProcessor create(Experience experience, MarkerDetectionHandler handler)
+		public ImageProcessor create(Context context, Experience experience, MarkerDetectionHandler handler)
 		{
-			return new MarkerEmbeddedChecksumDetector(experience, handler);
+			return new MarkerEmbeddedChecksumDetector(context, experience, handler);
 		}
 	}
 
-	public MarkerEmbeddedChecksumDetector(Experience experience, MarkerDetectionHandler handler)
+	public MarkerEmbeddedChecksumDetector(Context context, Experience experience, MarkerDetectionHandler handler)
 	{
-		super(experience, handler);
+		super(context, experience, handler);
 	}
 
 	protected Marker createMarkerForNode(int nodeIndex, List<MatOfPoint> contours, Mat hierarchy)

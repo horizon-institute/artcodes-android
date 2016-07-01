@@ -38,16 +38,29 @@ public class Marker
 		return toString().hashCode();
 	}
 
+	private String cashedToString = null;
 	@Override
 	public String toString()
 	{
-		StringBuilder sb = new StringBuilder(this.regions.size()*2);
-		for (MarkerRegion region : this.regions)
+		if (this.cashedToString==null)
 		{
-			sb.append(region.value);
-			sb.append(':');
+			StringBuilder sb = new StringBuilder(this.regions.size() * 2);
+			for (MarkerRegion region : this.regions)
+			{
+				sb.append(region.value);
+				sb.append(':');
+			}
+			sb.deleteCharAt(sb.length() - 1);
+			this.cashedToString = sb.toString();
 		}
-		sb.deleteCharAt(sb.length()-1);
-		return sb.toString();
+		return this.cashedToString;
+	}
+
+	@Override
+	public boolean equals(Object o)
+	{
+		// Marker and MarkerRegion contain indexes to contours in a frame
+		// so use the string representation for equality
+		return this.toString().equals(o.toString());
 	}
 }

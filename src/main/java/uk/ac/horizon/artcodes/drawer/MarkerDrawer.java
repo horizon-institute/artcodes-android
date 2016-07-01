@@ -17,17 +17,26 @@
  *     along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-package uk.ac.horizon.artcodes.detect.marker;
+package uk.ac.horizon.artcodes.drawer;
 
-import java.util.List;
+import org.opencv.core.Mat;
+import org.opencv.core.MatOfPoint;
+import org.opencv.core.Rect;
 
-public class MarkerWithEmbeddedChecksum extends Marker
+import java.util.ArrayList;
+
+import uk.ac.horizon.artcodes.detect.marker.Marker;
+
+public interface MarkerDrawer
 {
-    public final MarkerRegion checksumRegion;
-
-    public MarkerWithEmbeddedChecksum(int markerIndex, List<MarkerRegion> regions, MarkerRegion checksumRegion)
-    {
-        super(markerIndex, regions);
-        this.checksumRegion = checksumRegion;
-    }
+    /**
+     * Draw a marker in an image or in a new image. Implementing classes handle style of drawing.
+     * @param marker The marker to draw.
+     * @param contours Data the marker was detected from.
+     * @param hierarchy Data the marker was detected from.
+     * @param boundingRect A bounding box for the marker if one has already been computed, can be null.
+     * @param imageToDrawOn An image to draw on, can be null.
+     * @return imageToDrawOn, if provided, otherwise a new image.
+     */
+    Mat drawMarker(Marker marker, ArrayList<MatOfPoint> contours, Mat hierarchy, Rect boundingRect, Mat imageToDrawOn);
 }

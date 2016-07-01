@@ -16,16 +16,27 @@
  *     You should have received a copy of the GNU Affero General Public License
  *     along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
+package uk.ac.horizon.artcodes.model;
 
-package uk.ac.horizon.artcodes.detect.marker;
+import android.graphics.Bitmap;
 
-import org.opencv.core.Mat;
-import org.opencv.core.MatOfPoint;
+import uk.ac.horizon.artcodes.detect.marker.Marker;
 
-import java.util.ArrayList;
-import java.util.Collection;
-
-public interface MarkerDetectionHandler
+public class MarkerImage
 {
-	void onMarkersDetected(Collection<Marker> markers, ArrayList<MatOfPoint> contours, Mat hierarchy);
+    public final String code;
+    public final Bitmap image;
+    public final float x, y, width, height;
+    public boolean detectionActive = true;
+    public boolean newDetection = true;
+
+    public MarkerImage(String code, Bitmap image, float x, float y, float width, float height)
+    {
+        this.code = code;
+        this.image = image;
+        this.x = x;
+        this.y = y;
+        this.width = width;
+        this.height = height;
+    }
 }

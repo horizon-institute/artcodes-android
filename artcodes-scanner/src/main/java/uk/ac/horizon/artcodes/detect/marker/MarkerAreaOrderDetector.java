@@ -19,6 +19,8 @@
 
 package uk.ac.horizon.artcodes.detect.marker;
 
+import android.content.Context;
+
 import org.opencv.core.Mat;
 import org.opencv.core.MatOfPoint;
 import org.opencv.imgproc.Imgproc;
@@ -27,6 +29,7 @@ import java.util.Collections;
 import java.util.Comparator;
 import java.util.List;
 
+import uk.ac.horizon.artcodes.detect.handler.MarkerDetectionHandler;
 import uk.ac.horizon.artcodes.model.Experience;
 import uk.ac.horizon.artcodes.process.ImageProcessor;
 import uk.ac.horizon.artcodes.process.ImageProcessorFactory;
@@ -40,15 +43,15 @@ public class MarkerAreaOrderDetector extends MarkerDetector
 			return "detectOrdered";
 		}
 
-		public ImageProcessor create(Experience experience, MarkerDetectionHandler handler)
+		public ImageProcessor create(Context context, Experience experience, MarkerDetectionHandler handler)
 		{
-			return new MarkerAreaOrderDetector(experience, handler);
+			return new MarkerAreaOrderDetector(context, experience, handler);
 		}
 	}
 
-	public MarkerAreaOrderDetector(Experience experience, MarkerDetectionHandler handler)
+	public MarkerAreaOrderDetector(Context context, Experience experience, MarkerDetectionHandler handler)
 	{
-		super(experience, handler);
+		super(context, experience, handler);
 	}
 
 	@Override

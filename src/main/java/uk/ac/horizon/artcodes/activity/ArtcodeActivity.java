@@ -24,6 +24,8 @@ import android.content.res.ColorStateList;
 import android.net.Uri;
 import android.os.Build;
 import android.os.Bundle;
+import android.os.Handler;
+import android.os.Looper;
 import android.support.customtabs.CustomTabsIntent;
 import android.support.v4.app.NavUtils;
 import android.support.v4.app.TaskStackBuilder;
@@ -32,25 +34,30 @@ import android.util.Log;
 import android.view.MenuItem;
 import android.view.View;
 import android.view.ViewGroup;
+import android.widget.RelativeLayout;
 
 import com.google.gson.Gson;
 
-import java.util.Collection;
 import java.util.List;
 
 import uk.ac.horizon.artcodes.Artcodes;
+import uk.ac.horizon.artcodes.Feature;
 import uk.ac.horizon.artcodes.GoogleAnalytics;
 import uk.ac.horizon.artcodes.R;
 import uk.ac.horizon.artcodes.animator.VisibilityAnimator;
 import uk.ac.horizon.artcodes.databinding.ScannerActionBinding;
 import uk.ac.horizon.artcodes.detect.ArtcodeDetector;
-import uk.ac.horizon.artcodes.detect.marker.Marker;
-import uk.ac.horizon.artcodes.detect.marker.MarkerActionDetectionHandler;
+import uk.ac.horizon.artcodes.detect.handler.ActionDetectionHandler;
+import uk.ac.horizon.artcodes.detect.handler.MarkerActionDetectionHandler;
+import uk.ac.horizon.artcodes.detect.handler.MultipleMarkerActionDetectionHandler;
+import uk.ac.horizon.artcodes.drawer.MarkerThumbnailDrawer;
 import uk.ac.horizon.artcodes.model.Action;
 import uk.ac.horizon.artcodes.model.Experience;
+import uk.ac.horizon.artcodes.model.MarkerImage;
 import uk.ac.horizon.artcodes.scanner.ScannerActivity;
 import uk.ac.horizon.artcodes.server.ArtcodeServer;
 import uk.ac.horizon.artcodes.server.LoadCallback;
+import uk.ac.horizon.artcodes.ui.MarkerHistoryViewController;
 
 public class ArtcodeActivity extends ScannerActivity implements LoadCallback<Experience>
 {
@@ -188,13 +195,16 @@ public class ArtcodeActivity extends ScannerActivity implements LoadCallback<Exp
 				@Override
 				public void onClick(View v)
 				{
-					GoogleAnalytics.trackEvent("Action", "Opened", experience.getId(), action.getName());
-					CustomTabsIntent.Builder builder = new CustomTabsIntent.Builder();
-					// TODO Warmup urls
-					//builder.setSession(session);
-					builder.setToolbarColor(ContextCompat.getColor(ArtcodeActivity.this, R.color.apptheme_primary));
-					CustomTabsIntent customTabsIntent = builder.build();
-					customTabsIntent.launchUrl(ArtcodeActivity.this, Uri.parse(action.getUrl()));
+					if (action.getUrl() != null)
+					{
+						GoogleAnalytics.trackEvent("Action", "Opened", experience.getId(), action.getName());
+						CustomTabsIntent.Builder builder = new CustomTabsIntent.Builder();
+						// TODO Warmup urls
+						//builder.setSession(session);
+						builder.setToolbarColor(ContextCompat.getColor(ArtcodeActivity.this, R.color.apptheme_primary));
+						CustomTabsIntent customTabsIntent = builder.build();
+						customTabsIntent.launchUrl(ArtcodeActivity.this, Uri.parse(action.getUrl()));
+					}
 				}
 			});
 			runOnUiThread(new Runnable()
@@ -221,16 +231,33 @@ public class ArtcodeActivity extends ScannerActivity implements LoadCallback<Exp
 		}
 	}
 
+	private MarkerHistoryViewController markerHistoryViewController = null;
 	@Override
 	protected ArtcodeDetector getNewDetector(Experience experience)
 	{
-		return new ArtcodeDetector(experience, new MarkerActionDetectionHandler(new MarkerActionDetectionHandler.ActionDetectionHandler()
+		if (Feature.get(getApplicationContext(), R.bool.feature_combined_markers).isEnabled())
 		{
-			@Override
-			public void onMarkerActionDetected(Action detectedAction, Collection<Marker> detectedMarkers, Action asPartOfFutureAction)
+			markerHistoryViewController = new MarkerHistoryViewController(this, (RelativeLayout) findViewById(R.id.thumbnailImageLayout), new Handler(Looper.getMainLooper()));
+			return new ArtcodeDetector(this, experience, new MultipleMarkerActionDetectionHandler(new ActionDetectionHandler()
 			{
-				onActionChanged(detectedAction);
-			}
-		}, experience));
+				@Override
+				public void onMarkerActionDetected(Action detectedAction, Action futureAction, List<MarkerImage> detectedMarkers)
+				{
+					markerHistoryViewController.update(detectedMarkers, futureAction);
+					onActionChanged(detectedAction);
+				}
+			}, experience, new MarkerThumbnailDrawer()));
+		}
+		else
+		{
+			return new ArtcodeDetector(this, experience, new MarkerActionDetectionHandler(new ActionDetectionHandler()
+			{
+				@Override
+				public void onMarkerActionDetected(Action detectedAction, Action possibleFutureAction, List<MarkerImage> imagesForFutureAction)
+				{
+					onActionChanged(detectedAction);
+				}
+			}, experience, null));
+		}
 	}
 }

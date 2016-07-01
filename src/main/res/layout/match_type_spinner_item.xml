@@ -18,7 +18,11 @@
   ~     along with this program.  If not, see <http://www.gnu.org/licenses/>.
   -->
 
-<resources>
-	<bool name="feature_load_old_experiences">true</bool>
-	<bool name="feature_combined_markers">false</bool>
-</resources>
+<TextView xmlns:android="http://schemas.android.com/apk/res/android"
+          android:layout_width="match_parent"
+          android:layout_height="wrap_content"
+          android:gravity="center_vertical"
+          android:maxLines="2"
+          android:lines="2"
+          android:padding="16dp"
+    android:text="test"/>

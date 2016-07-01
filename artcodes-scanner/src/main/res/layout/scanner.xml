@@ -88,6 +88,13 @@
 
             </LinearLayout>
 
+            <RelativeLayout
+				android:id="@+id/thumbnailImageLayout"
+				android:layout_width="match_parent"
+				android:layout_height="match_parent">
+				<!-- This relative layout is here to contain images of detected markers/actions -->
+			</RelativeLayout>
+			
             <LinearLayout
                 android:id="@+id/settingsMenu"
                 android:layout_width="match_parent"

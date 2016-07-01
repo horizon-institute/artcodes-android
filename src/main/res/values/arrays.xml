@@ -19,6 +19,15 @@
   -->
 
 <resources>
-	<bool name="feature_load_old_experiences">true</bool>
-	<bool name="feature_combined_markers">false</bool>
+    <string-array name="match_type_titles">
+        <item>Any</item>
+        <item>Group</item>
+        <item>Sequence</item>
+    </string-array>
+
+    <string-array name="match_type_descriptions">
+        <item>Triggered by matching any of these codes</item>
+        <item>Triggered by matching all of these codes together</item>
+        <item>Triggered by matching all of these codes in a sequence</item>
+    </string-array>
 </resources>
