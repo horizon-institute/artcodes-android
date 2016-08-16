@@ -52,6 +52,11 @@ public class ImageBuffers
 		cameraImage.put(0, 0, data);
 	}
 
+	public void setImage(Bitmap bitmap)
+	{
+		Utils.bitmapToMat(bitmap, cameraImage);
+	}
+
 	public byte[] createBuffer(int imageWidth, int imageHeight, int imageDepth)
 	{
 		buffer = new byte[imageWidth * imageHeight * imageDepth / 8];

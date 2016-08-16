@@ -160,5 +160,6 @@
     <orderEntry type="library" exported="" name="customtabs-23.4.0" level="project" />
     <orderEntry type="library" exported="" name="play-services-basement-8.4.0" level="project" />
     <orderEntry type="module" module-name="artcodes-scanner" exported="" />
+    <orderEntry type="library" exported="" name="opencv-3.1.0" level="project" />
   </component>
 </module>

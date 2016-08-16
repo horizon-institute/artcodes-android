@@ -83,7 +83,7 @@ android {
 		versionName '3.2.3'
 		versionCode 400056
 		minSdkVersion 15
-		targetSdkVersion 23
+		targetSdkVersion 24
 		signingConfig signingConfigs.release
 	}
 

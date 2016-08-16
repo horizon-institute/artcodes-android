@@ -20,7 +20,6 @@
 package uk.ac.horizon.artcodes.detect;
 
 import android.content.Context;
-import android.graphics.Bitmap;
 import android.util.Log;
 
 import org.opencv.core.Rect;
