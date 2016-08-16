@@ -35,6 +35,7 @@ import java.util.Collections;
 import java.util.Comparator;
 import java.util.HashSet;
 import java.util.List;
+import java.util.Map;
 
 import uk.ac.horizon.artcodes.Feature;
 import uk.ac.horizon.artcodes.detect.DetectorSetting;
@@ -46,6 +47,9 @@ import uk.ac.horizon.artcodes.process.ImageProcessor;
 import uk.ac.horizon.artcodes.process.ImageProcessorFactory;
 import uk.ac.horizon.artcodes.scanner.R;
 
+/**
+ * This class detects standard Artcodes.
+ */
 public class MarkerDetector implements ImageProcessor
 {
 
@@ -56,7 +60,7 @@ public class MarkerDetector implements ImageProcessor
 			return "detect";
 		}
 
-		public ImageProcessor create(Context context, Experience experience, MarkerDetectionHandler handler)
+		public ImageProcessor create(Context context, Experience experience, MarkerDetectionHandler handler, Map<String, String> args)
 		{
 			return new MarkerDetector(context, experience, handler);
 		}
@@ -184,14 +188,16 @@ public class MarkerDetector implements ImageProcessor
 		final ArrayList<MatOfPoint> contours = new ArrayList<>();
 		final Mat hierarchy = new Mat();
 		// Make sure the image is rotated before the contours are generated, if necessary
-		if (Feature.get(this.context, R.bool.feature_combined_markers).isEnabled() || outlineDisplay != OutlineDisplay.none || codeDisplay == CodeDisplay.visible)
-		{
-			buffers.getOverlay();
-		}
+		//if (Feature.get(this.context, R.bool.feature_combined_markers).isEnabled() || outlineDisplay != OutlineDisplay.none || codeDisplay == CodeDisplay.visible)
+		//{
+		// if statement commented out as there was a bug where the overlay was not getting cleared
+		// after cycling through the threshold views.
+		buffers.getOverlay();
+		//}
 		try
 		{
 			final List<Marker> foundMarkers = new ArrayList<>();
-			Imgproc.findContours(buffers.getImage(), contours, hierarchy, Imgproc.RETR_TREE, Imgproc.CHAIN_APPROX_NONE);
+			Imgproc.findContours(buffers.getImageInGrey(), contours, hierarchy, Imgproc.RETR_TREE, Imgproc.CHAIN_APPROX_NONE);
 			for (int i = 0; i < contours.size(); i++)
 			{
 				final Marker marker = createMarkerForNode(i, contours, hierarchy);
@@ -236,7 +242,7 @@ public class MarkerDetector implements ImageProcessor
 			}
 
 			buffers.setDetected(!foundMarkers.isEmpty());
-			handler.onMarkersDetected(foundMarkers, contours, hierarchy, buffers.getImage().size());
+			handler.onMarkersDetected(foundMarkers, contours, hierarchy, buffers.getImageInGrey().size());
 		}
 		finally
 		{

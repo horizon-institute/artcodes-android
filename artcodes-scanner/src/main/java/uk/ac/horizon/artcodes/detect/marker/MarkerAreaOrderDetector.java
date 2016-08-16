@@ -28,6 +28,7 @@ import org.opencv.imgproc.Imgproc;
 import java.util.Collections;
 import java.util.Comparator;
 import java.util.List;
+import java.util.Map;
 
 import uk.ac.horizon.artcodes.detect.handler.MarkerDetectionHandler;
 import uk.ac.horizon.artcodes.model.Experience;
@@ -43,7 +44,7 @@ public class MarkerAreaOrderDetector extends MarkerDetector
 			return "detectOrdered";
 		}
 
-		public ImageProcessor create(Context context, Experience experience, MarkerDetectionHandler handler)
+		public ImageProcessor create(Context context, Experience experience, MarkerDetectionHandler handler, Map<String, String> args)
 		{
 			return new MarkerAreaOrderDetector(context, experience, handler);
 		}

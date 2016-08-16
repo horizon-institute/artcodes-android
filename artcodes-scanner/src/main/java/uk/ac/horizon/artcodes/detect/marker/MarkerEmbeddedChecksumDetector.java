@@ -26,12 +26,16 @@ import org.opencv.core.MatOfPoint;
 
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Map;
 
 import uk.ac.horizon.artcodes.detect.handler.MarkerDetectionHandler;
 import uk.ac.horizon.artcodes.model.Experience;
 import uk.ac.horizon.artcodes.process.ImageProcessor;
 import uk.ac.horizon.artcodes.process.ImageProcessorFactory;
 
+/**
+ * <p>This class detects Artcodes with an embedded checksum region.</p>
+ */
 public class MarkerEmbeddedChecksumDetector extends MarkerDetector
 {
 	public static class Factory implements ImageProcessorFactory
@@ -41,15 +45,21 @@ public class MarkerEmbeddedChecksumDetector extends MarkerDetector
 			return "detectEmbedded";
 		}
 
-		public ImageProcessor create(Context context, Experience experience, MarkerDetectionHandler handler)
+		public ImageProcessor create(Context context, Experience experience, MarkerDetectionHandler handler, Map<String, String> args)
 		{
-			return new MarkerEmbeddedChecksumDetector(context, experience, handler);
+			return new MarkerEmbeddedChecksumDetector(context, experience, handler, args!=null&&args.containsKey("embeddedOnly"), args!=null&&args.containsKey("relaxed"));
 		}
 	}
 
-	public MarkerEmbeddedChecksumDetector(Context context, Experience experience, MarkerDetectionHandler handler)
+	private boolean embeddedChecksumRequired;
+	private boolean relaxedEmbeddedChecksumIgnoreNonHollowDots;
+	private boolean relaxedEmbeddedChecksumIgnoreMultipleHollowSegments;
+
+	public MarkerEmbeddedChecksumDetector(Context context, Experience experience, MarkerDetectionHandler handler, boolean embeddedChecksumRequired, boolean relaxed)
 	{
 		super(context, experience, handler);
+		this.embeddedChecksumRequired = embeddedChecksumRequired;
+		this.relaxedEmbeddedChecksumIgnoreNonHollowDots = this.relaxedEmbeddedChecksumIgnoreMultipleHollowSegments = relaxed;
 	}
 
 	protected Marker createMarkerForNode(int nodeIndex, List<MatOfPoint> contours, Mat hierarchy)
@@ -103,7 +113,7 @@ public class MarkerEmbeddedChecksumDetector extends MarkerDetector
 		return null;
 	}
 
-	private MarkerRegion getChecksumRegionAtNode(int regionIndex, Mat hierarchy)
+	protected MarkerRegion getChecksumRegionAtNode(int regionIndex, Mat hierarchy)
 	{
 		// Find the first dot index:
 		double[] nodes = hierarchy.get(0, regionIndex);
@@ -120,14 +130,15 @@ public class MarkerEmbeddedChecksumDetector extends MarkerDetector
 			if (isValidHollowDot(currentDotIndex, hierarchy))
 			{
 				dotCount++;
-				// Get next dot node:
-				nodes = hierarchy.get(0, currentDotIndex);
-				currentDotIndex = (int) nodes[NEXT_NODE];
 			}
-			else
+			else if (!(this.relaxedEmbeddedChecksumIgnoreNonHollowDots && this.isValidDot(currentDotIndex, hierarchy)))
 			{
 				return null; // Dot is not a leaf in the hierarchy.
 			}
+
+			// Get next dot node:
+			nodes = hierarchy.get(0, currentDotIndex);
+			currentDotIndex = (int) nodes[NEXT_NODE];
 		}
 
 		return new MarkerRegion(regionIndex, dotCount);
@@ -137,7 +148,7 @@ public class MarkerEmbeddedChecksumDetector extends MarkerDetector
 	{
 		double[] nodes = hierarchy.get(0, nodeIndex);
 		return nodes[FIRST_NODE] >= 0 && // has a child node, and
-				hierarchy.get(0, (int) nodes[FIRST_NODE])[NEXT_NODE] < 0 && //the child has no siblings, and
+				(hierarchy.get(0, (int) nodes[FIRST_NODE])[NEXT_NODE] < 0 || this.relaxedEmbeddedChecksumIgnoreMultipleHollowSegments) && //the child has no siblings, and
 				isValidDot((int) nodes[FIRST_NODE], hierarchy);// the child is a leaf
 	}
 
@@ -146,6 +157,7 @@ public class MarkerEmbeddedChecksumDetector extends MarkerDetector
 	{
 		if (marker instanceof MarkerWithEmbeddedChecksum)
 		{
+			// If the detected Artcodes has an embedded checksum validate it
 			MarkerWithEmbeddedChecksum markerEc = (MarkerWithEmbeddedChecksum) marker;
 			if (markerEc.checksumRegion != null)
 			{
@@ -169,6 +181,18 @@ public class MarkerEmbeddedChecksumDetector extends MarkerDetector
 				return markerEc.checksumRegion.value == (weightedSum - 1) % 7 + 1;
 			}
 		}
-		return super.hasValidChecksum(marker);
+
+		if (!this.embeddedChecksumRequired)
+		{
+			// If the detected Artcode does not have an embedded checksum and embedded checksum is
+			// not required, delegate to super class
+			return super.hasValidChecksum(marker);
+		}
+		else
+		{
+			// If the detected Artcode does not have an embedded checksum and embedded checksum is
+			// required this is not a valid Artcode.
+			return false;
+		}
 	}
 }

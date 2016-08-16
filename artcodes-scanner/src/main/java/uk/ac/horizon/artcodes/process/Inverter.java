@@ -19,19 +19,37 @@
 
 package uk.ac.horizon.artcodes.process;
 
+import android.content.Context;
+
 import org.opencv.core.Core;
 
 import java.util.List;
+import java.util.Map;
 
 import uk.ac.horizon.artcodes.detect.DetectorSetting;
 import uk.ac.horizon.artcodes.detect.ImageBuffers;
+import uk.ac.horizon.artcodes.detect.handler.MarkerDetectionHandler;
+import uk.ac.horizon.artcodes.model.Experience;
 
 public class Inverter implements ImageProcessor
 {
+	public static class InverterFactory implements ImageProcessorFactory
+	{
+		public String getName()
+		{
+			return "invert";
+		}
+
+		public ImageProcessor create(Context context, Experience experience, MarkerDetectionHandler handler, Map<String, String> args)
+		{
+			return new Inverter();
+		}
+	}
+
 	@Override
 	public void process(ImageBuffers buffers)
 	{
-		Core.bitwise_not(buffers.getImage(), buffers.getImage());
+		Core.bitwise_not(buffers.getImageInAnyFormat(), buffers.getImageInAnyFormat());
 	}
 
 	@Override

@@ -26,6 +26,7 @@ import org.opencv.core.Size;
 import org.opencv.imgproc.Imgproc;
 
 import java.util.List;
+import java.util.Map;
 
 import uk.ac.horizon.artcodes.detect.DetectorSetting;
 import uk.ac.horizon.artcodes.detect.ImageBuffers;
@@ -42,7 +43,7 @@ public class TileThresholder implements ImageProcessor
 			return "tile";
 		}
 
-		public ImageProcessor create(Context context, Experience experience, MarkerDetectionHandler handler)
+		public ImageProcessor create(Context context, Experience experience, MarkerDetectionHandler handler, Map<String, String> args)
 		{
 			return new TileThresholder();
 		}
@@ -70,19 +71,20 @@ public class TileThresholder implements ImageProcessor
 	@Override
 	public void process(ImageBuffers buffers)
 	{
-		Imgproc.GaussianBlur(buffers.getImage(), buffers.getImage(), new Size(5, 5), 0);
+		Mat image = buffers.getImageInGrey();
+		Imgproc.GaussianBlur(image, image, new Size(5, 5), 0);
 
 		if (display == Display.greyscale)
 		{
-			Imgproc.cvtColor(buffers.getImage(), buffers.getOverlay(false), Imgproc.COLOR_GRAY2BGRA);
+			Imgproc.cvtColor(image, buffers.getOverlay(false), Imgproc.COLOR_GRAY2BGRA);
 		}
 
 		if (!buffers.hasDetected())
 		{
 			tiles = (tiles % 9) + 1;
 		}
-		final int tileHeight = (int) buffers.getImage().size().height / tiles;
-		final int tileWidth = (int) buffers.getImage().size().width / tiles;
+		final int tileHeight = (int) image.size().height / tiles;
+		final int tileWidth = (int) image.size().width / tiles;
 
 		// Split image into tiles and apply process on each image tile separately.
 		for (int tileRow = 0; tileRow < tiles; tileRow++)
@@ -95,7 +97,7 @@ public class TileThresholder implements ImageProcessor
 			}
 			else
 			{
-				endRow = (int) buffers.getImage().size().height;
+				endRow = (int) image.size().height;
 			}
 
 			for (int tileCol = 0; tileCol < tiles; tileCol++)
@@ -108,10 +110,10 @@ public class TileThresholder implements ImageProcessor
 				}
 				else
 				{
-					endCol = (int) buffers.getImage().size().width;
+					endCol = (int) image.size().width;
 				}
 
-				final Mat tileMat = buffers.getImage().submat(startRow, endRow, startCol, endCol);
+				final Mat tileMat = image.submat(startRow, endRow, startCol, endCol);
 				Imgproc.threshold(tileMat, tileMat, 127, 255, Imgproc.THRESH_OTSU);
 				tileMat.release();
 			}
@@ -119,8 +121,10 @@ public class TileThresholder implements ImageProcessor
 
 		if (display == Display.threshold)
 		{
-			Imgproc.cvtColor(buffers.getImage(), buffers.getOverlay(false), Imgproc.COLOR_GRAY2BGRA);
+			Imgproc.cvtColor(image, buffers.getOverlay(false), Imgproc.COLOR_GRAY2BGRA);
 		}
+
+		buffers.setImage(image);
 	}
 
 	@Override

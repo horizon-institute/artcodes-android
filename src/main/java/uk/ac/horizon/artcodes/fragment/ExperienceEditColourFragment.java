@@ -35,7 +35,7 @@ import uk.ac.horizon.artcodes.R;
 import uk.ac.horizon.artcodes.databinding.ExperienceEditColourBinding;
 import uk.ac.horizon.artcodes.detect.Detector;
 import uk.ac.horizon.artcodes.process.ImageProcessor;
-import uk.ac.horizon.artcodes.process.RGBFilter;
+import uk.ac.horizon.artcodes.process.RgbColourFilter;
 
 public class ExperienceEditColourFragment extends ExperienceEditFragment
 {
@@ -53,9 +53,9 @@ public class ExperienceEditColourFragment extends ExperienceEditFragment
 
 		final List<ImageProcessor> presets = new ArrayList<>();
 		// TODO presets.add(new IntensityGreyscaler());
-		presets.add(new RGBFilter(RGBFilter.Channel.red));
-		presets.add(new RGBFilter(RGBFilter.Channel.green));
-		presets.add(new RGBFilter(RGBFilter.Channel.blue));
+		presets.add(new RgbColourFilter.RgbColourFilter_MixChannelsImpl(RgbColourFilter.Channel.red));
+		presets.add(new RgbColourFilter.RgbColourFilter_MixChannelsImpl(RgbColourFilter.Channel.green));
+		presets.add(new RgbColourFilter.RgbColourFilter_MixChannelsImpl(RgbColourFilter.Channel.blue));
 
 		final Detector detector = new Detector();
 		binding.setDetector(detector);
@@ -90,9 +90,9 @@ public class ExperienceEditColourFragment extends ExperienceEditFragment
 				}
 
 				ImageProcessor processor = presets.get(position);
-				if(processor instanceof RGBFilter)
+				if(processor instanceof RgbColourFilter.RgbColourFilter_MixChannelsImpl)
 				{
-					((TextView)view).setText(((RGBFilter)processor).getChannel().toString());
+					((TextView)view).setText(((RgbColourFilter.RgbColourFilter_MixChannelsImpl)processor).getChannel().toString());
 				}
 
 

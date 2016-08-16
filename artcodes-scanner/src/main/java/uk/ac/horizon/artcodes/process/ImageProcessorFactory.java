@@ -21,11 +21,13 @@ package uk.ac.horizon.artcodes.process;
 
 import android.content.Context;
 
+import java.util.Map;
+
 import uk.ac.horizon.artcodes.detect.handler.MarkerDetectionHandler;
 import uk.ac.horizon.artcodes.model.Experience;
 
 public interface ImageProcessorFactory
 {
 	String getName();
-	ImageProcessor create(Context context, Experience experience, MarkerDetectionHandler handler);
+	ImageProcessor create(Context context, Experience experience, MarkerDetectionHandler handler, Map<String, String> args);
 }

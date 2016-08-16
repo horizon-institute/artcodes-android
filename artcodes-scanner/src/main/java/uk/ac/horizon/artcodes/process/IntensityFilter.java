@@ -19,36 +19,43 @@
 
 package uk.ac.horizon.artcodes.process;
 
-import org.opencv.core.Size;
-import org.opencv.imgproc.Imgproc;
+import android.content.Context;
+
+import org.opencv.core.Core;
 
 import java.util.List;
+import java.util.Map;
 
 import uk.ac.horizon.artcodes.detect.DetectorSetting;
 import uk.ac.horizon.artcodes.detect.ImageBuffers;
+import uk.ac.horizon.artcodes.detect.handler.MarkerDetectionHandler;
+import uk.ac.horizon.artcodes.model.Experience;
 
-public class ResizeThresholder implements ImageProcessor
+public class IntensityFilter implements ImageProcessor
 {
-	private transient int neighbourhood = 5;
+    public static class IntensityFilterFactory implements ImageProcessorFactory
+    {
+        public String getName()
+        {
+            return "intensity";
+        }
 
-	@Override
-	public void process(ImageBuffers buffers)
-	{
-		Imgproc.resize(buffers.getImageInGrey(), buffers.getImageInGrey(), new Size(540, 540));
+        public ImageProcessor create(Context context, Experience experience, MarkerDetectionHandler handler, Map<String, String> args)
+        {
+            return new IntensityFilter();
+        }
+    }
 
-		Imgproc.GaussianBlur(buffers.getImageInGrey(), buffers.getImageInGrey(), new Size(5, 5), 0);
+    @Override
+    public void process(ImageBuffers buffers)
+    {
+        // ImageBuffers implements this if needed when switching to the grey scale color space from
+        // either RGB or YUV.
+        buffers.getImageInGrey();
+    }
 
-		// TODO if (!detected)
-		//{
-		neighbourhood = (neighbourhood % 50) + 5;
-		//}
-		//Log.i(TAG, "Neighbourhood = " + neighbourhood);
-		Imgproc.adaptiveThreshold(buffers.getImageInGrey(), buffers.getImageInGrey(), 255, Imgproc.ADAPTIVE_THRESH_MEAN_C, Imgproc.THRESH_BINARY, neighbourhood, 2);
-	}
-
-	@Override
-	public void getSettings(List<DetectorSetting> settings)
-	{
-
-	}
+    @Override
+    public void getSettings(List<DetectorSetting> settings)
+    {
+    }
 }
