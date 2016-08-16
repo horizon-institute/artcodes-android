@@ -217,7 +217,7 @@ public class ArtcodeActivity extends ScannerActivity implements LoadCallback<Exp
 				}
 			});
 		}
-		else
+		/*else
 		{
 			runOnUiThread(new Runnable()
 			{
@@ -228,7 +228,7 @@ public class ArtcodeActivity extends ScannerActivity implements LoadCallback<Exp
 					progressBar.setVisibility(View.VISIBLE);
 				}
 			});
-		}
+		}*/
 	}
 
 	private MarkerHistoryViewController markerHistoryViewController = null;
