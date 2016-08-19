@@ -217,7 +217,7 @@ public class ArtcodeActivity extends ScannerActivity implements LoadCallback<Exp
 				}
 			});
 		}
-		/*else
+		else
 		{
 			runOnUiThread(new Runnable()
 			{
@@ -228,18 +228,18 @@ public class ArtcodeActivity extends ScannerActivity implements LoadCallback<Exp
 					progressBar.setVisibility(View.VISIBLE);
 				}
 			});
-		}*/
+		}
 	}
 
-	private MarkerHistoryViewController markerHistoryViewController = null;
 	@Override
 	protected ArtcodeDetector getNewDetector(Experience experience)
 	{
 		if (Feature.get(getApplicationContext(), R.bool.feature_combined_markers).isEnabled())
 		{
-			markerHistoryViewController = new MarkerHistoryViewController(this, (RelativeLayout) findViewById(R.id.thumbnailImageLayout), new Handler(Looper.getMainLooper()));
 			return new ArtcodeDetector(this, experience, new MultipleMarkerActionDetectionHandler(new ActionDetectionHandler()
 			{
+				private final MarkerHistoryViewController markerHistoryViewController = new MarkerHistoryViewController(ArtcodeActivity.this, (RelativeLayout) findViewById(R.id.thumbnailImageLayout), new Handler(Looper.getMainLooper()));
+
 				@Override
 				public void onMarkerActionDetected(Action detectedAction, Action futureAction, List<MarkerImage> detectedMarkers)
 				{

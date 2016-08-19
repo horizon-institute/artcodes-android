@@ -55,13 +55,13 @@ public class MarkerEmbeddedChecksumAreaOrderDetector extends MarkerEmbeddedCheck
 
 		public ImageProcessor create(Context context, Experience experience, MarkerDetectionHandler handler, Map<String, String> args)
 		{
-			return new MarkerEmbeddedChecksumAreaOrderDetector(context, experience, handler, args!=null&&args.containsKey("embeddedOnly"), args!=null&&args.containsKey("relaxed"));
+			return new MarkerEmbeddedChecksumAreaOrderDetector(experience, handler, args!=null&&args.containsKey("embeddedOnly"), args!=null&&args.containsKey("relaxed"));
 		}
 	}
 
-	public MarkerEmbeddedChecksumAreaOrderDetector(Context context, Experience experience, MarkerDetectionHandler handler, boolean embeddedChecksumRequired, boolean relaxed)
+	public MarkerEmbeddedChecksumAreaOrderDetector(Experience experience, MarkerDetectionHandler handler, boolean embeddedChecksumRequired, boolean relaxed)
 	{
-		super(context, experience, handler, embeddedChecksumRequired, relaxed);
+		super(experience, handler, embeddedChecksumRequired, relaxed);
 	}
 
 	protected Marker createMarkerForNode(int nodeIndex, List<MatOfPoint> contours, Mat hierarchy)

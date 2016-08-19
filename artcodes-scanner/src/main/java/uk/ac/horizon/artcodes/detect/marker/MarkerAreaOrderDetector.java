@@ -46,13 +46,13 @@ public class MarkerAreaOrderDetector extends MarkerDetector
 
 		public ImageProcessor create(Context context, Experience experience, MarkerDetectionHandler handler, Map<String, String> args)
 		{
-			return new MarkerAreaOrderDetector(context, experience, handler);
+			return new MarkerAreaOrderDetector(experience, handler);
 		}
 	}
 
-	public MarkerAreaOrderDetector(Context context, Experience experience, MarkerDetectionHandler handler)
+	public MarkerAreaOrderDetector(Experience experience, MarkerDetectionHandler handler)
 	{
-		super(context, experience, handler);
+		super(experience, handler);
 	}
 
 	@Override

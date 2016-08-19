@@ -19,7 +19,6 @@
 
 package uk.ac.horizon.artcodes.detect;
 
-import android.content.Context;
 import android.graphics.Bitmap;
 import android.util.Log;
 
@@ -41,14 +40,14 @@ public class ImageDetector
 		}
 	}
 
-	public static void detectMarkers(Bitmap image, Context context, Experience experience, MarkerDetectionHandler handler)
+	public static void detectMarkers(Bitmap image, Experience experience, MarkerDetectionHandler handler)
 	{
 		final ImageBuffers imageBuffers = new ImageBuffers();
 		imageBuffers.createBuffer(image.getWidth(), image.getHeight(), image.getByteCount() * 8);
 		imageBuffers.setImage(image);
 		final TileThresholder tileThresholder = new TileThresholder();
 		tileThresholder.process(imageBuffers);
-		final MarkerDetector markerDetector = new MarkerDetector(context, experience, handler);
+		final MarkerDetector markerDetector = new MarkerDetector(experience, handler);
 		markerDetector.process(imageBuffers);
 	}
 }

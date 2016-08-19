@@ -47,7 +47,7 @@ public class MarkerEmbeddedChecksumDetector extends MarkerDetector
 
 		public ImageProcessor create(Context context, Experience experience, MarkerDetectionHandler handler, Map<String, String> args)
 		{
-			return new MarkerEmbeddedChecksumDetector(context, experience, handler, args!=null&&args.containsKey("embeddedOnly"), args!=null&&args.containsKey("relaxed"));
+			return new MarkerEmbeddedChecksumDetector(experience, handler, args!=null&&args.containsKey("embeddedOnly"), args!=null&&args.containsKey("relaxed"));
 		}
 	}
 
@@ -55,9 +55,9 @@ public class MarkerEmbeddedChecksumDetector extends MarkerDetector
 	private boolean relaxedEmbeddedChecksumIgnoreNonHollowDots;
 	private boolean relaxedEmbeddedChecksumIgnoreMultipleHollowSegments;
 
-	public MarkerEmbeddedChecksumDetector(Context context, Experience experience, MarkerDetectionHandler handler, boolean embeddedChecksumRequired, boolean relaxed)
+	public MarkerEmbeddedChecksumDetector(Experience experience, MarkerDetectionHandler handler, boolean embeddedChecksumRequired, boolean relaxed)
 	{
-		super(context, experience, handler);
+		super(experience, handler);
 		this.embeddedChecksumRequired = embeddedChecksumRequired;
 		this.relaxedEmbeddedChecksumIgnoreNonHollowDots = this.relaxedEmbeddedChecksumIgnoreMultipleHollowSegments = relaxed;
 	}

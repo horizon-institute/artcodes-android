@@ -59,7 +59,7 @@ public class ArtcodeDetector extends Detector
 		register(new MarkerEmbeddedChecksumDetector.Factory());
 		register(new MarkerAreaOrderDetector.Factory());
 		register(new MarkerEmbeddedChecksumAreaOrderDetector.Factory());
-		
+
 		register(new TileThresholder.Factory());
 
 		register(new IntensityFilter.IntensityFilterFactory());
@@ -120,7 +120,7 @@ public class ArtcodeDetector extends Detector
 		if (pipeline.isEmpty())
 		{
 			pipeline.add(new TileThresholder());
-			pipeline.add(new MarkerDetector(context, experience, handler));
+			pipeline.add(new MarkerDetector(experience, handler));
 		}
 	}
 

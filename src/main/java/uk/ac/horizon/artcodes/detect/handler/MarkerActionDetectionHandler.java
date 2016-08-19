@@ -22,8 +22,6 @@ package uk.ac.horizon.artcodes.detect.handler;
 import android.graphics.Bitmap;
 import android.util.Log;
 
-import com.google.common.collect.Multiset;
-
 import org.opencv.android.Utils;
 import org.opencv.core.Mat;
 import org.opencv.core.MatOfPoint;
@@ -34,8 +32,6 @@ import org.opencv.imgproc.Imgproc;
 import java.util.ArrayList;
 import java.util.Collection;
 
-import uk.ac.horizon.artcodes.detect.handler.ActionDetectionHandler;
-import uk.ac.horizon.artcodes.detect.handler.MarkerCodeDetectionHandler;
 import uk.ac.horizon.artcodes.detect.marker.Marker;
 import uk.ac.horizon.artcodes.drawer.MarkerDrawer;
 import uk.ac.horizon.artcodes.model.Action;
@@ -44,101 +40,120 @@ import uk.ac.horizon.artcodes.model.MarkerImage;
 
 public class MarkerActionDetectionHandler extends MarkerCodeDetectionHandler
 {
-    protected static final int REQUIRED = 5;
-    protected static final int MAX = REQUIRED*4;
+	protected static final int REQUIRED = 5;
+	protected static final int MAX = REQUIRED;
+	// Keep displayed for 10s
+	private static final int REMAIN = 10000;
 
-    private final ActionDetectionHandler markerActionHandler;
-    private final Experience experience;
-    private final MarkerDrawer markerDrawer;
-    private Action currentAction;
+	private final ActionDetectionHandler markerActionHandler;
+	private final Experience experience;
+	private final MarkerDrawer markerDrawer;
+	private Action currentAction;
+	private long lastSeen;
 
-    public MarkerActionDetectionHandler(ActionDetectionHandler markerActionHandler, Experience experience, MarkerDrawer markerDrawer)
-    {
-        super(null);
-        this.markerActionHandler = markerActionHandler;
-        this.experience = experience;
-        this.markerDrawer = markerDrawer;
-    }
+	public MarkerActionDetectionHandler(ActionDetectionHandler markerActionHandler, Experience experience, MarkerDrawer markerDrawer)
+	{
+		super(null);
+		this.markerActionHandler = markerActionHandler;
+		this.experience = experience;
+		this.markerDrawer = markerDrawer;
+	}
 
-    @Override
-    public void onMarkersDetected(Collection<Marker> markers, ArrayList<MatOfPoint> contours, Mat hierarchy, Size sourceImageSize)
-    {
-        actOnMarkers(countMarkers(markers), markers, contours, hierarchy, sourceImageSize);
-    }
+	@Override
+	public void onMarkersDetected(Collection<Marker> markers, ArrayList<MatOfPoint> contours, Mat hierarchy, Size sourceImageSize)
+	{
+		countMarkers(markers);
+		long now = System.currentTimeMillis();
+		int best = 0;
+		Action selected = null;
+		for (Action action : this.experience.getActions())
+		{
+			if (action.getMatch() == Action.Match.any)
+			{
+				for (String code : action.getCodes())
+				{
+					int count = markerCounts.count(code);
+					if (count > best)
+					{
+						selected = action;
+						best = count;
+					}
+				}
+			}
+			else if (action.getMatch() == Action.Match.all)
+			{
+				int min = MAX;
+				int total = 0;
+				for (String code : action.getCodes())
+				{
+					int count = markerCounts.count(code);
+					min = Math.min(min, count);
+					total += (count * 2);
+				}
 
-    protected void actOnMarkers(Multiset<String> markers, Collection<Marker> markerObjects, ArrayList<MatOfPoint> contours, Mat hierarchy, Size sourceImageSize)
-    {
-        int best = 0;
-        Action selected = null;
-        for (Action action : this.experience.getActions())
-        {
-            if (action.getMatch() == Action.Match.any)
-            {
-                for (String code : action.getCodes())
-                {
-                    int count = markers.count(code);
-                    if (count > best)
-                    {
-                        selected = action;
-                        best = count;
-                    }
-                }
-            }
-            else if (action.getMatch() == Action.Match.all)
-            {
-                int min = MAX;
-                int total = 0;
-                for (String code : action.getCodes())
-                {
-                    int count = markers.count(code);
-                    min = Math.min(min, count);
-                    total += (count * 2);
-                }
+				if (min > REQUIRED && total > best)
+				{
+					best = total;
+					selected = action;
+				}
+			}
+		}
 
-                if (min > REQUIRED && total > best)
-                {
-                    best = total;
-                    selected = action;
-                }
-            }
-        }
+		if (best < REQUIRED)
+		{
+			if (currentAction != null)
+			{
+				if(now - lastSeen > REMAIN)
+				{
+					currentAction = null;
+					this.markerActionHandler.onMarkerActionDetected(null, null, null);
+				}
+			}
+		}
+		else if (selected != currentAction)
+		{
+			currentAction = selected;
+			lastSeen = now;
+			ArrayList<MarkerImage> markerImages = null;
+			if (this.markerDrawer != null)
+			{
+				Marker markerObject = null;
+				for (Marker possibleMarkerObject : markers)
+				{
+					if (possibleMarkerObject.toString().equals(currentAction.getCodes().get(0)))
+					{
+						markerObject = possibleMarkerObject;
+					}
+				}
+				if (markerObject != null)
+				{
+					final Rect boundingRect = Imgproc.boundingRect(contours.get(markerObject.markerIndex));
+					Mat thumbnailMat = this.markerDrawer.drawMarker(markerObject, contours, hierarchy, boundingRect, null);
+					Bitmap thumbnail = Bitmap.createBitmap(thumbnailMat.width(), thumbnailMat.height(), Bitmap.Config.ARGB_8888);
+					Utils.matToBitmap(thumbnailMat, thumbnail);
+					MarkerImage markerImage = new MarkerImage(markerObject.toString(), thumbnail, (float) (boundingRect.tl().x / sourceImageSize.width), (float) (boundingRect.tl().y / sourceImageSize.height), (float) (boundingRect.width / sourceImageSize.width), (float) (boundingRect.height / sourceImageSize.height));
+					markerImages = new ArrayList<>(1);
+					markerImages.add(markerImage);
 
-        if (selected == null || best < REQUIRED)
-        {
-            if (currentAction != null)
-            {
-                currentAction = null;
-                this.markerActionHandler.onMarkerActionDetected(null, null, null);
-            }
-        }
-        else if (selected != currentAction)
-        {
-            currentAction = selected;
-            ArrayList<MarkerImage> markerImages = null;
-            if (this.markerDrawer!=null)
-            {
-                Marker markerObject = null;
-                for (Marker possibleMarkerObject : markerObjects)
-                {
-                    if (possibleMarkerObject.toString().equals(currentAction.getCodes().get(0)))
-                    {
-                        markerObject = possibleMarkerObject;
-                    }
-                }
-                if (markerObject!=null)
-                {
-                    final Rect boundingRect = Imgproc.boundingRect(contours.get(markerObject.markerIndex));
-                    Mat thumbnailMat = this.markerDrawer.drawMarker(markerObject, contours, hierarchy, boundingRect, null);
-                    Bitmap thumbnail = Bitmap.createBitmap(thumbnailMat.width(), thumbnailMat.height(), Bitmap.Config.ARGB_8888);
-                    Utils.matToBitmap(thumbnailMat, thumbnail);
-                    MarkerImage markerImage = new MarkerImage(markerObject.toString(), thumbnail, (float)(boundingRect.tl().x/sourceImageSize.width), (float)(boundingRect.tl().y/sourceImageSize.height), (float)(boundingRect.width/sourceImageSize.width), (float)(boundingRect.height/sourceImageSize.height));
-                    markerImages = new ArrayList<>(1);
-                    markerImages.add(markerImage);
-
-                    Log.i("SOURCEIMG", "w"+sourceImageSize.width+" h"+sourceImageSize.height);
-                }
-            }
-            this.markerActionHandler.onMarkerActionDetected(currentAction, currentAction, markerImages);
-        }
-    }
+					Log.i("SOURCEIMG", "w" + sourceImageSize.width + " h" + sourceImageSize.height);
+				}
+			}
+			this.markerActionHandler.onMarkerActionDetected(currentAction, currentAction, markerImages);
+		}
+		else
+		{
+			for (Marker possibleMarkerObject : markers)
+			{
+				String marker = possibleMarkerObject.toString();
+				for(String code: currentAction.getCodes())
+				{
+					if(code.equals(marker))
+					{
+						lastSeen = now;
+						return;
+					}
+				}
+			}
+		}
+	}
 }

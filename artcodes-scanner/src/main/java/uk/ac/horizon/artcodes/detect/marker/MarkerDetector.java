@@ -62,7 +62,7 @@ public class MarkerDetector implements ImageProcessor
 
 		public ImageProcessor create(Context context, Experience experience, MarkerDetectionHandler handler, Map<String, String> args)
 		{
-			return new MarkerDetector(context, experience, handler);
+			return new MarkerDetector(experience, handler);
 		}
 	}
 
@@ -108,11 +108,8 @@ public class MarkerDetector implements ImageProcessor
 	private CodeDisplay codeDisplay = CodeDisplay.hidden;
 	private OutlineDisplay outlineDisplay = OutlineDisplay.none;
 
-	private Context context;
-
-	public MarkerDetector(Context context, Experience experience, MarkerDetectionHandler handler)
+	public MarkerDetector(Experience experience, MarkerDetectionHandler handler)
 	{
-		this.context = context;
 		int maxValue = 3;
 		int minRegionCount = 20;
 		int maxRegionCount = 3;

@@ -38,7 +38,6 @@ import uk.ac.horizon.artcodes.detect.marker.MarkerWithEmbeddedChecksum;
 
 public class MarkerCodeDetectionHandler implements MarkerDetectionHandler
 {
-
     protected static final int REQUIRED = 20;
     protected static final int MAX = REQUIRED * 4;
 	protected static final int OCCURRENCES = 2;
@@ -54,32 +53,27 @@ public class MarkerCodeDetectionHandler implements MarkerDetectionHandler
     @Override
     public void onMarkersDetected(Collection<Marker> markers, ArrayList<MatOfPoint> contours, Mat hierarchy, Size sourceImageSize)
     {
-        actOnMarkers(countMarkers(markers));
-    }
+        countMarkers(markers);
+	    int best = 0;
+	    String selected = null;
+	    for (String code : markerCounts.elementSet())
+	    {
+		    int count = markerCounts.count(code);
+		    if (count > best)
+		    {
+			    selected = code;
+			    best = count;
+		    }
+	    }
 
-    protected void actOnMarkers(Multiset<String> markers)
-    {
-        int best = 0;
-        String selected = null;
-        for (String code : markers.elementSet())
-        {
-            int count = markers.count(code);
-            if (count > best)
-            {
-                selected = code;
-                best = count;
-            }
-        }
-
-        if (selected != null || best >= REQUIRED)
-        {
-            this.markerCodeHandler.onMarkerCodeDetected(selected);
-        }
+	    if (selected != null || best >= REQUIRED)
+	    {
+		    this.markerCodeHandler.onMarkerCodeDetected(selected);
+	    }
     }
 
     protected Multiset<String> countMarkers(Collection<Marker> markers)
     {
-
         final Collection<String> removals = new HashSet<>(markerCounts.elementSet());
 
         for (Marker marker : markers)
