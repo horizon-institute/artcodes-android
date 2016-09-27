@@ -54,6 +54,7 @@ public class CameraView extends SurfaceView
 	private SurfaceHolder surface;
 	private int surfaceWidth;
 	private int surfaceHeight;
+	private boolean deviceNeedsManualAutoFocus = false;
 
 
 	public CameraView(Context context)
@@ -242,7 +243,7 @@ public class CameraView extends SurfaceView
 			// if FOCUS_MODE_CONTINUOUS_VIDEO is not supported flag that manual auto-focus is needed every few seconds
 			Log.w("Scanner", "Camera requires manual focussing");
 			parameters.setFocusMode(Camera.Parameters.FOCUS_MODE_AUTO);
-			//deviceNeedsManualAutoFocus = true;
+			deviceNeedsManualAutoFocus = true;
 		}
 
 		float ratioOfSurface = (float) surfaceHeight / surfaceWidth;
@@ -350,5 +351,10 @@ public class CameraView extends SurfaceView
 			}
 			camera = null;
 		}
+	}
+
+	public boolean deviceNeedsManualAutoFocus()
+	{
+		return this.deviceNeedsManualAutoFocus;
 	}
 }

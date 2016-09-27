@@ -235,6 +235,20 @@ public class ScannerActivity extends AppCompatActivity
 				getSupportActionBar().setTitle(experience.getName());
 			}
 			cameraView.setDetector(detector);
+
+			if (cameraView.deviceNeedsManualAutoFocus())
+			{
+				// tap to focus
+				View v = findViewById(R.id.thumbnailImageLayout);
+				v.setOnClickListener(new View.OnClickListener()
+				{
+					@Override
+					public void onClick(View view)
+					{
+						cameraView.focus(null);
+					}
+				});
+			}
 		}
 		else
 		{
