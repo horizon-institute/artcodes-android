@@ -104,6 +104,13 @@
                         tools:text="www.cs.nott.ac.uk"/>
                 </LinearLayout>
 
+                <Button
+                    android:id="@+id/upload_to_artcodes_co_uk_button"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:text="@string/upload_to_artcodes_co_uk"
+                    android:visibility="gone"/>
+
                 <LinearLayout
                     android:id="@+id/editableLayout"
                     android:layout_width="match_parent"

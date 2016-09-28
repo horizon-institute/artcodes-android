@@ -24,4 +24,5 @@
 	<bool name="feature_log_scanned_images">true</bool>
 	<bool name="feature_edit_colour">false</bool>
 	<bool name="feature_edit_features">false</bool>
+	<bool name="feature_upload_to_artcodes_co_uk">false</bool>
 </resources>

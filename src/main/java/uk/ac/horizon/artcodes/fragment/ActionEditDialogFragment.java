@@ -22,6 +22,7 @@ package uk.ac.horizon.artcodes.fragment;
 import android.app.Activity;
 import android.app.Dialog;
 import android.content.Intent;
+import android.net.Uri;
 import android.os.Bundle;
 import android.support.annotation.NonNull;
 import android.support.v4.app.DialogFragment;
@@ -33,6 +34,7 @@ import android.widget.AdapterView;
 import android.widget.ArrayAdapter;
 
 import java.util.Collections;
+import java.util.UUID;
 
 import uk.ac.horizon.artcodes.Feature;
 import uk.ac.horizon.artcodes.R;
@@ -190,6 +192,28 @@ public class ActionEditDialogFragment extends DialogFragment
 			binding.matchSpinner.setVisibility(View.VISIBLE);
 		}
 
+		// Upload to artcodes.co.uk feature button:
+		if (Feature.get(getContext(), R.bool.feature_upload_to_artcodes_co_uk).isEnabled())
+		{
+			binding.uploadToArtcodesCoUkButton.setOnClickListener(new View.OnClickListener()
+			{
+				@Override
+				public void onClick(View view)
+				{
+					UUID uuid = UUID.randomUUID();
+					String url = "http://www.artcodes.co.uk/test1234/?file=A"+uuid.toString()+"&source=artcodes-android-app";
+
+					getAction().setUrl(url);
+					updateAction();
+
+					Intent intent = new Intent();
+					intent.setAction(Intent.ACTION_VIEW);
+					intent.setData(Uri.parse(url+"&dontCheckForFiles"));
+					startActivity(intent);
+				}
+			});
+			binding.uploadToArtcodesCoUkButton.setVisibility(View.VISIBLE);
+		}
 		return dialog;
 	}
 
