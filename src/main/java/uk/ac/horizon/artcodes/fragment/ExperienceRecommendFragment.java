@@ -58,20 +58,24 @@ public class ExperienceRecommendFragment extends ArtcodeFragmentBase
 	}
 
 	@Override
+	public void onStart()
+	{
+		super.onStart();
+
+		if (ContextCompat.checkSelfPermission(getContext(), Manifest.permission.ACCESS_FINE_LOCATION) != PackageManager.PERMISSION_GRANTED)
+		{
+			requestPermissions(new String[]{Manifest.permission.ACCESS_FINE_LOCATION}, LOCATION_PERMISSION_REQUEST);
+		}
+	}
+
+	@Override
 	public void onResume()
 	{
 		super.onResume();
 		GoogleAnalytics.trackScreen("View Recommended");
 		getActivity().setTitle(R.string.nav_home);
 
-		if (ContextCompat.checkSelfPermission(getContext(), Manifest.permission.ACCESS_FINE_LOCATION) == PackageManager.PERMISSION_GRANTED)
-		{
-			loadExperiences();
-		}
-		else
-		{
-			requestPermissions(new String[]{Manifest.permission.ACCESS_FINE_LOCATION}, LOCATION_PERMISSION_REQUEST);
-		}
+		loadExperiences();
 	}
 
 	@Override
@@ -150,7 +154,6 @@ public class ExperienceRecommendFragment extends ArtcodeFragmentBase
 		else
 		{
 			Log.i("location", "No location permission");
-
 		}
 		return null;
 	}
