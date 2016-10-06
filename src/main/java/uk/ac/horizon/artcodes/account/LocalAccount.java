@@ -87,6 +87,11 @@ public class LocalAccount implements Account
 	@Override
 	public void saveExperience(final Experience experience)
 	{
+		this.saveExperience(experience, null);
+	}
+	@Override
+	public void saveExperience(final Experience experience, final AccountProcessCallback saveCallback)
+	{
 		try
 		{
 			File file;
@@ -114,9 +119,18 @@ public class LocalAccount implements Account
 					.putString(experience.getId(), getId())
 					.apply();
 			Log.i("local", experience.getId() + " = " + getId());
+
+			if (saveCallback!=null)
+			{
+				saveCallback.accountProcessCallback(true, experience);
+			}
 		}
 		catch (Exception e)
 		{
+			if (saveCallback!=null)
+			{
+				saveCallback.accountProcessCallback(false, null);
+			}
 			GoogleAnalytics.trackException(e);
 		}
 	}
@@ -217,17 +231,28 @@ public class LocalAccount implements Account
 
 	public void deleteExperience(Experience experience)
 	{
+		this.deleteExperience(experience, null);
+	}
+	public void deleteExperience(Experience experience, Account.AccountProcessCallback accountProcessCallback)
+	{
+		boolean success = true;
 		try
 		{
 			File file = new File(URI.create(experience.getId()));
 			if (!file.delete())
 			{
 				Log.w("local", "Experience " + experience.getId() + " not deleted");
+				success = false;
 			}
 		}
 		catch (Exception e)
 		{
 			GoogleAnalytics.trackException(e);
+			success = false;
+		}
+		if (accountProcessCallback!=null)
+		{
+			accountProcessCallback.accountProcessCallback(success, null);
 		}
 	}
 

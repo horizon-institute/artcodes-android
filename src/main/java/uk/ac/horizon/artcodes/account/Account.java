@@ -32,8 +32,10 @@ public interface Account
 	void loadLibrary(LoadCallback<List<String>> callback);
 
 	void saveExperience(Experience experience);
+	void saveExperience(Experience experience, AccountProcessCallback saveCallback);
 
 	void deleteExperience(Experience experience);
+	void deleteExperience(Experience experience, AccountProcessCallback saveCallback);
 
 	String getId();
 
@@ -52,4 +54,13 @@ public interface Account
 	boolean validates() throws UserRecoverableAuthException;
 
 	boolean load(String uri, URILoaderCallback callback);
+
+	interface AccountProcessCallback
+	{
+		/**
+		 * @param success if the process was a success (e.g. file uploaded).
+         * @param experience The created resource, can be null.
+         */
+		void accountProcessCallback(boolean success, Experience experience);
+	}
 }

@@ -22,7 +22,6 @@ package uk.ac.horizon.artcodes.adapter;
 import android.content.Context;
 import android.support.v7.util.SortedList;
 import android.support.v7.widget.util.SortedListAdapterCallback;
-import android.text.TextUtils;
 
 import com.google.common.collect.Ordering;
 
@@ -47,13 +46,13 @@ public class ExperienceSortedListAdapter extends ExperienceAdapter
 			@Override
 			public boolean areContentsTheSame(Experience oldItem, Experience newItem)
 			{
-				return TextUtils.equals(oldItem.getId(), newItem.getId());
+				return oldItem.equals(newItem);
 			}
 
 			@Override
 			public boolean areItemsTheSame(Experience item1, Experience item2)
 			{
-				return TextUtils.equals(item1.getId(), item2.getId());
+				return item1.equals(item2);
 			}
 
 			@Override
@@ -84,16 +83,52 @@ public class ExperienceSortedListAdapter extends ExperienceAdapter
 	@Override
 	public void loaded(final List<String> item)
 	{
+		synchronized (experiences)
+		{
+			for (int i = 0; i < experiences.size(); ++i)
+			{
+				Experience e = experiences.get(i);
+				if (!item.contains(e.getId()))
+				{
+					experiences.remove(e);
+					--i;
+				}
+			}
+		}
+
 		for (String uri : item)
 		{
 			loadStarted();
+
 			server.loadExperience(uri, new LoadCallback<Experience>()
 			{
 				@Override
 				public void loaded(Experience item)
 				{
 					loadFinished();
-					experiences.add(item);
+					synchronized (experiences)
+					{
+						int index = -1;
+						for (int i=0; i<experiences.size(); ++i)
+						{
+							if (item.equals(experiences.get(i)))
+							{
+								index = i;
+								break;
+							}
+						}
+						// experiences.indexOf(item) seems to be buggy.
+						if (index > -1)
+						{
+							// experiences.updateItemAt() is ignored if a.equals(b)
+							experiences.removeItemAt(index);
+							experiences.add(item);
+						}
+						else
+						{
+							experiences.add(item);
+						}
+					}
 				}
 
 				@Override
@@ -104,6 +139,7 @@ public class ExperienceSortedListAdapter extends ExperienceAdapter
 				}
 			});
 		}
+
 		loadFinished();
 	}
 }

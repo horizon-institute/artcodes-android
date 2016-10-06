@@ -35,7 +35,10 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.UUID;
+import java.util.concurrent.ConcurrentHashMap;
+import java.util.concurrent.TimeUnit;
 
+import okhttp3.CacheControl;
 import okhttp3.FormBody;
 import okhttp3.Headers;
 import okhttp3.Request;
@@ -51,6 +54,9 @@ import uk.ac.horizon.artcodes.server.URILoaderCallback;
 
 public class AppEngineAccount implements Account
 {
+	private boolean numberOfExperiencesHasChangedHint = false;
+	private Map<String,Object> experienceUrlsThatHaveChangedHint = new ConcurrentHashMap<>();
+
 	static final String appSavePrefix = "appSaveID:";
 	private static final String httpRoot = "http://aestheticodes.appspot.com/";
 	private static final String httpsRoot = "https://aestheticodes.appspot.com/";
@@ -147,11 +153,29 @@ public class AppEngineAccount implements Account
 				{
 					try
 					{
+						CacheControl cc;
+						if (numberOfExperiencesHasChangedHint && uri.equals("https://aestheticodes.appspot.com/experiences"))
+						{
+							numberOfExperiencesHasChangedHint = false;
+							cc = CacheControl.FORCE_NETWORK;
+						}
+						else if (experienceUrlsThatHaveChangedHint.containsKey(uri))
+						{
+							experienceUrlsThatHaveChangedHint.remove(uri);
+							cc = CacheControl.FORCE_NETWORK;
+						}
+						else
+						{
+							cc = new CacheControl.Builder().maxAge(5, TimeUnit.MINUTES).build();
+						}
+
 						String url = uri.replace(httpRoot, httpsRoot);
+
 						final Request request = new Request.Builder()
 								.get()
 								.url(url)
 								.headers(getHeaders())
+								.cacheControl(cc)
 								.build();
 
 						final Response response = Artcodes.httpClient.newCall(request).execute();
@@ -171,14 +195,26 @@ public class AppEngineAccount implements Account
 		return false;
 	}
 
+
 	@Override
 	public void saveExperience(final Experience experience)
+	{
+		this.saveExperience(experience, null);
+	}
+
+	@Override
+	public void saveExperience(final Experience experience, final AccountProcessCallback saveCallback)
 	{
 		if (experience.getId() == null)
 		{
 			experience.setId(appSavePrefix + UUID.randomUUID().toString());
+			this.numberOfExperiencesHasChangedHint = true;
 		}
-		AppEngineUploadThread uploadThread = new AppEngineUploadThread(this, experience);
+		else
+		{
+			this.experienceUrlsThatHaveChangedHint.put(experience.getId(), new Object());
+		}
+		AppEngineUploadThread uploadThread = new AppEngineUploadThread(this, experience, saveCallback);
 		uploadThreads.put(experience.getId(), uploadThread);
 		uploadThread.start();
 	}
@@ -186,15 +222,26 @@ public class AppEngineAccount implements Account
 	@Override
 	public void deleteExperience(final Experience experience)
 	{
+		this.deleteExperience(experience, null);
+	}
+	@Override
+	public void deleteExperience(final Experience experience, final Account.AccountProcessCallback accountProcessCallback)
+	{
 		if (!canEdit(experience.getId()))
 		{
+			if (accountProcessCallback != null)
+			{
+				accountProcessCallback.accountProcessCallback(false, null);
+			}
 			return;
 		}
+		this.numberOfExperiencesHasChangedHint = true;
 		new Thread(new Runnable()
 		{
 			@Override
 			public void run()
 			{
+				boolean success = true;
 				try
 				{
 					final Request request = new Request.Builder()
@@ -208,7 +255,13 @@ public class AppEngineAccount implements Account
 				}
 				catch (Exception e)
 				{
+					success = false;
 					GoogleAnalytics.trackException(e);
+				}
+
+				if (accountProcessCallback != null)
+				{
+					accountProcessCallback.accountProcessCallback(success, null);
 				}
 			}
 		}).start();

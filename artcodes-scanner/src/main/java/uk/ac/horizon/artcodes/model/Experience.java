@@ -157,4 +157,15 @@ public class Experience
 		}
 		return false;
 	}
+
+	public boolean equals(Experience other)
+	{
+		return (this.getId()!=null && this.getId().equals(other.getId())) || this==other;
+	}
+
+	@Override
+	public int hashCode()
+	{
+		return this.getId()!=null ? this.getId().hashCode() : 0;
+	}
 }

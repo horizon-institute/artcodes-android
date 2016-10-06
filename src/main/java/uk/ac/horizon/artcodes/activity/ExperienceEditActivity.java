@@ -19,6 +19,8 @@
 
 package uk.ac.horizon.artcodes.activity;
 
+import android.app.Activity;
+import android.app.ProgressDialog;
 import android.content.Context;
 import android.content.DialogInterface;
 import android.content.Intent;
@@ -117,9 +119,49 @@ public class ExperienceEditActivity extends ExperienceActivityBase
 
 	public void saveExperience(View view)
 	{
-		Experience experience = getExperience();
-		getAccount().saveExperience(experience);
-		NavUtils.navigateUpTo(this, ExperienceActivity.intent(this, experience));
+		final Experience experience = getExperience();
+		final boolean isNew = experience.getId() == null;
+		final Activity activity = this;
+		final ProgressDialog dialog = ProgressDialog.show(activity, getResources().getString(R.string.saving_progress_dialog_title), getResources().getString(R.string.saving_progress_dialog_message), true);
+		getAccount().saveExperience(experience, new Account.AccountProcessCallback() {
+			@Override
+			public void accountProcessCallback(boolean success, Experience savedExperience)
+			{
+				dialog.dismiss();
+				if (success)
+				{
+					if (isNew)
+					{
+						Intent intent = ExperienceActivity.intent(activity, savedExperience);
+						startActivity(intent);
+						activity.finish();
+					}
+					else
+					{
+						NavUtils.navigateUpTo(activity, ExperienceActivity.intent(activity, experience));
+					}
+				}
+				else
+				{
+					runOnUiThread(new Runnable()
+					{
+						@Override
+						public void run()
+						{
+							new AlertDialog.Builder(activity)
+									.setTitle(R.string.saving_error_title)
+									.setMessage(R.string.saving_error_message)
+									.setPositiveButton(R.string.saving_error_button, new DialogInterface.OnClickListener() {
+										public void onClick(DialogInterface dialog, int which) {
+											dialog.dismiss();
+										}
+									})
+									.show();
+						}
+					});
+				}
+			}
+		});
 	}
 
 	public void editIcon(View view)
@@ -214,14 +256,45 @@ public class ExperienceEditActivity extends ExperienceActivityBase
 
 	public void deleteExperience(View view)
 	{
+		final Activity activity = this;
 		new AlertDialog.Builder(this)
 				.setMessage(getString(R.string.experienceDeleteConfirm, getExperience().getName()))
 				.setPositiveButton(R.string.delete, new DialogInterface.OnClickListener()
 				{
 					public void onClick(DialogInterface dialog, int whichButton)
 					{
-						getAccount().deleteExperience(getExperience());
-						NavUtils.navigateUpTo(ExperienceEditActivity.this, new Intent(ExperienceEditActivity.this, NavigationActivity.class));
+						final ProgressDialog progressDialog = ProgressDialog.show(activity, getResources().getString(R.string.delete_progress_dialog_title), getResources().getString(R.string.delete_progress_dialog_message), true);
+
+						getAccount().deleteExperience(getExperience(), new Account.AccountProcessCallback() {
+							@Override
+							public void accountProcessCallback(boolean success, Experience experience)
+							{
+								progressDialog.dismiss();
+								if (success)
+								{
+									NavUtils.navigateUpTo(ExperienceEditActivity.this, new Intent(ExperienceEditActivity.this, NavigationActivity.class));
+								}
+								else
+								{
+									runOnUiThread(new Runnable()
+									{
+										@Override
+										public void run()
+										{
+											new AlertDialog.Builder(activity)
+													.setTitle(R.string.delete_error_title)
+													.setMessage(R.string.delete_error_message)
+													.setPositiveButton(R.string.delete_error_button, new DialogInterface.OnClickListener() {
+														public void onClick(DialogInterface dialog, int which) {
+															dialog.dismiss();
+														}
+													})
+													.show();
+										}
+									});
+								}
+							}
+						});
 					}
 				})
 				.setNegativeButton(android.R.string.cancel, null).show();

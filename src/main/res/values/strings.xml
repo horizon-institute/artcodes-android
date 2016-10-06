@@ -130,4 +130,18 @@
     <string name="next">Next</string>
     <string name="original_experience">Original Experience</string>
 	<string name="upload_to_artcodes_co_uk">..or upload to Artcodes.co.uk</string>
+
+	<string name="saving_progress_dialog_title">Saving</string>
+	<string name="saving_progress_dialog_message">Please wait...</string>
+
+	<string name="saving_error_title">Error</string>
+	<string name="saving_error_message">Could not save changes, please check your internet connection.</string>
+	<string name="saving_error_button">OK</string>
+
+	<string name="delete_progress_dialog_title">Deleting</string>
+	<string name="delete_progress_dialog_message">Please wait...</string>
+
+	<string name="delete_error_title">Error</string>
+	<string name="delete_error_message">Could not delete experience, please check your internet connection.</string>
+	<string name="delete_error_button">OK</string>
 </resources>

@@ -44,6 +44,7 @@ class AppEngineUploadThread extends Thread
 	private static final MediaType MEDIA_TYPE_JSON = MediaType.parse("application/json; charset=utf-8");
 
 	private final Experience experience;
+	private final Account.AccountProcessCallback saveCallback;
 	private final AppEngineAccount account;
 	private boolean finished = false;
 
@@ -51,11 +52,20 @@ class AppEngineUploadThread extends Thread
 	{
 		this.account = account;
 		this.experience = experience;
+		this.saveCallback = null;
+	}
+	public AppEngineUploadThread(AppEngineAccount account, Experience experience, Account.AccountProcessCallback saveCallback)
+	{
+		this.account = account;
+		this.experience = experience;
+		this.saveCallback = saveCallback;
 	}
 
 	@Override
 	public void run()
 	{
+		boolean success = true;
+		Experience saved = null;
 		try
 		{
 			final File tempFile = createTempFile(experience.getId());
@@ -97,7 +107,7 @@ class AppEngineUploadThread extends Thread
 			final Response response = Artcodes.httpClient.newCall(request).execute();
 
 			account.validateResponse(request, response);
-			Experience saved = account.getGson().fromJson(response.body().charStream(), Experience.class);
+			saved = account.getGson().fromJson(response.body().charStream(), Experience.class);
 			response.body().close();
 
 			account.getContext()
@@ -117,8 +127,13 @@ class AppEngineUploadThread extends Thread
 		catch (Exception e)
 		{
 			GoogleAnalytics.trackException(e);
+			success = false;
 		}
 		finished = true;
+		if (this.saveCallback!=null)
+		{
+			this.saveCallback.accountProcessCallback(success, saved);
+		}
 	}
 
 	public boolean isFinished()
