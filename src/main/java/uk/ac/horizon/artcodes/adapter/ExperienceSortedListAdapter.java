@@ -25,6 +25,9 @@ import android.support.v7.widget.util.SortedListAdapterCallback;
 
 import com.google.common.collect.Ordering;
 
+import java.util.ArrayList;
+import java.util.Collections;
+import java.util.Comparator;
 import java.util.List;
 
 import uk.ac.horizon.artcodes.R;
@@ -81,14 +84,21 @@ public class ExperienceSortedListAdapter extends ExperienceAdapter
 	}
 
 	@Override
-	public void loaded(final List<String> item)
+	public void loaded(final List<String> items)
 	{
+		// If this adapter is empty, wait for all experiences to load before adding to adapter.
+		// This is because if the experiences are added in non-alphabetical order the user can
+		// be left in the middle of the list rather than the start.
+		final boolean batchUpdate = experiences.size() == 0;
+		final List<Experience> experiencesToBatchUpdate = new ArrayList<>();
+		final int[] count = {0};
+
 		synchronized (experiences)
 		{
 			for (int i = 0; i < experiences.size(); ++i)
 			{
 				Experience e = experiences.get(i);
-				if (!item.contains(e.getId()))
+				if (!items.contains(e.getId()))
 				{
 					experiences.remove(e);
 					--i;
@@ -96,37 +106,61 @@ public class ExperienceSortedListAdapter extends ExperienceAdapter
 			}
 		}
 
-		for (String uri : item)
+		for (String uri : items)
 		{
 			loadStarted();
 
 			server.loadExperience(uri, new LoadCallback<Experience>()
 			{
 				@Override
-				public void loaded(Experience item)
+				public void loaded(Experience experience)
 				{
 					loadFinished();
 					synchronized (experiences)
 					{
-						int index = -1;
-						for (int i=0; i<experiences.size(); ++i)
+						if (batchUpdate)
 						{
-							if (item.equals(experiences.get(i)))
+							experiencesToBatchUpdate.add(experience);
+							if (++count[0] == items.size())
 							{
-								index = i;
-								break;
+								Collections.sort(experiencesToBatchUpdate, new Comparator<Experience>()
+								{
+									@Override
+									public int compare(Experience experience1, Experience experience2)
+									{
+										return (experience1.getName()==null ? "" : experience1.getName()).compareTo(experience2.getName()==null ? "" : experience2.getName());
+									}
+								});
+								for (Experience experienceFromBatchUpdate : experiencesToBatchUpdate)
+								{
+									experiences.add(experienceFromBatchUpdate);
+								}
+								experiencesToBatchUpdate.clear();
+								count[0] = 0;
 							}
-						}
-						// experiences.indexOf(item) seems to be buggy.
-						if (index > -1)
-						{
-							// experiences.updateItemAt() is ignored if a.equals(b)
-							experiences.removeItemAt(index);
-							experiences.add(item);
 						}
 						else
 						{
-							experiences.add(item);
+							int index = -1;
+							for (int i = 0; i < experiences.size(); ++i)
+							{
+								if (experience.equals(experiences.get(i)))
+								{
+									index = i;
+									break;
+								}
+							}
+							// experiences.indexOf(item) seems to be buggy.
+							if (index > -1)
+							{
+								// experiences.updateItemAt() is ignored if a.equals(b)
+								experiences.removeItemAt(index);
+								experiences.add(experience);
+							}
+							else
+							{
+								experiences.add(experience);
+							}
 						}
 					}
 				}
@@ -136,6 +170,14 @@ public class ExperienceSortedListAdapter extends ExperienceAdapter
 				{
 					loadFinished();
 					showError(context.getString(R.string.connection_error));
+
+					if (batchUpdate && ++count[0] == items.size())
+					{
+						for (Experience experienceFromBatchUpdate : experiencesToBatchUpdate)
+						{
+							experiences.add(experienceFromBatchUpdate);
+						}
+					}
 				}
 			});
 		}
