@@ -53,6 +53,8 @@ import uk.ac.horizon.artcodes.scanner.R;
 public class MarkerDetector implements ImageProcessor
 {
 
+	private Experience experience;
+
 	public static class Factory implements ImageProcessorFactory
 	{
 		public String getName()
@@ -110,6 +112,7 @@ public class MarkerDetector implements ImageProcessor
 
 	public MarkerDetector(Experience experience, MarkerDetectionHandler handler)
 	{
+		this.experience = experience;
 		int maxValue = 3;
 		int minRegionCount = 20;
 		int maxRegionCount = 3;
@@ -203,6 +206,18 @@ public class MarkerDetector implements ImageProcessor
 					final String markerCode = getCodeKey(marker);
 					if (validCodes.isEmpty() || validCodes.contains(markerCode))
 					{
+						// If this marker has a minimum size set and is smaller: continue in loop.
+						Action action = experience.getActionForCode(markerCode);
+						if (action != null && action.getMinimumSize() != null)
+						{
+							double minimumSize = action.getMinimumSize();
+							Rect boundingRect = Imgproc.boundingRect(contours.get(i));
+							if (!(boundingRect.width/(float) buffers.getImageInAnyFormat().cols() > minimumSize || boundingRect.height/(float) buffers.getImageInAnyFormat().rows() > minimumSize))
+							{
+								continue;
+							}
+						}
+
 						foundMarkers.add(marker);
 
 						if (outlineDisplay != OutlineDisplay.none)

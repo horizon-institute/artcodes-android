@@ -31,22 +31,23 @@ import java.util.ArrayList;
 import java.util.Collection;
 import java.util.HashSet;
 
-import uk.ac.horizon.artcodes.detect.handler.CodeDetectionHandler;
-import uk.ac.horizon.artcodes.detect.handler.MarkerDetectionHandler;
 import uk.ac.horizon.artcodes.detect.marker.Marker;
-import uk.ac.horizon.artcodes.detect.marker.MarkerWithEmbeddedChecksum;
+import uk.ac.horizon.artcodes.model.Action;
+import uk.ac.horizon.artcodes.model.Experience;
 
 public class MarkerCodeDetectionHandler implements MarkerDetectionHandler
 {
     protected static final int REQUIRED = 20;
-    protected static final int MAX = REQUIRED * 4;
+    protected static final int MAX_MULTIPLIER = 4;
 	protected static final int OCCURRENCES = 2;
 
     protected final Multiset<String> markerCounts = HashMultiset.create();
+    private Experience experience;
     private final CodeDetectionHandler markerCodeHandler;
 
-    public MarkerCodeDetectionHandler(CodeDetectionHandler markerCodeHandler)
+    public MarkerCodeDetectionHandler(Experience experience, CodeDetectionHandler markerCodeHandler)
     {
+        this.experience = experience;
         this.markerCodeHandler = markerCodeHandler;
     }
 
@@ -66,7 +67,7 @@ public class MarkerCodeDetectionHandler implements MarkerDetectionHandler
 		    }
 	    }
 
-	    if (selected != null || best >= REQUIRED)
+	    if (selected != null || best >= this.requiredFor(selected))
 	    {
 		    this.markerCodeHandler.onMarkerCodeDetected(selected);
 	    }
@@ -80,25 +81,50 @@ public class MarkerCodeDetectionHandler implements MarkerDetectionHandler
         {
             final String markerCode = marker.toString();
             final int count = markerCounts.count(markerCode);
-            if (count > MAX)
+            int max = maxFor(markerCode);
+            if (count > max)
             {
-                markerCounts.setCount(markerCode, MAX);
+                markerCounts.setCount(markerCode, max);
             }
 
             //increase occurrence if this marker is already in the list.
-            if (marker instanceof MarkerWithEmbeddedChecksum)
-            {
-                markerCounts.add(markerCode, REQUIRED-1);
-            }
-            else
-            {
-                markerCounts.add(markerCode, OCCURRENCES);
-            }
+            markerCounts.add(markerCode, this.awardFor(markerCode));
             removals.remove(markerCode);
         }
 
 	    Multisets.removeOccurrences(markerCounts, removals);
 
         return markerCounts;
+    }
+
+    private int awardFor(String code)
+    {
+        if (this.experience != null)
+        {
+            Action action = this.experience.getActionForCode(code);
+            if (action != null && action.getFramesAwarded() != null)
+            {
+                return action.getFramesAwarded();
+            }
+        }
+        return OCCURRENCES;
+    }
+
+    private int requiredFor(String code)
+    {
+        if (this.experience != null)
+        {
+            Action action = this.experience.getActionForCode(code);
+            if (action != null && action.getFramesRequired() != null)
+            {
+                return action.getFramesRequired();
+            }
+        }
+        return REQUIRED;
+    }
+
+    private int maxFor(String code)
+    {
+        return this.requiredFor(code) * MAX_MULTIPLIER;
     }
 }

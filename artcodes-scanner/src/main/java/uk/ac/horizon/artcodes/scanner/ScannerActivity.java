@@ -375,7 +375,7 @@ public class ScannerActivity extends AppCompatActivity
 
 	protected ArtcodeDetector getNewDetector(Experience experience)
 	{
-		return new ArtcodeDetector(this, experience, new MarkerCodeDetectionHandler(new CodeDetectionHandler()
+		return new ArtcodeDetector(this, experience, new MarkerCodeDetectionHandler(this.experience, new CodeDetectionHandler()
 		{
 			@Override
 			public void onMarkerCodeDetected(String code)

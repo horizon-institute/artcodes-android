@@ -39,6 +39,10 @@ public class Action
 	private String owner;
 	//private boolean showDetail = false;
 
+	private Integer framesRequired;
+	private Integer framesAwarded;
+	private Double minimumSize;
+
 	public List<String> getCodes()
 	{
 		return codes;
@@ -152,5 +156,35 @@ public class Action
 		}
 		builder.append(")");
 		return builder.toString();
+	}
+
+	public Integer getFramesRequired()
+	{
+		return framesRequired;
+	}
+
+	public void setFramesRequired(Integer framesRequired)
+	{
+		this.framesRequired = framesRequired;
+	}
+
+	public Integer getFramesAwarded()
+	{
+		return framesAwarded;
+	}
+
+	public void setFramesAwarded(Integer framesAwarded)
+	{
+		this.framesAwarded = framesAwarded;
+	}
+
+	public Double getMinimumSize()
+	{
+		return minimumSize;
+	}
+
+	public void setMinimumSize(Double minimumSize)
+	{
+		this.minimumSize = minimumSize;
 	}
 }

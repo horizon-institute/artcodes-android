@@ -168,4 +168,19 @@ public class Experience
 	{
 		return this.getId()!=null ? this.getId().hashCode() : 0;
 	}
+
+	public Action getActionForCode(String code)
+	{
+		for (Action action : this.getActions())
+		{
+			for (String codeFromAction : action.getCodes())
+			{
+				if (code.equals(codeFromAction))
+				{
+					return action;
+				}
+			}
+		}
+		return null;
+	}
 }

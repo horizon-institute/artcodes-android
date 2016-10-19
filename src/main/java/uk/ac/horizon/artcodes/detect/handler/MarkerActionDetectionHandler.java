@@ -53,7 +53,7 @@ public class MarkerActionDetectionHandler extends MarkerCodeDetectionHandler
 
 	public MarkerActionDetectionHandler(ActionDetectionHandler markerActionHandler, Experience experience, MarkerDrawer markerDrawer)
 	{
-		super(null);
+		super(experience, null);
 		this.markerActionHandler = markerActionHandler;
 		this.experience = experience;
 		this.markerDrawer = markerDrawer;
