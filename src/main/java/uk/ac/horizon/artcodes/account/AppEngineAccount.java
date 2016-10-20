@@ -39,10 +39,8 @@ import java.util.concurrent.ConcurrentHashMap;
 import java.util.concurrent.TimeUnit;
 
 import okhttp3.CacheControl;
-import okhttp3.FormBody;
 import okhttp3.Headers;
 import okhttp3.Request;
-import okhttp3.RequestBody;
 import okhttp3.Response;
 import uk.ac.horizon.artcodes.Artcodes;
 import uk.ac.horizon.artcodes.GoogleAnalytics;
@@ -55,7 +53,7 @@ import uk.ac.horizon.artcodes.server.URILoaderCallback;
 public class AppEngineAccount implements Account
 {
 	private boolean numberOfExperiencesHasChangedHint = false;
-	private Map<String,Object> experienceUrlsThatHaveChangedHint = new ConcurrentHashMap<>();
+	private Map<String, Object> experienceUrlsThatHaveChangedHint = new ConcurrentHashMap<>();
 
 	static final String appSavePrefix = "appSaveID:";
 	private static final String httpRoot = "http://aestheticodes.appspot.com/";
@@ -224,6 +222,7 @@ public class AppEngineAccount implements Account
 	{
 		this.deleteExperience(experience, null);
 	}
+
 	@Override
 	public void deleteExperience(final Experience experience, final Account.AccountProcessCallback accountProcessCallback)
 	{
@@ -310,42 +309,6 @@ public class AppEngineAccount implements Account
 		catch (Exception e)
 		{
 			GoogleAnalytics.trackException(e);
-		}
-		return false;
-	}
-
-	@Override
-	public boolean logScan(final String uri)
-	{
-		if (uri != null && (uri.startsWith("http:") || (uri.startsWith("https:"))))
-		{
-			new Thread(new Runnable()
-			{
-				@Override
-				public void run()
-				{
-					try
-					{
-						final RequestBody body = new FormBody.Builder()
-								.add("experience", uri)
-								.build();
-
-						final Request request = new Request.Builder()
-								.post(body)
-								.url("https://aestheticodes.appspot.com/interaction")
-								.headers(getHeaders())
-								.build();
-
-						final Response response = Artcodes.httpClient.newCall(request).execute();
-						validateResponse(request, response);
-					}
-					catch (Exception e)
-					{
-						GoogleAnalytics.trackException(e);
-					}
-				}
-			}).start();
-			return true;
 		}
 		return false;
 	}

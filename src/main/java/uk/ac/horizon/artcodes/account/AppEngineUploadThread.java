@@ -48,13 +48,7 @@ class AppEngineUploadThread extends Thread
 	private final AppEngineAccount account;
 	private boolean finished = false;
 
-	public AppEngineUploadThread(AppEngineAccount account, Experience experience)
-	{
-		this.account = account;
-		this.experience = experience;
-		this.saveCallback = null;
-	}
-	public AppEngineUploadThread(AppEngineAccount account, Experience experience, Account.AccountProcessCallback saveCallback)
+	AppEngineUploadThread(AppEngineAccount account, Experience experience, Account.AccountProcessCallback saveCallback)
 	{
 		this.account = account;
 		this.experience = experience;
@@ -130,7 +124,7 @@ class AppEngineUploadThread extends Thread
 			success = false;
 		}
 		finished = true;
-		if (this.saveCallback!=null)
+		if (this.saveCallback != null)
 		{
 			this.saveCallback.accountProcessCallback(success, saved);
 		}

@@ -32,8 +32,13 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
 
+import okhttp3.FormBody;
+import okhttp3.Request;
+import okhttp3.RequestBody;
+import uk.ac.horizon.artcodes.Artcodes;
 import uk.ac.horizon.artcodes.ExperienceParser;
 import uk.ac.horizon.artcodes.Feature;
+import uk.ac.horizon.artcodes.GoogleAnalytics;
 import uk.ac.horizon.artcodes.R;
 import uk.ac.horizon.artcodes.account.Account;
 import uk.ac.horizon.artcodes.account.AppEngineAccount;
@@ -63,7 +68,7 @@ public class AppEngineServer implements ArtcodeServer
 
 		if (!accountIDs.contains("local"))
 		{
-			if(Feature.get(context, R.bool.feature_show_local).isEnabled())
+			if (Feature.get(context, R.bool.feature_show_local).isEnabled())
 			{
 				accountIDs.add("local");
 				saveIDs(Account.class, accounts_tag, accountIDs);
@@ -73,7 +78,7 @@ public class AppEngineServer implements ArtcodeServer
 		for (String accountID : accountIDs)
 		{
 			Account account = createAccount(accountID);
-			if(account != null)
+			if (account != null)
 			{
 				accounts.add(account);
 			}
@@ -89,7 +94,7 @@ public class AppEngineServer implements ArtcodeServer
 		}
 		else if (id.equals("local"))
 		{
-			if(Feature.get(context, R.bool.feature_show_local).isEnabled())
+			if (Feature.get(context, R.bool.feature_show_local).isEnabled())
 			{
 				return localAccount;
 			}
@@ -185,14 +190,14 @@ public class AppEngineServer implements ArtcodeServer
 		}.getType());
 
 		// Only log scan event if an identical scan hasn't happened recently
-		if(!history.isEmpty())
+		if (!history.isEmpty())
 		{
 			final ScanEvent lastEvent = history.get(history.size() - 1);
-			if(System.currentTimeMillis() - lastEvent.getTimestamp() < 1000)
+			if (System.currentTimeMillis() - lastEvent.getTimestamp() < 1000)
 			{
 				String lastAction = gson.toJson(lastEvent.getAction());
 				String currentAction = gson.toJson(action);
-				if(currentAction.equals(lastAction))
+				if (currentAction.equals(lastAction))
 				{
 					return;
 				}
@@ -203,12 +208,34 @@ public class AppEngineServer implements ArtcodeServer
 
 		preferences.edit().putString(uri, gson.toJson(history)).apply();
 
-		for (Account account : accounts)
+		if (uri != null && (uri.startsWith("http:") || (uri.startsWith("https:"))))
 		{
-			if (account.logScan(uri))
+			new Thread(new Runnable()
 			{
-				break;
-			}
+				@Override
+				public void run()
+				{
+					try
+					{
+						final RequestBody body = new FormBody.Builder()
+								.add("experience", uri)
+								.build();
+
+						final Request request = new Request.Builder()
+								.post(body)
+								.url("https://aestheticodes.appspot.com/interaction")
+								.header("Authorization", context.getString(R.string.oauth_client_id))
+								.header("User-Agent", Artcodes.userAgent)
+								.build();
+
+						Artcodes.httpClient.newCall(request).execute();
+					}
+					catch (Exception e)
+					{
+						GoogleAnalytics.trackException(e);
+					}
+				}
+			}).start();
 		}
 	}
 

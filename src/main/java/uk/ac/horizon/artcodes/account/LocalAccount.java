@@ -174,12 +174,6 @@ public class LocalAccount implements Account
 	}
 
 	@Override
-	public boolean logScan(String uri)
-	{
-		return false;
-	}
-
-	@Override
 	public boolean isLocal()
 	{
 		return true;

@@ -49,8 +49,6 @@ public interface Account
 
 	boolean isLocal();
 
-	boolean logScan(String uri);
-
 	boolean validates() throws UserRecoverableAuthException;
 
 	boolean load(String uri, URILoaderCallback callback);
