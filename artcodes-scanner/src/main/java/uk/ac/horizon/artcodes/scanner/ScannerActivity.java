@@ -261,16 +261,16 @@ public class ScannerActivity extends AppCompatActivity
 		Log.i("Marker", "MarkerDisplay Detected: " + markerCode);
 		if (markerCode != null)
 		{
-			if (getCallingActivity() != null)
+			if (experience.getCallback() != null)
+			{
+				startActivity(new Intent(Intent.ACTION_VIEW, Uri.parse(experience.getCallback().replace("{code}", markerCode))));
+			}
+			else
 			{
 				Intent intent = getIntent();
 				intent.putExtra("marker", markerCode);
 				setResult(RESULT_OK, intent);
 				finish();
-			}
-			else
-			{
-				startActivity(new Intent(Intent.ACTION_VIEW, Uri.parse(experience.getCallback().replace("{code}", markerCode))));
 			}
 		}
 	}
