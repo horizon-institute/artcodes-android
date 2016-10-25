@@ -67,7 +67,7 @@ public class MarkerCodeDetectionHandler implements MarkerDetectionHandler
 		    }
 	    }
 
-	    if (selected != null || best >= this.requiredFor(selected))
+	    if (selected != null && best >= this.requiredFor(selected))
 	    {
 		    this.markerCodeHandler.onMarkerCodeDetected(selected);
 	    }
