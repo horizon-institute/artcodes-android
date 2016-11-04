@@ -40,6 +40,8 @@ import android.support.v4.graphics.drawable.DrawableCompat;
 import android.support.v7.app.AppCompatActivity;
 import android.support.v7.widget.Toolbar;
 import android.util.Log;
+import android.util.TypedValue;
+import android.view.Gravity;
 import android.view.MenuItem;
 import android.view.View;
 import android.view.ViewGroup;
@@ -236,24 +238,68 @@ public class ScannerActivity extends AppCompatActivity
 			}
 			cameraView.setDetector(detector);
 
-			if (cameraView.deviceNeedsManualAutoFocus())
+			if (cameraView.deviceNeedsTapToFocus())
 			{
 				// tap to focus
 				View v = findViewById(R.id.thumbnailImageLayout);
-				v.setOnClickListener(new View.OnClickListener()
+				if (v != null)
 				{
-					@Override
-					public void onClick(View view)
+					v.setOnClickListener(new View.OnClickListener()
 					{
-						cameraView.focus(null);
-					}
-				});
+						@Override
+						public void onClick(View view)
+						{
+							setFocusTextVisible(false);
+							cameraView.focus(new Runnable()
+							{
+								@Override
+								public void run()
+								{
+									setFocusTextVisible(true);
+								}
+							});
+
+						}
+					});
+				}
+				setFocusTextVisible(true);
 			}
 		}
 		else
 		{
 			cameraView.setDetector(null);
 		}
+	}
+
+	private boolean focusTextAlreadyShown = false;
+	private void setFocusTextVisible(final boolean visible)
+	{
+		final TextView focusTextView = (TextView) findViewById(R.id.focusText);
+		runOnUiThread(new Runnable()
+		{
+			@Override
+			public void run()
+			{
+				if (focusTextView != null)
+				{
+					if (focusTextAlreadyShown)
+					{
+						focusTextView.setText(R.string.tap_to_refocus);
+						focusTextView.setTextSize(TypedValue.COMPLEX_UNIT_DIP, 18);
+						focusTextView.setGravity(Gravity.TOP | Gravity.CENTER_HORIZONTAL);
+					}
+					if (visible)
+					{
+						focusTextView.setVisibility(View.VISIBLE);
+					}
+					else
+					{
+						focusTextView.setVisibility(View.INVISIBLE);
+						focusTextAlreadyShown = true;
+					}
+				}
+			}
+		});
 	}
 
 	private void onCodeDetected(String markerCode)

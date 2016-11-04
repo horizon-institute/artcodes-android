@@ -27,6 +27,7 @@ import android.hardware.Camera;
 import android.os.Build;
 import android.os.Handler;
 import android.os.HandlerThread;
+import android.os.Looper;
 import android.support.v4.content.ContextCompat;
 import android.util.AttributeSet;
 import android.util.Log;
@@ -54,7 +55,9 @@ public class CameraView extends SurfaceView
 	private SurfaceHolder surface;
 	private int surfaceWidth;
 	private int surfaceHeight;
-	private boolean deviceNeedsManualAutoFocus = false;
+	private boolean deviceNeedsTapToFocus = false;
+	private final Object cameraFocusLock = new Object();
+	private boolean cameraIsFocused = false;
 
 
 	public CameraView(Context context)
@@ -82,14 +85,6 @@ public class CameraView extends SurfaceView
 		init();
 	}
 
-	public void focus(Camera.AutoFocusCallback callback)
-	{
-		if (camera != null)
-		{
-			camera.autoFocus(callback);
-		}
-	}
-
 	public void setDetector(Detector processor)
 	{
 		this.detector = processor;
@@ -108,6 +103,26 @@ public class CameraView extends SurfaceView
 					public void onPreviewFrame(final byte[] data, final Camera camera)
 					{
 						detector.setData(data);
+
+						if (deviceNeedsTapToFocus)
+						{
+							synchronized (cameraFocusLock)
+							{
+								while (!cameraIsFocused)
+								{
+									try
+									{
+										Log.i("Scanner", "Thread " + Thread.currentThread().getName() + " waiting on cameraFocusLock for camera focus");
+										cameraFocusLock.wait();
+									}
+									catch (InterruptedException ignored)
+									{
+									}
+									Log.i("Scanner", "Thread " + Thread.currentThread().getName() + " notified, cameraIsFocused="+cameraIsFocused);
+								}
+							}
+						}
+
 						camera.addCallbackBuffer(data);
 					}
 				});
@@ -228,22 +243,26 @@ public class CameraView extends SurfaceView
 
 	private void openCamera(int cameraId)
 	{
+		Log.i("Scanner", "Device manufacturer: " + android.os.Build.MANUFACTURER + " model: " + android.os.Build.MODEL);
+
 		camera = Camera.open(cameraId);
 		Camera.CameraInfo cameraInfo = new Camera.CameraInfo();
 		Camera.getCameraInfo(cameraId, cameraInfo);
 
 		Camera.Parameters parameters = camera.getParameters();
 		List<String> focusModes = parameters.getSupportedFocusModes();
-		if (focusModes != null && focusModes.contains(Camera.Parameters.FOCUS_MODE_CONTINUOUS_VIDEO))
+		if (!android.os.Build.MANUFACTURER.equalsIgnoreCase("SAMSUNG") &&
+				focusModes != null &&
+				focusModes.contains(Camera.Parameters.FOCUS_MODE_CONTINUOUS_VIDEO))
 		{
 			parameters.setFocusMode(Camera.Parameters.FOCUS_MODE_CONTINUOUS_VIDEO);
 		}
 		else if (focusModes != null && focusModes.contains(Camera.Parameters.FOCUS_MODE_AUTO))
 		{
 			// if FOCUS_MODE_CONTINUOUS_VIDEO is not supported flag that manual auto-focus is needed every few seconds
-			Log.w("Scanner", "Camera requires manual focussing");
+			Log.w("Scanner", "Camera requires manual focusing");
 			parameters.setFocusMode(Camera.Parameters.FOCUS_MODE_AUTO);
-			deviceNeedsManualAutoFocus = true;
+			deviceNeedsTapToFocus = true;
 		}
 
 		float ratioOfSurface = (float) surfaceHeight / surfaceWidth;
@@ -353,8 +372,43 @@ public class CameraView extends SurfaceView
 		}
 	}
 
-	public boolean deviceNeedsManualAutoFocus()
+	/* Auto focus methods */
+
+	public boolean deviceNeedsTapToFocus()
 	{
-		return this.deviceNeedsManualAutoFocus;
+		return this.deviceNeedsTapToFocus;
+	}
+
+	public void focus(final Runnable callback)
+	{
+
+		synchronized (cameraFocusLock)
+		{
+			cameraIsFocused = false;
+		}
+
+		if (camera != null)
+		{
+			Log.i("Scanner", "Attempting to focus camera.");
+			camera.autoFocus(null);
+		}
+
+		// set a timeout rather than use the auto focus callback
+		// (because the auto focus callback never gets called on some devices)
+		Handler h = new Handler(Looper.getMainLooper());
+		h.postDelayed(new Runnable()
+		{
+			@Override
+			public void run()
+			{
+				Log.i("Scanner", "Firing auto focus timeout, notifying on cameraFocusLock.");
+				synchronized (cameraFocusLock)
+				{
+					cameraIsFocused = true;
+					cameraFocusLock.notifyAll();
+				}
+				callback.run();
+			}
+		}, 1000);
 	}
 }

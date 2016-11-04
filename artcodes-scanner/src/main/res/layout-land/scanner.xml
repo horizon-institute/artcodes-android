@@ -86,7 +86,17 @@
 				android:layout_height="match_parent">
 				<!-- This relative layout is here to contain images of detected markers/actions -->
 			</RelativeLayout>
-			
+
+            <TextView
+                android:id="@+id/focusText"
+                android:layout_width="match_parent"
+                android:layout_height="match_parent"
+                android:text="@string/tap_to_focus"
+                android:textColor="@android:color/white"
+                android:textSize="36dip"
+                android:visibility="invisible"
+                android:gravity="center_vertical|center_horizontal"/>
+
             <LinearLayout
                 android:id="@+id/settingsMenu"
                 android:layout_width="wrap_content"
