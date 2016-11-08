@@ -25,7 +25,9 @@ import android.util.Log;
 import org.opencv.core.Core;
 import org.opencv.core.Mat;
 import org.opencv.core.MatOfPoint;
+import org.opencv.core.MatOfPoint2f;
 import org.opencv.core.Rect;
+import org.opencv.core.RotatedRect;
 import org.opencv.core.Scalar;
 import org.opencv.imgproc.Imgproc;
 
@@ -198,6 +200,7 @@ public class MarkerDetector implements ImageProcessor
 		{
 			final List<Marker> foundMarkers = new ArrayList<>();
 			Imgproc.findContours(buffers.getImageInGrey(), contours, hierarchy, Imgproc.RETR_TREE, Imgproc.CHAIN_APPROX_NONE);
+			double diagonalScreenSize = Math.sqrt(Math.pow(buffers.getImageInAnyFormat().cols(), 2) + Math.pow(buffers.getImageInAnyFormat().rows(), 2));
 			for (int i = 0; i < contours.size(); i++)
 			{
 				final Marker marker = createMarkerForNode(i, contours, hierarchy);
@@ -208,11 +211,12 @@ public class MarkerDetector implements ImageProcessor
 					{
 						// If this marker has a minimum size set and is smaller: continue in loop.
 						Action action = experience.getActionForCode(markerCode);
-						if (action != null && action.getMinimumSize() != null)
+						if (diagonalScreenSize > 0 && action != null && action.getMinimumSize() != null)
 						{
 							double minimumSize = action.getMinimumSize();
-							Rect boundingRect = Imgproc.boundingRect(contours.get(i));
-							if (!(boundingRect.width/(float) buffers.getImageInAnyFormat().cols() > minimumSize || boundingRect.height/(float) buffers.getImageInAnyFormat().rows() > minimumSize))
+							RotatedRect rotatedRect = Imgproc.minAreaRect(new MatOfPoint2f(contours.get(i).toArray()));
+							double markerSize = Math.max(rotatedRect.size.width, rotatedRect.size.height);
+							if (!(markerSize/diagonalScreenSize >= minimumSize))
 							{
 								continue;
 							}
