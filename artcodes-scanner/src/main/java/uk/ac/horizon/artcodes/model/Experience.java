@@ -41,6 +41,7 @@ public class Experience
 	private String author;
 	private String callback;
 	private String originalID;
+	private String requestedAutoFocusMode;
 
 	public Experience()
 	{
@@ -182,5 +183,15 @@ public class Experience
 			}
 		}
 		return null;
+	}
+
+	public String getRequestedAutoFocusMode()
+	{
+		return requestedAutoFocusMode;
+	}
+
+	public void setRequestedAutoFocusMode(String requestedAutoFocusMode)
+	{
+		this.requestedAutoFocusMode = requestedAutoFocusMode;
 	}
 }

@@ -40,6 +40,7 @@ import java.io.IOException;
 import java.util.List;
 
 import uk.ac.horizon.artcodes.detect.Detector;
+import uk.ac.horizon.artcodes.model.Experience;
 import uk.ac.horizon.artcodes.scanner.R;
 import uk.ac.horizon.artcodes.detect.DetectorSetting;
 
@@ -58,7 +59,7 @@ public class CameraView extends SurfaceView
 	private boolean deviceNeedsTapToFocus = false;
 	private final Object cameraFocusLock = new Object();
 	private boolean cameraIsFocused = false;
-
+	private Experience experience;
 
 	public CameraView(Context context)
 	{
@@ -87,6 +88,11 @@ public class CameraView extends SurfaceView
 
 	public void setDetector(Detector processor)
 	{
+		setDetector(processor, null);
+	}
+	public void setDetector(Detector processor, Experience experience)
+	{
+		this.experience = experience;
 		this.detector = processor;
 		if (detector != null)
 		{
@@ -253,6 +259,7 @@ public class CameraView extends SurfaceView
 		List<String> focusModes = parameters.getSupportedFocusModes();
 		if (!android.os.Build.MANUFACTURER.equalsIgnoreCase("SAMSUNG") &&
 				focusModes != null &&
+				!(this.experience!=null && this.experience.getRequestedAutoFocusMode()!=null && this.experience.getRequestedAutoFocusMode().equals("tapToFocus") && focusModes.contains(Camera.Parameters.FOCUS_MODE_AUTO)) &&
 				focusModes.contains(Camera.Parameters.FOCUS_MODE_CONTINUOUS_VIDEO))
 		{
 			parameters.setFocusMode(Camera.Parameters.FOCUS_MODE_CONTINUOUS_VIDEO);
@@ -301,7 +308,7 @@ public class CameraView extends SurfaceView
 
 			info = new CameraInfo(cameraInfo, parameters, getDeviceRotation());
 			camera.setDisplayOrientation(info.getRotation());
-			setDetector(detector);
+			setDetector(detector, experience);
 
 			try
 			{

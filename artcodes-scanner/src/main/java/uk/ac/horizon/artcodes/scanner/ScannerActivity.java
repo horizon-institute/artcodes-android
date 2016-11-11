@@ -236,7 +236,7 @@ public class ScannerActivity extends AppCompatActivity
 				getSupportActionBar().setDisplayShowTitleEnabled(true);
 				getSupportActionBar().setTitle(experience.getName());
 			}
-			cameraView.setDetector(detector);
+			cameraView.setDetector(detector, experience);
 
 			if (cameraView.deviceNeedsTapToFocus())
 			{
@@ -267,7 +267,7 @@ public class ScannerActivity extends AppCompatActivity
 		}
 		else
 		{
-			cameraView.setDetector(null);
+			cameraView.setDetector(null, null);
 		}
 	}
 
