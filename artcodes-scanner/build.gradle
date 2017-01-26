@@ -21,7 +21,7 @@ buildscript {
         jcenter()
     }
     dependencies {
-        classpath 'com.android.tools.build:gradle:2.2.2'
+        classpath 'com.android.tools.build:gradle:2.3.0-beta3'
     }
 }
 
@@ -34,20 +34,20 @@ repositories {
 }
 
 dependencies {
-    compile 'com.android.support:appcompat-v7:25.0.0'
-    compile 'com.google.code.gson:gson:2.7'
-    compile 'com.google.guava:guava:19.0'
+    compile 'com.android.support:appcompat-v7:25.1.0'
+    compile 'com.google.code.gson:gson:2.8.0'
+    compile 'com.google.guava:guava:20.0'
     compile files('libs/opencv-3.1.0.jar')
     testCompile 'junit:junit:4.12'
 }
 
 android {
-    compileSdkVersion 24
-    buildToolsVersion "24.0.3"
+    compileSdkVersion 25
+    buildToolsVersion "25.0.2"
 
     defaultConfig {
         minSdkVersion 15
-        targetSdkVersion 24
+        targetSdkVersion 25
         versionName '3.4.2'
     }
 

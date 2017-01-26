@@ -24,11 +24,15 @@ import android.app.Dialog;
 import android.content.Intent;
 import android.net.Uri;
 import android.os.Bundle;
+import android.provider.Settings;
 import android.support.annotation.NonNull;
 import android.support.v4.app.DialogFragment;
 import android.support.v4.app.FragmentManager;
 import android.support.v7.app.AlertDialog;
 import android.text.InputFilter;
+import android.text.InputType;
+import android.text.method.DigitsKeyListener;
+import android.util.Log;
 import android.view.View;
 import android.widget.AdapterView;
 import android.widget.ArrayAdapter;
@@ -73,6 +77,13 @@ public class ActionEditDialogFragment extends DialogFragment
 	{
 		binding = ActionEditBinding.inflate(getActivity().getLayoutInflater());
 		binding.newMarkerCode.setFilters(new InputFilter[]{new MarkerFormat()});
+		String currentKeyboard = Settings.Secure.getString(getContext().getContentResolver(), Settings.Secure.DEFAULT_INPUT_METHOD);
+		Log.i("Keyboard", currentKeyboard);
+		if (currentKeyboard.contains("com.lge.ime"))
+		{
+			binding.newMarkerCode.setKeyListener(DigitsKeyListener.getInstance("0123456789:"));
+			binding.newMarkerCode.setRawInputType(InputType.TYPE_CLASS_NUMBER | InputType.TYPE_NUMBER_FLAG_DECIMAL);
+		}
 		binding.newMarkerCode.addTextChangedListener(new SimpleTextWatcher()
 		{
 			@Override
@@ -139,7 +150,7 @@ public class ActionEditDialogFragment extends DialogFragment
 				if (getArguments().containsKey("action"))
 				{
 					updateAction(); // make sure code is sorted
-					if (getAction().getCodes().size()==1)
+					if (getAction().getCodes().size() == 1)
 					{
 						// Actions with only 1 code can not be a group or sequence!
 						getAction().setMatch(Action.Match.any);
@@ -161,7 +172,7 @@ public class ActionEditDialogFragment extends DialogFragment
 			@Override
 			public void onItemSelected(AdapterView<?> adapterView, View view, int i, long l)
 			{
-				if (getAction()!=null)
+				if (getAction() != null)
 				{
 					switch (i)
 					{
@@ -201,14 +212,14 @@ public class ActionEditDialogFragment extends DialogFragment
 				public void onClick(View view)
 				{
 					UUID uuid = UUID.randomUUID();
-					String url = "http://www.artcodes.co.uk/test1234/?file=A"+uuid.toString()+"&source=artcodes-android-app";
+					String url = "http://www.artcodes.co.uk/test1234/?file=A" + uuid.toString() + "&source=artcodes-android-app";
 
 					getAction().setUrl(url);
 					updateAction();
 
 					Intent intent = new Intent();
 					intent.setAction(Intent.ACTION_VIEW);
-					intent.setData(Uri.parse(url+"&dontCheckForFiles"));
+					intent.setData(Uri.parse(url + "&dontCheckForFiles"));
 					startActivity(intent);
 				}
 			});
@@ -225,7 +236,7 @@ public class ActionEditDialogFragment extends DialogFragment
 		{
 			String code = data.getStringExtra("marker");
 			Action action = getAction();
-			if (code != null && (action.getMatch()==Action.Match.sequence || !action.getCodes().contains(code)))
+			if (code != null && (action.getMatch() == Action.Match.sequence || !action.getCodes().contains(code)))
 			{
 				action.getCodes().add(code);
 				ActionCodeBinding codeBinding = createCodeBinding(binding, action, action.getCodes().size() - 1);
@@ -279,7 +290,7 @@ public class ActionEditDialogFragment extends DialogFragment
 	private void updateCodes(final ActionEditBinding binding, final Action action)
 	{
 		binding.markerCodeList.removeAllViews();
-		if (action!=null && action.getMatch()!=Action.Match.sequence)
+		if (action != null && action.getMatch() != Action.Match.sequence)
 		{
 			// only sort codes if not a sequence!
 			Collections.sort(action.getCodes());
@@ -292,9 +303,9 @@ public class ActionEditDialogFragment extends DialogFragment
 
 	private void updateMatchType(final ActionEditBinding binding, final Action action)
 	{
-		if (action!=null)
+		if (action != null)
 		{
-			binding.matchSpinner.setSelection(action.getMatch()==Action.Match.any?0:(action.getMatch()==Action.Match.all?1:2));
+			binding.matchSpinner.setSelection(action.getMatch() == Action.Match.any ? 0 : (action.getMatch() == Action.Match.all ? 1 : 2));
 		}
 	}
 
@@ -303,6 +314,12 @@ public class ActionEditDialogFragment extends DialogFragment
 		final String code = action.getCodes().get(codeIndex);
 		final ActionCodeBinding codeBinding = ActionCodeBinding.inflate(getActivity().getLayoutInflater(), binding.markerCodeList, false);
 		codeBinding.editMarkerCode.setText(code);
+		String currentKeyboard = Settings.Secure.getString(getContext().getContentResolver(), Settings.Secure.DEFAULT_INPUT_METHOD);
+		if (currentKeyboard.contains("com.lge.ime"))
+		{
+			codeBinding.editMarkerCode.setKeyListener(DigitsKeyListener.getInstance("0123456789:"));
+			codeBinding.editMarkerCode.setRawInputType(InputType.TYPE_CLASS_NUMBER | InputType.TYPE_NUMBER_FLAG_DECIMAL);
+		}
 		codeBinding.editMarkerCode.setFilters(new InputFilter[]{new MarkerFormat()});
 		codeBinding.editMarkerCode.addTextChangedListener(new SimpleTextWatcher()
 		{

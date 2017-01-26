@@ -170,8 +170,7 @@
                     android:layout_height="wrap_content"
                     android:id="@+id/match_spinner"
                     android:layout_margin="16dp"
-                    android:visibility="gone"
-                    />
+                    android:visibility="gone"                    />
 
                 <LinearLayout
                     android:layout_width="match_parent"
@@ -184,8 +183,7 @@
                         android:layout_margin="16dp"
                         android:src="@drawable/ic_looks_one_black_24dp"
                         android:tint="@color/ic_tint"
-                        tools:ignore="ContentDescription"
-                        />
+                        tools:ignore="ContentDescription"                        />
 
                     <LinearLayout
                         android:orientation="vertical"
@@ -208,11 +206,11 @@
                             android:layout_marginLeft="16dp"
                             android:layout_marginRight="16dp"
                             android:digits="0123456789:"
+                            android:gravity="end"
                             android:hint="@string/newMarkerCode"
                             android:inputType="time"
-                            android:textAppearance="@style/TextAppearance.AppCompat"
-                            android:gravity="end"
-                            android:maxLines="1"/>
+                            android:maxLines="1"
+                            android:textAppearance="@style/TextAppearance.AppCompat"/>
                     </LinearLayout>
                 </LinearLayout>
 

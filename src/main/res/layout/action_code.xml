@@ -31,9 +31,9 @@
         android:layout_marginLeft="16dp"
         android:layout_marginRight="16dp"
         android:digits="0123456789:"
+        android:gravity="end"
         android:hint="@string/markerCode"
         android:inputType="time"
         android:maxLines="1"
-        android:textAppearance="@style/TextAppearance.AppCompat"
-        android:gravity="end"/>
+        android:textAppearance="@style/TextAppearance.AppCompat"/>
 </layout>
