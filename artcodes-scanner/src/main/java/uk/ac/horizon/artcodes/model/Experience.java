@@ -172,13 +172,16 @@ public class Experience
 
 	public Action getActionForCode(String code)
 	{
-		for (Action action : this.getActions())
+		if (code != null)
 		{
-			for (String codeFromAction : action.getCodes())
+			for (Action action : this.getActions())
 			{
-				if (code.equals(codeFromAction))
+				for (String codeFromAction : action.getCodes())
 				{
-					return action;
+					if (code.equals(codeFromAction))
+					{
+						return action;
+					}
 				}
 			}
 		}
