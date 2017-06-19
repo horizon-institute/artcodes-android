@@ -20,6 +20,8 @@
 package uk.ac.horizon.artcodes.adapter;
 
 import android.content.Context;
+import android.os.Handler;
+import android.os.Looper;
 import android.support.v7.util.SortedList;
 import android.support.v7.widget.util.SortedListAdapterCallback;
 
@@ -93,18 +95,7 @@ public class ExperienceSortedListAdapter extends ExperienceAdapter
 		final List<Experience> experiencesToBatchUpdate = new ArrayList<>();
 		final int[] count = {0};
 
-		synchronized (experiences)
-		{
-			for (int i = 0; i < experiences.size(); ++i)
-			{
-				Experience e = experiences.get(i);
-				if (!items.contains(e.getId()))
-				{
-					experiences.remove(e);
-					--i;
-				}
-			}
-		}
+		removeExperiencesNotIn(items);
 
 		for (String uri : items)
 		{
@@ -115,52 +106,20 @@ public class ExperienceSortedListAdapter extends ExperienceAdapter
 				@Override
 				public void loaded(Experience experience)
 				{
-					loadFinished();
 					synchronized (experiences)
 					{
+						loadFinished();
 						if (batchUpdate)
 						{
 							experiencesToBatchUpdate.add(experience);
 							if (++count[0] == items.size())
 							{
-								Collections.sort(experiencesToBatchUpdate, new Comparator<Experience>()
-								{
-									@Override
-									public int compare(Experience experience1, Experience experience2)
-									{
-										return (experience1.getName()==null ? "" : experience1.getName()).compareTo(experience2.getName()==null ? "" : experience2.getName());
-									}
-								});
-								for (Experience experienceFromBatchUpdate : experiencesToBatchUpdate)
-								{
-									experiences.add(experienceFromBatchUpdate);
-								}
-								experiencesToBatchUpdate.clear();
-								count[0] = 0;
+								addExperiences(experiencesToBatchUpdate);
 							}
 						}
 						else
 						{
-							int index = -1;
-							for (int i = 0; i < experiences.size(); ++i)
-							{
-								if (experience.equals(experiences.get(i)))
-								{
-									index = i;
-									break;
-								}
-							}
-							// experiences.indexOf(item) seems to be buggy.
-							if (index > -1)
-							{
-								// experiences.updateItemAt() is ignored if a.equals(b)
-								experiences.removeItemAt(index);
-								experiences.add(experience);
-							}
-							else
-							{
-								experiences.add(experience);
-							}
+							addExperience(experience);
 						}
 					}
 				}
@@ -168,14 +127,14 @@ public class ExperienceSortedListAdapter extends ExperienceAdapter
 				@Override
 				public void error(Throwable e)
 				{
-					loadFinished();
-					showError(context.getString(R.string.connection_error));
-
-					if (batchUpdate && ++count[0] == items.size())
+					synchronized (experiences)
 					{
-						for (Experience experienceFromBatchUpdate : experiencesToBatchUpdate)
+						loadFinished();
+						showError(context.getString(R.string.connection_error));
+
+						if (batchUpdate && ++count[0] == items.size())
 						{
-							experiences.add(experienceFromBatchUpdate);
+							addExperiences(experiencesToBatchUpdate);
 						}
 					}
 				}
@@ -183,5 +142,101 @@ public class ExperienceSortedListAdapter extends ExperienceAdapter
 		}
 
 		loadFinished();
+	}
+
+	public void addExperience(final Experience experience)
+	{
+		runTask(new Runnable()
+		{
+			@Override
+			public void run()
+			{
+				synchronized (experiences)
+				{
+					int index = -1;
+					for (int i = 0; i < experiences.size(); ++i)
+					{
+						if (experience.equals(experiences.get(i)))
+						{
+							index = i;
+							break;
+						}
+					}
+					// experiences.indexOf(item) seems to be buggy.
+					if (index > -1)
+					{
+						// experiences.updateItemAt() is ignored if a.equals(b)
+						experiences.removeItemAt(index);
+						experiences.add(experience);
+					}
+					else
+					{
+						experiences.add(experience);
+					}
+				}
+			}
+		});
+	}
+
+	public void addExperiences(final List<Experience> experiencesToAdd)
+	{
+		Collections.sort(experiencesToAdd, new Comparator<Experience>()
+		{
+			@Override
+			public int compare(Experience experience1, Experience experience2)
+			{
+				return (experience1.getName()==null ? "" : experience1.getName()).compareTo(experience2.getName()==null ? "" : experience2.getName());
+			}
+		});
+		runTask(new Runnable()
+		{
+			@Override
+			public void run()
+			{
+				synchronized (experiences)
+				{
+					for (Experience experienceFromBatchUpdate : experiencesToAdd)
+					{
+						experiences.add(experienceFromBatchUpdate);
+					}
+				}
+			}
+		});
+	}
+
+	public void removeExperiencesNotIn(final List<String> items)
+	{
+		runTask(new Runnable()
+		{
+			@Override
+			public void run()
+			{
+				synchronized (experiences)
+				{
+					for (int i = 0; i < experiences.size(); ++i)
+					{
+						Experience e = experiences.get(i);
+						if (!items.contains(e.getId()))
+						{
+							experiences.remove(e);
+							--i;
+						}
+					}
+				}
+			}
+		});
+	}
+
+	private void runTask(Runnable task)
+	{
+		if (Looper.getMainLooper().getThread().equals(Thread.currentThread()))
+		{
+			task.run();
+		}
+		else
+		{
+			final Handler h = new Handler(Looper.getMainLooper());
+			h.post(task);
+		}
 	}
 }
