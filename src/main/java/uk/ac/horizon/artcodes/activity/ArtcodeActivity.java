@@ -66,6 +66,7 @@ public class ArtcodeActivity extends ScannerActivity implements LoadCallback<Exp
 
 	public static void start(Context context, Experience experience)
 	{
+		/*
 		final String experienceJSON = new Gson().toJson(experience);
 		TaskStackBuilder.create(context)
 				.addNextIntent(new Intent(context, NavigationActivity.class))
@@ -74,6 +75,14 @@ public class ArtcodeActivity extends ScannerActivity implements LoadCallback<Exp
 				.addNextIntent(new Intent(context, ArtcodeActivity.class)
 						.putExtra("experience", experienceJSON))
 				.startActivities();
+		*/
+
+		StaticActivityMessage.experience = experience;
+		TaskStackBuilder.create(context)
+				.addNextIntent(new Intent(context, NavigationActivity.class))
+				.addNextIntent(new Intent(context, ExperienceActivity.class))
+						.addNextIntent(new Intent(context, ArtcodeActivity.class))
+								.startActivities();
 	}
 
 	@Override
@@ -165,6 +174,12 @@ public class ArtcodeActivity extends ScannerActivity implements LoadCallback<Exp
 				if (data != null)
 				{
 					getServer().loadExperience(data.toString(), this);
+				} else {
+
+					if (StaticActivityMessage.experience != null)
+					{
+						loaded(StaticActivityMessage.experience);
+					}
 				}
 			}
 		}

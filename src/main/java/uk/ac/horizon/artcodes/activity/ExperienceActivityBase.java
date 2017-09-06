@@ -88,6 +88,11 @@ public abstract class ExperienceActivityBase extends ArtcodeActivityBase impleme
 						uri = uri.replace("://aestheticodes.appspot.com/experience/info", "://aestheticodes.appspot.com/experience");
 					}
 					getServer().loadExperience(uri, this);
+				} else {
+					if (StaticActivityMessage.experience!=null)
+					{
+						loaded(StaticActivityMessage.experience);
+					}
 				}
 			}
 		}

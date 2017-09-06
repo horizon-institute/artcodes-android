@@ -268,7 +268,13 @@ public class ImageBuffers
 		{
 			if (overlayBitmap == null)
 			{
-				overlayBitmap = Bitmap.createBitmap(overlay.cols(), overlay.rows(), Bitmap.Config.ARGB_8888);
+				try
+				{
+					overlayBitmap = Bitmap.createBitmap(overlay.cols(), overlay.rows(), Bitmap.Config.ARGB_8888);
+				} catch (OutOfMemoryError e) {
+					Log.e("ImageBuffers", "Ignoring exception when creating overlay", e);
+					return null;
+				}
 			}
 			Utils.matToBitmap(overlay, overlayBitmap);
 			return overlayBitmap;

@@ -65,7 +65,8 @@ public class ExperienceActivity extends ExperienceActivityBase
 	public static Intent intent(Context context, Experience experience)
 	{
 		Intent intent = new Intent(context, ExperienceActivity.class);
-		intent.putExtra("experience", new Gson().toJson(experience));
+		//intent.putExtra("experience", new Gson().toJson(experience));
+		StaticActivityMessage.experience = experience;
 		return intent;
 	}
 
