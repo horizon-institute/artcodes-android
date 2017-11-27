@@ -28,6 +28,7 @@ import org.opencv.imgproc.Imgproc;
 import java.util.List;
 import java.util.Map;
 
+import uk.ac.horizon.artcodes.camera.CameraFocusControl;
 import uk.ac.horizon.artcodes.detect.DetectorSetting;
 import uk.ac.horizon.artcodes.detect.ImageBuffers;
 import uk.ac.horizon.artcodes.detect.handler.MarkerDetectionHandler;
@@ -43,7 +44,7 @@ public class TileThresholder implements ImageProcessor
 			return "tile";
 		}
 
-		public ImageProcessor create(Context context, Experience experience, MarkerDetectionHandler handler, Map<String, String> args)
+		public ImageProcessor create(Context context, Experience experience, MarkerDetectionHandler handler, CameraFocusControl cameraFocusControl, Map<String, String> args)
 		{
 			return new TileThresholder();
 		}

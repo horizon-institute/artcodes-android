@@ -40,6 +40,7 @@ import java.util.List;
 import java.util.Map;
 
 import uk.ac.horizon.artcodes.Feature;
+import uk.ac.horizon.artcodes.camera.CameraFocusControl;
 import uk.ac.horizon.artcodes.detect.DetectorSetting;
 import uk.ac.horizon.artcodes.detect.ImageBuffers;
 import uk.ac.horizon.artcodes.detect.handler.MarkerDetectionHandler;
@@ -64,7 +65,7 @@ public class MarkerDetector implements ImageProcessor
 			return "detect";
 		}
 
-		public ImageProcessor create(Context context, Experience experience, MarkerDetectionHandler handler, Map<String, String> args)
+		public ImageProcessor create(Context context, Experience experience, MarkerDetectionHandler handler, CameraFocusControl cameraFocusControl, Map<String, String> args)
 		{
 			return new MarkerDetector(experience, handler);
 		}

@@ -17,18 +17,9 @@
  *     along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-package uk.ac.horizon.artcodes.process;
+package uk.ac.horizon.artcodes.camera;
 
-import android.content.Context;
-
-import java.util.Map;
-
-import uk.ac.horizon.artcodes.camera.CameraFocusControl;
-import uk.ac.horizon.artcodes.detect.handler.MarkerDetectionHandler;
-import uk.ac.horizon.artcodes.model.Experience;
-
-public interface ImageProcessorFactory
+public interface CameraFocusControl
 {
-	String getName();
-	ImageProcessor create(Context context, Experience experience, MarkerDetectionHandler handler, CameraFocusControl cameraFocusControl, Map<String, String> args);
+    void focus(Runnable callback);
 }

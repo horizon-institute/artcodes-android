@@ -30,6 +30,7 @@ import java.util.Comparator;
 import java.util.List;
 import java.util.Map;
 
+import uk.ac.horizon.artcodes.camera.CameraFocusControl;
 import uk.ac.horizon.artcodes.detect.handler.MarkerDetectionHandler;
 import uk.ac.horizon.artcodes.model.Experience;
 import uk.ac.horizon.artcodes.process.ImageProcessor;
@@ -44,7 +45,7 @@ public class MarkerAreaOrderDetector extends MarkerDetector
 			return "detectOrdered";
 		}
 
-		public ImageProcessor create(Context context, Experience experience, MarkerDetectionHandler handler, Map<String, String> args)
+		public ImageProcessor create(Context context, Experience experience, MarkerDetectionHandler handler, CameraFocusControl cameraFocusControl, Map<String, String> args)
 		{
 			return new MarkerAreaOrderDetector(experience, handler);
 		}

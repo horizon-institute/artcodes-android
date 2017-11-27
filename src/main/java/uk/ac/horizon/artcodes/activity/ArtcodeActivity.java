@@ -261,7 +261,7 @@ public class ArtcodeActivity extends ScannerActivity implements LoadCallback<Exp
 					markerHistoryViewController.update(detectedMarkers, futureAction);
 					onActionChanged(detectedAction);
 				}
-			}, experience, new MarkerThumbnailDrawer()));
+			}, experience, new MarkerThumbnailDrawer()), this.cameraView);
 		}
 		else
 		{
@@ -272,7 +272,7 @@ public class ArtcodeActivity extends ScannerActivity implements LoadCallback<Exp
 				{
 					onActionChanged(detectedAction);
 				}
-			}, experience, null));
+			}, experience, null), this.cameraView);
 		}
 	}
 }

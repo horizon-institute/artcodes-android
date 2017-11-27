@@ -45,7 +45,7 @@ import uk.ac.horizon.artcodes.scanner.R;
 import uk.ac.horizon.artcodes.detect.DetectorSetting;
 
 @SuppressWarnings("deprecation")
-public class CameraView extends SurfaceView
+public class CameraView extends SurfaceView implements CameraFocusControl
 {
 	private static final String THREAD_NAME = "Frame Processor";
 	private CameraInfo info;
@@ -58,7 +58,7 @@ public class CameraView extends SurfaceView
 	private int surfaceHeight;
 	private boolean deviceNeedsTapToFocus = false;
 	private final Object cameraFocusLock = new Object();
-	private boolean cameraIsFocused = false;
+	private boolean cameraIsFocused = true;
 	private Experience experience;
 
 	public CameraView(Context context)
@@ -102,15 +102,17 @@ public class CameraView extends SurfaceView
 			}
 			if (camera != null)
 			{
+				cameraIsFocused = !deviceNeedsTapToFocus;
 				camera.addCallbackBuffer(detector.createBuffer(info, surfaceWidth, surfaceHeight));
 				camera.setPreviewCallbackWithBuffer(new Camera.PreviewCallback()
 				{
 					@Override
 					public void onPreviewFrame(final byte[] data, final Camera camera)
 					{
-						detector.setData(data);
 
-						if (deviceNeedsTapToFocus)
+						boolean focusedOnThisFrame = false;
+
+						if (deviceNeedsTapToFocus || !cameraIsFocused)
 						{
 							synchronized (cameraFocusLock)
 							{
@@ -118,18 +120,27 @@ public class CameraView extends SurfaceView
 								{
 									try
 									{
-										Log.i("Scanner", "Thread " + Thread.currentThread().getName() + " waiting on cameraFocusLock for camera focus");
+										Log.i("FOCUS", "cameraFocusLock.wait(); Thread: " + Thread.currentThread().getName());
+										focusedOnThisFrame = true;
 										cameraFocusLock.wait();
 									}
 									catch (InterruptedException ignored)
 									{
 									}
-									Log.i("Scanner", "Thread " + Thread.currentThread().getName() + " notified, cameraIsFocused="+cameraIsFocused);
 								}
+								Log.i("FOCUS", "notified Thread: " + Thread.currentThread().getName());
 							}
 						}
 
-						camera.addCallbackBuffer(data);
+						if (cameraIsFocused)
+						{
+							Log.i("FOCUS", "cameraIsFocused test: "+cameraIsFocused);
+							if (!focusedOnThisFrame)
+							{
+								detector.setData(data);
+							}
+							camera.addCallbackBuffer(data);
+						}
 					}
 				});
 			}
@@ -257,9 +268,14 @@ public class CameraView extends SurfaceView
 
 		Camera.Parameters parameters = camera.getParameters();
 		List<String> focusModes = parameters.getSupportedFocusModes();
-		if (!android.os.Build.MANUFACTURER.equalsIgnoreCase("SAMSUNG") &&
+		if (//!android.os.Build.MANUFACTURER.equalsIgnoreCase("SAMSUNG") &&
 				focusModes != null &&
-				!(this.experience!=null && this.experience.getRequestedAutoFocusMode()!=null && this.experience.getRequestedAutoFocusMode().equals("tapToFocus") && focusModes.contains(Camera.Parameters.FOCUS_MODE_AUTO)) &&
+				!(
+						this.experience!=null &&
+								this.experience.getRequestedAutoFocusMode()!=null &&
+								(this.experience.getRequestedAutoFocusMode().equals("tapToFocus") || this.experience.getRequestedAutoFocusMode().equals("blurScore")) &&
+								focusModes.contains(Camera.Parameters.FOCUS_MODE_AUTO)
+				) &&
 				focusModes.contains(Camera.Parameters.FOCUS_MODE_CONTINUOUS_VIDEO))
 		{
 			parameters.setFocusMode(Camera.Parameters.FOCUS_MODE_CONTINUOUS_VIDEO);
@@ -269,7 +285,10 @@ public class CameraView extends SurfaceView
 			// if FOCUS_MODE_CONTINUOUS_VIDEO is not supported flag that manual auto-focus is needed every few seconds
 			Log.w("Scanner", "Camera requires manual focusing");
 			parameters.setFocusMode(Camera.Parameters.FOCUS_MODE_AUTO);
-			deviceNeedsTapToFocus = true;
+			if (!(this.experience.getRequestedAutoFocusMode()!=null && this.experience.getRequestedAutoFocusMode().equals("blurScore")))
+			{
+				deviceNeedsTapToFocus = true;
+			}
 		}
 
 		float ratioOfSurface = (float) surfaceHeight / surfaceWidth;
@@ -386,17 +405,19 @@ public class CameraView extends SurfaceView
 		return this.deviceNeedsTapToFocus;
 	}
 
+	@Override
 	public void focus(final Runnable callback)
 	{
 
 		synchronized (cameraFocusLock)
 		{
+			Log.i("FOCUS", "cameraIsFocused = false;");
 			cameraIsFocused = false;
 		}
 
 		if (camera != null)
 		{
-			Log.i("Scanner", "Attempting to focus camera.");
+			Log.i("FOCUS", "Attempting to focus camera.");
 			camera.autoFocus(null);
 		}
 
@@ -408,14 +429,17 @@ public class CameraView extends SurfaceView
 			@Override
 			public void run()
 			{
-				Log.i("Scanner", "Firing auto focus timeout, notifying on cameraFocusLock.");
+				Log.i("FOCUS", "Firing auto focus timeout.");
 				synchronized (cameraFocusLock)
 				{
+					Log.i("FOCUS", "cameraIsFocused = true;");
 					cameraIsFocused = true;
+					Log.i("FOCUS", "notifyAll()");
 					cameraFocusLock.notifyAll();
 				}
 				callback.run();
 			}
 		}, 1000);
 	}
+
 }

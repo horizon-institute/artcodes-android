@@ -30,6 +30,7 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
 
+import uk.ac.horizon.artcodes.camera.CameraFocusControl;
 import uk.ac.horizon.artcodes.detect.DetectorSetting;
 import uk.ac.horizon.artcodes.detect.ImageBuffers;
 import uk.ac.horizon.artcodes.detect.handler.MarkerDetectionHandler;
@@ -55,7 +56,7 @@ public class RgbColourFilter
             return "redFilter";
         }
 
-        public ImageProcessor create(Context context, Experience experience, MarkerDetectionHandler handler, Map<String, String> args)
+        public ImageProcessor create(Context context, Experience experience, MarkerDetectionHandler handler, CameraFocusControl cameraFocusControl, Map<String, String> args)
         {
             return new RgbColourFilter_MixChannelsImpl(Channel.red);
         }
@@ -68,7 +69,7 @@ public class RgbColourFilter
             return "greenFilter";
         }
 
-        public ImageProcessor create(Context context, Experience experience, MarkerDetectionHandler handler, Map<String, String> args)
+        public ImageProcessor create(Context context, Experience experience, MarkerDetectionHandler handler, CameraFocusControl cameraFocusControl, Map<String, String> args)
         {
             return new RgbColourFilter_MixChannelsImpl(Channel.green);
         }
@@ -81,7 +82,7 @@ public class RgbColourFilter
             return "blueFilter";
         }
 
-        public ImageProcessor create(Context context, Experience experience, MarkerDetectionHandler handler, Map<String, String> args)
+        public ImageProcessor create(Context context, Experience experience, MarkerDetectionHandler handler, CameraFocusControl cameraFocusControl, Map<String, String> args)
         {
             return new RgbColourFilter_MixChannelsImpl(Channel.blue);
         }

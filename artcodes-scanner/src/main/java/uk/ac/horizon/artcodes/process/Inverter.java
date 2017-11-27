@@ -26,6 +26,7 @@ import org.opencv.core.Core;
 import java.util.List;
 import java.util.Map;
 
+import uk.ac.horizon.artcodes.camera.CameraFocusControl;
 import uk.ac.horizon.artcodes.detect.DetectorSetting;
 import uk.ac.horizon.artcodes.detect.ImageBuffers;
 import uk.ac.horizon.artcodes.detect.handler.MarkerDetectionHandler;
@@ -40,7 +41,7 @@ public class Inverter implements ImageProcessor
 			return "invert";
 		}
 
-		public ImageProcessor create(Context context, Experience experience, MarkerDetectionHandler handler, Map<String, String> args)
+		public ImageProcessor create(Context context, Experience experience, MarkerDetectionHandler handler, CameraFocusControl cameraFocusControl, Map<String, String> args)
 		{
 			return new Inverter();
 		}

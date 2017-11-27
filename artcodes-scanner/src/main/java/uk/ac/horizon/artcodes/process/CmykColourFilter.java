@@ -25,6 +25,7 @@ import org.opencv.core.Mat;
 import java.util.List;
 import java.util.Map;
 
+import uk.ac.horizon.artcodes.camera.CameraFocusControl;
 import uk.ac.horizon.artcodes.detect.DetectorSetting;
 import uk.ac.horizon.artcodes.detect.ImageBuffers;
 import uk.ac.horizon.artcodes.detect.handler.MarkerDetectionHandler;
@@ -44,7 +45,7 @@ public class CmykColourFilter
             return "cyanKFilter";
         }
 
-        public ImageProcessor create(Context context, Experience experience, MarkerDetectionHandler handler, Map<String, String> args)
+        public ImageProcessor create(Context context, Experience experience, MarkerDetectionHandler handler, CameraFocusControl cameraFocusControl, Map<String, String> args)
         {
             return new CmykColourFilter_UpdatedCMYImpl(Channel.cyan);
         }
@@ -56,7 +57,7 @@ public class CmykColourFilter
             return "magentaKFilter";
         }
 
-        public ImageProcessor create(Context context, Experience experience, MarkerDetectionHandler handler, Map<String, String> args)
+        public ImageProcessor create(Context context, Experience experience, MarkerDetectionHandler handler, CameraFocusControl cameraFocusControl, Map<String, String> args)
         {
             return new CmykColourFilter_UpdatedCMYImpl(Channel.magenta);
         }
@@ -68,7 +69,7 @@ public class CmykColourFilter
             return "yellowKFilter";
         }
 
-        public ImageProcessor create(Context context, Experience experience, MarkerDetectionHandler handler, Map<String, String> args)
+        public ImageProcessor create(Context context, Experience experience, MarkerDetectionHandler handler, CameraFocusControl cameraFocusControl, Map<String, String> args)
         {
             return new CmykColourFilter_UpdatedCMYImpl(Channel.yellow);
         }
@@ -80,7 +81,7 @@ public class CmykColourFilter
             return "blackKFilter";
         }
 
-        public ImageProcessor create(Context context, Experience experience, MarkerDetectionHandler handler, Map<String, String> args)
+        public ImageProcessor create(Context context, Experience experience, MarkerDetectionHandler handler, CameraFocusControl cameraFocusControl, Map<String, String> args)
         {
             return new CmykColourFilter_UpdatedKImpl();
         }

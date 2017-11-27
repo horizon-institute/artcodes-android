@@ -75,7 +75,7 @@ public class ScannerActivity extends AppCompatActivity
 	private Experience experience;
 	private VisibilityAnimator menuAnimator;
 	private TextAnimator textAnimator;
-	private CameraView cameraView;
+	protected CameraView cameraView;
 
 	@SuppressWarnings("UnusedParameters")
 	public void hideMenu(View view)
@@ -428,6 +428,6 @@ public class ScannerActivity extends AppCompatActivity
 			{
 				onCodeDetected(code);
 			}
-		}));
+		}), this.cameraView);
 	}
 }

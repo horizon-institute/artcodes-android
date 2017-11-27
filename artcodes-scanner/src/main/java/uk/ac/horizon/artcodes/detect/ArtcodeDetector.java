@@ -33,12 +33,14 @@ import java.util.Map;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
+import uk.ac.horizon.artcodes.camera.CameraFocusControl;
 import uk.ac.horizon.artcodes.detect.marker.MarkerEmbeddedChecksumAreaOrderDetector;
 import uk.ac.horizon.artcodes.detect.marker.MarkerAreaOrderDetector;
 import uk.ac.horizon.artcodes.detect.handler.MarkerDetectionHandler;
 import uk.ac.horizon.artcodes.detect.marker.MarkerDetector;
 import uk.ac.horizon.artcodes.detect.marker.MarkerEmbeddedChecksumDetector;
 import uk.ac.horizon.artcodes.model.Experience;
+import uk.ac.horizon.artcodes.process.BlurDetectionFilter;
 import uk.ac.horizon.artcodes.process.CmykColourFilter;
 import uk.ac.horizon.artcodes.process.HlsEditImageProcessor;
 import uk.ac.horizon.artcodes.process.ImageProcessor;
@@ -75,13 +77,13 @@ public class ArtcodeDetector extends Detector
 		register(new CmykColourFilter.BlackCmykColourFilterFactory());
 	}
 
-	public ArtcodeDetector(final Context context, Experience experience, MarkerDetectionHandler handler)
+	public ArtcodeDetector(final Context context, Experience experience, MarkerDetectionHandler handler, CameraFocusControl cameraFocusControl)
 	{
 		boolean missingProcessors = false;
 
 		for (String processorName : experience.getPipeline())
 		{
-			ImageProcessor processor = getProcessor(context, processorName, experience, handler);
+			ImageProcessor processor = getProcessor(context, processorName, experience, handler, cameraFocusControl);
 			if (processor != null)
 			{
 				pipeline.add(processor);
@@ -122,6 +124,11 @@ public class ArtcodeDetector extends Detector
 			pipeline.add(new TileThresholder());
 			pipeline.add(new MarkerDetector(experience, handler));
 		}
+
+		if (experience.getRequestedAutoFocusMode() != null && experience.getRequestedAutoFocusMode().equals("blurScore"))
+		{
+			pipeline.add(0, new BlurDetectionFilter(cameraFocusControl));
+		}
 	}
 
 	private static void register(ImageProcessorFactory factory)
@@ -129,7 +136,7 @@ public class ArtcodeDetector extends Detector
 		factoryRegistry.put(factory.getName(), factory);
 	}
 
-	private static ImageProcessor getProcessor(Context context, String string, Experience experience, MarkerDetectionHandler handler)
+	private static ImageProcessor getProcessor(Context context, String string, Experience experience, MarkerDetectionHandler handler, CameraFocusControl cameraFocusControl)
 	{
 		// matches "group1" or "group1(group2)" or "group1()"
 		String pattern = "([^\\(\\)]+)(?:\\(([^\\(\\)]*)\\))?";
@@ -146,7 +153,7 @@ public class ArtcodeDetector extends Detector
 			{
 				try
 				{
-					return factory.create(context, experience, handler, getImageProcessorArgs(imageProcessorArgs));
+					return factory.create(context, experience, handler, cameraFocusControl, getImageProcessorArgs(imageProcessorArgs));
 				}
 				catch (Exception e)
 				{
