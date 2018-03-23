@@ -38,11 +38,14 @@ import android.widget.RelativeLayout;
 
 import com.google.gson.Gson;
 
+import java.security.MessageDigest;
+import java.security.NoSuchAlgorithmException;
 import java.util.List;
 
 import uk.ac.horizon.artcodes.Artcodes;
 import uk.ac.horizon.artcodes.Feature;
 import uk.ac.horizon.artcodes.GoogleAnalytics;
+import uk.ac.horizon.artcodes.Hash;
 import uk.ac.horizon.artcodes.R;
 import uk.ac.horizon.artcodes.animator.VisibilityAnimator;
 import uk.ac.horizon.artcodes.databinding.ScannerActionBinding;
@@ -200,37 +203,55 @@ public class ArtcodeActivity extends ScannerActivity implements LoadCallback<Exp
 		Log.i("action", "" + action);
 		if (action != null)
 		{
-			final Experience experience = getExperience();
-			getServer().logScan(experience.getId(), action);
-			GoogleAnalytics.trackEvent("Action", "Scanned", experience.getId(), action.getName());
 
-			actionBinding.setAction(action);
-			actionBinding.getRoot().setOnClickListener(new View.OnClickListener()
+			if (Feature.get(getApplicationContext(), R.bool.feature_open_without_touch).isEnabled())
 			{
-				@Override
-				public void onClick(View v)
+				if (action.getUrl() != null)
 				{
-					if (action.getUrl() != null)
+					final Experience experience = getExperience();
+					GoogleAnalytics.trackEvent("Action", "Opened", experience.getId(), action.getName());
+					CustomTabsIntent.Builder builder = new CustomTabsIntent.Builder();
+					// TODO Warmup urls
+					//builder.setSession(session);
+					builder.setToolbarColor(ContextCompat.getColor(ArtcodeActivity.this, R.color.apptheme_primary));
+					CustomTabsIntent customTabsIntent = builder.build();
+					customTabsIntent.launchUrl(ArtcodeActivity.this, Uri.parse(processURL(action.getUrl(), action)));
+				}
+			}
+			else
+			{
+				final Experience experience = getExperience();
+				getServer().logScan(experience.getId(), action);
+				GoogleAnalytics.trackEvent("Action", "Scanned", experience.getId(), action.getName());
+
+				actionBinding.setAction(action);
+				actionBinding.getRoot().setOnClickListener(new View.OnClickListener()
+				{
+					@Override
+					public void onClick(View v)
 					{
-						GoogleAnalytics.trackEvent("Action", "Opened", experience.getId(), action.getName());
-						CustomTabsIntent.Builder builder = new CustomTabsIntent.Builder();
-						// TODO Warmup urls
-						//builder.setSession(session);
-						builder.setToolbarColor(ContextCompat.getColor(ArtcodeActivity.this, R.color.apptheme_primary));
-						CustomTabsIntent customTabsIntent = builder.build();
-						customTabsIntent.launchUrl(ArtcodeActivity.this, Uri.parse(action.getUrl()));
+						if (action.getUrl() != null)
+						{
+							GoogleAnalytics.trackEvent("Action", "Opened", experience.getId(), action.getName());
+							CustomTabsIntent.Builder builder = new CustomTabsIntent.Builder();
+							// TODO Warmup urls
+							//builder.setSession(session);
+							builder.setToolbarColor(ContextCompat.getColor(ArtcodeActivity.this, R.color.apptheme_primary));
+							CustomTabsIntent customTabsIntent = builder.build();
+							customTabsIntent.launchUrl(ArtcodeActivity.this, Uri.parse(processURL(action.getUrl(), action)));
+						}
 					}
-				}
-			});
-			runOnUiThread(new Runnable()
-			{
-				@Override
-				public void run()
+				});
+				runOnUiThread(new Runnable()
 				{
-					actionAnimator.showView();
-					progressBar.setVisibility(View.INVISIBLE);
-				}
-			});
+					@Override
+					public void run()
+					{
+						actionAnimator.showView();
+						progressBar.setVisibility(View.INVISIBLE);
+					}
+				});
+			}
 		}
 		else
 		{
@@ -273,6 +294,49 @@ public class ArtcodeActivity extends ScannerActivity implements LoadCallback<Exp
 					onActionChanged(detectedAction);
 				}
 			}, experience, null), this.cameraView);
+		}
+	}
+
+	protected String processURL(String url, Action action)
+	{
+		String result = url;
+
+		if (action != null && action.getCodes() != null && action.getCodes().size() > 0)
+		{
+			result = result.replace("{code}", action.getCodes().get(0));
+		}
+
+		if (result.contains("{timestamp}"))
+		{
+			result = result.replace("{timestamp}", "" + (System.currentTimeMillis() / 1000));
+		}
+
+		if (result.contains("{timehash1}"))
+		{
+			result = result.replace("{timehash1}", sha256(Hash.salts.get("timehash1") + (((System.currentTimeMillis() / 1000) / 1000) * 1000)));
+		}
+
+		return result;
+	}
+
+	private String sha256(String string)
+	{
+		try
+		{
+			MessageDigest md = MessageDigest.getInstance("SHA-256");
+			md.update(string.getBytes());
+			byte[] bytes = md.digest();
+			StringBuffer result = new StringBuffer();
+			for (byte byt : bytes)
+			{
+				result.append(Integer.toString((byt & 0xff) + 0x100, 16).substring(1));
+			}
+			return result.toString();
+		}
+		catch (NoSuchAlgorithmException e)
+		{
+			Log.e("ArtcodeActivity", "Exception getting sha256.", e);
+			return "";
 		}
 	}
 }

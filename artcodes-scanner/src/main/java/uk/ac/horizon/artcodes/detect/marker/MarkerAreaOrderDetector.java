@@ -57,6 +57,16 @@ public class MarkerAreaOrderDetector extends MarkerDetector
 	}
 
 	@Override
+	protected MarkerRegion createRegionForNode(int regionIndex, List<MatOfPoint> contours, Mat hierarchy, ContourStatus[] status, int statusIndex)
+	{
+		MarkerRegion region = super.createRegionForNode(regionIndex, contours, hierarchy, status, statusIndex);
+		if (region != null)
+		{
+			region.data = Imgproc.contourArea(contours.get(region.index));
+		}
+		return region;
+	}
+	@Override
 	protected MarkerRegion createRegionForNode(int regionIndex, List<MatOfPoint> contours, Mat hierarchy)
 	{
 		MarkerRegion region = super.createRegionForNode(regionIndex, contours, hierarchy);

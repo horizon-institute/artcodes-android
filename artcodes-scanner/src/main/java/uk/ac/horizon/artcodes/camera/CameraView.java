@@ -61,6 +61,8 @@ public class CameraView extends SurfaceView implements CameraFocusControl
 	private boolean cameraIsFocused = true;
 	private Experience experience;
 
+	private String debug_resolution;
+
 	public CameraView(Context context)
 	{
 		super(context);
@@ -291,6 +293,7 @@ public class CameraView extends SurfaceView implements CameraFocusControl
 			}
 		}
 
+
 		float ratioOfSurface = (float) surfaceHeight / surfaceWidth;
 		if (ratioOfSurface < 1)
 		{
@@ -303,12 +306,18 @@ public class CameraView extends SurfaceView implements CameraFocusControl
 		final List<Camera.Size> supportedPreviewSizes = parameters.getSupportedPreviewSizes();
 		Camera.Size bestFitSoFar = null;
 		float ratioDifferenceOfBestFitSoFar = 0;
+		StringBuilder cameraPreviewSizeDebugMessage = new StringBuilder("Available camera preview sizes: ");
 		for (Camera.Size supportedSize : supportedPreviewSizes)
 		{
 			float ratio = (float) supportedSize.width / supportedSize.height;
 			float ratioDifference = Math.abs(ratio - ratioOfSurface);
 
-			//Log.i("Scanner", "Preview Size " + supportedSize.width + "x" + supportedSize.height + " (" + ratio + ")");
+			cameraPreviewSizeDebugMessage.append(supportedSize.width);
+			cameraPreviewSizeDebugMessage.append('x');
+			cameraPreviewSizeDebugMessage.append(supportedSize.height);
+			cameraPreviewSizeDebugMessage.append(" (");
+			cameraPreviewSizeDebugMessage.append(ratio);
+			cameraPreviewSizeDebugMessage.append(") ");
 
 			if (bestFitSoFar == null || ratioDifference < ratioDifferenceOfBestFitSoFar)
 			{
@@ -316,11 +325,13 @@ public class CameraView extends SurfaceView implements CameraFocusControl
 				ratioDifferenceOfBestFitSoFar = ratioDifference;
 			}
 		}
+		Log.i("Scanner", cameraPreviewSizeDebugMessage.toString());
 
 		if (bestFitSoFar != null)
 		{
 			// Would only be null if there are no supportedPreviewSizes
-			Log.i("Scanner", "Selected Preview Size: " + bestFitSoFar.width + "x" + bestFitSoFar.height + " (" + ((float) bestFitSoFar.width / (float) bestFitSoFar.height) + ")");
+			this.debug_resolution = "Selected Preview Size: " + bestFitSoFar.width + "x" + bestFitSoFar.height + " (" + ((float) bestFitSoFar.width / (float) bestFitSoFar.height) + ")";
+			Log.i("Scanner", this.debug_resolution);
 			parameters.setPreviewSize(bestFitSoFar.width, bestFitSoFar.height);
 
 			camera.setParameters(parameters);

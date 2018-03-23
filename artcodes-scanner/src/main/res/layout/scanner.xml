@@ -57,12 +57,6 @@
             android:layout_height="0dp"
             android:layout_weight="1">
 
-            <ImageView
-                android:id="@+id/overlay"
-                android:layout_width="match_parent"
-                android:layout_height="match_parent"
-                android:scaleType="fitXY"
-                tools:ignore="ContentDescription"/>
 
             <LinearLayout
                 android:id="@+id/cameraError"
@@ -87,6 +81,13 @@
                     android:textAppearance="@style/TextAppearance.AppCompat.Medium"/>
 
             </LinearLayout>
+
+            <ImageView
+                android:id="@+id/overlay"
+                android:layout_width="match_parent"
+                android:layout_height="match_parent"
+                android:scaleType="fitXY"
+                tools:ignore="ContentDescription"/>
 
             <RelativeLayout
 				android:id="@+id/thumbnailImageLayout"

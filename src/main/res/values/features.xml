@@ -25,4 +25,5 @@
 	<bool name="feature_edit_colour">false</bool>
 	<bool name="feature_edit_features">false</bool>
 	<bool name="feature_upload_to_artcodes_co_uk">false</bool>
+	<bool name="feature_open_without_touch">false</bool>
 </resources>

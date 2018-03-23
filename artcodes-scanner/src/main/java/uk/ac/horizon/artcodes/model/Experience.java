@@ -25,6 +25,7 @@ import java.util.List;
 
 public class Experience
 {
+
 	public enum Status
 	{
 		loaded, modified, saving
@@ -42,6 +43,9 @@ public class Experience
 	private String callback;
 	private String originalID;
 	private String requestedAutoFocusMode;
+
+	private Boolean canCopy;
+	private Boolean scanHistoryEnabled;
 
 	public Experience()
 	{
@@ -196,5 +200,25 @@ public class Experience
 	public void setRequestedAutoFocusMode(String requestedAutoFocusMode)
 	{
 		this.requestedAutoFocusMode = requestedAutoFocusMode;
+	}
+
+	public Boolean getCanCopy()
+	{
+		return canCopy;
+	}
+
+	public void setCanCopy(Boolean canCopy)
+	{
+		this.canCopy = canCopy;
+	}
+
+	public Boolean getScanHistoryEnabled()
+	{
+		return scanHistoryEnabled;
+	}
+
+	public void setScanHistoryEnabled(Boolean scanHistoryEnabled)
+	{
+		this.scanHistoryEnabled = scanHistoryEnabled;
 	}
 }

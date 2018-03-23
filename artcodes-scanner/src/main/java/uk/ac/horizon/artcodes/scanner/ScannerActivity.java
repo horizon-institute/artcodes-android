@@ -194,9 +194,11 @@ public class ScannerActivity extends AppCompatActivity
 						@Override
 						public void run()
 						{
+							Log.i("cameraErrorView", "Getting camera error view...");
 							View errorView = findViewById(R.id.cameraError);
 							if (errorView != null)
 							{
+								Log.i("cameraErrorView", "Setting camera error view to GONE");
 								errorView.setVisibility(View.GONE);
 							}
 							progressBar.setVisibility(View.VISIBLE);

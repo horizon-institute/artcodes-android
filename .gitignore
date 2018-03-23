@@ -9,3 +9,5 @@ src/main/res/values/keys.xml
 src/main/res/xml/app_tracker.xml
 
 *.keystore
+
+src/main/java/uk/ac/horizon/artcodes/Hash.java

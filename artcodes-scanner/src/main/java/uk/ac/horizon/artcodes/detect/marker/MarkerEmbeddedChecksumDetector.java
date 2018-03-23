@@ -63,6 +63,13 @@ public class MarkerEmbeddedChecksumDetector extends MarkerDetector
 		this.relaxedEmbeddedChecksumIgnoreNonHollowDots = this.relaxedEmbeddedChecksumIgnoreMultipleHollowSegments = relaxed;
 	}
 
+	@Override
+	protected Marker createMarkerForNode(int nodeIndex, List<MatOfPoint> contours, Mat hierarchy, ContourStatus[] status, int statusIndex)
+	{
+		return createMarkerForNode(nodeIndex, contours, hierarchy);
+	}
+
+	@Override
 	protected Marker createMarkerForNode(int nodeIndex, List<MatOfPoint> contours, Mat hierarchy)
 	{
 		List<MarkerRegion> regions = null;
@@ -103,7 +110,7 @@ public class MarkerEmbeddedChecksumDetector extends MarkerDetector
 
 		if (regions!=null)
 		{
-			Marker marker = new MarkerWithEmbeddedChecksum(nodeIndex, regions, checksumRegion);
+			MarkerWithEmbeddedChecksum marker = new MarkerWithEmbeddedChecksum(nodeIndex, regions, checksumRegion);
 			sortCode(marker);
 			if (isValidRegionList(marker))
 			{
@@ -151,6 +158,13 @@ public class MarkerEmbeddedChecksumDetector extends MarkerDetector
 		return nodes[FIRST_NODE] >= 0 && // has a child node, and
 				(hierarchy.get(0, (int) nodes[FIRST_NODE])[NEXT_NODE] < 0 || this.relaxedEmbeddedChecksumIgnoreMultipleHollowSegments) && //the child has no siblings, and
 				isValidDot((int) nodes[FIRST_NODE], hierarchy);// the child is a leaf
+	}
+
+
+	@Override
+	protected boolean hasValidChecksum(Marker marker, ContourStatus[] status, int statusIndex)
+	{
+		return hasValidChecksum(marker);
 	}
 
 	@Override

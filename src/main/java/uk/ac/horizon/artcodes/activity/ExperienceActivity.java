@@ -252,6 +252,11 @@ public class ExperienceActivity extends ExperienceActivityBase
 
 	public void copyExperience(View view)
 	{
+		if (getExperience().getCanCopy() != null && !getExperience().getCanCopy().booleanValue())
+		{
+			return;
+		}
+
 		final AlertDialog.Builder builder = new AlertDialog.Builder(this);
 		final LinearLayout linearLayout = new LinearLayout(this);
 		linearLayout.setOrientation(LinearLayout.VERTICAL);
@@ -281,6 +286,7 @@ public class ExperienceActivity extends ExperienceActivityBase
 						}
 						experience.setId(null);
 						experience.setName(getString(R.string.copy_of, experience.getName()));
+						experience.getAvailabilities().clear();
 						account.saveExperience(experience);
 						ExperienceActivity.start(ExperienceActivity.this, experience);
 					}
@@ -341,8 +347,13 @@ public class ExperienceActivity extends ExperienceActivityBase
 			}
 		}
 
+		if (getExperience().getCanCopy() != null && !getExperience().getCanCopy().booleanValue())
+		{
+			copiable = false;
+		}
+
 		final List<ScanEvent> history = getServer().getScanHistory(getUri());
-		setVisible(binding.scanHistoryButton, history != null && !history.isEmpty());
+		setVisible(binding.scanHistoryButton, history != null && !history.isEmpty() && (getExperience().getScanHistoryEnabled()==null || getExperience().getScanHistoryEnabled().booleanValue()));
 		setVisible(binding.editButton, editable);
 		setVisible(binding.copyButton, copiable);
 		setVisible(binding.saveProgress, saving);

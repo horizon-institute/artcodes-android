@@ -31,7 +31,8 @@
 
     <string name="draw_marker_off">Marker outlines hidden</string>
     <string name="draw_marker_outline">Marker outlines visible</string>
-    <string name="draw_marker_regions">Marker and region outlines visible</string>
+	<string name="draw_marker_regions">Marker and region outlines visible</string>
+	<string name="draw_marker_debug">Marker debug visible</string>
     <string name="display_menu">Display Menu</string>
 
     <string name="artcode_scan_scheme">x-artcode-scan</string>

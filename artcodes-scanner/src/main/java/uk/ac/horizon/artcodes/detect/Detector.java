@@ -112,7 +112,17 @@ public class Detector
 	public byte[] createBuffer(CameraInfo info, int surfaceWidth, int surfaceHeight)
 	{
 		byte[] buffer = buffers.createBuffer(info.getImageWidth(), info.getImageHeight(), info.getImageDepth());
-		buffers.setROI(createROI(info.getImageWidth(), info.getImageHeight(), surfaceWidth, surfaceHeight));
+
+		boolean fullscreen = false;
+		if (!fullscreen)
+		{
+			buffers.setROI(createROI(info.getImageWidth(), info.getImageHeight(), surfaceWidth, surfaceHeight));
+		}
+		else
+		{
+			buffers.setROI(null);if(callback != null)callback.detectionStart(100);
+		}
+
 		buffers.setRotation(info.getRotation());
 		buffers.setFrontFacing(info.isFrontFacing());
 		createSettings();

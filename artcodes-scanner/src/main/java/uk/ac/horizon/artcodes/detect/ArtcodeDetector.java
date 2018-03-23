@@ -47,6 +47,7 @@ import uk.ac.horizon.artcodes.process.ImageProcessor;
 import uk.ac.horizon.artcodes.process.ImageProcessorFactory;
 import uk.ac.horizon.artcodes.process.IntensityFilter;
 import uk.ac.horizon.artcodes.process.Inverter;
+import uk.ac.horizon.artcodes.process.OtsuThresholder;
 import uk.ac.horizon.artcodes.process.RgbColourFilter;
 import uk.ac.horizon.artcodes.process.TileThresholder;
 import uk.ac.horizon.artcodes.process.WhiteBalanceImageProcessor;
@@ -63,6 +64,7 @@ public class ArtcodeDetector extends Detector
 		register(new MarkerEmbeddedChecksumAreaOrderDetector.Factory());
 
 		register(new TileThresholder.Factory());
+		register(new OtsuThresholder.Factory());
 
 		register(new IntensityFilter.IntensityFilterFactory());
 		register(new Inverter.InverterFactory());
@@ -81,6 +83,8 @@ public class ArtcodeDetector extends Detector
 	{
 		boolean missingProcessors = false;
 
+		Log.i("ArtcodesDetector", "Pipeline items: "+experience.getPipeline().size());
+
 		for (String processorName : experience.getPipeline())
 		{
 			ImageProcessor processor = getProcessor(context, processorName, experience, handler, cameraFocusControl);
@@ -91,6 +95,7 @@ public class ArtcodeDetector extends Detector
 			else
 			{
 				missingProcessors = true;
+				Log.w("ArtcodeDetector", "Missing pipeline item: "+processorName);
 			}
 		}
 
