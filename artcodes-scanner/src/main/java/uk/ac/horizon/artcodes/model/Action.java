@@ -29,6 +29,14 @@ public class Action
 		any, all, sequence
 	}
 
+	/**
+	 * Action level option for the "visual checksum (optional)" detector.
+	 */
+	public enum ChecksumOption
+	{
+		optional, required, excluded
+	}
+
 	public static final String HTTP_PREFIX = "http://";
 	private final List<String> codes = new ArrayList<>();
 	private Match match = Match.any;
@@ -42,6 +50,8 @@ public class Action
 	private Integer framesRequired;
 	private Integer framesAwarded;
 	private Double minimumSize;
+
+	private ChecksumOption checksumOption;
 
 	public List<String> getCodes()
 	{
@@ -187,4 +197,15 @@ public class Action
 	{
 		this.minimumSize = minimumSize;
 	}
+
+	public ChecksumOption getChecksumOption()
+	{
+		return checksumOption;
+	}
+
+	public void setChecksumOption(ChecksumOption checksumOption)
+	{
+		this.checksumOption = checksumOption;
+	}
+
 }

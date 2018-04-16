@@ -68,11 +68,6 @@ public class MarkerEmbeddedChecksumAreaOrderDetector extends MarkerEmbeddedCheck
 	@Override
 	protected Marker createMarkerForNode(int nodeIndex, List<MatOfPoint> contours, Mat hierarchy, ContourStatus[] status, int statusIndex)
 	{
-		return createMarkerForNode(nodeIndex, contours, hierarchy);
-	}
-	@Override
-	protected Marker createMarkerForNode(int nodeIndex, List<MatOfPoint> contours, Mat hierarchy)
-	{
 		List<MarkerRegion> regions = null;
 		MarkerRegion checksumRegion = null;
 		for (int currentNodeIndex = (int) hierarchy.get(0, nodeIndex)[FIRST_NODE]; currentNodeIndex >= 0; currentNodeIndex = (int) hierarchy.get(0, currentNodeIndex)[NEXT_NODE])

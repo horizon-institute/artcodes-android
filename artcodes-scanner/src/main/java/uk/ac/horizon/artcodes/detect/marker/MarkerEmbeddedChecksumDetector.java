@@ -20,6 +20,7 @@
 package uk.ac.horizon.artcodes.detect.marker;
 
 import android.content.Context;
+import android.util.Log;
 
 import org.opencv.core.Mat;
 import org.opencv.core.MatOfPoint;
@@ -30,9 +31,14 @@ import java.util.Map;
 
 import uk.ac.horizon.artcodes.camera.CameraFocusControl;
 import uk.ac.horizon.artcodes.detect.handler.MarkerDetectionHandler;
+import uk.ac.horizon.artcodes.model.Action;
 import uk.ac.horizon.artcodes.model.Experience;
 import uk.ac.horizon.artcodes.process.ImageProcessor;
 import uk.ac.horizon.artcodes.process.ImageProcessorFactory;
+
+import static uk.ac.horizon.artcodes.detect.marker.MarkerDetector.ContourStatus.leaf;
+import static uk.ac.horizon.artcodes.detect.marker.MarkerDetector.ContourStatus.ok;
+import static uk.ac.horizon.artcodes.detect.marker.MarkerDetector.ContourStatus.tooManyRegions;
 
 /**
  * <p>This class detects Artcodes with an embedded checksum region.</p>
@@ -63,20 +69,46 @@ public class MarkerEmbeddedChecksumDetector extends MarkerDetector
 		this.relaxedEmbeddedChecksumIgnoreNonHollowDots = this.relaxedEmbeddedChecksumIgnoreMultipleHollowSegments = relaxed;
 	}
 
+
 	@Override
-	protected Marker createMarkerForNode(int nodeIndex, List<MatOfPoint> contours, Mat hierarchy, ContourStatus[] status, int statusIndex)
+	protected boolean isMarkerValidForAction(final Marker marker, final Action action, final ArrayList<MatOfPoint> contours, final Mat hierarchy)
 	{
-		return createMarkerForNode(nodeIndex, contours, hierarchy);
+		boolean result = true;
+
+		// if checksum region is set as optional on the Detector...
+		if (!this.embeddedChecksumRequired &&
+				marker != null &&
+				action != null &&
+				action.getChecksumOption() != null)
+		{
+			boolean markerHasChecksumRegion = (marker instanceof MarkerWithEmbeddedChecksum) && ((MarkerWithEmbeddedChecksum)marker).checksumRegion!=null;
+
+			// ...check for checksum option set on Action
+			switch (action.getChecksumOption())
+			{
+				case optional:
+					result = true;
+					break;
+				case required:
+					result = markerHasChecksumRegion;
+					break;
+				case excluded:
+					result = !markerHasChecksumRegion;
+			}
+			Log.i("OPT_CHECKSUM_TEST", "cs option: "+action.getChecksumOption() + ", has cs region: "+markerHasChecksumRegion + ", result: "+result);
+		}
+
+		return result && super.isMarkerValidForAction(marker, action, contours, hierarchy);
 	}
 
 	@Override
-	protected Marker createMarkerForNode(int nodeIndex, List<MatOfPoint> contours, Mat hierarchy)
+	protected Marker createMarkerForNode(int nodeIndex, List<MatOfPoint> contours, Mat hierarchy, ContourStatus[] status, int statusIndex)
 	{
 		List<MarkerRegion> regions = null;
 		MarkerRegion checksumRegion = null;
 		for (int currentNodeIndex = (int) hierarchy.get(0, nodeIndex)[FIRST_NODE]; currentNodeIndex >= 0; currentNodeIndex = (int) hierarchy.get(0, currentNodeIndex)[NEXT_NODE])
 		{
-			final MarkerRegion region = createRegionForNode(currentNodeIndex, contours, hierarchy);
+			final MarkerRegion region = createRegionForNode(currentNodeIndex, contours, hierarchy, status, statusIndex);
 			if (region != null)
 			{
 				if (this.ignoreEmptyRegions && region.value==0)
@@ -89,6 +121,7 @@ public class MarkerEmbeddedChecksumDetector extends MarkerDetector
 				}
 				else if (regions.size() >= maxRegions)
 				{
+					status[statusIndex] = tooManyRegions;
 					return null;
 				}
 
@@ -112,10 +145,15 @@ public class MarkerEmbeddedChecksumDetector extends MarkerDetector
 		{
 			MarkerWithEmbeddedChecksum marker = new MarkerWithEmbeddedChecksum(nodeIndex, regions, checksumRegion);
 			sortCode(marker);
-			if (isValidRegionList(marker))
+			if (isValidRegionList(marker, status, statusIndex))
 			{
+				status[statusIndex] = ok;
 				return marker;
 			}
+		}
+		else
+		{
+			status[statusIndex] = leaf;
 		}
 
 		return null;
@@ -164,12 +202,6 @@ public class MarkerEmbeddedChecksumDetector extends MarkerDetector
 	@Override
 	protected boolean hasValidChecksum(Marker marker, ContourStatus[] status, int statusIndex)
 	{
-		return hasValidChecksum(marker);
-	}
-
-	@Override
-	protected boolean hasValidChecksum(Marker marker)
-	{
 		if (marker instanceof MarkerWithEmbeddedChecksum)
 		{
 			// If the detected Artcodes has an embedded checksum validate it
@@ -193,7 +225,10 @@ public class MarkerEmbeddedChecksumDetector extends MarkerDetector
 					}
 					weightedSum += value * weight++;
 				}
-				return markerEc.checksumRegion.value == (weightedSum - 1) % 7 + 1;
+
+				boolean validChecksumRegion = markerEc.checksumRegion.value == (weightedSum - 1) % 7 + 1;
+				if (!validChecksumRegion) status[statusIndex] = ContourStatus.wrongChecksum;
+				return validChecksumRegion;
 			}
 		}
 
@@ -201,12 +236,13 @@ public class MarkerEmbeddedChecksumDetector extends MarkerDetector
 		{
 			// If the detected Artcode does not have an embedded checksum and embedded checksum is
 			// not required, delegate to super class
-			return super.hasValidChecksum(marker);
+			return super.hasValidChecksum(marker, status, statusIndex);
 		}
 		else
 		{
 			// If the detected Artcode does not have an embedded checksum and embedded checksum is
 			// required this is not a valid Artcode.
+			status[statusIndex] = ContourStatus.wrongChecksum;
 			return false;
 		}
 	}

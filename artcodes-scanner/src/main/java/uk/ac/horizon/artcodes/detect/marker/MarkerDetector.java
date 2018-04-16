@@ -83,6 +83,8 @@ public class MarkerDetector implements ImageProcessor
 
 	private Experience experience;
 
+	private double diagonalScreenSize;
+
 	public static class Factory implements ImageProcessorFactory
 	{
 		public String getName()
@@ -228,7 +230,7 @@ public class MarkerDetector implements ImageProcessor
 		{
 			final List<Marker> foundMarkers = new ArrayList<>();
 			Imgproc.findContours(buffers.getImageInGrey(), contours, hierarchy, Imgproc.RETR_TREE, Imgproc.CHAIN_APPROX_NONE);
-			double diagonalScreenSize = Math.sqrt(Math.pow(buffers.getImageInAnyFormat().cols(), 2) + Math.pow(buffers.getImageInAnyFormat().rows(), 2));
+			diagonalScreenSize = Math.sqrt(Math.pow(buffers.getImageInAnyFormat().cols(), 2) + Math.pow(buffers.getImageInAnyFormat().rows(), 2));
 
 
 			ContourStatus[] contourStatus = new ContourStatus[contours.size()];
@@ -243,15 +245,9 @@ public class MarkerDetector implements ImageProcessor
 					{
 						// If this marker has a minimum size set and is smaller: continue in loop.
 						Action action = experience.getActionForCode(markerCode);
-						if (diagonalScreenSize > 0 && action != null && action.getMinimumSize() != null)
+						if (!this.isMarkerValidForAction(marker, action, contours, hierarchy))
 						{
-							double minimumSize = action.getMinimumSize();
-							RotatedRect rotatedRect = Imgproc.minAreaRect(new MatOfPoint2f(contours.get(i).toArray()));
-							double markerSize = Math.max(rotatedRect.size.width, rotatedRect.size.height);
-							if (!(markerSize/diagonalScreenSize >= minimumSize))
-							{
-								continue;
-							}
+							continue;
 						}
 
 						foundMarkers.add(marker);
@@ -309,6 +305,31 @@ public class MarkerDetector implements ImageProcessor
 			contours.clear();
 			hierarchy.release();
 		}
+	}
+
+	/**
+	 * Override this method to check a detected Marker is valid for any extra options set on an
+	 * Action. E.g. base class checks for minimum size requirements. Remember to && your result
+	 * with super.isMarkerValidForAction.
+	 * @param marker
+	 * @param action
+	 * @param contours
+	 * @param hierarchy
+	 * @return If the Marker is valid based on the options in Action.
+	 */
+	protected boolean isMarkerValidForAction(final Marker marker, final Action action, final ArrayList<MatOfPoint> contours, final Mat hierarchy)
+	{
+		// check if marker meets minimum size requirement set on action
+		if (diagonalScreenSize > 0 && action != null && action.getMinimumSize() != null)
+		{
+			double minimumSize = action.getMinimumSize();
+			RotatedRect rotatedRect = Imgproc.minAreaRect(new MatOfPoint2f(contours.get(marker.markerIndex).toArray()));
+			double markerSize = Math.sqrt(Math.pow(rotatedRect.size.width, 2.0) + Math.pow(rotatedRect.size.height, 2.0));
+			boolean result = markerSize / diagonalScreenSize >= minimumSize;
+			Log.i("MIN_MARKER_SIZE", "markerSize/diagonalScreenSize >= minimumSize = "+markerSize+"/"+diagonalScreenSize+" >= "+minimumSize+" = "+result);
+			return result;
+		}
+		return true;
 	}
 
 	private void drawDebug(Mat overlay, ArrayList<MatOfPoint> contours, Mat hierarchy, ContourStatus[] contourStatuses, List<Marker> markers)
