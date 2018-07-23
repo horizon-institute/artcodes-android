@@ -27,7 +27,8 @@
     <uses-permission android:name="android.permission.GET_ACCOUNTS"/>
     <uses-permission android:name="android.permission.MANAGE_ACCOUNTS"/>
     <uses-permission android:name="android.permission.USE_CREDENTIALS"/>
-    <uses-permission android:name="android.permission.ACCESS_FINE_LOCATION"/>
+	<uses-permission android:name="android.permission.ACCESS_FINE_LOCATION"/>
+	<uses-permission android:name="android.permission.READ_EXTERNAL_STORAGE"/>
 
     <uses-feature
         android:name="android.hardware.camera"
@@ -65,7 +66,8 @@
         <activity
             android:name=".activity.ArtcodeActivity"
             android:parentActivityName=".activity.ExperienceActivity"
-            android:theme="@style/Theme.Artcodes.Camera">
+            android:theme="@style/Theme.Artcodes.Camera"
+			android:screenOrientation="portrait">
         </activity>
         <activity
             android:name=".activity.ActionActivity"
@@ -117,8 +119,16 @@
                 <data android:scheme="https"/>
                 <data android:mimeType="*/*"/>
                 <data android:host="*"/>
-                <data android:pathPattern="/.*\\.artcode"/>
+                <data android:pathPattern=".*\\.artcode"/>
             </intent-filter>
+			<intent-filter>
+				<action android:name="android.intent.action.VIEW" />
+				<category android:name="android.intent.category.DEFAULT" />
+				<data android:scheme="file" />
+				<data android:host="*" />
+				<data android:mimeType="*/*"/>
+				<data android:pathPattern=".*\\.artcode" />
+			</intent-filter>
         </activity>
         <activity
             android:name=".activity.NavigationActivity"

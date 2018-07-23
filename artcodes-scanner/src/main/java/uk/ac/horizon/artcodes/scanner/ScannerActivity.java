@@ -27,6 +27,8 @@ import android.content.res.ColorStateList;
 import android.content.res.Configuration;
 import android.content.res.TypedArray;
 import android.graphics.Color;
+import android.graphics.PorterDuff;
+import android.graphics.PorterDuffColorFilter;
 import android.graphics.drawable.Drawable;
 import android.net.Uri;
 import android.os.Build;
@@ -46,6 +48,7 @@ import android.view.MenuItem;
 import android.view.View;
 import android.view.ViewGroup;
 import android.view.WindowManager;
+import android.widget.Button;
 import android.widget.ImageView;
 import android.widget.LinearLayout;
 import android.widget.ProgressBar;
@@ -64,7 +67,9 @@ import uk.ac.horizon.artcodes.detect.DetectorCallback;
 import uk.ac.horizon.artcodes.detect.DetectorSetting;
 import uk.ac.horizon.artcodes.detect.handler.CodeDetectionHandler;
 import uk.ac.horizon.artcodes.detect.handler.MarkerCodeDetectionHandler;
+import uk.ac.horizon.artcodes.model.Action;
 import uk.ac.horizon.artcodes.model.Experience;
+import uk.ac.horizon.artcodes.scanner.databinding.ScannerActionBinding;
 
 public class ScannerActivity extends AppCompatActivity
 {
@@ -91,6 +96,9 @@ public class ScannerActivity extends AppCompatActivity
 			getWindow().getDecorView().setSystemUiVisibility(View.SYSTEM_UI_FLAG_LAYOUT_HIDE_NAVIGATION | View.SYSTEM_UI_FLAG_LAYOUT_STABLE);
 		}
 	}
+
+	protected ScannerActionBinding actionBinding;
+	protected VisibilityAnimator actionAnimator;
 
 	@Override
 	public void onCreate(Bundle savedInstanceState)
@@ -122,6 +130,20 @@ public class ScannerActivity extends AppCompatActivity
 		menuAnimator = new VisibilityAnimator(findViewById(R.id.settingsMenu), findViewById(R.id.settingsMenuButton));
 		TextView settingsFeedback = (TextView) findViewById(R.id.settingsFeedback);
 		textAnimator = new TextAnimator(settingsFeedback);
+
+
+		ViewGroup bottomView = (ViewGroup) findViewById(R.id.bottomView);
+		if (bottomView != null)
+		{
+			actionBinding = ScannerActionBinding.inflate(getLayoutInflater(), bottomView, false);
+			bottomView.addView(actionBinding.getRoot());
+			actionAnimator = new VisibilityAnimator(actionBinding.getRoot());
+		}
+
+		if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.LOLLIPOP)
+		{
+			progressBar.setIndeterminateTintList(ColorStateList.valueOf(0xff33b5e5));
+		}
 	}
 
 	@Override
@@ -148,7 +170,103 @@ public class ScannerActivity extends AppCompatActivity
 	public void loaded(Experience experience)
 	{
 		this.experience = experience;
+		setExperienceStyle();
 		startScanning();
+	}
+
+	/**
+	 * This function sets the colors of the scan screen (only if the experience contains colors).
+	 */
+	public void setExperienceStyle() {
+		if (this.experience != null)
+		{
+			if (this.experience.getBackgroundColor() != null || this.experience.getForegroundColor() != null)
+			{
+
+				if (this.experience.getBackgroundColor() != null)
+				{
+					View topFrame = findViewById(R.id.topView);
+					View bottomFrame = findViewById(R.id.bottomView);
+					int backgroundColor = Color.parseColor(this.experience.getBackgroundColor());
+					// If no transparency is set add default transparency to background:
+					if (this.experience.getBackgroundColor().length() <= 7) backgroundColor &= 0xbbffffff;
+					if (topFrame != null) topFrame.setBackgroundColor(backgroundColor);
+					if (bottomFrame != null) bottomFrame.setBackgroundColor(backgroundColor);
+				}
+
+				if (this.experience.getForegroundColor() != null)
+				{
+					int foregroundColor = Color.parseColor(this.experience.getForegroundColor());
+					Toolbar v = (Toolbar) findViewById(R.id.toolbar);
+					if (v != null)
+					{
+						v.setTitleTextColor(foregroundColor);
+						// set back icon color:
+						try
+						{
+							if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.LOLLIPOP)
+							{
+								v.getNavigationIcon().setTint(foregroundColor);
+							}
+							else
+							{
+								v.getNavigationIcon().setColorFilter(new
+										PorterDuffColorFilter(foregroundColor, PorterDuff.Mode.MULTIPLY));
+							}
+						}
+						catch (NullPointerException e)
+						{
+							Log.w("", "Exception setting toolbar icon colour.", e);
+						}
+					}
+
+
+					TextView scanScreenTextTitle = (TextView) findViewById(R.id.scanScreenTextTitle);
+					if (scanScreenTextTitle != null) {
+						scanScreenTextTitle.setTextColor(foregroundColor);
+					}
+					TextView scanScreenTextDesc = (TextView) findViewById(R.id.scanScreenTextDesc);
+					if (scanScreenTextDesc != null) {
+						scanScreenTextDesc.setTextColor(foregroundColor);
+					}
+				}
+
+			}
+
+			if (this.experience.getHighlightBackgroundColor() != null && this.experience.getHighlightForegroundColor() != null)
+			{
+				int foregroundColor = Color.parseColor(this.experience.getHighlightForegroundColor());
+				int backgroundColor = Color.parseColor(this.experience.getHighlightBackgroundColor());
+
+				Button b = (Button) findViewById(R.id.scan_event_button);
+				if (b != null)
+				{
+					b.setTextColor(foregroundColor);
+					b.setBackgroundColor(backgroundColor);
+				}
+				ProgressBar pb = (ProgressBar) findViewById(R.id.progressBar);
+				if (pb != null && Build.VERSION.SDK_INT >= Build.VERSION_CODES.LOLLIPOP)
+				{
+					pb.setIndeterminateTintList(ColorStateList.valueOf(backgroundColor));
+				}
+			}
+
+			if (this.experience.getScanScreenTextTitle() != null) {
+				TextView textView = (TextView) findViewById(R.id.scanScreenTextTitle);
+				if (textView != null) {
+					textView.setVisibility(View.VISIBLE);
+					textView.setText(this.experience.getScanScreenTextTitle());
+				}
+			}
+			if (this.experience.getScanScreenTextDesciption() != null) {
+				TextView textView = (TextView) findViewById(R.id.scanScreenTextDesc);
+				if (textView != null) {
+					textView.setVisibility(View.VISIBLE);
+					textView.setText(this.experience.getScanScreenTextDesciption());
+				}
+			}
+
+		}
 	}
 
 	@SuppressWarnings("UnusedParameters")
@@ -233,7 +351,7 @@ public class ScannerActivity extends AppCompatActivity
 				}
 			});
 			detector.setOverlay((ImageView) findViewById(R.id.overlay));
-			if (getSupportActionBar() != null)
+			if (getSupportActionBar() != null && experience.getScanScreenTextTitle()==null)
 			{
 				getSupportActionBar().setDisplayShowTitleEnabled(true);
 				getSupportActionBar().setTitle(experience.getName());
@@ -304,7 +422,49 @@ public class ScannerActivity extends AppCompatActivity
 		});
 	}
 
-	private void onCodeDetected(String markerCode)
+	private String lastFoundCode = null;
+	private void onCodeDetected(final String markerCode)
+	{
+		if (experience != null)
+		{
+			if (experience.getOpenWithoutUserInput() == null || experience.getOpenWithoutUserInput())
+			{
+				returnCode(markerCode);
+			}
+			else
+			{
+				final Experience experience = getExperience();
+				final Action action = experience.getActionForCode(markerCode);
+				if (action != null)
+				{
+					lastFoundCode = markerCode;
+					actionBinding.setAction(action);
+					actionBinding.getRoot().findViewById(R.id.scan_event_button).setOnClickListener(new View.OnClickListener()
+					{
+						@Override
+						public void onClick(View v)
+						{
+							if (action.getUrl() != null)
+							{
+								returnCode(markerCode);
+							}
+						}
+					});
+					runOnUiThread(new Runnable()
+					{
+						@Override
+						public void run()
+						{
+							actionAnimator.showView();
+							progressBar.setVisibility(View.INVISIBLE);
+						}
+					});
+				}
+			}
+		}
+	}
+
+	private void returnCode(String markerCode)
 	{
 		Log.i("Marker", "MarkerDisplay Detected: " + markerCode);
 		if (markerCode != null)

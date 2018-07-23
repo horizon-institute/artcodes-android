@@ -43,7 +43,8 @@
         android:supportsRtl="true">
 		<activity
 			android:name=".ScannerActivity"
-			android:theme="@style/Theme.Artcodes.Camera">
+			android:theme="@style/Theme.Artcodes.Camera"
+			android:screenOrientation="portrait">
 			<intent-filter>
 				<action android:name="uk.ac.horizon.aestheticodes.SCAN"/>
 

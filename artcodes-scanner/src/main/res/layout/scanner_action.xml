@@ -20,7 +20,7 @@
 
 <layout xmlns:android="http://schemas.android.com/apk/res/android"
         xmlns:tools="http://schemas.android.com/tools"
-        tools:context="uk.ac.horizon.artcodes.activity.ArtcodeActivity"
+        tools:context="uk.ac.horizon.artcodes.scanner.ScanActivity"
         tools:ignore="UnusedResources">
 
 	<data>
@@ -32,16 +32,25 @@
 			type="uk.ac.horizon.artcodes.model.Action"/>
 	</data>
 
-	<Button
-        style="@style/Widget.AppCompat.ActionButton"
-        android:layout_width="match_parent"
-        android:layout_height="match_parent"
-        android:padding="16dp"
-        android:text="@{action.name ?? action.displayUrl}"
-        android:textAppearance="@style/TextAppearance.AppCompat.Title"
-        android:textColor="@color/apptheme_accent_light"
-        android:visibility="invisible"
-        tools:text="Marker Blah"
-        tools:visibility="visible"
-        android:background="@color/viewfinder_mask"/>
+	<LinearLayout
+		android:layout_width="match_parent"
+		android:layout_height="match_parent"
+		android:gravity="center"
+		android:orientation="vertical"
+		android:visibility="invisible">
+
+		<Button
+			android:id="@+id/scan_event_button"
+			style="@style/Widget.AppCompat.ActionButton"
+			android:layout_width="wrap_content"
+			android:layout_height="wrap_content"
+			android:background="@android:color/holo_blue_light"
+			android:padding="16dp"
+			android:text="@{action.name ?? action.displayUrl}"
+			android:textAppearance="@style/TextAppearance.AppCompat.Title"
+			android:textColor="@android:color/white"
+			tools:text="Marker Blah"
+			tools:visibility="visible"/>
+
+	</LinearLayout>
 </layout>

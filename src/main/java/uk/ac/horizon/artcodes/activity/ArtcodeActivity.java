@@ -34,6 +34,7 @@ import android.util.Log;
 import android.view.MenuItem;
 import android.view.View;
 import android.view.ViewGroup;
+import android.widget.Button;
 import android.widget.RelativeLayout;
 
 import com.google.gson.Gson;
@@ -47,8 +48,6 @@ import uk.ac.horizon.artcodes.Feature;
 import uk.ac.horizon.artcodes.GoogleAnalytics;
 import uk.ac.horizon.artcodes.Hash;
 import uk.ac.horizon.artcodes.R;
-import uk.ac.horizon.artcodes.animator.VisibilityAnimator;
-import uk.ac.horizon.artcodes.databinding.ScannerActionBinding;
 import uk.ac.horizon.artcodes.detect.ArtcodeDetector;
 import uk.ac.horizon.artcodes.detect.handler.ActionDetectionHandler;
 import uk.ac.horizon.artcodes.detect.handler.MarkerActionDetectionHandler;
@@ -64,8 +63,6 @@ import uk.ac.horizon.artcodes.ui.MarkerHistoryViewController;
 
 public class ArtcodeActivity extends ScannerActivity implements LoadCallback<Experience>
 {
-	private ScannerActionBinding actionBinding;
-	private VisibilityAnimator actionAnimator;
 
 	public static void start(Context context, Experience experience)
 	{
@@ -93,6 +90,7 @@ public class ArtcodeActivity extends ScannerActivity implements LoadCallback<Exp
 	{
 		super.onCreate(savedInstanceState);
 
+		/*
 		ViewGroup bottomView = (ViewGroup) findViewById(R.id.bottomView);
 		if (bottomView != null)
 		{
@@ -105,6 +103,7 @@ public class ArtcodeActivity extends ScannerActivity implements LoadCallback<Exp
 		{
 			progressBar.setIndeterminateTintList(ColorStateList.valueOf(ContextCompat.getColor(this, R.color.apptheme_accent)));
 		}
+		*/
 
 		if (getSupportActionBar() != null)
 		{
@@ -128,6 +127,7 @@ public class ArtcodeActivity extends ScannerActivity implements LoadCallback<Exp
 	public void loaded(final Experience experience)
 	{
 		super.loaded(experience);
+
 		if (experience != null)
 		{
 			GoogleAnalytics.trackScreen("Scan", getExperience().getId());
@@ -204,7 +204,8 @@ public class ArtcodeActivity extends ScannerActivity implements LoadCallback<Exp
 		if (action != null)
 		{
 
-			if (Feature.get(getApplicationContext(), R.bool.feature_open_without_touch).isEnabled())
+			if ((getExperience().getOpenWithoutUserInput() != null && getExperience().getOpenWithoutUserInput()) ||
+					Feature.get(getApplicationContext(), R.bool.feature_open_without_touch).isEnabled())
 			{
 				if (action.getUrl() != null)
 				{
@@ -225,7 +226,7 @@ public class ArtcodeActivity extends ScannerActivity implements LoadCallback<Exp
 				GoogleAnalytics.trackEvent("Action", "Scanned", experience.getId(), action.getName());
 
 				actionBinding.setAction(action);
-				actionBinding.getRoot().setOnClickListener(new View.OnClickListener()
+				actionBinding.getRoot().findViewById(R.id.scan_event_button).setOnClickListener(new View.OnClickListener()
 				{
 					@Override
 					public void onClick(View v)
@@ -339,4 +340,5 @@ public class ArtcodeActivity extends ScannerActivity implements LoadCallback<Exp
 			return "";
 		}
 	}
+
 }

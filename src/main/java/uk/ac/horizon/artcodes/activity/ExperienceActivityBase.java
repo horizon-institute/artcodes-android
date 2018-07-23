@@ -19,9 +19,14 @@
 
 package uk.ac.horizon.artcodes.activity;
 
+import android.Manifest;
 import android.content.Intent;
+import android.content.pm.PackageManager;
 import android.net.Uri;
 import android.os.Bundle;
+import android.support.annotation.NonNull;
+import android.support.v4.app.ActivityCompat;
+import android.support.v4.content.ContextCompat;
 import android.util.Log;
 
 import com.google.gson.Gson;
@@ -61,6 +66,8 @@ public abstract class ExperienceActivityBase extends ArtcodeActivityBase impleme
 		return experience != null;
 	}
 
+
+	private static final int FILESYSTEM_PERMISSION_REQUEST = 4523;
 	@Override
 	protected void onPostCreate(Bundle savedInstanceState)
 	{
@@ -87,7 +94,23 @@ public abstract class ExperienceActivityBase extends ArtcodeActivityBase impleme
 					{
 						uri = uri.replace("://aestheticodes.appspot.com/experience/info", "://aestheticodes.appspot.com/experience");
 					}
-					getServer().loadExperience(uri, this);
+
+					if (uri.startsWith("file") && !uri.contains("uk.ac.horizon.aestheticodes"))
+					{
+						// need file permission
+						if (ContextCompat.checkSelfPermission(this, Manifest.permission.READ_EXTERNAL_STORAGE) == PackageManager.PERMISSION_GRANTED)
+						{
+							getServer().loadExperience(uri, this);
+						}
+						else
+						{
+							ActivityCompat.requestPermissions(this, new String[]{Manifest.permission.READ_EXTERNAL_STORAGE}, FILESYSTEM_PERMISSION_REQUEST);
+						}
+					}
+					else
+					{
+						getServer().loadExperience(uri, this);
+					}
 				} else {
 					if (StaticActivityMessage.experience!=null)
 					{
@@ -97,6 +120,29 @@ public abstract class ExperienceActivityBase extends ArtcodeActivityBase impleme
 			}
 		}
 	}
+
+	@Override
+	public void onRequestPermissionsResult(int requestCode, @NonNull String[] permissions, @NonNull int[] grantResults)
+	{
+		switch (requestCode)
+		{
+			case FILESYSTEM_PERMISSION_REQUEST:
+				// If request is cancelled, the result arrays are empty.
+				if (grantResults.length > 0 && grantResults[0] == PackageManager.PERMISSION_GRANTED)
+				{
+					getServer().loadExperience(uri, this);
+				}
+				else
+				{
+					Log.i("a", "Permission not granted");
+					// TODO
+				}
+				break;
+			default:
+				break;
+		}
+	}
+
 
 	@Override
 	public void error(Throwable e)

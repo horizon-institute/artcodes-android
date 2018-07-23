@@ -44,13 +44,45 @@
             android:elevation="2dp"
             tools:ignore="UnusedAttribute">
 
-            <android.support.v7.widget.Toolbar
-                android:id="@+id/toolbar"
-                android:layout_width="fill_parent"
-                android:layout_height="wrap_content"
-                app:navigationIcon="@drawable/ic_arrow_back_white_24dp"
-                app:theme="@style/ThemeOverlay.AppCompat.Dark.ActionBar"/>
-        </FrameLayout>
+
+			<LinearLayout
+				android:layout_width="match_parent"
+				android:layout_height="match_parent"
+				android:gravity="center_vertical|center_horizontal"
+				android:orientation="vertical">
+
+				<TextView
+					android:id="@+id/scanScreenTextTitle"
+					android:layout_width="match_parent"
+					android:layout_height="wrap_content"
+					android:layout_marginEnd="16dp"
+					android:layout_marginStart="16dp"
+					android:textAlignment="center"
+					android:textColor="@android:color/white"
+					android:textSize="24sp"
+					android:visibility="gone"
+					tools:text="Title"/>
+
+				<TextView
+					android:id="@+id/scanScreenTextDesc"
+					android:layout_width="match_parent"
+					android:layout_height="wrap_content"
+					android:layout_marginEnd="16dp"
+					android:layout_marginStart="16dp"
+					android:textAlignment="center"
+					android:textColor="@android:color/white"
+					android:textSize="18sp"
+					android:visibility="gone"
+					tools:text="Description description description description description description description"/>
+			</LinearLayout>
+
+			<android.support.v7.widget.Toolbar
+				android:id="@+id/toolbar"
+				android:layout_width="fill_parent"
+				android:layout_height="wrap_content"
+				app:navigationIcon="@drawable/ic_arrow_back_white_24dp"
+				app:theme="@style/ThemeOverlay.AppCompat.Dark.ActionBar"/>
+		</FrameLayout>
 
         <FrameLayout
             android:layout_width="fill_parent"

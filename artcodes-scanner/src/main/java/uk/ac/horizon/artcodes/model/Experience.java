@@ -26,6 +26,7 @@ import java.util.List;
 public class Experience
 {
 
+
 	public enum Status
 	{
 		loaded, modified, saving
@@ -46,6 +47,15 @@ public class Experience
 
 	private Boolean canCopy;
 	private Boolean scanHistoryEnabled;
+
+	private Boolean openWithoutUserInput;
+
+	private String backgroundColor;
+	private String foregroundColor;
+	private String highlightBackgroundColor;
+	private String highlightForegroundColor;
+	private String scanScreenTextTitle;
+	private String scanScreenTextDesciption;
 
 	public Experience()
 	{
@@ -220,5 +230,73 @@ public class Experience
 	public void setScanHistoryEnabled(Boolean scanHistoryEnabled)
 	{
 		this.scanHistoryEnabled = scanHistoryEnabled;
+	}
+
+	public String getBackgroundColor()
+	{
+		return backgroundColor;
+	}
+
+	public void setBackgroundColor(String backgroundColor)
+	{
+		this.backgroundColor = backgroundColor;
+	}
+
+	public String getForegroundColor()
+	{
+		return foregroundColor;
+	}
+
+	public void setForegroundColor(String forgroundColor)
+	{
+		this.foregroundColor = forgroundColor;
+	}
+	public String getHighlightForegroundColor()
+	{
+		return highlightForegroundColor;
+	}
+
+	public void setHighlightForegroundColor(String highlighForgroundColor)
+	{
+		this.highlightForegroundColor = highlighForgroundColor;
+	}
+
+	public String getHighlightBackgroundColor()
+	{
+		return highlightBackgroundColor;
+	}
+
+	public void setHighlightBackgroundColor(String highlighBackgroundColor)
+	{
+		this.highlightBackgroundColor = highlighBackgroundColor;
+	}
+
+	public Boolean getOpenWithoutUserInput()
+	{
+		return openWithoutUserInput;
+	}
+
+	public void setOpenWithoutUserInput(Boolean openWithoutUserInput)
+	{
+		this.openWithoutUserInput = openWithoutUserInput;
+	}
+	public String getScanScreenTextTitle()
+	{
+		return scanScreenTextTitle;
+	}
+
+	public void setScanScreenTextTitle(String scanScreenTextTitle)
+	{
+		this.scanScreenTextTitle = scanScreenTextTitle;
+	}
+
+	public String getScanScreenTextDesciption()
+	{
+		return scanScreenTextDesciption;
+	}
+
+	public void setScanScreenTextDesciption(String scanScreenTextDesciption)
+	{
+		this.scanScreenTextDesciption = scanScreenTextDesciption;
 	}
 }

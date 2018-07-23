@@ -66,6 +66,7 @@ android {
 			storePassword project.property('keystore.password')
 			keyAlias project.property('key.alias')
 			keyPassword project.property('key.password')
+            v2SigningEnabled false
 		}
 	}
 
@@ -80,8 +81,8 @@ android {
 
 	defaultConfig {
 		applicationId "uk.ac.horizon.aestheticodes"
-		versionName '3.3.5'
-		versionCode 400071
+		versionName '3.3.8'
+		versionCode 400083
 		minSdkVersion 15
 		targetSdkVersion 25
 		signingConfig signingConfigs.release
