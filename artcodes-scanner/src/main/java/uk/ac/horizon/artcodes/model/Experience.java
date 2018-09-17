@@ -26,7 +26,6 @@ import java.util.List;
 public class Experience
 {
 
-
 	public enum Status
 	{
 		loaded, modified, saving
@@ -56,6 +55,8 @@ public class Experience
 	private String highlightForegroundColor;
 	private String scanScreenTextTitle;
 	private String scanScreenTextDesciption;
+
+	private Boolean fullscreen;
 
 	public Experience()
 	{
@@ -298,5 +299,16 @@ public class Experience
 	public void setScanScreenTextDesciption(String scanScreenTextDesciption)
 	{
 		this.scanScreenTextDesciption = scanScreenTextDesciption;
+	}
+
+
+	public Boolean getFullscreen()
+	{
+		return fullscreen;
+	}
+
+	public void setFullscreen(Boolean fullscreen)
+	{
+		this.fullscreen = fullscreen;
 	}
 }

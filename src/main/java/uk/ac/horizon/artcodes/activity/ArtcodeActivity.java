@@ -225,24 +225,35 @@ public class ArtcodeActivity extends ScannerActivity implements LoadCallback<Exp
 				getServer().logScan(experience.getId(), action);
 				GoogleAnalytics.trackEvent("Action", "Scanned", experience.getId(), action.getName());
 
-				actionBinding.setAction(action);
-				actionBinding.getRoot().findViewById(R.id.scan_event_button).setOnClickListener(new View.OnClickListener()
+				final Button actionButton = (Button) actionView.findViewById(R.id.scan_event_button);
+				if (actionButton != null)
 				{
-					@Override
-					public void onClick(View v)
+					runOnUiThread(new Runnable()
 					{
-						if (action.getUrl() != null)
+						@Override
+						public void run()
 						{
-							GoogleAnalytics.trackEvent("Action", "Opened", experience.getId(), action.getName());
-							CustomTabsIntent.Builder builder = new CustomTabsIntent.Builder();
-							// TODO Warmup urls
-							//builder.setSession(session);
-							builder.setToolbarColor(ContextCompat.getColor(ArtcodeActivity.this, R.color.apptheme_primary));
-							CustomTabsIntent customTabsIntent = builder.build();
-							customTabsIntent.launchUrl(ArtcodeActivity.this, Uri.parse(processURL(action.getUrl(), action)));
+							actionButton.setText(action.getName() != null && !action.getName().equals("") ? action.getName() : (action.getDisplayUrl() != null && !action.getDisplayUrl().equals("") ? action.getDisplayUrl() : action.getCodes().get(0)));
+							actionButton.setOnClickListener(new View.OnClickListener()
+							{
+								@Override
+								public void onClick(View v)
+								{
+									if (action.getUrl() != null)
+									{
+										GoogleAnalytics.trackEvent("Action", "Opened", experience.getId(), action.getName());
+										CustomTabsIntent.Builder builder = new CustomTabsIntent.Builder();
+										// TODO Warmup urls
+										//builder.setSession(session);
+										builder.setToolbarColor(ContextCompat.getColor(ArtcodeActivity.this, R.color.apptheme_primary));
+										CustomTabsIntent customTabsIntent = builder.build();
+										customTabsIntent.launchUrl(ArtcodeActivity.this, Uri.parse(processURL(action.getUrl(), action)));
+									}
+								}
+							});
 						}
-					}
-				});
+					});
+				}
 				runOnUiThread(new Runnable()
 				{
 					@Override

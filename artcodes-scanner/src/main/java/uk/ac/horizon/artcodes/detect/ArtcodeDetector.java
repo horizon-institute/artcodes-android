@@ -81,6 +81,9 @@ public class ArtcodeDetector extends Detector
 
 	public ArtcodeDetector(final Context context, Experience experience, MarkerDetectionHandler handler, CameraFocusControl cameraFocusControl)
 	{
+
+		this.fullscreen = experience.getFullscreen() != null && experience.getFullscreen();
+
 		boolean missingProcessors = false;
 
 		Log.i("ArtcodesDetector", "Pipeline items: "+experience.getPipeline().size());

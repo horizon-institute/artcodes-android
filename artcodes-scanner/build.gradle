@@ -45,14 +45,10 @@ android {
     compileSdkVersion 25
     buildToolsVersion "25.0.2"
 
-    dataBinding {
-        enabled = true
-    }
-
     defaultConfig {
         minSdkVersion 15
         targetSdkVersion 25
-        versionName '3.4.8'
+        versionName '3.5'
     }
 
     lintOptions {

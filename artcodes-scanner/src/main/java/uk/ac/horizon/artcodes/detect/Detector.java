@@ -47,6 +47,7 @@ public class Detector
 	protected final ImageBuffers buffers = new ImageBuffers();
 	private ImageView overlay;
 	protected DetectorCallback callback;
+	protected boolean fullscreen = false;
 
 	public Detector()
 	{
@@ -113,14 +114,13 @@ public class Detector
 	{
 		byte[] buffer = buffers.createBuffer(info.getImageWidth(), info.getImageHeight(), info.getImageDepth());
 
-		boolean fullscreen = false;
 		if (!fullscreen)
 		{
 			buffers.setROI(createROI(info.getImageWidth(), info.getImageHeight(), surfaceWidth, surfaceHeight));
 		}
 		else
 		{
-			buffers.setROI(null);if(callback != null)callback.detectionStart(100);
+			buffers.setROI(null);if(callback != null)callback.detectionStart(260);
 		}
 
 		buffers.setRotation(info.getRotation());

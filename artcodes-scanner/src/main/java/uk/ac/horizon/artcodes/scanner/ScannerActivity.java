@@ -69,7 +69,6 @@ import uk.ac.horizon.artcodes.detect.handler.CodeDetectionHandler;
 import uk.ac.horizon.artcodes.detect.handler.MarkerCodeDetectionHandler;
 import uk.ac.horizon.artcodes.model.Action;
 import uk.ac.horizon.artcodes.model.Experience;
-import uk.ac.horizon.artcodes.scanner.databinding.ScannerActionBinding;
 
 public class ScannerActivity extends AppCompatActivity
 {
@@ -97,7 +96,7 @@ public class ScannerActivity extends AppCompatActivity
 		}
 	}
 
-	protected ScannerActionBinding actionBinding;
+	protected View actionView;
 	protected VisibilityAnimator actionAnimator;
 
 	@Override
@@ -135,9 +134,9 @@ public class ScannerActivity extends AppCompatActivity
 		ViewGroup bottomView = (ViewGroup) findViewById(R.id.bottomView);
 		if (bottomView != null)
 		{
-			actionBinding = ScannerActionBinding.inflate(getLayoutInflater(), bottomView, false);
-			bottomView.addView(actionBinding.getRoot());
-			actionAnimator = new VisibilityAnimator(actionBinding.getRoot());
+			actionView = getLayoutInflater().inflate(R.layout.scanner_action, bottomView, false);
+			bottomView.addView(actionView);
+			actionAnimator = new VisibilityAnimator(actionView);
 		}
 
 		if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.LOLLIPOP)
@@ -431,34 +430,43 @@ public class ScannerActivity extends AppCompatActivity
 			{
 				returnCode(markerCode);
 			}
-			else
+			else if (!markerCode.equals(lastFoundCode))
 			{
 				final Experience experience = getExperience();
 				final Action action = experience.getActionForCode(markerCode);
 				if (action != null)
 				{
 					lastFoundCode = markerCode;
-					actionBinding.setAction(action);
-					actionBinding.getRoot().findViewById(R.id.scan_event_button).setOnClickListener(new View.OnClickListener()
+					final Button actionButton = (Button) actionView.findViewById(R.id.scan_event_button);
+					if (actionButton != null)
 					{
-						@Override
-						public void onClick(View v)
+
+						runOnUiThread(new Runnable()
+									  {
+										  @Override
+										  public void run()
+										  {
+											  actionButton.setText(action.getName() != null && !action.getName().equals("") ? action.getName() : (action.getDisplayUrl() != null && !action.getDisplayUrl().equals("") ? action.getDisplayUrl() : markerCode));
+											  actionButton.setOnClickListener(new View.OnClickListener()
+											  {
+												  @Override
+												  public void onClick(View v)
+												  {
+														  returnCode(markerCode);
+												  }
+											  });
+										  }
+									  });
+						runOnUiThread(new Runnable()
 						{
-							if (action.getUrl() != null)
+							@Override
+							public void run()
 							{
-								returnCode(markerCode);
+								actionAnimator.showView();
+								progressBar.setVisibility(View.INVISIBLE);
 							}
-						}
-					});
-					runOnUiThread(new Runnable()
-					{
-						@Override
-						public void run()
-						{
-							actionAnimator.showView();
-							progressBar.setVisibility(View.INVISIBLE);
-						}
-					});
+						});
+					}
 				}
 			}
 		}
