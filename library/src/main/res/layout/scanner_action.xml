@@ -1,0 +1,43 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!--
+  ~ Artcodes recognises a different marker scheme that allows the
+  ~ creation of aesthetically pleasing, even beautiful, codes.
+  ~ Copyright (C) 2013-2016  The University of Nottingham
+  ~
+  ~     This program is free software: you can redistribute it and/or modify
+  ~     it under the terms of the GNU Affero General Public License as published
+  ~     by the Free Software Foundation, either version 3 of the License, or
+  ~     (at your option) any later version.
+  ~
+  ~     This program is distributed in the hope that it will be useful,
+  ~     but WITHOUT ANY WARRANTY; without even the implied warranty of
+  ~     MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+  ~     GNU Affero General Public License for more details.
+  ~
+  ~     You should have received a copy of the GNU Affero General Public License
+  ~     along with this program.  If not, see <http://www.gnu.org/licenses/>.
+  -->
+<LinearLayout
+	xmlns:android="http://schemas.android.com/apk/res/android"
+	xmlns:tools="http://schemas.android.com/tools"
+	tools:context="uk.ac.horizon.artcodes.scanner.ScannerActivity"
+	tools:ignore="UnusedResources"
+	android:layout_width="match_parent"
+	android:layout_height="match_parent"
+	android:gravity="center"
+	android:orientation="vertical"
+	android:visibility="invisible">
+
+	<Button
+		android:id="@+id/scan_event_button"
+		style="@style/Widget.AppCompat.ActionButton"
+		android:layout_width="wrap_content"
+		android:layout_height="wrap_content"
+		android:background="@android:color/holo_blue_light"
+		android:padding="16dp"
+		android:textAppearance="@style/TextAppearance.AppCompat.Title"
+		android:textColor="@android:color/white"
+		tools:text="Tap to Open"
+		tools:visibility="visible"/>
+
+</LinearLayout>

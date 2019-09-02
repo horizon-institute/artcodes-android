@@ -1,0 +1,111 @@
+/*
+ * Artcodes recognises a different marker scheme that allows the
+ * creation of aesthetically pleasing, even beautiful, codes.
+ * Copyright (C) 2013-2016  The University of Nottingham
+ *
+ *     This program is free software: you can redistribute it and/or modify
+ *     it under the terms of the GNU Affero General Public License as published
+ *     by the Free Software Foundation, either version 3 of the License, or
+ *     (at your option) any later version.
+ *
+ *     This program is distributed in the hope that it will be useful,
+ *     but WITHOUT ANY WARRANTY; without even the implied warranty of
+ *     MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+ *     GNU Affero General Public License for more details.
+ *
+ *     You should have received a copy of the GNU Affero General Public License
+ *     along with this program.  If not, see <http://www.gnu.org/licenses/>.
+ */
+
+apply plugin: 'idea'
+apply plugin: 'com.android.application'
+apply plugin: 'com.google.gms.google-services'
+
+dependencies {
+	implementation project(':library')
+	implementation 'androidx.appcompat:appcompat:1.0.2'
+	implementation 'androidx.browser:browser:1.0.0'
+	implementation 'androidx.cardview:cardview:1.0.0'
+	implementation 'androidx.palette:palette:1.0.0'
+	implementation 'androidx.recyclerview:recyclerview:1.0.0'
+	implementation 'com.android.support:multidex:1.0.3'
+	//implementation 'com.crashlytics.sdk.android:crashlytics:2.10.1'
+	implementation 'com.google.android.gms:play-services-auth:17.0.0'
+	implementation 'com.google.android.gms:play-services-base:17.0.0'
+	implementation 'com.google.android.gms:play-services-identity:17.0.0'
+	implementation 'com.google.android.gms:play-services-places:17.0.0'
+	implementation 'com.google.android.material:material:1.0.0'
+	implementation 'com.google.code.gson:gson:2.8.5'
+	implementation 'com.google.firebase:firebase-analytics:17.1.0'
+	implementation 'com.google.guava:guava:28.0-android'
+	implementation 'com.squareup.picasso:picasso:2.71828'
+	implementation 'com.squareup.okhttp3:okhttp:4.1.0'
+	implementation("com.squareup.okhttp3:logging-interceptor:4.1.0")
+	implementation 'fr.avianey.com.viewpagerindicator:library:2.4.1@aar'
+	testImplementation 'junit:junit:4.12'
+}
+
+android {
+	compileSdkVersion 28
+	buildToolsVersion '28.0.3'
+
+	dataBinding {
+		enabled = true
+	}
+
+	signingConfigs {
+		release {
+			storeFile file(project.property('keystore'))
+			storePassword project.property('keystore.password')
+			keyAlias project.property('key.alias')
+			keyPassword project.property('key.password')
+		}
+	}
+
+	buildTypes {
+		release {
+			signingConfig signingConfigs.release
+		}
+		debug {
+			signingConfig signingConfigs.release
+		}
+	}
+
+	defaultConfig {
+		applicationId "uk.ac.horizon.aestheticodes"
+		versionName '3.4.0'
+		versionCode 400083
+		minSdkVersion 16
+		targetSdkVersion 28
+		signingConfig signingConfigs.release
+		multiDexEnabled true
+	}
+
+	lintOptions {
+		abortOnError false
+	}
+
+	splits {
+		abi {
+			enable true
+			reset()
+			include 'x86', 'x86_64', 'armeabi', 'armeabi-v7a', 'mips', 'mips64', 'arm64-v8a'
+			universalApk false
+		}
+	}
+
+	// map for the version code
+	project.ext.versionCodes = ['armeabi': 1, 'armeabi-v7a': 2, 'arm64-v8a': 3, mips: 4, mips64: 5, 'x86': 6, 'x86_64': 7]
+	android.applicationVariants.all { variant ->
+		// assign different version code for each output
+		variant.outputs.each { output ->
+			output.versionCodeOverride =
+					project.ext.versionCodes.get(output.getFilter(com.android.build.OutputFile.ABI), 0) + (defaultConfig.versionCode * 10)
+		}
+	}
+
+	compileOptions {
+		sourceCompatibility JavaVersion.VERSION_1_8
+		targetCompatibility JavaVersion.VERSION_1_8
+	}
+}
