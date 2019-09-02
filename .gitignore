@@ -15,3 +15,5 @@ src/main/java/uk/ac/horizon/artcodes/Hash.java
 app/google-services.json
 
 app/gradle.properties
+
+app/src/main/res/values/keys.xml
