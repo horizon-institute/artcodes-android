@@ -20,31 +20,29 @@
 package uk.ac.horizon.artcodes.activity;
 
 import android.content.Intent;
-import androidx.databinding.DataBindingUtil;
 import android.os.Bundle;
+import android.view.View;
+
 import androidx.annotation.Nullable;
+import androidx.databinding.DataBindingUtil;
 import androidx.fragment.app.Fragment;
 import androidx.fragment.app.FragmentManager;
 import androidx.fragment.app.FragmentPagerAdapter;
 import androidx.viewpager.widget.ViewPager;
-import android.view.View;
 
 import java.util.ArrayList;
 import java.util.List;
 
-import uk.ac.horizon.artcodes.Feature;
+import uk.ac.horizon.artcodes.Features;
 import uk.ac.horizon.artcodes.R;
 import uk.ac.horizon.artcodes.databinding.AboutBinding;
 import uk.ac.horizon.artcodes.fragment.AboutFragment;
 
-public class AboutArtcodesActivity extends ArtcodeActivityBase
-{
-	public static class AboutPagerAdapter extends FragmentPagerAdapter
-	{
+public class AboutArtcodesActivity extends ArtcodeActivityBase {
+	public static class AboutPagerAdapter extends FragmentPagerAdapter {
 		private final List<Fragment> fragments = new ArrayList<>();
 
-		AboutPagerAdapter(FragmentManager fm)
-		{
+		AboutPagerAdapter(FragmentManager fm) {
 			super(fm);
 
 			fragments.add(AboutFragment.create(R.layout.about_artcodes));
@@ -53,20 +51,17 @@ public class AboutArtcodesActivity extends ArtcodeActivityBase
 		}
 
 		@Override
-		public int getCount()
-		{
+		public int getCount() {
 			return fragments.size();
 		}
 
 		@Override
-		public Fragment getItem(int position)
-		{
+		public Fragment getItem(int position) {
 			return fragments.get(position);
 		}
 
 		@Override
-		public CharSequence getPageTitle(int position)
-		{
+		public CharSequence getPageTitle(int position) {
 			// Generate title based on item position
 			return null;
 		}
@@ -74,50 +69,40 @@ public class AboutArtcodesActivity extends ArtcodeActivityBase
 
 	private AboutBinding binding;
 
-	public void finish(View view)
-	{
+	public void finish(View view) {
 		startActivity(new Intent(this, NavigationActivity.class));
-		Feature.get(this, R.bool.feature_show_welcome).setEnabled(false);
+		Features.show_welcome.setEnabled(this, false);
 	}
 
-	public void nextPage(View view)
-	{
+	public void nextPage(View view) {
 		binding.viewpager.setCurrentItem(binding.viewpager.getCurrentItem() + 1);
 	}
 
-	public void more(View view)
-	{
+	public void more(View view) {
 		startActivity(new Intent(this, AboutDrawingActivity.class));
 	}
 
 	@Override
-	protected void onCreate(@Nullable Bundle savedInstanceState)
-	{
+	protected void onCreate(@Nullable Bundle savedInstanceState) {
 		super.onCreate(savedInstanceState);
 
 		binding = DataBindingUtil.setContentView(this, R.layout.about);
 		binding.viewpager.setAdapter(new AboutPagerAdapter(getSupportFragmentManager()));
 		binding.indicator.setViewPager(binding.viewpager);
-		binding.indicator.setOnPageChangeListener(new ViewPager.OnPageChangeListener()
-		{
+		binding.indicator.setOnPageChangeListener(new ViewPager.OnPageChangeListener() {
 			@Override
-			public void onPageScrolled(int position, float positionOffset, int positionOffsetPixels)
-			{
+			public void onPageScrolled(int position, float positionOffset, int positionOffsetPixels) {
 
 			}
 
 			@Override
-			public void onPageSelected(int position)
-			{
-				if (position == (binding.viewpager.getAdapter().getCount() - 1))
-				{
+			public void onPageSelected(int position) {
+				if (position == (binding.viewpager.getAdapter().getCount() - 1)) {
 					//binding.moreButton.setVisibility(View.VISIBLE);
 					binding.doneButton.setVisibility(View.VISIBLE);
 					binding.nextButton.setVisibility(View.GONE);
 					binding.skipButton.setVisibility(View.INVISIBLE);
-				}
-				else
-				{
+				} else {
 					//binding.moreButton.setVisibility(View.GONE);
 					binding.doneButton.setVisibility(View.GONE);
 					binding.nextButton.setVisibility(View.VISIBLE);
@@ -126,8 +111,7 @@ public class AboutArtcodesActivity extends ArtcodeActivityBase
 			}
 
 			@Override
-			public void onPageScrollStateChanged(int state)
-			{
+			public void onPageScrollStateChanged(int state) {
 
 			}
 		});

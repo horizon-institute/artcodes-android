@@ -29,6 +29,7 @@ import android.os.Bundle;
 import android.view.MenuItem;
 import android.view.View;
 
+import androidx.annotation.NonNull;
 import androidx.appcompat.app.AlertDialog;
 import androidx.core.app.NavUtils;
 import androidx.databinding.DataBindingUtil;
@@ -42,7 +43,7 @@ import com.google.gson.Gson;
 import java.util.ArrayList;
 import java.util.List;
 
-import uk.ac.horizon.artcodes.Feature;
+import uk.ac.horizon.artcodes.Features;
 import uk.ac.horizon.artcodes.R;
 import uk.ac.horizon.artcodes.account.Account;
 import uk.ac.horizon.artcodes.databinding.ExperienceEditBinding;
@@ -53,40 +54,34 @@ import uk.ac.horizon.artcodes.fragment.ExperienceEditFragment;
 import uk.ac.horizon.artcodes.fragment.ExperienceEditInfoFragment;
 import uk.ac.horizon.artcodes.model.Experience;
 
-public class ExperienceEditActivity extends ExperienceActivityBase
-{
-	private class ExperienceEditPagerAdapter extends FragmentPagerAdapter
-	{
+public class ExperienceEditActivity extends ExperienceActivityBase {
+	private class ExperienceEditPagerAdapter extends FragmentPagerAdapter {
 		private final List<ExperienceEditFragment> fragments = new ArrayList<>();
 
-		private ExperienceEditPagerAdapter(FragmentManager fm)
-		{
+		private ExperienceEditPagerAdapter(FragmentManager fm) {
 			super(fm);
 
 			fragments.add(new ExperienceEditInfoFragment());
 			fragments.add(new ActionEditListFragment());
 			fragments.add(new AvailabilityEditListFragment());
-			if (Feature.get(getApplicationContext(), R.bool.feature_edit_colour).isEnabled())
-			{
+			if (Features.edit_colour.isEnabled(getApplicationContext())) {
 				fragments.add(new ExperienceEditColourFragment());
 			}
 		}
 
 		@Override
-		public int getCount()
-		{
+		public int getCount() {
 			return fragments.size();
 		}
 
+		@NonNull
 		@Override
-		public Fragment getItem(int position)
-		{
+		public Fragment getItem(int position) {
 			return fragments.get(position);
 		}
 
 		@Override
-		public CharSequence getPageTitle(int position)
-		{
+		public CharSequence getPageTitle(int position) {
 			// Generate title based on item position
 			return getString(fragments.get(position).getTitleResource());
 		}
@@ -98,83 +93,60 @@ public class ExperienceEditActivity extends ExperienceActivityBase
 	private Account account;
 	private ExperienceEditPagerAdapter adapter;
 
-	public static void start(Context context, Experience experience, Account account)
-	{
+	public static void start(Context context, Experience experience, Account account) {
 		Intent intent = new Intent(context, ExperienceEditActivity.class);
 		intent.putExtra("experience", new Gson().toJson(experience));
 		intent.putExtra("account", account.getId());
 		context.startActivity(intent);
 	}
 
-	public void nextPage(View view)
-	{
+	public void nextPage(View view) {
 		binding.viewpager.setCurrentItem(binding.viewpager.getCurrentItem() + 1);
 	}
 
-	public void prevPage(View view)
-	{
+	public void prevPage(View view) {
 		binding.viewpager.setCurrentItem(Math.max(0, binding.viewpager.getCurrentItem() - 1));
 	}
 
-	public void saveExperience(View view)
-	{
+	public void saveExperience(View view) {
 		final Experience experience = getExperience();
 		final boolean isNew = experience.getId() == null;
 		final Activity activity = this;
 		final ProgressDialog dialog = ProgressDialog.show(activity, getResources().getString(R.string.saving_progress_dialog_title), getResources().getString(R.string.saving_progress_dialog_message), true);
 		getAccount().saveExperience(experience, (success, savedExperience) -> {
 			dialog.dismiss();
-			if (success)
-			{
-				if (isNew)
-				{
+			if (success) {
+				if (isNew) {
 					Intent intent = ExperienceActivity.intent(activity, savedExperience);
 					startActivity(intent);
 					activity.finish();
-				}
-				else
-				{
+				} else {
 					NavUtils.navigateUpTo(activity, ExperienceActivity.intent(activity, experience));
 				}
-			}
-			else
-			{
-				runOnUiThread(new Runnable()
-				{
-					@Override
-					public void run()
-					{
-						new AlertDialog.Builder(activity)
-								.setTitle(R.string.saving_error_title)
-								.setMessage(R.string.saving_error_message)
-								.setPositiveButton(R.string.saving_error_button, (dialog1, which) -> dialog1.dismiss())
-								.show();
-					}
-				});
+			} else {
+				runOnUiThread(() -> new AlertDialog.Builder(activity)
+						.setTitle(R.string.saving_error_title)
+						.setMessage(R.string.saving_error_message)
+						.setPositiveButton(R.string.saving_error_button, (dialog1, which) -> dialog1.dismiss())
+						.show());
 			}
 		});
 	}
 
-	public void editIcon(View view)
-	{
+	public void editIcon(View view) {
 		selectImage(ICON_PICKER_REQUEST);
 	}
 
-	public void editImage(View view)
-	{
+	public void editImage(View view) {
 		selectImage(IMAGE_PICKER_REQUEST);
 	}
 
-	public Account getAccount()
-	{
-		if (account == null)
-		{
-			if (getIntent().hasExtra("account"))
-			{
+	public Account getAccount() {
+		if (account == null) {
+			if (getIntent().hasExtra("account")) {
 				String accountID = getIntent().getStringExtra("account");
 				Account account = getServer().getAccount(accountID);
-				if (account != null)
-				{
+				if (account != null) {
 					this.account = account;
 					return account;
 				}
@@ -182,11 +154,9 @@ public class ExperienceEditActivity extends ExperienceActivityBase
 
 			SharedPreferences preferences = getSharedPreferences(Account.class.getName(), MODE_PRIVATE);
 			String accountID = preferences.getString(getUri(), null);
-			if (accountID != null)
-			{
+			if (accountID != null) {
 				Account account = getServer().getAccount(accountID);
-				if (account != null)
-				{
+				if (account != null) {
 					this.account = account;
 					return account;
 				}
@@ -198,38 +168,30 @@ public class ExperienceEditActivity extends ExperienceActivityBase
 		return account;
 	}
 
-	public void setAccount(Account account)
-	{
+	public void setAccount(Account account) {
 		this.account = account;
 	}
 
 	@Override
-	public boolean onOptionsItemSelected(MenuItem item)
-	{
-		switch (item.getItemId())
-		{
-			case android.R.id.home:
-				NavUtils.navigateUpTo(this, createCancelIntent());
-				return true;
+	public boolean onOptionsItemSelected(MenuItem item) {
+		if (item.getItemId() == android.R.id.home) {
+			NavUtils.navigateUpTo(this, createCancelIntent());
+			return true;
 		}
 		return super.onOptionsItemSelected(item);
 	}
 
 	@Override
-	public void loaded(Experience experience)
-	{
+	public void loaded(Experience experience) {
 		super.loaded(experience);
 
-		if (experience.getId() == null)
-		{
+		if (experience.getId() == null) {
 			binding.deleteButton.setVisibility(View.GONE);
 			binding.tabs.setVisibility(View.GONE);
 			binding.saveButton.setVisibility(View.GONE);
 			binding.prevButton.setVisibility(View.GONE);
 			binding.nextButton.setVisibility(View.VISIBLE);
-		}
-		else
-		{
+		} else {
 			binding.deleteButton.setVisibility(View.VISIBLE);
 			binding.tabs.setVisibility(View.VISIBLE);
 			binding.saveButton.setVisibility(View.VISIBLE);
@@ -238,13 +200,11 @@ public class ExperienceEditActivity extends ExperienceActivityBase
 		}
 	}
 
-	public View getRoot()
-	{
+	public View getRoot() {
 		return binding.getRoot();
 	}
 
-	public void deleteExperience(View view)
-	{
+	public void deleteExperience(View view) {
 		final Activity activity = this;
 		new AlertDialog.Builder(this)
 				.setMessage(getString(R.string.experienceDeleteConfirm, getExperience().getName()))
@@ -253,12 +213,9 @@ public class ExperienceEditActivity extends ExperienceActivityBase
 
 					getAccount().deleteExperience(getExperience(), (success, experience) -> {
 						progressDialog.dismiss();
-						if (success)
-						{
+						if (success) {
 							NavUtils.navigateUpTo(ExperienceEditActivity.this, new Intent(ExperienceEditActivity.this, NavigationActivity.class));
-						}
-						else
-						{
+						} else {
 							runOnUiThread(() -> new AlertDialog.Builder(activity)
 									.setTitle(R.string.delete_error_title)
 									.setMessage(R.string.delete_error_message)
@@ -270,17 +227,12 @@ public class ExperienceEditActivity extends ExperienceActivityBase
 				.setNegativeButton(android.R.string.cancel, null).show();
 	}
 
-	protected void onActivityResult(int requestCode, int resultCode, Intent data)
-	{
-		if (resultCode == RESULT_OK)
-		{
-			if (requestCode == IMAGE_PICKER_REQUEST)
-			{
+	protected void onActivityResult(int requestCode, int resultCode, Intent data) {
+		if (resultCode == RESULT_OK) {
+			if (requestCode == IMAGE_PICKER_REQUEST) {
 				Uri fullPhotoUri = data.getData();
 				getExperience().setImage(fullPhotoUri.toString());
-			}
-			else if (requestCode == ICON_PICKER_REQUEST)
-			{
+			} else if (requestCode == ICON_PICKER_REQUEST) {
 				Uri fullPhotoUri = data.getData();
 				getExperience().setIcon(fullPhotoUri.toString());
 			}
@@ -289,54 +241,39 @@ public class ExperienceEditActivity extends ExperienceActivityBase
 	}
 
 	@Override
-	protected void onCreate(Bundle savedInstanceState)
-	{
+	protected void onCreate(Bundle savedInstanceState) {
 		super.onCreate(savedInstanceState);
 
 		binding = DataBindingUtil.setContentView(this, R.layout.experience_edit);
 		adapter = new ExperienceEditPagerAdapter(getSupportFragmentManager());
 		binding.viewpager.setAdapter(adapter);
-		binding.viewpager.addOnPageChangeListener(new ViewPager.OnPageChangeListener()
-		{
+		binding.viewpager.addOnPageChangeListener(new ViewPager.OnPageChangeListener() {
 			@Override
-			public void onPageSelected(int position)
-			{
+			public void onPageSelected(int position) {
 				Fragment fragment = adapter.getItem(position);
-				if (fragment instanceof ExperienceEditFragment)
-				{
+				if (fragment instanceof ExperienceEditFragment) {
 					ExperienceEditFragment experienceEditFragment = (ExperienceEditFragment) fragment;
-					if (experienceEditFragment.displayAddFAB())
-					{
+					if (experienceEditFragment.displayAddFAB()) {
 						binding.add.show();
-					}
-					else
-					{
+					} else {
 						binding.add.hide();
 					}
-				}
-				else
-				{
+				} else {
 					binding.add.hide();
 				}
 
 				Experience experience = getExperience();
-				if (experience == null || experience.getId() == null)
-				{
+				if (experience == null || experience.getId() == null) {
 
-					if (position == 0)
-					{
+					if (position == 0) {
 						binding.saveButton.setVisibility(View.GONE);
 						binding.prevButton.setVisibility(View.GONE);
 						binding.nextButton.setVisibility(View.VISIBLE);
-					}
-					else if (position == adapter.getCount() - 1)
-					{
+					} else if (position == adapter.getCount() - 1) {
 						binding.saveButton.setVisibility(View.VISIBLE);
 						binding.prevButton.setVisibility(View.VISIBLE);
 						binding.nextButton.setVisibility(View.GONE);
-					}
-					else
-					{
+					} else {
 						binding.saveButton.setVisibility(View.GONE);
 						binding.prevButton.setVisibility(View.VISIBLE);
 						binding.nextButton.setVisibility(View.VISIBLE);
@@ -345,37 +282,31 @@ public class ExperienceEditActivity extends ExperienceActivityBase
 			}
 
 			@Override
-			public void onPageScrollStateChanged(int state)
-			{
+			public void onPageScrollStateChanged(int state) {
 			}
 
 			@Override
-			public void onPageScrolled(int position, float positionOffset, int positionOffsetPixels)
-			{
+			public void onPageScrolled(int position, float positionOffset, int positionOffsetPixels) {
 			}
 		});
 		binding.add.setOnClickListener(v -> {
 			int position = binding.viewpager.getCurrentItem();
 			Fragment fragment = adapter.getItem(position);
-			if (fragment instanceof ExperienceEditFragment)
-			{
+			if (fragment instanceof ExperienceEditFragment) {
 				ExperienceEditFragment experienceEditFragment = (ExperienceEditFragment) fragment;
-				if (experienceEditFragment.displayAddFAB())
-				{
+				if (experienceEditFragment.displayAddFAB()) {
 					experienceEditFragment.add();
 				}
 			}
 		});
 		binding.tabs.setupWithViewPager(binding.viewpager);
 
-		if (savedInstanceState != null)
-		{
+		if (savedInstanceState != null) {
 			binding.viewpager.setCurrentItem(savedInstanceState.getInt("tab", 0));
 		}
 
 		setSupportActionBar(binding.toolbar);
-		if (getSupportActionBar() != null)
-		{
+		if (getSupportActionBar() != null) {
 			getSupportActionBar().setDisplayShowTitleEnabled(false);
 		}
 
@@ -383,16 +314,14 @@ public class ExperienceEditActivity extends ExperienceActivityBase
 	}
 
 	@Override
-	protected void onSaveInstanceState(Bundle outState)
-	{
+	protected void onSaveInstanceState(Bundle outState) {
 		super.onSaveInstanceState(outState);
 
 		outState.putInt("tab", binding.viewpager.getCurrentItem());
 		outState.putString("experience", new Gson().toJson(getExperience()));
 	}
 
-	private Intent createCancelIntent()
-	{
+	private Intent createCancelIntent() {
 		Intent intent = (Intent) getIntent().clone();
 		intent.setClass(this, ExperienceActivity.class);
 		return intent;
@@ -409,12 +338,10 @@ public class ExperienceEditActivity extends ExperienceActivityBase
 //		}
 //	}
 
-	private void selectImage(int request_id)
-	{
+	private void selectImage(int request_id) {
 		Intent intent = new Intent(Intent.ACTION_GET_CONTENT);
 		intent.setType("image/*");
-		if (intent.resolveActivity(getPackageManager()) != null)
-		{
+		if (intent.resolveActivity(getPackageManager()) != null) {
 			startActivityForResult(intent, request_id);
 		}
 	}

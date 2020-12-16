@@ -16,7 +16,6 @@
  *     You should have received a copy of the GNU Affero General Public License
  *     along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
-
 package uk.ac.horizon.artcodes.fragment;
 
 import android.os.Bundle;
@@ -28,60 +27,32 @@ import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
 import androidx.fragment.app.Fragment;
 
-import java.lang.reflect.Field;
-
-import uk.ac.horizon.artcodes.Feature;
-import uk.ac.horizon.artcodes.Analytics;
-import uk.ac.horizon.artcodes.R;
+import uk.ac.horizon.artcodes.Features;
+import uk.ac.horizon.artcodes.ScannerFeatures;
 import uk.ac.horizon.artcodes.adapter.FeatureAdapter;
+import uk.ac.horizon.artcodes.adapter.FeatureItem;
 import uk.ac.horizon.artcodes.databinding.ListBinding;
 
-public class FeatureListFragment extends Fragment
-{
+public class FeatureListFragment extends Fragment {
 	@Nullable
 	@Override
-	public View onCreateView(@NonNull LayoutInflater inflater, ViewGroup container, Bundle savedInstanceState)
-	{
+	public View onCreateView(@NonNull LayoutInflater inflater, ViewGroup container, Bundle savedInstanceState) {
 		ListBinding binding = ListBinding.inflate(inflater, container, false);
 		final FeatureAdapter adapter = new FeatureAdapter(getActivity());
 		binding.setAdapter(adapter);
 
-		final R.bool features = new R.bool();
-		final Field[] fields = features.getClass().getDeclaredFields();
-		for (Field field : fields)
-		{
-			try
-			{
-				addFeature(adapter, field.getInt(features));
+		try {
+			for(Features feature: Features.values()) {
+				adapter.add(new FeatureItem(feature, getContext()));
 			}
-			catch (Exception e)
-			{
-				Analytics.trackException(e);
+			for(ScannerFeatures feature: ScannerFeatures.values()) {
+				adapter.add(new FeatureItem(feature, getContext()));
 			}
+		} catch (Exception e) {
+			e.printStackTrace();
 		}
 
-		final Field[] scannerFields = uk.ac.horizon.artcodes.scanner.R.bool.class.getDeclaredFields();
-		for (Field field : scannerFields)
-		{
-			try
-			{
-				addFeature(adapter, field.getInt(features));
-			}
-			catch (Exception e)
-			{
-				Analytics.trackException(e);
-			}
-		}
 
 		return binding.getRoot();
-	}
-
-	private void addFeature(FeatureAdapter adapter, int featureID)
-	{
-		Feature feature = Feature.get(getActivity(), featureID);
-		if (feature.getName().startsWith("feature_"))
-		{
-			adapter.add(feature);
-		}
 	}
 }

@@ -25,10 +25,6 @@ import android.content.Intent;
 import android.net.Uri;
 import android.os.Bundle;
 import android.provider.Settings;
-import androidx.annotation.NonNull;
-import androidx.fragment.app.DialogFragment;
-import androidx.fragment.app.FragmentManager;
-import androidx.appcompat.app.AlertDialog;
 import android.text.InputFilter;
 import android.text.InputType;
 import android.text.method.DigitsKeyListener;
@@ -37,11 +33,17 @@ import android.view.View;
 import android.widget.AdapterView;
 import android.widget.ArrayAdapter;
 
+import androidx.annotation.NonNull;
+import androidx.appcompat.app.AlertDialog;
+import androidx.fragment.app.DialogFragment;
+import androidx.fragment.app.FragmentManager;
+
 import java.util.Collections;
 import java.util.UUID;
 
-import uk.ac.horizon.artcodes.Feature;
+import uk.ac.horizon.artcodes.Features;
 import uk.ac.horizon.artcodes.R;
+import uk.ac.horizon.artcodes.ScannerFeatures;
 import uk.ac.horizon.artcodes.activity.ExperienceActivityBase;
 import uk.ac.horizon.artcodes.databinding.ActionCodeBinding;
 import uk.ac.horizon.artcodes.databinding.ActionEditBinding;
@@ -52,17 +54,14 @@ import uk.ac.horizon.artcodes.ui.ActionEditor;
 import uk.ac.horizon.artcodes.ui.MarkerFormat;
 import uk.ac.horizon.artcodes.ui.SimpleTextWatcher;
 
-public class ActionEditDialogFragment extends DialogFragment
-{
+public class ActionEditDialogFragment extends DialogFragment {
 	private static final int ACTION_EDIT_DIALOG = 193;
 	private static final int SCAN_CODE_REQUEST = 931;
 	private ActionEditBinding binding;
 
-	static void show(FragmentManager fragmentManager, ActionEditListFragment fragment, int num)
-	{
+	static void show(FragmentManager fragmentManager, ActionEditListFragment fragment, int num) {
 		final ActionEditDialogFragment dialog = new ActionEditDialogFragment();
-		if (fragment != null)
-		{
+		if (fragment != null) {
 			dialog.setTargetFragment(fragment, ACTION_EDIT_DIALOG);
 		}
 		final Bundle args = new Bundle();
@@ -73,30 +72,24 @@ public class ActionEditDialogFragment extends DialogFragment
 
 	@NonNull
 	@Override
-	public Dialog onCreateDialog(Bundle savedInstanceState) throws NullPointerException
-	{
+	public Dialog onCreateDialog(Bundle savedInstanceState) throws NullPointerException {
 		binding = ActionEditBinding.inflate(getActivity().getLayoutInflater());
 		binding.newMarkerCode.setFilters(new InputFilter[]{new MarkerFormat()});
 		String currentKeyboard = Settings.Secure.getString(getContext().getContentResolver(), Settings.Secure.DEFAULT_INPUT_METHOD);
 		Log.i("Keyboard", currentKeyboard);
-		if (currentKeyboard.contains("com.lge.ime"))
-		{
+		if (currentKeyboard.contains("com.lge.ime")) {
 			binding.newMarkerCode.setKeyListener(DigitsKeyListener.getInstance("0123456789:"));
 			binding.newMarkerCode.setRawInputType(InputType.TYPE_CLASS_NUMBER | InputType.TYPE_NUMBER_FLAG_DECIMAL);
 		}
-		binding.newMarkerCode.addTextChangedListener(new SimpleTextWatcher()
-		{
+		binding.newMarkerCode.addTextChangedListener(new SimpleTextWatcher() {
 			@Override
-			public String getText()
-			{
+			public String getText() {
 				return null;
 			}
 
 			@Override
-			public void onTextChanged(String value)
-			{
-				if (!value.isEmpty())
-				{
+			public void onTextChanged(String value) {
+				if (!value.isEmpty()) {
 					binding.newMarkerCode.setText("");
 					Action action = getAction();
 					action.getCodes().add(value);
@@ -107,57 +100,38 @@ public class ActionEditDialogFragment extends DialogFragment
 			}
 		});
 
-		binding.scanButton.setOnClickListener(new View.OnClickListener()
-		{
-			@Override
-			public void onClick(View v)
-			{
-				Intent intent = new Intent(getActivity(), ScannerActivity.class);
-				intent.putExtra("experience", "{\"name\":\"Scan Code\"}");
-				startActivityForResult(intent, SCAN_CODE_REQUEST);
-			}
+		binding.scanButton.setOnClickListener(v -> {
+			Intent intent = new Intent(getActivity(), ScannerActivity.class);
+			intent.putExtra("experience", "{\"name\":\"Scan Code\"}");
+			startActivityForResult(intent, SCAN_CODE_REQUEST);
 		});
 
 		final AlertDialog.Builder builder = new AlertDialog.Builder(getActivity());
 		builder.setView(binding.getRoot());
 		final Dialog dialog = builder.create();
 
-		binding.deleteButton.setOnClickListener(new View.OnClickListener()
-		{
-			@Override
-			public void onClick(View v)
-			{
-				if (getArguments().containsKey("action"))
-				{
-					dialog.dismiss();
-					final int index = getArguments().getInt("action");
-					if (getTargetFragment() instanceof ActionEditListFragment)
-					{
-						((ActionEditListFragment) getTargetFragment()).getAdapter().deleteAction(index);
-					}
-					else
-					{
-						getExperience().getActions().remove(index);
-					}
+		binding.deleteButton.setOnClickListener(v -> {
+			if (getArguments().containsKey("action")) {
+				dialog.dismiss();
+				final int index = getArguments().getInt("action");
+				if (getTargetFragment() instanceof ActionEditListFragment) {
+					((ActionEditListFragment) getTargetFragment()).getAdapter().deleteAction(index);
+				} else {
+					getExperience().getActions().remove(index);
 				}
 			}
 		});
-		binding.doneButton.setOnClickListener(new View.OnClickListener()
-		{
+		binding.doneButton.setOnClickListener(new View.OnClickListener() {
 			@Override
-			public void onClick(View v)
-			{
-				if (getArguments().containsKey("action"))
-				{
+			public void onClick(View v) {
+				if (getArguments().containsKey("action")) {
 					updateAction(); // make sure code is sorted
-					if (getAction().getCodes().size() == 1)
-					{
+					if (getAction().getCodes().size() == 1) {
 						// Actions with only 1 code can not be a group or sequence!
 						getAction().setMatch(Action.Match.any);
 					}
 					final int index = getArguments().getInt("action");
-					if (getTargetFragment() instanceof ActionEditListFragment)
-					{
+					if (getTargetFragment() instanceof ActionEditListFragment) {
 						((ActionEditListFragment) getTargetFragment()).getAdapter().actionUpdated(index);
 					}
 				}
@@ -167,15 +141,11 @@ public class ActionEditDialogFragment extends DialogFragment
 
 		ArrayAdapter<CharSequence> adapter = ArrayAdapter.createFromResource(this.getContext(), R.array.match_type_descriptions, R.layout.match_type_spinner_item);
 		binding.matchSpinner.setAdapter(adapter);
-		binding.matchSpinner.setOnItemSelectedListener(new AdapterView.OnItemSelectedListener()
-		{
+		binding.matchSpinner.setOnItemSelectedListener(new AdapterView.OnItemSelectedListener() {
 			@Override
-			public void onItemSelected(AdapterView<?> adapterView, View view, int i, long l)
-			{
-				if (getAction() != null)
-				{
-					switch (i)
-					{
+			public void onItemSelected(AdapterView<?> adapterView, View view, int i, long l) {
+				if (getAction() != null) {
+					switch (i) {
 						case 0:
 							getAction().setMatch(Action.Match.any);
 							break;
@@ -190,38 +160,30 @@ public class ActionEditDialogFragment extends DialogFragment
 			}
 
 			@Override
-			public void onNothingSelected(AdapterView<?> adapterView)
-			{
+			public void onNothingSelected(AdapterView<?> adapterView) {
 
 			}
 		});
 
 
-		if (Feature.get(getContext(), R.bool.feature_combined_markers).isEnabled())
-		{
+		if (ScannerFeatures.combined_markers.isEnabled(getContext())) {
 			binding.selectLayout.setVisibility(View.GONE);
 			binding.matchSpinner.setVisibility(View.VISIBLE);
 		}
 
 		// Upload to artcodes.co.uk feature button:
-		if (Feature.get(getContext(), R.bool.feature_upload_to_artcodes_co_uk).isEnabled())
-		{
-			binding.uploadToArtcodesCoUkButton.setOnClickListener(new View.OnClickListener()
-			{
-				@Override
-				public void onClick(View view)
-				{
-					UUID uuid = UUID.randomUUID();
-					String url = "http://www.artcodes.co.uk/test1234/?file=A" + uuid.toString() + "&source=artcodes-android-app";
+		if (Features.upload_to_artcodes_co_uk.isEnabled(getContext())) {
+			binding.uploadToArtcodesCoUkButton.setOnClickListener(view -> {
+				UUID uuid = UUID.randomUUID();
+				String url = "http://www.artcodes.co.uk/test1234/?file=A" + uuid.toString() + "&source=artcodes-android-app";
 
-					getAction().setUrl(url);
-					updateAction();
+				getAction().setUrl(url);
+				updateAction();
 
-					Intent intent = new Intent();
-					intent.setAction(Intent.ACTION_VIEW);
-					intent.setData(Uri.parse(url + "&dontCheckForFiles"));
-					startActivity(intent);
-				}
+				Intent intent = new Intent();
+				intent.setAction(Intent.ACTION_VIEW);
+				intent.setData(Uri.parse(url + "&dontCheckForFiles"));
+				startActivity(intent);
 			});
 			binding.uploadToArtcodesCoUkButton.setVisibility(View.VISIBLE);
 		}
@@ -229,15 +191,12 @@ public class ActionEditDialogFragment extends DialogFragment
 	}
 
 	@Override
-	public void onActivityResult(int requestCode, int resultCode, Intent data)
-	{
+	public void onActivityResult(int requestCode, int resultCode, Intent data) {
 		super.onActivityResult(requestCode, resultCode, data);
-		if (requestCode == SCAN_CODE_REQUEST && resultCode == Activity.RESULT_OK)
-		{
+		if (requestCode == SCAN_CODE_REQUEST && resultCode == Activity.RESULT_OK) {
 			String code = data.getStringExtra("marker");
 			Action action = getAction();
-			if (code != null && (action.getMatch() == Action.Match.sequence || !action.getCodes().contains(code)))
-			{
+			if (code != null && (action.getMatch() == Action.Match.sequence || !action.getCodes().contains(code))) {
 				action.getCodes().add(code);
 				ActionCodeBinding codeBinding = createCodeBinding(binding, action, action.getCodes().size() - 1);
 				codeBinding.editMarkerCode.requestFocus();
@@ -246,29 +205,23 @@ public class ActionEditDialogFragment extends DialogFragment
 	}
 
 	@Override
-	public void onResume()
-	{
+	public void onResume() {
 		super.onResume();
 		updateAction();
 	}
 
-	private Experience getExperience()
-	{
-		if (getActivity() instanceof ExperienceActivityBase)
-		{
+	private Experience getExperience() {
+		if (getActivity() instanceof ExperienceActivityBase) {
 			return ((ExperienceActivityBase) getActivity()).getExperience();
 		}
 		return null;
 	}
 
 	@NonNull
-	private Action getAction() throws NullPointerException
-	{
+	private Action getAction() throws NullPointerException {
 		Experience experience = getExperience();
-		if (experience != null)
-		{
-			if (getArguments().containsKey("action"))
-			{
+		if (experience != null) {
+			if (getArguments().containsKey("action")) {
 				int index = getArguments().getInt("action");
 				return experience.getActions().get(index);
 			}
@@ -276,8 +229,7 @@ public class ActionEditDialogFragment extends DialogFragment
 		throw new NullPointerException("Couldn't get action");
 	}
 
-	private void updateAction()
-	{
+	private void updateAction() {
 		final Action action = getAction();
 
 		binding.setAction(action);
@@ -287,59 +239,46 @@ public class ActionEditDialogFragment extends DialogFragment
 		updateMatchType(binding, action);
 	}
 
-	private void updateCodes(final ActionEditBinding binding, final Action action)
-	{
+	private void updateCodes(final ActionEditBinding binding, final Action action) {
 		binding.markerCodeList.removeAllViews();
-		if (action != null && action.getMatch() != Action.Match.sequence)
-		{
+		if (action != null && action.getMatch() != Action.Match.sequence) {
 			// only sort codes if not a sequence!
 			Collections.sort(action.getCodes());
 		}
-		for (int index = 0; index < action.getCodes().size(); index++)
-		{
+		for (int index = 0; index < action.getCodes().size(); index++) {
 			createCodeBinding(binding, action, index);
 		}
 	}
 
-	private void updateMatchType(final ActionEditBinding binding, final Action action)
-	{
-		if (action != null)
-		{
+	private void updateMatchType(final ActionEditBinding binding, final Action action) {
+		if (action != null) {
 			binding.matchSpinner.setSelection(action.getMatch() == Action.Match.any ? 0 : (action.getMatch() == Action.Match.all ? 1 : 2));
 		}
 	}
 
-	private ActionCodeBinding createCodeBinding(final ActionEditBinding binding, final Action action, final int codeIndex)
-	{
+	private ActionCodeBinding createCodeBinding(final ActionEditBinding binding, final Action action, final int codeIndex) {
 		final String code = action.getCodes().get(codeIndex);
 		final ActionCodeBinding codeBinding = ActionCodeBinding.inflate(getActivity().getLayoutInflater(), binding.markerCodeList, false);
 		codeBinding.editMarkerCode.setText(code);
 		String currentKeyboard = Settings.Secure.getString(getContext().getContentResolver(), Settings.Secure.DEFAULT_INPUT_METHOD);
-		if (currentKeyboard.contains("com.lge.ime"))
-		{
+		if (currentKeyboard.contains("com.lge.ime")) {
 			codeBinding.editMarkerCode.setKeyListener(DigitsKeyListener.getInstance("0123456789:"));
 			codeBinding.editMarkerCode.setRawInputType(InputType.TYPE_CLASS_NUMBER | InputType.TYPE_NUMBER_FLAG_DECIMAL);
 		}
 		codeBinding.editMarkerCode.setFilters(new InputFilter[]{new MarkerFormat()});
-		codeBinding.editMarkerCode.addTextChangedListener(new SimpleTextWatcher()
-		{
+		codeBinding.editMarkerCode.addTextChangedListener(new SimpleTextWatcher() {
 			@Override
-			public String getText()
-			{
+			public String getText() {
 				return null;
 			}
 
 			@Override
-			public void onTextChanged(String value)
-			{
-				if (value.isEmpty())
-				{
+			public void onTextChanged(String value) {
+				if (value.isEmpty()) {
 					action.getCodes().remove(codeIndex);
 					updateCodes(binding, action);
 					binding.newMarkerCode.requestFocus();
-				}
-				else
-				{
+				} else {
 					action.getCodes().set(codeIndex, value);
 				}
 			}

@@ -40,11 +40,12 @@ import java.security.MessageDigest;
 import java.security.NoSuchAlgorithmException;
 import java.util.List;
 
-import uk.ac.horizon.artcodes.Artcodes;
-import uk.ac.horizon.artcodes.Feature;
 import uk.ac.horizon.artcodes.Analytics;
+import uk.ac.horizon.artcodes.Artcodes;
+import uk.ac.horizon.artcodes.Features;
 import uk.ac.horizon.artcodes.Hash;
 import uk.ac.horizon.artcodes.R;
+import uk.ac.horizon.artcodes.ScannerFeatures;
 import uk.ac.horizon.artcodes.detect.ArtcodeDetector;
 import uk.ac.horizon.artcodes.detect.handler.ActionDetectionHandler;
 import uk.ac.horizon.artcodes.detect.handler.MarkerActionDetectionHandler;
@@ -58,10 +59,8 @@ import uk.ac.horizon.artcodes.server.ArtcodeServer;
 import uk.ac.horizon.artcodes.server.LoadCallback;
 import uk.ac.horizon.artcodes.ui.MarkerHistoryViewController;
 
-public class ArtcodeActivity extends ScannerActivity implements LoadCallback<Experience>
-{
-	public static void start(Context context, Experience experience)
-	{
+public class ArtcodeActivity extends ScannerActivity implements LoadCallback<Experience> {
+	public static void start(Context context, Experience experience) {
 		StaticActivityMessage.experience = experience;
 		TaskStackBuilder.create(context)
 				.addNextIntent(new Intent(context, NavigationActivity.class))
@@ -71,20 +70,16 @@ public class ArtcodeActivity extends ScannerActivity implements LoadCallback<Exp
 	}
 
 	@Override
-	public void onCreate(Bundle savedInstanceState)
-	{
+	public void onCreate(Bundle savedInstanceState) {
 		super.onCreate(savedInstanceState);
-		if (getSupportActionBar() != null)
-		{
+		if (getSupportActionBar() != null) {
 			getSupportActionBar().setDisplayHomeAsUpEnabled(true);
 		}
 	}
 
 	@Override
-	public boolean onOptionsItemSelected(MenuItem item)
-	{
-		if (item.getItemId() == android.R.id.home)
-		{
+	public boolean onOptionsItemSelected(MenuItem item) {
+		if (item.getItemId() == android.R.id.home) {
 			final Experience experience = getExperience();
 			NavUtils.navigateUpTo(this, ExperienceActivity.intent(this, experience));
 			return true;
@@ -93,25 +88,20 @@ public class ArtcodeActivity extends ScannerActivity implements LoadCallback<Exp
 	}
 
 	@Override
-	public void loaded(final Experience experience)
-	{
+	public void loaded(final Experience experience) {
 		super.loaded(experience);
 
-		if (experience != null)
-		{
-			getServer().loadRecent(new LoadCallback<List<String>>()
-			{
+		if (experience != null) {
+			getServer().loadRecent(new LoadCallback<List<String>>() {
 				@Override
-				public void loaded(List<String> item)
-				{
+				public void loaded(List<String> item) {
 					item.remove(experience.getId());
 					item.add(0, experience.getId());
 					getServer().saveRecent(item);
 				}
 
 				@Override
-				public void error(Throwable e)
-				{
+				public void error(Throwable e) {
 					Analytics.trackException(e);
 				}
 			});
@@ -119,38 +109,26 @@ public class ArtcodeActivity extends ScannerActivity implements LoadCallback<Exp
 	}
 
 	@Override
-	public void error(Throwable e)
-	{
+	public void error(Throwable e) {
 		Analytics.trackException(e);
 	}
 
 	@Override
-	protected void loadExperience(Bundle savedInstanceState)
-	{
-		if (savedInstanceState != null && savedInstanceState.containsKey("experience"))
-		{
+	protected void loadExperience(Bundle savedInstanceState) {
+		if (savedInstanceState != null && savedInstanceState.containsKey("experience")) {
 
 			loaded(new Gson().fromJson(savedInstanceState.getString("experience"), Experience.class));
-		}
-		else
-		{
+		} else {
 			Intent intent = getIntent();
-			if (intent.hasExtra("experience"))
-			{
+			if (intent.hasExtra("experience")) {
 				loaded(new Gson().fromJson(intent.getStringExtra("experience"), Experience.class));
-			}
-			else
-			{
+			} else {
 				final Uri data = intent.getData();
-				if (data != null)
-				{
+				if (data != null) {
 					getServer().loadExperience(data.toString(), this);
-				}
-				else
-				{
+				} else {
 
-					if (StaticActivityMessage.experience != null)
-					{
+					if (StaticActivityMessage.experience != null) {
 						loaded(StaticActivityMessage.experience);
 					}
 				}
@@ -158,27 +136,21 @@ public class ArtcodeActivity extends ScannerActivity implements LoadCallback<Exp
 		}
 	}
 
-	private Artcodes getArtcodes()
-	{
+	private Artcodes getArtcodes() {
 		return (Artcodes) getApplication();
 	}
 
-	private ArtcodeServer getServer()
-	{
+	private ArtcodeServer getServer() {
 		return getArtcodes().getServer();
 	}
 
-	private void onActionChanged(final Action action)
-	{
+	private void onActionChanged(final Action action) {
 		Log.i("action", "" + action);
-		if (action != null)
-		{
+		if (action != null) {
 
 			if ((getExperience().getOpenWithoutUserInput() != null && getExperience().getOpenWithoutUserInput()) ||
-					Feature.get(getApplicationContext(), R.bool.feature_open_without_touch).isEnabled())
-			{
-				if (action.getUrl() != null)
-				{
+					Features.open_without_touch.isEnabled(getApplicationContext())) {
+				if (action.getUrl() != null) {
 					final Experience experience = getExperience();
 					Analytics.logOpenScan(experience.getId(), action);
 					CustomTabsIntent.Builder builder = new CustomTabsIntent.Builder();
@@ -188,21 +160,17 @@ public class ArtcodeActivity extends ScannerActivity implements LoadCallback<Exp
 					CustomTabsIntent customTabsIntent = builder.build();
 					customTabsIntent.launchUrl(ArtcodeActivity.this, Uri.parse(processURL(action.getUrl(), action)));
 				}
-			}
-			else
-			{
+			} else {
 				final Experience experience = getExperience();
 				getServer().logScan(experience.getId(), action);
 				Analytics.logScan(experience.getId(), action);
 
 				final Button actionButton = actionView.findViewById(R.id.scan_event_button);
-				if (actionButton != null)
-				{
+				if (actionButton != null) {
 					runOnUiThread(() -> {
 						actionButton.setText(action.getName() != null && !action.getName().equals("") ? action.getName() : (action.getDisplayUrl() != null && !action.getDisplayUrl().equals("") ? action.getDisplayUrl() : action.getCodes().get(0)));
 						actionButton.setOnClickListener(v -> {
-							if (action.getUrl() != null)
-							{
+							if (action.getUrl() != null) {
 								Analytics.logOpenScan(experience.getId(), action);
 								CustomTabsIntent.Builder builder = new CustomTabsIntent.Builder();
 								// TODO Warmup urls
@@ -219,9 +187,7 @@ public class ArtcodeActivity extends ScannerActivity implements LoadCallback<Exp
 					progressBar.setVisibility(View.INVISIBLE);
 				});
 			}
-		}
-		else
-		{
+		} else {
 			runOnUiThread(() -> {
 				actionAnimator.hideView();
 				progressBar.setVisibility(View.VISIBLE);
@@ -230,66 +196,51 @@ public class ArtcodeActivity extends ScannerActivity implements LoadCallback<Exp
 	}
 
 	@Override
-	protected ArtcodeDetector getNewDetector(Experience experience)
-	{
-		if (Feature.get(getApplicationContext(), R.bool.feature_combined_markers).isEnabled())
-		{
-			return new ArtcodeDetector(this, experience, new MultipleMarkerActionDetectionHandler(new ActionDetectionHandler()
-			{
+	protected ArtcodeDetector getNewDetector(Experience experience) {
+		if (ScannerFeatures.combined_markers.isEnabled(getApplicationContext())) {
+			return new ArtcodeDetector(this, experience, new MultipleMarkerActionDetectionHandler(new ActionDetectionHandler() {
 				private final MarkerHistoryViewController markerHistoryViewController = new MarkerHistoryViewController(ArtcodeActivity.this, findViewById(R.id.thumbnailImageLayout), new Handler(Looper.getMainLooper()));
 
 				@Override
-				public void onMarkerActionDetected(Action detectedAction, Action futureAction, List<MarkerImage> detectedMarkers)
-				{
+				public void onMarkerActionDetected(Action detectedAction, Action futureAction, List<MarkerImage> detectedMarkers) {
 					markerHistoryViewController.update(detectedMarkers, futureAction);
 					onActionChanged(detectedAction);
 				}
 			}, experience, new MarkerThumbnailDrawer()), this.cameraView);
-		}
-		else
-		{
+		} else {
 			return new ArtcodeDetector(this, experience, new MarkerActionDetectionHandler((detectedAction, possibleFutureAction, imagesForFutureAction) -> onActionChanged(detectedAction), experience, null), this.cameraView);
 		}
 	}
 
-	protected String processURL(String url, Action action)
-	{
+	protected String processURL(String url, Action action) {
 		String result = url;
 
-		if (action != null && action.getCodes() != null && action.getCodes().size() > 0)
-		{
+		if (action != null && action.getCodes() != null && action.getCodes().size() > 0) {
 			result = result.replace("{code}", action.getCodes().get(0));
 		}
 
-		if (result.contains("{timestamp}"))
-		{
+		if (result.contains("{timestamp}")) {
 			result = result.replace("{timestamp}", "" + (System.currentTimeMillis() / 1000));
 		}
 
-		if (result.contains("{timehash1}"))
-		{
+		if (result.contains("{timehash1}")) {
 			result = result.replace("{timehash1}", sha256(Hash.salts.get("timehash1") + (((System.currentTimeMillis() / 1000) / 1000) * 1000)));
 		}
 
 		return result;
 	}
 
-	private String sha256(String string)
-	{
-		try
-		{
+	private String sha256(String string) {
+		try {
 			MessageDigest md = MessageDigest.getInstance("SHA-256");
 			md.update(string.getBytes());
 			byte[] bytes = md.digest();
 			StringBuilder result = new StringBuilder();
-			for (byte byt : bytes)
-			{
+			for (byte byt : bytes) {
 				result.append(Integer.toString((byt & 0xff) + 0x100, 16).substring(1));
 			}
 			return result.toString();
-		}
-		catch (NoSuchAlgorithmException e)
-		{
+		} catch (NoSuchAlgorithmException e) {
 			Log.e("ArtcodeActivity", "Exception getting sha256.", e);
 			return "";
 		}

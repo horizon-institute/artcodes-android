@@ -78,15 +78,7 @@ public class Detector
 				final Bitmap overlayBitmap = buffers.createOverlayBitmap();
 				if(overlayBitmap != null)
 				{
-					overlay.post(new Runnable()
-					{
-						@Override
-						public void run()
-						{
-
-							overlay.setImageBitmap(overlayBitmap);
-						}
-					});
+					overlay.post(() -> overlay.setImageBitmap(overlayBitmap));
 				}
 			}
 		}

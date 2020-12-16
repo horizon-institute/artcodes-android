@@ -37,111 +37,82 @@ import com.google.gson.stream.JsonWriter;
 import java.io.IOException;
 
 import uk.ac.horizon.artcodes.model.Experience;
-import uk.ac.horizon.artcodes.scanner.R;
 
-public class ExperienceParser
-{
-	private static class ExperienceTypeAdapterFactor implements TypeAdapterFactory
-	{
+public class ExperienceParser {
+	private static class ExperienceTypeAdapterFactor implements TypeAdapterFactory {
 		@SuppressWarnings("unchecked")
 		// we use a runtime check to guarantee that 'C' and 'T' are equal
-		public final <T> TypeAdapter<T> create(Gson gson, TypeToken<T> type)
-		{
+		public final <T> TypeAdapter<T> create(Gson gson, TypeToken<T> type) {
 			return type.getRawType() == Experience.class ? (TypeAdapter<T>) customizeMyClassAdapter(gson, (TypeToken<Experience>) type) : null;
 		}
 
-		private TypeAdapter<Experience> customizeMyClassAdapter(Gson gson, TypeToken<Experience> type)
-		{
+		private TypeAdapter<Experience> customizeMyClassAdapter(Gson gson, TypeToken<Experience> type) {
 			final TypeAdapter<Experience> delegate = gson.getDelegateAdapter(this, type);
 			final TypeAdapter<JsonElement> elementAdapter = gson.getAdapter(JsonElement.class);
 
-			return new TypeAdapter<Experience>()
-			{
+			return new TypeAdapter<Experience>() {
 				@Override
-				public Experience read(JsonReader in) throws IOException
-				{
+				public Experience read(JsonReader in) throws IOException {
 					JsonElement tree = elementAdapter.read(in);
-					if (tree.isJsonObject())
-					{
+					if (tree.isJsonObject()) {
 						JsonObject jsonObject = tree.getAsJsonObject();
-						if (jsonObject.has("threshold") && jsonObject.get("threshold").isJsonPrimitive())
-						{
+						if (jsonObject.has("threshold") && jsonObject.get("threshold").isJsonPrimitive()) {
 							jsonObject.remove("threshold");
 						}
-						if (jsonObject.has("id"))
-						{
+						if (jsonObject.has("id")) {
 							String id = jsonObject.get("id").getAsString();
-							if (!id.contains(":"))
-							{
+							if (!id.contains(":")) {
 								jsonObject.addProperty("id", "http://aestheticodes.appspot.com/experience/" + id);
 							}
 						}
 
-						if (!jsonObject.has("pipeline"))
-						{
+						if (!jsonObject.has("pipeline")) {
 							JsonArray array = new JsonArray();
 							array.add(new JsonPrimitive("tile"));
 							if (jsonObject.has("embeddedChecksum")
 									&& jsonObject.get("embeddedChecksum") instanceof JsonPrimitive
-									&& jsonObject.get("embeddedChecksum").getAsBoolean())
-							{
+									&& jsonObject.get("embeddedChecksum").getAsBoolean()) {
 								array.add(new JsonPrimitive("detectEmbedded"));
-							}
-							else
-							{
+							} else {
 								array.add(new JsonPrimitive("detect"));
 							}
 
 							jsonObject.add("pipeline", array);
 						}
 
-						if (jsonObject.has("markers"))
-						{
+						if (jsonObject.has("markers")) {
 							JsonElement markers = jsonObject.get("markers");
 							jsonObject.add("actions", markers);
 
-							if (markers.isJsonArray())
-							{
+							if (markers.isJsonArray()) {
 								JsonArray markerArray = markers.getAsJsonArray();
-								for (JsonElement element : markerArray)
-								{
-									if (element.isJsonObject())
-									{
+								for (JsonElement element : markerArray) {
+									if (element.isJsonObject()) {
 										JsonObject actionObject = element.getAsJsonObject();
-										if (actionObject.has("title"))
-										{
+										if (actionObject.has("title")) {
 											actionObject.add("name", actionObject.get("title"));
 										}
 
-										if (actionObject.has("action"))
-										{
+										if (actionObject.has("action")) {
 											actionObject.add("url", actionObject.get("action"));
 										}
 
-										if (actionObject.has("code"))
-										{
+										if (actionObject.has("code")) {
 											JsonArray codeArray = new JsonArray();
 											String codeString = actionObject.get("code").getAsString();
-											if(codeString.contains("+"))
-											{
+											if (codeString.contains("+")) {
 												String[] codes = codeString.split("\\+");
-												for(String code: codes)
-												{
+												for (String code : codes) {
 													codeArray.add(new JsonPrimitive(code));
 												}
 												actionObject.addProperty("match", "all");
-											}
-											else if(codeString.contains(">"))
-											{
+											} else if (codeString.contains(">")) {
 												String[] codes = codeString.split(">");
-												for(String code: codes)
-												{
+												for (String code : codes) {
 													codeArray.add(new JsonPrimitive(code));
 												}
 												actionObject.addProperty("match", "sequence");
-											}
-											else
-											{
+											} else {
 												codeArray.add(codeString);
 												actionObject.addProperty("match", "any");
 											}
@@ -157,8 +128,7 @@ public class ExperienceParser
 				}
 
 				@Override
-				public void write(JsonWriter out, Experience value) throws IOException
-				{
+				public void write(JsonWriter out, Experience value) throws IOException {
 					delegate.write(out, value);
 				}
 			};
@@ -167,13 +137,10 @@ public class ExperienceParser
 
 	private static Gson gson;
 
-	public static Gson createGson(Context context)
-	{
-		if (gson == null)
-		{
+	public static Gson createGson(Context context) {
+		if (gson == null) {
 			GsonBuilder builder = new GsonBuilder();
-			if (context == null || Feature.get(context, R.bool.feature_load_old_experiences).isEnabled())
-			{
+			if (context == null || ScannerFeatures.load_old_experiences.isEnabled(context)) {
 				builder.registerTypeAdapterFactory(new ExperienceTypeAdapterFactor());
 			}
 			gson = builder.create();

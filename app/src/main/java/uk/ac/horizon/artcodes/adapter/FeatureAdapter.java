@@ -20,77 +20,59 @@
 package uk.ac.horizon.artcodes.adapter;
 
 import android.content.Context;
-import androidx.recyclerview.widget.SortedList;
-import androidx.recyclerview.widget.SortedListAdapterCallback;
 import android.view.LayoutInflater;
 import android.view.ViewGroup;
-import android.widget.CompoundButton;
+
+import androidx.recyclerview.widget.SortedList;
+import androidx.recyclerview.widget.SortedListAdapterCallback;
 
 import com.google.common.collect.Ordering;
 
-import uk.ac.horizon.artcodes.Feature;
 import uk.ac.horizon.artcodes.databinding.FeatureItemBinding;
 
-public class FeatureAdapter extends ListAdapter<FeatureItemBinding>
-{
+public class FeatureAdapter extends ListAdapter<FeatureItemBinding> {
 	private static final Ordering<String> CASE_INSENSITIVE_NULL_SAFE_ORDER =
 			Ordering.from(String.CASE_INSENSITIVE_ORDER).nullsLast();
-	private final SortedList<Feature> features;
+	private final SortedList<FeatureItem> features;
 
-	public FeatureAdapter(Context context)
-	{
+	public FeatureAdapter(Context context) {
 		super(context);
-		features = new SortedList<>(Feature.class, new SortedListAdapterCallback<Feature>(adapter)
-		{
+		features = new SortedList<>(FeatureItem.class, new SortedListAdapterCallback<FeatureItem>(adapter) {
 			@Override
-			public boolean areContentsTheSame(Feature oldItem, Feature newItem)
-			{
-				return oldItem.getId() == newItem.getId();
+			public boolean areContentsTheSame(FeatureItem oldItem, FeatureItem newItem) {
+				return oldItem.getName().equals(newItem.getName());
 			}
 
 			@Override
-			public boolean areItemsTheSame(Feature item1, Feature item2)
-			{
-				return item1.getId() == item2.getId();
+			public boolean areItemsTheSame(FeatureItem item1, FeatureItem item2) {
+				return item1.getName().equals(item2.getName());
 			}
 
 			@Override
-			public int compare(Feature o1, Feature o2)
-			{
+			public int compare(FeatureItem o1, FeatureItem o2) {
 				return CASE_INSENSITIVE_NULL_SAFE_ORDER.compare(o1.getName(), o2.getName());
 			}
 		});
 	}
 
-	public void add(Feature item)
-	{
+	public void add(FeatureItem item) {
 		features.add(item);
 	}
 
 	@Override
-	public FeatureItemBinding createBinding(final ViewGroup parent, final int viewType)
-	{
+	public FeatureItemBinding createBinding(final ViewGroup parent, final int viewType) {
 		return FeatureItemBinding.inflate(LayoutInflater.from(parent.getContext()), parent, false);
 	}
 
 	@Override
-	public void bind(final int position, final FeatureItemBinding binding)
-	{
-		final Feature feature = features.get(position);
+	public void bind(final int position, final FeatureItemBinding binding) {
+		final FeatureItem feature = features.get(position);
 		binding.setFeature(feature);
-		binding.featureSwitch.setOnCheckedChangeListener(new CompoundButton.OnCheckedChangeListener()
-		{
-			@Override
-			public void onCheckedChanged(CompoundButton buttonView, boolean isChecked)
-			{
-				feature.setEnabled(isChecked);
-			}
-		});
+		binding.featureSwitch.setOnCheckedChangeListener((buttonView, isChecked) -> feature.setEnabled(isChecked));
 	}
 
 	@Override
-	public int getViewCount()
-	{
+	public int getViewCount() {
 		return features.size();
 	}
 }

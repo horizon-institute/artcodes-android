@@ -21,20 +21,19 @@ apply plugin: 'com.android.library'
 apply from: 'maven-push.gradle'
 
 dependencies {
-	implementation 'androidx.appcompat:appcompat:1.0.2'
-	implementation 'com.google.code.gson:gson:2.8.5'
-	implementation 'com.google.guava:guava:28.0-android'
-	api files('libs/opencv-3.1.0.jar')
-	testImplementation 'junit:junit:4.12'
+	implementation 'androidx.appcompat:appcompat:1.2.0'
+	implementation 'com.google.code.gson:gson:2.8.6'
+	implementation 'com.google.guava:guava:30.1-android'
+	api files('libs/opencv-3.4.12.jar')
+	testImplementation 'junit:junit:4.13.1'
 }
 
 android {
-	compileSdkVersion 28
-	buildToolsVersion '28.0.3'
+	compileSdkVersion 30
 
 	defaultConfig {
 		minSdkVersion 15
-		targetSdkVersion 28
+		targetSdkVersion 30
 		versionName '3.5'
 	}
 

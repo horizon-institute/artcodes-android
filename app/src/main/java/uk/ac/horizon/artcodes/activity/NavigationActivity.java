@@ -53,8 +53,8 @@ import com.google.android.material.navigation.NavigationView;
 
 import java.util.List;
 
-import uk.ac.horizon.artcodes.Feature;
 import uk.ac.horizon.artcodes.Analytics;
+import uk.ac.horizon.artcodes.Features;
 import uk.ac.horizon.artcodes.R;
 import uk.ac.horizon.artcodes.account.Account;
 import uk.ac.horizon.artcodes.databinding.NavigationBinding;
@@ -67,8 +67,7 @@ import uk.ac.horizon.artcodes.fragment.FeatureListFragment;
 import uk.ac.horizon.artcodes.server.LoadCallback;
 
 public class NavigationActivity extends ArtcodeActivityBase implements
-		NavigationView.OnNavigationItemSelectedListener
-{
+		NavigationView.OnNavigationItemSelectedListener {
 	private static final int REQUEST_CODE_SIGN_IN = 63;
 	private static final int REQUEST_CODE_PICK_ACCOUNT = 67;
 	private static final long DRAWER_CLOSE_DELAY_MS = 250;
@@ -85,32 +84,24 @@ public class NavigationActivity extends ArtcodeActivityBase implements
 	private GoogleApiClient apiClient;
 
 	@Override
-	public void onBackPressed()
-	{
-		if (binding.drawer.isDrawerOpen(GravityCompat.START))
-		{
+	public void onBackPressed() {
+		if (binding.drawer.isDrawerOpen(GravityCompat.START)) {
 			binding.drawer.closeDrawer(GravityCompat.START);
-		}
-		else
-		{
+		} else {
 			super.onBackPressed();
 		}
 	}
 
 	@Override
-	public void onConfigurationChanged(final Configuration newConfig)
-	{
+	public void onConfigurationChanged(@NonNull final Configuration newConfig) {
 		super.onConfigurationChanged(newConfig);
 		drawerToggle.onConfigurationChanged(newConfig);
 	}
 
 	@Override
-	public boolean onNavigationItemSelected(@NonNull final MenuItem menuItem)
-	{
-		if (menuItem.isCheckable())
-		{
-			if (selected != null)
-			{
+	public boolean onNavigationItemSelected(@NonNull final MenuItem menuItem) {
+		if (menuItem.isCheckable()) {
+			if (selected != null) {
 				selected.setChecked(false);
 			}
 
@@ -124,37 +115,29 @@ public class NavigationActivity extends ArtcodeActivityBase implements
 	}
 
 	@Override
-	public boolean onOptionsItemSelected(final MenuItem item)
-	{
-		if (item.getItemId() == R.id.home)
-		{
+	public boolean onOptionsItemSelected(final MenuItem item) {
+		if (item.getItemId() == R.id.home) {
 			return drawerToggle.onOptionsItemSelected(item);
 		}
 		return super.onOptionsItemSelected(item);
 	}
 
-	private void updateAccounts()
-	{
+	private void updateAccounts() {
 		final Menu menu = binding.navigation.getMenu();
 		final MenuItem libraries = menu.findItem(R.id.nav_libraries);
 		final SubMenu subMenu = libraries.getSubMenu();
 
-		while (subMenu.size() > 0)
-		{
+		while (subMenu.size() > 0) {
 			subMenu.removeItem(subMenu.getItem(0).getItemId());
 		}
 
 		final List<Account> accounts = getServer().getAccounts();
-		for (int index = 0; index < accounts.size(); index++)
-		{
+		for (int index = 0; index < accounts.size(); index++) {
 			final Account account = accounts.get(index);
 			final MenuItem menuItem = subMenu.add(R.id.navigation, index, Menu.NONE, account.getDisplayName());
-			if (account.getId().equals("local"))
-			{
+			if (account.getId().equals("local")) {
 				menuItem.setIcon(R.drawable.ic_folder_24dp);
-			}
-			else
-			{
+			} else {
 				menuItem.setIcon(R.drawable.ic_cloud_24dp);
 			}
 			menuItem.setCheckable(true);
@@ -163,11 +146,9 @@ public class NavigationActivity extends ArtcodeActivityBase implements
 		final MenuItem menuItem = subMenu.add(R.id.navigation, R.id.nav_addaccount, Menu.NONE, R.string.nav_addaccount);
 		menuItem.setIcon(R.drawable.ic_add_24dp);
 
-		for (int i = 0, count = binding.navigation.getChildCount(); i < count; i++)
-		{
+		for (int i = 0, count = binding.navigation.getChildCount(); i < count; i++) {
 			final View child = binding.navigation.getChildAt(i);
-			if (child instanceof ListView)
-			{
+			if (child instanceof ListView) {
 				final ListView menuView = (ListView) child;
 				final HeaderViewListAdapter adapter = (HeaderViewListAdapter) menuView.getAdapter();
 				final BaseAdapter wrapped = (BaseAdapter) adapter.getWrappedAdapter();
@@ -175,62 +156,49 @@ public class NavigationActivity extends ArtcodeActivityBase implements
 			}
 		}
 
-		getServer().loadRecent(new LoadCallback<List<String>>()
-		{
+		getServer().loadRecent(new LoadCallback<List<String>>() {
 			@Override
-			public void loaded(List<String> item)
-			{
+			public void loaded(List<String> item) {
 				final MenuItem recent = menu.findItem(R.id.nav_recent);
-				if (recent != null)
-				{
+				if (recent != null) {
 					recent.setVisible(!item.isEmpty());
 				}
 			}
 
 			@Override
-			public void error(Throwable e)
-			{
+			public void error(Throwable e) {
 				Analytics.trackException(e);
 			}
 		});
-		getServer().loadStarred(new LoadCallback<List<String>>()
-		{
+		getServer().loadStarred(new LoadCallback<List<String>>() {
 			@Override
-			public void loaded(List<String> item)
-			{
+			public void loaded(List<String> item) {
 				final MenuItem starred = menu.findItem(R.id.nav_starred);
-				if (starred != null)
-				{
+				if (starred != null) {
 					starred.setVisible(!item.isEmpty());
 				}
 			}
 
 			@Override
-			public void error(Throwable e)
-			{
+			public void error(Throwable e) {
 				Analytics.trackException(e);
 			}
 		});
 	}
 
 	@Override
-	protected void onNewIntent(Intent intent)
-	{
+	protected void onNewIntent(Intent intent) {
 		Log.i("a", "New intent " + intent);
 		super.onNewIntent(intent);
 	}
 
-	public void navigate(Fragment fragment, boolean addToBackStack)
-	{
-		if (addToBackStack)
-		{
+	public void navigate(Fragment fragment, boolean addToBackStack) {
+		if (addToBackStack) {
 			getSupportFragmentManager().beginTransaction()
 					.replace(R.id.content, fragment, FRAGMENT_TAG)
 					.addToBackStack(null)
 					.commit();
-		}
-		else
-		{
+		} else {
 			getSupportFragmentManager().beginTransaction()
 					.replace(R.id.content, fragment, FRAGMENT_TAG)
 					.commit();
@@ -238,8 +206,7 @@ public class NavigationActivity extends ArtcodeActivityBase implements
 	}
 
 	@Override
-	public boolean onCreateOptionsMenu(Menu menu)
-	{
+	public boolean onCreateOptionsMenu(Menu menu) {
 		final MenuInflater inflater = getMenuInflater();
 		inflater.inflate(R.menu.search_menu, menu);
 
@@ -247,28 +214,23 @@ public class NavigationActivity extends ArtcodeActivityBase implements
 		final SearchView searchView = (SearchView) searchItem.getActionView();
 		final SearchManager searchManager = (SearchManager) getSystemService(Context.SEARCH_SERVICE);
 		searchView.setSearchableInfo(searchManager.getSearchableInfo(getComponentName()));
-		searchView.setOnQueryTextListener(new SearchView.OnQueryTextListener()
-		{
+		searchView.setOnQueryTextListener(new SearchView.OnQueryTextListener() {
 			private Runnable delayedAction = null;
 
 			@Override
-			public boolean onQueryTextSubmit(String query)
-			{
+			public boolean onQueryTextSubmit(String query) {
 				search(query);
 				return true;
 			}
 
 			@Override
-			public boolean onQueryTextChange(final String newText)
-			{
-				if (delayedAction != null)
-				{
+			public boolean onQueryTextChange(final String newText) {
+				if (delayedAction != null) {
 					searchHandler.removeCallbacks(delayedAction);
 					delayedAction = null;
 				}
 
-				if (newText.trim().length() > 3)
-				{
+				if (newText.trim().length() > 3) {
 					delayedAction = () -> search(newText);
 
 					searchHandler.postDelayed(delayedAction, 1000);
@@ -276,21 +238,17 @@ public class NavigationActivity extends ArtcodeActivityBase implements
 				return true;
 			}
 		});
-		searchItem.setOnActionExpandListener(new MenuItem.OnActionExpandListener()
-		{
+		searchItem.setOnActionExpandListener(new MenuItem.OnActionExpandListener() {
 			@Override
-			public boolean onMenuItemActionExpand(final MenuItem item)
-			{
+			public boolean onMenuItemActionExpand(final MenuItem item) {
 				return true;
 			}
 
 			@Override
-			public boolean onMenuItemActionCollapse(final MenuItem item)
-			{
+			public boolean onMenuItemActionCollapse(final MenuItem item) {
 				Log.i("a", "Closed");
 				Fragment fragment = getSupportFragmentManager().findFragmentByTag(FRAGMENT_TAG);
-				if (fragment instanceof ExperienceSearchFragment)
-				{
+				if (fragment instanceof ExperienceSearchFragment) {
 					getSupportFragmentManager().popBackStack();
 				}
 				return true;
@@ -300,16 +258,12 @@ public class NavigationActivity extends ArtcodeActivityBase implements
 		return true;
 	}
 
-	private void search(String query)
-	{
+	private void search(String query) {
 		Analytics.logSearch(query);
 		Fragment fragment = getSupportFragmentManager().findFragmentByTag(FRAGMENT_TAG);
-		if (fragment instanceof ExperienceSearchFragment)
-		{
+		if (fragment instanceof ExperienceSearchFragment) {
 			((ExperienceSearchFragment) fragment).search(query);
-		}
-		else
-		{
+		} else {
 			ExperienceSearchFragment experienceSearchFragment = new ExperienceSearchFragment();
 			experienceSearchFragment.setArguments(new Bundle());
 			experienceSearchFragment.getArguments().putString("query", query);
@@ -318,42 +272,32 @@ public class NavigationActivity extends ArtcodeActivityBase implements
 	}
 
 	@Override
-	protected void onActivityResult(int requestCode, int resultCode, Intent data)
-	{
-		if (requestCode == REQUEST_CODE_PICK_ACCOUNT)
-		{
-			if (resultCode == RESULT_OK)
-			{
-				if (data != null)
-				{
-					if (data.hasExtra(AccountManager.KEY_ACCOUNT_NAME))
-					{
+	protected void onActivityResult(int requestCode, int resultCode, Intent data) {
+		super.onActivityResult(requestCode, resultCode, data);
+		if (requestCode == REQUEST_CODE_PICK_ACCOUNT) {
+			if (resultCode == RESULT_OK) {
+				if (data != null) {
+					if (data.hasExtra(AccountManager.KEY_ACCOUNT_NAME)) {
 						String accountName = data.getStringExtra(AccountManager.KEY_ACCOUNT_NAME);
 
-						if (accountName != null)
-						{
+						if (accountName != null) {
 							tryGoogleAccount(accountName, null);
 						}
 					}
 				}
 			}
-		}
-		else if (requestCode == REQUEST_CODE_SIGN_IN)
-		{
+		} else if (requestCode == REQUEST_CODE_SIGN_IN) {
 			final GoogleSignInResult result = Auth.GoogleSignInApi.getSignInResultFromIntent(data);
-			if (result.getSignInAccount() != null)
-			{
+			if (result.getSignInAccount() != null) {
 				tryGoogleAccount(result.getSignInAccount().getEmail(), result.getSignInAccount().getDisplayName());
 			}
 		}
 	}
 
 	@Override
-	protected void onCreate(final Bundle savedInstanceState)
-	{
+	protected void onCreate(final Bundle savedInstanceState) {
 		super.onCreate(savedInstanceState);
-		if (Feature.get(this, R.bool.feature_show_welcome).isEnabled())
-		{
+		if (Features.show_welcome.isEnabled(this)) {
 			startActivity(new Intent(this, AboutArtcodesActivity.class));
 			return;
 		}
@@ -367,27 +311,22 @@ public class NavigationActivity extends ArtcodeActivityBase implements
 		final View headerView = binding.navigation.inflateHeaderView(R.layout.navigation_header);
 
 		final MenuItem featureItem = binding.navigation.getMenu().findItem(R.id.nav_features);
-		if (Feature.get(this, R.bool.feature_edit_features).isEnabled())
-		{
+		if (Features.edit_features.isEnabled(this)) {
 			featureItem.setVisible(true);
-		}
-		else
-		{
+		} else {
 			headerView.setLongClickable(true);
 			headerView.setOnLongClickListener(v -> {
 				featureItem.setVisible(true);
-				Feature.get(getBaseContext(), R.bool.feature_edit_features).setEnabled(true);
+				Features.edit_features.setEnabled(this, true);
 				return false;
 			});
 		}
 
 		updateAccounts();
 
-		drawerToggle = new ActionBarDrawerToggle(this, binding.drawer, binding.toolbar, R.string.open, R.string.close)
-		{
+		drawerToggle = new ActionBarDrawerToggle(this, binding.drawer, binding.toolbar, R.string.open, R.string.close) {
 			@Override
-			public void onDrawerOpened(View drawerView)
-			{
+			public void onDrawerOpened(View drawerView) {
 				super.onDrawerOpened(drawerView);
 				updateAccounts();
 			}
@@ -397,13 +336,11 @@ public class NavigationActivity extends ArtcodeActivityBase implements
 		drawerToggle.syncState();
 
 		int navigationIndex = R.id.nav_home;
-		if (savedInstanceState != null)
-		{
+		if (savedInstanceState != null) {
 			navigationIndex = savedInstanceState.getInt(NAV_ITEM_ID, R.id.nav_home);
 		}
 		MenuItem item = binding.navigation.getMenu().findItem(navigationIndex);
-		if (item == null)
-		{
+		if (item == null) {
 			item = binding.navigation.getMenu().findItem(R.id.nav_home);
 		}
 
@@ -424,23 +361,18 @@ public class NavigationActivity extends ArtcodeActivityBase implements
 	}
 
 	@Override
-	protected void onSaveInstanceState(final Bundle outState)
-	{
+	protected void onSaveInstanceState(final Bundle outState) {
 		super.onSaveInstanceState(outState);
-		if (selected != null)
-		{
+		if (selected != null) {
 			outState.putInt(NAV_ITEM_ID, selected.getItemId());
 		}
 	}
 
-	private void tryGoogleAccount(final String name, final String displayName)
-	{
+	private void tryGoogleAccount(final String name, final String displayName) {
 		new Thread(() -> {
-			try
-			{
+			try {
 				final Account account = getServer().createAccount("google:" + name);
-				if (account.validates())
-				{
+				if (account.validates()) {
 					account.setDisplayName(displayName);
 					getServer().add(account);
 					new Handler(Looper.getMainLooper()).post(() -> {
@@ -452,30 +384,23 @@ public class NavigationActivity extends ArtcodeActivityBase implements
 						navigate(fragment, true);
 					});
 				}
-			}
-			catch (UserRecoverableAuthException userRecoverableException)
-			{
+			} catch (UserRecoverableAuthException userRecoverableException) {
 				Log.i("intent", "Intent = " + userRecoverableException.getIntent());
 				startActivityForResult(userRecoverableException.getIntent(), REQUEST_CODE_PICK_ACCOUNT);
-			}
-			catch (Exception e)
-			{
+			} catch (Exception e) {
 				e.printStackTrace();
 			}
 		}).start();
 	}
 
-	private void selectAccount()
-	{
+	private void selectAccount() {
 		apiClient.clearDefaultAccountAndReconnect();
 		Intent signInIntent = Auth.GoogleSignInApi.getSignInIntent(apiClient);
 		startActivityForResult(signInIntent, REQUEST_CODE_SIGN_IN);
 	}
 
-	private void navigate(MenuItem item, boolean addToBackStack)
-	{
-		switch (item.getItemId())
-		{
+	private void navigate(MenuItem item, boolean addToBackStack) {
+		switch (item.getItemId()) {
 			case R.id.nav_home:
 				navigate(new ExperienceRecommendFragment(), addToBackStack);
 				break;
@@ -502,8 +427,7 @@ public class NavigationActivity extends ArtcodeActivityBase implements
 
 			default:
 				final List<Account> accounts = getServer().getAccounts();
-				if (item.getItemId() < accounts.size())
-				{
+				if (item.getItemId() < accounts.size()) {
 					final Account account = accounts.get(item.getItemId());
 					Bundle bundle = new Bundle();
 					bundle.putString("account", account.getId());
