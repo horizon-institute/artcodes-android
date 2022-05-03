@@ -2,7 +2,7 @@
 .gradle/
 build/
 
-/gradle.properties
+/keystore.properties
 /local.properties
 
 src/main/res/values/keys.xml

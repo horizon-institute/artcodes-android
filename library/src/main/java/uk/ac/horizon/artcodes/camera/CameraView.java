@@ -135,7 +135,7 @@ public class CameraView extends SurfaceView implements CameraFocusControl
 
 						if (cameraIsFocused)
 						{
-							Log.i("FOCUS", "cameraIsFocused test: "+cameraIsFocused);
+							//Log.i("FOCUS", "cameraIsFocused test: "+cameraIsFocused);
 							if (!focusedOnThisFrame)
 							{
 								detector.setData(data);

@@ -20,6 +20,8 @@
 package uk.ac.horizon.artcodes.activity;
 
 import android.accounts.AccountManager;
+import android.annotation.SuppressLint;
+import android.app.Activity;
 import android.app.SearchManager;
 import android.content.Context;
 import android.content.Intent;
@@ -37,6 +39,8 @@ import android.widget.BaseAdapter;
 import android.widget.HeaderViewListAdapter;
 import android.widget.ListView;
 
+import androidx.activity.result.ActivityResultLauncher;
+import androidx.activity.result.contract.ActivityResultContracts;
 import androidx.annotation.NonNull;
 import androidx.appcompat.app.ActionBarDrawerToggle;
 import androidx.appcompat.widget.SearchView;
@@ -67,375 +71,393 @@ import uk.ac.horizon.artcodes.fragment.FeatureListFragment;
 import uk.ac.horizon.artcodes.server.LoadCallback;
 
 public class NavigationActivity extends ArtcodeActivityBase implements
-		NavigationView.OnNavigationItemSelectedListener {
-	private static final int REQUEST_CODE_SIGN_IN = 63;
-	private static final int REQUEST_CODE_PICK_ACCOUNT = 67;
-	private static final long DRAWER_CLOSE_DELAY_MS = 250;
-	private static final String NAV_ITEM_ID = "navItemId";
+        NavigationView.OnNavigationItemSelectedListener {
+    private static final long DRAWER_CLOSE_DELAY_MS = 250;
+    private static final String NAV_ITEM_ID = "navItemId";
 
-	private final Handler drawerActionHandler = new Handler();
-	private NavigationBinding binding;
-	private ActionBarDrawerToggle drawerToggle;
-	private MenuItem selected;
+    private final Handler drawerActionHandler = new Handler();
+    private NavigationBinding binding;
+    private ActionBarDrawerToggle drawerToggle;
+    private MenuItem selected;
 
-	private static final String FRAGMENT_TAG = "fragment";
-	private static final Handler searchHandler = new Handler();
+    private static final String FRAGMENT_TAG = "fragment";
+    private static final Handler searchHandler = new Handler();
 
-	private GoogleApiClient apiClient;
+    private GoogleApiClient apiClient;
 
-	@Override
-	public void onBackPressed() {
-		if (binding.drawer.isDrawerOpen(GravityCompat.START)) {
-			binding.drawer.closeDrawer(GravityCompat.START);
-		} else {
-			super.onBackPressed();
-		}
-	}
+    private final ActivityResultLauncher<Intent> loginLauncher = registerForActivityResult(
+            new ActivityResultContracts.StartActivityForResult(),
+            result -> {
+                Log.i("RESULT", "" + result);
+                //if (result.getResultCode() == Activity.RESULT_OK) {
+                // There are no request codes
+                Intent data = result.getData();
 
-	@Override
-	public void onConfigurationChanged(@NonNull final Configuration newConfig) {
-		super.onConfigurationChanged(newConfig);
-		drawerToggle.onConfigurationChanged(newConfig);
-	}
+                Log.i("RESULT", "" + data);
+                if (data != null) {
+                    final GoogleSignInResult signInResult = Auth.GoogleSignInApi.getSignInResultFromIntent(data);
+                    Log.i("RESULT", "" + signInResult);
+                    if (signInResult != null) {
+                        Log.i("RESULT", "" + signInResult.getStatus());
+                        Log.i("RESULT", "" + signInResult.getSignInAccount());
+                        if (signInResult.getSignInAccount() != null) {
+                            tryGoogleAccount(signInResult.getSignInAccount().getEmail(), signInResult.getSignInAccount().getDisplayName());
+                        }
+                    }
+                }
+                //}
+            });
 
-	@Override
-	public boolean onNavigationItemSelected(@NonNull final MenuItem menuItem) {
-		if (menuItem.isCheckable()) {
-			if (selected != null) {
-				selected.setChecked(false);
-			}
+    private final ActivityResultLauncher<Intent> accountSelectLauncher = registerForActivityResult(
+            new ActivityResultContracts.StartActivityForResult(),
+            result -> {
+                if (result.getResultCode() == Activity.RESULT_OK) {
+                    // There are no request codes
+                    Intent data = result.getData();
+                    if (data != null) {
+                        if (data.hasExtra(AccountManager.KEY_ACCOUNT_NAME)) {
+                            String accountName = data.getStringExtra(AccountManager.KEY_ACCOUNT_NAME);
 
-			selected = menuItem;
-			menuItem.setChecked(true);
-		}
-		drawerActionHandler.postDelayed(() -> navigate(menuItem, true), DRAWER_CLOSE_DELAY_MS);
+                            if (accountName != null) {
+                                tryGoogleAccount(accountName, null);
+                            }
+                        }
+                    }
+                }
+            });
 
-		binding.drawer.closeDrawer(GravityCompat.START);
-		return true;
-	}
 
-	@Override
-	public boolean onOptionsItemSelected(final MenuItem item) {
-		if (item.getItemId() == R.id.home) {
-			return drawerToggle.onOptionsItemSelected(item);
-		}
-		return super.onOptionsItemSelected(item);
-	}
+    @Override
+    public void onBackPressed() {
+        if (binding.drawer.isDrawerOpen(GravityCompat.START)) {
+            binding.drawer.closeDrawer(GravityCompat.START);
+        } else {
+            super.onBackPressed();
+        }
+    }
 
-	private void updateAccounts() {
-		final Menu menu = binding.navigation.getMenu();
-		final MenuItem libraries = menu.findItem(R.id.nav_libraries);
-		final SubMenu subMenu = libraries.getSubMenu();
+    @Override
+    public void onConfigurationChanged(@NonNull final Configuration newConfig) {
+        super.onConfigurationChanged(newConfig);
+        drawerToggle.onConfigurationChanged(newConfig);
+    }
 
-		while (subMenu.size() > 0) {
-			subMenu.removeItem(subMenu.getItem(0).getItemId());
-		}
+    @Override
+    public boolean onNavigationItemSelected(@NonNull final MenuItem menuItem) {
+        if (menuItem.isCheckable()) {
+            if (selected != null) {
+                selected.setChecked(false);
+            }
 
-		final List<Account> accounts = getServer().getAccounts();
-		for (int index = 0; index < accounts.size(); index++) {
-			final Account account = accounts.get(index);
-			final MenuItem menuItem = subMenu.add(R.id.navigation, index, Menu.NONE, account.getDisplayName());
-			if (account.getId().equals("local")) {
-				menuItem.setIcon(R.drawable.ic_folder_24dp);
-			} else {
-				menuItem.setIcon(R.drawable.ic_cloud_24dp);
-			}
-			menuItem.setCheckable(true);
-		}
+            selected = menuItem;
+            menuItem.setChecked(true);
+        }
+        drawerActionHandler.postDelayed(() -> navigate(menuItem, true), DRAWER_CLOSE_DELAY_MS);
 
-		final MenuItem menuItem = subMenu.add(R.id.navigation, R.id.nav_addaccount, Menu.NONE, R.string.nav_addaccount);
-		menuItem.setIcon(R.drawable.ic_add_24dp);
+        binding.drawer.closeDrawer(GravityCompat.START);
+        return true;
+    }
 
-		for (int i = 0, count = binding.navigation.getChildCount(); i < count; i++) {
-			final View child = binding.navigation.getChildAt(i);
-			if (child instanceof ListView) {
-				final ListView menuView = (ListView) child;
-				final HeaderViewListAdapter adapter = (HeaderViewListAdapter) menuView.getAdapter();
-				final BaseAdapter wrapped = (BaseAdapter) adapter.getWrappedAdapter();
-				wrapped.notifyDataSetChanged();
-			}
-		}
+    @Override
+    public boolean onOptionsItemSelected(final MenuItem item) {
+        if (item.getItemId() == R.id.home) {
+            return drawerToggle.onOptionsItemSelected(item);
+        }
+        return super.onOptionsItemSelected(item);
+    }
 
-		getServer().loadRecent(new LoadCallback<List<String>>() {
-			@Override
-			public void loaded(List<String> item) {
-				final MenuItem recent = menu.findItem(R.id.nav_recent);
-				if (recent != null) {
-					recent.setVisible(!item.isEmpty());
-				}
-			}
+    private void updateAccounts() {
+        final Menu menu = binding.navigation.getMenu();
+        final MenuItem libraries = menu.findItem(R.id.nav_libraries);
+        final SubMenu subMenu = libraries.getSubMenu();
 
-			@Override
-			public void error(Throwable e) {
-				Analytics.trackException(e);
-			}
-		});
-		getServer().loadStarred(new LoadCallback<List<String>>() {
-			@Override
-			public void loaded(List<String> item) {
-				final MenuItem starred = menu.findItem(R.id.nav_starred);
-				if (starred != null) {
-					starred.setVisible(!item.isEmpty());
-				}
-			}
+        while (subMenu.size() > 0) {
+            subMenu.removeItem(subMenu.getItem(0).getItemId());
+        }
 
-			@Override
-			public void error(Throwable e) {
-				Analytics.trackException(e);
-			}
-		});
-	}
+        final List<Account> accounts = getServer().getAccounts();
+        for (int index = 0; index < accounts.size(); index++) {
+            final Account account = accounts.get(index);
+            final MenuItem menuItem = subMenu.add(R.id.navigation, index, Menu.NONE, account.getDisplayName());
+            if (account.getId().equals("local")) {
+                menuItem.setIcon(R.drawable.ic_folder_24dp);
+            } else {
+                menuItem.setIcon(R.drawable.ic_cloud_24dp);
+            }
+            menuItem.setCheckable(true);
+        }
 
-	@Override
-	protected void onNewIntent(Intent intent) {
-		Log.i("a", "New intent " + intent);
-		super.onNewIntent(intent);
-	}
+        final MenuItem menuItem = subMenu.add(R.id.navigation, R.id.nav_addaccount, Menu.NONE, R.string.nav_addaccount);
+        menuItem.setIcon(R.drawable.ic_add_24dp);
 
-	public void navigate(Fragment fragment, boolean addToBackStack) {
-		if (addToBackStack) {
-			getSupportFragmentManager().beginTransaction()
-					.replace(R.id.content, fragment, FRAGMENT_TAG)
-					.addToBackStack(null)
-					.commit();
-		} else {
-			getSupportFragmentManager().beginTransaction()
-					.replace(R.id.content, fragment, FRAGMENT_TAG)
-					.commit();
-		}
-	}
+        for (int i = 0, count = binding.navigation.getChildCount(); i < count; i++) {
+            final View child = binding.navigation.getChildAt(i);
+            if (child instanceof ListView) {
+                final ListView menuView = (ListView) child;
+                final HeaderViewListAdapter adapter = (HeaderViewListAdapter) menuView.getAdapter();
+                final BaseAdapter wrapped = (BaseAdapter) adapter.getWrappedAdapter();
+                wrapped.notifyDataSetChanged();
+            }
+        }
 
-	@Override
-	public boolean onCreateOptionsMenu(Menu menu) {
-		final MenuInflater inflater = getMenuInflater();
-		inflater.inflate(R.menu.search_menu, menu);
+        getServer().loadRecent(new LoadCallback<List<String>>() {
+            @Override
+            public void loaded(List<String> item) {
+                final MenuItem recent = menu.findItem(R.id.nav_recent);
+                if (recent != null) {
+                    recent.setVisible(!item.isEmpty());
+                }
+            }
 
-		final MenuItem searchItem = menu.findItem(R.id.search);
-		final SearchView searchView = (SearchView) searchItem.getActionView();
-		final SearchManager searchManager = (SearchManager) getSystemService(Context.SEARCH_SERVICE);
-		searchView.setSearchableInfo(searchManager.getSearchableInfo(getComponentName()));
-		searchView.setOnQueryTextListener(new SearchView.OnQueryTextListener() {
-			private Runnable delayedAction = null;
+            @Override
+            public void error(Throwable e) {
+                Analytics.trackException(e);
+            }
+        });
+        getServer().loadStarred(new LoadCallback<List<String>>() {
+            @Override
+            public void loaded(List<String> item) {
+                final MenuItem starred = menu.findItem(R.id.nav_starred);
+                if (starred != null) {
+                    starred.setVisible(!item.isEmpty());
+                }
+            }
 
-			@Override
-			public boolean onQueryTextSubmit(String query) {
-				search(query);
-				return true;
-			}
+            @Override
+            public void error(Throwable e) {
+                Analytics.trackException(e);
+            }
+        });
+    }
 
-			@Override
-			public boolean onQueryTextChange(final String newText) {
-				if (delayedAction != null) {
-					searchHandler.removeCallbacks(delayedAction);
-					delayedAction = null;
-				}
+    @Override
+    protected void onNewIntent(Intent intent) {
+        Log.i("a", "New intent " + intent);
+        super.onNewIntent(intent);
+    }
 
-				if (newText.trim().length() > 3) {
-					delayedAction = () -> search(newText);
+    public void navigate(Fragment fragment, boolean addToBackStack) {
+        if (addToBackStack) {
+            getSupportFragmentManager().beginTransaction()
+                    .replace(R.id.content, fragment, FRAGMENT_TAG)
+                    .addToBackStack(null)
+                    .commit();
+        } else {
+            getSupportFragmentManager().beginTransaction()
+                    .replace(R.id.content, fragment, FRAGMENT_TAG)
+                    .commit();
+        }
+    }
 
-					searchHandler.postDelayed(delayedAction, 1000);
-				}
-				return true;
-			}
-		});
-		searchItem.setOnActionExpandListener(new MenuItem.OnActionExpandListener() {
-			@Override
-			public boolean onMenuItemActionExpand(final MenuItem item) {
-				return true;
-			}
+    @Override
+    public boolean onCreateOptionsMenu(Menu menu) {
+        final MenuInflater inflater = getMenuInflater();
+        inflater.inflate(R.menu.search_menu, menu);
 
-			@Override
-			public boolean onMenuItemActionCollapse(final MenuItem item) {
-				Log.i("a", "Closed");
-				Fragment fragment = getSupportFragmentManager().findFragmentByTag(FRAGMENT_TAG);
-				if (fragment instanceof ExperienceSearchFragment) {
-					getSupportFragmentManager().popBackStack();
-				}
-				return true;
-			}
-		});
+        final MenuItem searchItem = menu.findItem(R.id.search);
+        final SearchView searchView = (SearchView) searchItem.getActionView();
+        final SearchManager searchManager = (SearchManager) getSystemService(Context.SEARCH_SERVICE);
+        searchView.setSearchableInfo(searchManager.getSearchableInfo(getComponentName()));
+        searchView.setOnQueryTextListener(new SearchView.OnQueryTextListener() {
+            private Runnable delayedAction = null;
 
-		return true;
-	}
+            @Override
+            public boolean onQueryTextSubmit(String query) {
+                search(query);
+                return true;
+            }
 
-	private void search(String query) {
-		Analytics.logSearch(query);
-		Fragment fragment = getSupportFragmentManager().findFragmentByTag(FRAGMENT_TAG);
-		if (fragment instanceof ExperienceSearchFragment) {
-			((ExperienceSearchFragment) fragment).search(query);
-		} else {
-			ExperienceSearchFragment experienceSearchFragment = new ExperienceSearchFragment();
-			experienceSearchFragment.setArguments(new Bundle());
-			experienceSearchFragment.getArguments().putString("query", query);
-			navigate(experienceSearchFragment, true);
-		}
-	}
+            @Override
+            public boolean onQueryTextChange(final String newText) {
+                if (delayedAction != null) {
+                    searchHandler.removeCallbacks(delayedAction);
+                    delayedAction = null;
+                }
 
-	@Override
-	protected void onActivityResult(int requestCode, int resultCode, Intent data) {
-		super.onActivityResult(requestCode, resultCode, data);
-		if (requestCode == REQUEST_CODE_PICK_ACCOUNT) {
-			if (resultCode == RESULT_OK) {
-				if (data != null) {
-					if (data.hasExtra(AccountManager.KEY_ACCOUNT_NAME)) {
-						String accountName = data.getStringExtra(AccountManager.KEY_ACCOUNT_NAME);
+                if (newText.trim().length() > 3) {
+                    delayedAction = () -> search(newText);
 
-						if (accountName != null) {
-							tryGoogleAccount(accountName, null);
-						}
-					}
-				}
-			}
-		} else if (requestCode == REQUEST_CODE_SIGN_IN) {
-			final GoogleSignInResult result = Auth.GoogleSignInApi.getSignInResultFromIntent(data);
-			if (result.getSignInAccount() != null) {
-				tryGoogleAccount(result.getSignInAccount().getEmail(), result.getSignInAccount().getDisplayName());
-			}
-		}
-	}
+                    searchHandler.postDelayed(delayedAction, 1000);
+                }
+                return true;
+            }
+        });
+        searchItem.setOnActionExpandListener(new MenuItem.OnActionExpandListener() {
+            @Override
+            public boolean onMenuItemActionExpand(final MenuItem item) {
+                return true;
+            }
 
-	@Override
-	protected void onCreate(final Bundle savedInstanceState) {
-		super.onCreate(savedInstanceState);
-		if (Features.show_welcome.isEnabled(this)) {
-			startActivity(new Intent(this, AboutArtcodesActivity.class));
-			return;
-		}
+            @Override
+            public boolean onMenuItemActionCollapse(final MenuItem item) {
+                Log.i("a", "Closed");
+                Fragment fragment = getSupportFragmentManager().findFragmentByTag(FRAGMENT_TAG);
+                if (fragment instanceof ExperienceSearchFragment) {
+                    getSupportFragmentManager().popBackStack();
+                }
+                return true;
+            }
+        });
 
-		binding = DataBindingUtil.setContentView(this, R.layout.navigation);
+        return true;
+    }
 
-		setSupportActionBar(binding.toolbar);
+    private void search(String query) {
+        Analytics.logSearch(query);
+        Fragment fragment = getSupportFragmentManager().findFragmentByTag(FRAGMENT_TAG);
+        if (fragment instanceof ExperienceSearchFragment) {
+            ((ExperienceSearchFragment) fragment).search(query);
+        } else {
+            ExperienceSearchFragment experienceSearchFragment = new ExperienceSearchFragment();
+            experienceSearchFragment.setArguments(new Bundle());
+            experienceSearchFragment.getArguments().putString("query", query);
+            navigate(experienceSearchFragment, true);
+        }
+    }
 
-		binding.navigation.setNavigationItemSelectedListener(this);
+    @Override
+    protected void onCreate(final Bundle savedInstanceState) {
+        super.onCreate(savedInstanceState);
+        if (Features.show_welcome.isEnabled(this)) {
+            startActivity(new Intent(this, AboutArtcodesActivity.class));
+            return;
+        }
 
-		final View headerView = binding.navigation.inflateHeaderView(R.layout.navigation_header);
+        binding = DataBindingUtil.setContentView(this, R.layout.navigation);
 
-		final MenuItem featureItem = binding.navigation.getMenu().findItem(R.id.nav_features);
-		if (Features.edit_features.isEnabled(this)) {
-			featureItem.setVisible(true);
-		} else {
-			headerView.setLongClickable(true);
-			headerView.setOnLongClickListener(v -> {
-				featureItem.setVisible(true);
-				Features.edit_features.setEnabled(this, true);
-				return false;
-			});
-		}
+        setSupportActionBar(binding.toolbar);
 
-		updateAccounts();
+        binding.navigation.setNavigationItemSelectedListener(this);
 
-		drawerToggle = new ActionBarDrawerToggle(this, binding.drawer, binding.toolbar, R.string.open, R.string.close) {
-			@Override
-			public void onDrawerOpened(View drawerView) {
-				super.onDrawerOpened(drawerView);
-				updateAccounts();
-			}
-		};
-		binding.drawer.addDrawerListener(drawerToggle);
+        final View headerView = binding.navigation.inflateHeaderView(R.layout.navigation_header);
 
-		drawerToggle.syncState();
+        final MenuItem featureItem = binding.navigation.getMenu().findItem(R.id.nav_features);
+        if (Features.edit_features.isEnabled(this)) {
+            featureItem.setVisible(true);
+        } else {
+            headerView.setLongClickable(true);
+            headerView.setOnLongClickListener(v -> {
+                featureItem.setVisible(true);
+                Features.edit_features.setEnabled(this, true);
+                return false;
+            });
+        }
 
-		int navigationIndex = R.id.nav_home;
-		if (savedInstanceState != null) {
-			navigationIndex = savedInstanceState.getInt(NAV_ITEM_ID, R.id.nav_home);
-		}
-		MenuItem item = binding.navigation.getMenu().findItem(navigationIndex);
-		if (item == null) {
-			item = binding.navigation.getMenu().findItem(R.id.nav_home);
-		}
+        updateAccounts();
 
-		navigate(item, false);
+        drawerToggle = new ActionBarDrawerToggle(this, binding.drawer, binding.toolbar, R.string.open, R.string.close) {
+            @Override
+            public void onDrawerOpened(View drawerView) {
+                super.onDrawerOpened(drawerView);
+                updateAccounts();
+            }
+        };
+        binding.drawer.addDrawerListener(drawerToggle);
 
-		final GoogleSignInOptions gso = new GoogleSignInOptions.Builder(GoogleSignInOptions.DEFAULT_SIGN_IN)
-				.requestIdToken(getString(R.string.oauth_client_id))
-				.requestEmail()
-				.requestProfile()
-				.build();
+        drawerToggle.syncState();
 
-		apiClient = new GoogleApiClient.Builder(this)
-				.enableAutoManage(this, connectionResult -> Log.i("Signin", "Failed " + connectionResult))
-				.addApi(Auth.GOOGLE_SIGN_IN_API, gso)
-				.build();
-		apiClient.connect();
+        int navigationIndex = R.id.nav_home;
+        if (savedInstanceState != null) {
+            navigationIndex = savedInstanceState.getInt(NAV_ITEM_ID, R.id.nav_home);
+        }
+        MenuItem item = binding.navigation.getMenu().findItem(navigationIndex);
+        if (item == null) {
+            item = binding.navigation.getMenu().findItem(R.id.nav_home);
+        }
 
-	}
+        navigate(item, false);
 
-	@Override
-	protected void onSaveInstanceState(final Bundle outState) {
-		super.onSaveInstanceState(outState);
-		if (selected != null) {
-			outState.putInt(NAV_ITEM_ID, selected.getItemId());
-		}
-	}
+        final GoogleSignInOptions gso = new GoogleSignInOptions.Builder(GoogleSignInOptions.DEFAULT_SIGN_IN)
+                .requestIdToken(getString(R.string.oauth_client_id))
+                .requestEmail()
+                .requestProfile()
+                .build();
 
-	private void tryGoogleAccount(final String name, final String displayName) {
-		new Thread(() -> {
-			try {
-				final Account account = getServer().createAccount("google:" + name);
-				if (account.validates()) {
-					account.setDisplayName(displayName);
-					getServer().add(account);
-					new Handler(Looper.getMainLooper()).post(() -> {
-						updateAccounts();
-						final Bundle bundle = new Bundle();
-						bundle.putString("account", account.getId());
-						final Fragment fragment = new ExperienceLibraryFragment();
-						fragment.setArguments(bundle);
-						navigate(fragment, true);
-					});
-				}
-			} catch (UserRecoverableAuthException userRecoverableException) {
-				Log.i("intent", "Intent = " + userRecoverableException.getIntent());
-				startActivityForResult(userRecoverableException.getIntent(), REQUEST_CODE_PICK_ACCOUNT);
-			} catch (Exception e) {
-				e.printStackTrace();
-			}
-		}).start();
-	}
+        apiClient = new GoogleApiClient.Builder(this)
+                .enableAutoManage(this, connectionResult -> Log.i("Signin", "Failed " + connectionResult))
+                .addApi(Auth.GOOGLE_SIGN_IN_API, gso)
+                .build();
+        apiClient.connect();
 
-	private void selectAccount() {
-		apiClient.clearDefaultAccountAndReconnect();
-		Intent signInIntent = Auth.GoogleSignInApi.getSignInIntent(apiClient);
-		startActivityForResult(signInIntent, REQUEST_CODE_SIGN_IN);
-	}
+    }
 
-	private void navigate(MenuItem item, boolean addToBackStack) {
-		switch (item.getItemId()) {
-			case R.id.nav_home:
-				navigate(new ExperienceRecommendFragment(), addToBackStack);
-				break;
+    @Override
+    protected void onSaveInstanceState(@NonNull final Bundle outState) {
+        super.onSaveInstanceState(outState);
+        if (selected != null) {
+            outState.putInt(NAV_ITEM_ID, selected.getItemId());
+        }
+    }
 
-			case R.id.nav_starred:
-				navigate(new ExperienceStarFragment(), addToBackStack);
-				break;
+    private void tryGoogleAccount(final String name, final String displayName) {
+        new Thread(() -> {
+            try {
+                final Account account = getServer().createAccount("google:" + name);
+                if (account.validates()) {
+                    account.setDisplayName(displayName);
+                    getServer().add(account);
+                    new Handler(Looper.getMainLooper()).post(() -> {
+                        updateAccounts();
+                        final Bundle bundle = new Bundle();
+                        bundle.putString("account", account.getId());
+                        final Fragment fragment = new ExperienceLibraryFragment();
+                        fragment.setArguments(bundle);
+                        navigate(fragment, true);
+                    });
+                }
+            } catch (UserRecoverableAuthException userRecoverableException) {
+                Log.i("intent", "Intent = " + userRecoverableException.getIntent());
+                accountSelectLauncher.launch(userRecoverableException.getIntent());
+            } catch (Exception e) {
+                e.printStackTrace();
+            }
+        }).start();
+    }
 
-			case R.id.nav_features:
-				navigate(new FeatureListFragment(), addToBackStack);
-				break;
+    private void selectAccount() {
+        apiClient.clearDefaultAccountAndReconnect();
+        Intent signInIntent = Auth.GoogleSignInApi.getSignInIntent(apiClient);
+        loginLauncher.launch(signInIntent);
+    }
 
-			case R.id.nav_recent:
-				navigate(new ExperienceRecentFragment(), addToBackStack);
-				break;
+    @SuppressLint("NonConstantResourceId")
+    private void navigate(MenuItem item, boolean addToBackStack) {
+        switch (item.getItemId()) {
+            case R.id.nav_home:
+                navigate(new ExperienceRecommendFragment(), addToBackStack);
+                break;
 
-			case R.id.nav_about_artcodes:
-				startActivity(new Intent(this, AboutArtcodesActivity.class));
-				break;
+            case R.id.nav_starred:
+                navigate(new ExperienceStarFragment(), addToBackStack);
+                break;
 
-			case R.id.nav_addaccount:
-				selectAccount();
-				break;
+            case R.id.nav_features:
+                navigate(new FeatureListFragment(), addToBackStack);
+                break;
 
-			default:
-				final List<Account> accounts = getServer().getAccounts();
-				if (item.getItemId() < accounts.size()) {
-					final Account account = accounts.get(item.getItemId());
-					Bundle bundle = new Bundle();
-					bundle.putString("account", account.getId());
-					final Fragment fragment = new ExperienceLibraryFragment();
-					fragment.setArguments(bundle);
-					navigate(fragment, addToBackStack);
-				}
-				break;
-		}
-	}
+            case R.id.nav_recent:
+                navigate(new ExperienceRecentFragment(), addToBackStack);
+                break;
+
+            case R.id.nav_about_artcodes:
+                startActivity(new Intent(this, AboutArtcodesActivity.class));
+                break;
+
+            case R.id.nav_addaccount:
+                selectAccount();
+                break;
+
+            default:
+                final List<Account> accounts = getServer().getAccounts();
+                if (item.getItemId() < accounts.size()) {
+                    final Account account = accounts.get(item.getItemId());
+                    Bundle bundle = new Bundle();
+                    bundle.putString("account", account.getId());
+                    final Fragment fragment = new ExperienceLibraryFragment();
+                    fragment.setArguments(bundle);
+                    navigate(fragment, addToBackStack);
+                }
+                break;
+        }
+    }
 }

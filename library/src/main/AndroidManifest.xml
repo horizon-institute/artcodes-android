@@ -16,8 +16,7 @@
   ~     You should have received a copy of the GNU Affero General Public License
   ~     along with this program.  If not, see <http://www.gnu.org/licenses/>.
   -->
-<manifest xmlns:android="http://schemas.android.com/apk/res/android"
-	package="uk.ac.horizon.artcodes.scanner">
+<manifest xmlns:android="http://schemas.android.com/apk/res/android">
 
 	<uses-permission android:name="android.permission.CAMERA" />
 
@@ -41,6 +40,7 @@
 	<application android:supportsRtl="true">
 		<activity
 			android:name=".ScannerActivity"
+			android:exported="true"
 			android:screenOrientation="portrait"
 			android:theme="@style/Theme.Artcodes.Camera">
 			<intent-filter>

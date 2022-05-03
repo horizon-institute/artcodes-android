@@ -22,7 +22,6 @@ package uk.ac.horizon.artcodes.detect.marker;
 import android.content.Context;
 import android.util.Log;
 
-import org.opencv.core.Core;
 import org.opencv.core.Mat;
 import org.opencv.core.MatOfPoint;
 import org.opencv.core.MatOfPoint2f;
@@ -35,7 +34,6 @@ import org.opencv.imgproc.Imgproc;
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.Collections;
-import java.util.Comparator;
 import java.util.HashSet;
 import java.util.List;
 import java.util.Map;
@@ -81,7 +79,7 @@ public class MarkerDetector implements ImageProcessor
 
 	}
 
-	private Experience experience;
+	private final Experience experience;
 
 	private double diagonalScreenSize;
 
@@ -123,7 +121,7 @@ public class MarkerDetector implements ImageProcessor
 	}
 
 	static final int NEXT_NODE = 0;
-	static final int PREV_NODE = 1;
+	//static final int PREV_NODE = 1;
 	static final int FIRST_NODE = 2;
 	static final int PARENT_NODE = 3;
 	private static final Scalar detectedColour = new Scalar(255, 255, 0, 255);
@@ -283,8 +281,8 @@ public class MarkerDetector implements ImageProcessor
 							{
 								textToShow += " (" + action.getName() + ")";
 							}
-							Imgproc.putText(overlay, textToShow, bounds.tl(), Core.FONT_HERSHEY_SIMPLEX, 1, outlineColour, 5);
-							Imgproc.putText(overlay, textToShow, bounds.tl(), Core.FONT_HERSHEY_SIMPLEX, 1, detectedColour, 3);
+							Imgproc.putText(overlay, textToShow, bounds.tl(), Imgproc.FONT_HERSHEY_SIMPLEX, 1, outlineColour, 5);
+							Imgproc.putText(overlay, textToShow, bounds.tl(), Imgproc.FONT_HERSHEY_SIMPLEX, 1, detectedColour, 3);
 						}
 					}
 				}
@@ -312,10 +310,6 @@ public class MarkerDetector implements ImageProcessor
 	 * Action. E.g. base class checks for minimum size requirements. Remember to && your result
 	 * with super.isMarkerValidForAction.
 	 *
-	 * @param marker
-	 * @param action
-	 * @param contours
-	 * @param hierarchy
 	 * @return If the Marker is valid based on the options in Action.
 	 */
 	protected boolean isMarkerValidForAction(final Marker marker, final Action action, final ArrayList<MatOfPoint> contours, final Mat hierarchy)
@@ -358,7 +352,7 @@ public class MarkerDetector implements ImageProcessor
 					// wrong code found (hard fail)
 					Imgproc.drawContours(overlay, contours, marker.markerIndex, rightCodeColor, -1, 8, hierarchy, 2, new Point(0, 0)); // draw blobs
 					Imgproc.drawContours(overlay, contours, marker.markerIndex, wrongCodeColor, -1, 8, hierarchy, 1, new Point(0, 0));
-					String message = "Wrong code found (HARD FAIL) " + marker.toString() + (action != null ? "/" + action.getName() : "");
+					String message = "Wrong code found (HARD FAIL) " + marker + (action != null ? "/" + action.getName() : "");
 					if (!messages.contains(message))
 					{
 						messages.add(message);
@@ -369,7 +363,7 @@ public class MarkerDetector implements ImageProcessor
 				{
 					// right code found!
 					Imgproc.drawContours(overlay, contours, marker.markerIndex, rightCodeColor, -1, 8, hierarchy, 1, new Point(0, 0));
-					String message = "Right code found " + marker.toString() + (action != null ? "/" + action.getName() : "");
+					String message = "Right code found " + marker + "/" + action.getName();
 					if (!messages.contains(message))
 					{
 						messages.add(message);
@@ -408,7 +402,7 @@ public class MarkerDetector implements ImageProcessor
 						// wrong code found (soft fail)
 						Imgproc.drawContours(overlay, contours, i, rightCodeColor, -1, 8, hierarchy, 2, new Point(0, 0)); // draw blobs
 						Imgproc.drawContours(overlay, contours, i, wrongCodeSoftColor, -1, 8, hierarchy, 1, new Point(0, 0));
-						String message = "Unknown code found (soft fail) " + getDebugCode(i, contours, hierarchy);
+						String message = "Unknown code found (soft fail) " + getDebugCode(i, hierarchy);
 						if (!messages.contains(message))
 						{
 							messages.add(message);
@@ -419,7 +413,7 @@ public class MarkerDetector implements ImageProcessor
 					{
 						// right code found!
 						Imgproc.drawContours(overlay, contours, i, rightCodeColor, -1, 8, hierarchy, 1, new Point(0, 0));
-						String message = "Right code found " + getDebugCode(i, contours, hierarchy);
+						String message = "Right code found " + getDebugCode(i, hierarchy);
 						if (!messages.contains(message))
 						{
 							messages.add(message);
@@ -434,7 +428,7 @@ public class MarkerDetector implements ImageProcessor
 					if (contourStatuses[i] == tooManyDots)
 					{
 						color = tooManyDotsColor;
-						String message = "Too many dots " + getDebugCode(i, contours, hierarchy);
+						String message = "Too many dots " + getDebugCode(i, hierarchy);
 						if (!messages.contains(message))
 						{
 							messages.add(message);
@@ -444,7 +438,7 @@ public class MarkerDetector implements ImageProcessor
 					else if (contourStatuses[i] == tooFewRegions)
 					{
 						color = tooFewRegionsColor;
-						String message = "Too few regions " + getDebugCode(i, contours, hierarchy);
+						String message = "Too few regions " + getDebugCode(i, hierarchy);
 						if (!messages.contains(message))
 						{
 							messages.add(message);
@@ -454,7 +448,7 @@ public class MarkerDetector implements ImageProcessor
 					else if (contourStatuses[i] == tooManyRegions)
 					{
 						color = toManyRegionsColor;
-						String message = "Too many regions " + getDebugCode(i, contours, hierarchy);
+						String message = "Too many regions " + getDebugCode(i, hierarchy);
 						if (!messages.contains(message))
 						{
 							messages.add(message);
@@ -464,7 +458,7 @@ public class MarkerDetector implements ImageProcessor
 					else if (contourStatuses[i] == nestedRegion)
 					{
 						color = nestedRegionColor;
-						String message = "Nested regions " + getDebugCode(i, contours, hierarchy);
+						String message = "Nested regions " + getDebugCode(i, hierarchy);
 						if (!messages.contains(message))
 						{
 							messages.add(message);
@@ -474,7 +468,7 @@ public class MarkerDetector implements ImageProcessor
 					else if (contourStatuses[i] == wrongChecksum)
 					{
 						color = wrongChecksumColor;
-						String message = "Wrong checksum " + getDebugCode(i, contours, hierarchy);
+						String message = "Wrong checksum " + getDebugCode(i, hierarchy);
 						if (!messages.contains(message))
 						{
 							messages.add(message);
@@ -491,12 +485,12 @@ public class MarkerDetector implements ImageProcessor
 		for (int i = 0; i < messages.size(); ++i)
 		{
 			String text = messages.get(i);
-			Imgproc.putText(overlay, text, new Point(15, 30 * (i + 1)), Core.FONT_HERSHEY_SIMPLEX, 1, outlineColour, 5);
-			Imgproc.putText(overlay, text, new Point(15, 30 * (i + 1)), Core.FONT_HERSHEY_SIMPLEX, 1, messageColors.get(i), 3);
+			Imgproc.putText(overlay, text, new Point(15, 30 * (i + 1)), Imgproc.FONT_HERSHEY_SIMPLEX, 1, outlineColour, 5);
+			Imgproc.putText(overlay, text, new Point(15, 30 * (i + 1)), Imgproc.FONT_HERSHEY_SIMPLEX, 1, messageColors.get(i), 3);
 		}
 	}
 
-	public String getDebugCode(int nodeIndex, List<MatOfPoint> contours, Mat hierarchy)
+	private String getDebugCode(int nodeIndex, Mat hierarchy)
 	{
 
 		if (hierarchy.get(0, nodeIndex)[FIRST_NODE] == -1)
@@ -506,21 +500,21 @@ public class MarkerDetector implements ImageProcessor
 		else
 		{
 			int leafCount = 0;
-			String code = "";
+			StringBuilder code = new StringBuilder();
 			for (int currentNodeIndex = (int) hierarchy.get(0, nodeIndex)[FIRST_NODE]; currentNodeIndex >= 0; currentNodeIndex = (int) hierarchy.get(0, currentNodeIndex)[NEXT_NODE])
 			{
-				String r = getDebugCode(currentNodeIndex, contours, hierarchy);
+				String r = getDebugCode(currentNodeIndex, hierarchy);
 				if (r.equals("leaf"))
 				{
 					leafCount++;
 				}
 				else
 				{
-					code += (code.equals("") ? "" : ".") + r;
+					code.append(code.toString().equals("") ? "" : ".").append(r);
 				}
 			}
 
-			if (code.equals(""))
+			if (code.toString().equals(""))
 			{
 				return "" + leafCount;
 			}
@@ -637,12 +631,6 @@ public class MarkerDetector implements ImageProcessor
 		return nodes[FIRST_NODE] < 0;
 	}
 
-	protected Marker createMarkerForNode(int nodeIndex, List<MatOfPoint> contours, Mat hierarchy)
-	{
-		ContourStatus[] temp = new ContourStatus[1];
-		return createMarkerForNode(nodeIndex, contours, hierarchy, temp, 0);
-	}
-
 	protected Marker createMarkerForNode(int nodeIndex, List<MatOfPoint> contours, Mat hierarchy, ContourStatus[] status, int statusIndex)
 	{
 		List<MarkerRegion> regions = null;
@@ -742,14 +730,8 @@ public class MarkerDetector implements ImageProcessor
 	 */
 	protected void sortCode(Marker marker)
 	{
-		Collections.sort(marker.regions, new Comparator<MarkerRegion>()
-		{
-			@Override
-			public int compare(MarkerRegion region1, MarkerRegion region2)
-			{
-				return region1.value < region2.value ? -1 : (region1.value == region2.value ? 0 : 1);
-			}
-		});
+		//noinspection ComparatorCombinators
+		Collections.sort(marker.regions, (region1, region2) -> Integer.compare(region1.value, region2.value));
 	}
 
 	/**
@@ -795,19 +777,6 @@ public class MarkerDetector implements ImageProcessor
 		}
 
 		return hasValidChecksum(marker, status, statusIndex);
-	}
-
-	/**
-	 * This function divides the total number of leaves in the marker by the
-	 * value given in the checksum preference. CodeDisplay is valid if the modulo is 0.
-	 *
-	 * @return true if the number of leaves are divisible by the checksum value
-	 * otherwise false.
-	 */
-	protected boolean hasValidChecksum(Marker marker)
-	{
-		ContourStatus[] temp = new ContourStatus[1];
-		return hasValidChecksum(marker, temp, 0);
 	}
 
 	protected boolean hasValidChecksum(Marker marker, ContourStatus[] status, int statusIndex)

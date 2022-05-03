@@ -48,13 +48,13 @@ public class MarkerThumbnailDrawer implements MarkerDrawer
             }
             Mat output = new Mat(boundingRect.size(), CvType.CV_8UC4, BACKGROUND);
 
-            Imgproc.drawContours(output, contours, marker.markerIndex, COLOR, Core.FILLED, Core.LINE_8, hierarchy, 2, new Point(-boundingRect.tl().x, -boundingRect.tl().y));
+            Imgproc.drawContours(output, contours, marker.markerIndex, COLOR, Core.FILLED, Imgproc.LINE_8, hierarchy, 2, new Point(-boundingRect.tl().x, -boundingRect.tl().y));
 
             return output;
         }
         else
         {
-            Imgproc.drawContours(imageToDrawOn, contours, marker.markerIndex, COLOR, Core.FILLED, Core.LINE_8, hierarchy, 2, new Point(0, 0));
+            Imgproc.drawContours(imageToDrawOn, contours, marker.markerIndex, COLOR, Core.FILLED, Imgproc.LINE_8, hierarchy, 2, new Point(0, 0));
             return imageToDrawOn;
         }
     }
