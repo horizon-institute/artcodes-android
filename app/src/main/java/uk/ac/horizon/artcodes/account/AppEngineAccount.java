@@ -53,7 +53,7 @@ import uk.ac.horizon.artcodes.server.URILoaderCallback;
 public class AppEngineAccount implements Account
 {
 	private boolean numberOfExperiencesHasChangedHint = false;
-	private Map<String, Object> experienceUrlsThatHaveChangedHint = new ConcurrentHashMap<>();
+	private final Map<String, Object> experienceUrlsThatHaveChangedHint = new ConcurrentHashMap<>();
 
 	static final String appSavePrefix = "appSaveID:";
 	static final String httpRoot = "http://aestheticodes.appspot.com/";
