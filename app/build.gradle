@@ -77,8 +77,8 @@ android {
 
 	defaultConfig {
 		applicationId "uk.ac.horizon.aestheticodes"
-		versionName '3.4.2'
-		versionCode 4000851
+		versionName '3.4.3'
+		versionCode 4000852
 		minSdkVersion 21
 		targetSdkVersion 32
 		signingConfig signingConfigs.release
