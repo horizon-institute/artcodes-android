@@ -145,7 +145,7 @@ public class ArtcodeActivity extends ScannerActivity implements LoadCallback<Exp
 	}
 
 	private void onActionChanged(final Action action) {
-		Log.i("action", "" + action);
+		Log.i("action", String.valueOf(action));
 		if (action != null) {
 
 			if ((getExperience().getOpenWithoutUserInput() != null && getExperience().getOpenWithoutUserInput()) ||
@@ -165,7 +165,7 @@ public class ArtcodeActivity extends ScannerActivity implements LoadCallback<Exp
 				getServer().logScan(experience.getId(), action);
 				Analytics.logScan(experience.getId(), action);
 
-				final Button actionButton = actionView.findViewById(R.id.scan_event_button);
+				final Button actionButton = actionView.findViewById(uk.ac.horizon.artcodes.scanner.R.id.scan_event_button);
 				if (actionButton != null) {
 					runOnUiThread(() -> {
 						actionButton.setText(action.getName() != null && !action.getName().equals("") ? action.getName() : (action.getDisplayUrl() != null && !action.getDisplayUrl().equals("") ? action.getDisplayUrl() : action.getCodes().get(0)));
@@ -199,7 +199,7 @@ public class ArtcodeActivity extends ScannerActivity implements LoadCallback<Exp
 	protected ArtcodeDetector getNewDetector(Experience experience) {
 		if (ScannerFeatures.combined_markers.isEnabled(getApplicationContext())) {
 			return new ArtcodeDetector(this, experience, new MultipleMarkerActionDetectionHandler(new ActionDetectionHandler() {
-				private final MarkerHistoryViewController markerHistoryViewController = new MarkerHistoryViewController(ArtcodeActivity.this, findViewById(R.id.thumbnailImageLayout), new Handler(Looper.getMainLooper()));
+				private final MarkerHistoryViewController markerHistoryViewController = new MarkerHistoryViewController(ArtcodeActivity.this, findViewById(uk.ac.horizon.artcodes.scanner.R.id.thumbnailImageLayout), new Handler(Looper.getMainLooper()));
 
 				@Override
 				public void onMarkerActionDetected(Action detectedAction, Action futureAction, List<MarkerImage> detectedMarkers) {
@@ -220,7 +220,7 @@ public class ArtcodeActivity extends ScannerActivity implements LoadCallback<Exp
 		}
 
 		if (result.contains("{timestamp}")) {
-			result = result.replace("{timestamp}", "" + (System.currentTimeMillis() / 1000));
+			result = result.replace("{timestamp}", String.valueOf(System.currentTimeMillis() / 1000));
 		}
 
 		if (result.contains("{timehash1}")) {
@@ -245,5 +245,4 @@ public class ArtcodeActivity extends ScannerActivity implements LoadCallback<Exp
 			return "";
 		}
 	}
-
 }

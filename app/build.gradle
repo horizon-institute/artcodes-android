@@ -22,21 +22,30 @@ apply plugin: 'com.android.application'
 apply plugin: 'com.google.gms.google-services'
 
 dependencies {
+	constraints {
+		implementation("org.jetbrains.kotlin:kotlin-stdlib-jdk7:1.8.0") {
+			because("kotlin-stdlib-jdk7 is now a part of kotlin-stdlib")
+		}
+		implementation("org.jetbrains.kotlin:kotlin-stdlib-jdk8:1.8.0") {
+			because("kotlin-stdlib-jdk8 is now a part of kotlin-stdlib")
+		}
+	}
+
 	implementation project(':library')
-	implementation 'androidx.appcompat:appcompat:1.4.1'
-	implementation 'androidx.browser:browser:1.4.0'
+	implementation 'androidx.appcompat:appcompat:1.6.1'
+	implementation 'androidx.browser:browser:1.5.0'
 	implementation 'androidx.cardview:cardview:1.0.0'
 	implementation 'androidx.palette:palette:1.0.0'
-	implementation 'androidx.recyclerview:recyclerview:1.2.1'
+	implementation 'androidx.recyclerview:recyclerview:1.3.1'
 	implementation 'androidx.multidex:multidex:2.0.1'
 	//implementation 'com.crashlytics.sdk.android:crashlytics:2.10.1'
-	implementation 'com.google.android.gms:play-services-auth:20.2.0'
-	implementation 'com.google.android.gms:play-services-base:18.0.1'
+	implementation 'com.google.android.gms:play-services-auth:20.6.0'
+	implementation 'com.google.android.gms:play-services-base:18.2.0'
 	implementation 'com.google.android.gms:play-services-identity:18.0.1'
 	implementation 'com.google.android.gms:play-services-places:17.0.0'
-	implementation 'com.google.android.material:material:1.5.0'
-	implementation 'com.google.code.gson:gson:2.8.9'
-	implementation 'com.google.firebase:firebase-analytics:20.1.2'
+	implementation 'com.google.android.material:material:1.9.0'
+	implementation 'com.google.code.gson:gson:2.10'
+	implementation 'com.google.firebase:firebase-analytics:21.3.0'
 	implementation 'com.google.guava:guava:30.1-android'
 	implementation 'com.squareup.picasso:picasso:2.71828'
 	implementation 'com.squareup.okhttp3:okhttp:4.9.0'
@@ -51,10 +60,12 @@ keystoreProperties.load(new FileInputStream(keystorePropertiesFile))
 
 android {
 	namespace 'uk.ac.horizon.artcodes'
-	compileSdkVersion 32
+	compileSdkVersion 33
 
 	buildFeatures {
 		dataBinding true
+		buildConfig true
+		resValues true
 	}
 
 	signingConfigs {
@@ -78,9 +89,9 @@ android {
 	defaultConfig {
 		applicationId "uk.ac.horizon.aestheticodes"
 		versionName '3.4.3'
-		versionCode 4000852
+		versionCode 4000853
 		minSdkVersion 21
-		targetSdkVersion 32
+		targetSdkVersion 33
 		signingConfig signingConfigs.release
 		multiDexEnabled true
 	}

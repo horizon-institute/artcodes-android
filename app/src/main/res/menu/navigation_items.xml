@@ -1,5 +1,4 @@
-<?xml version="1.0" encoding="utf-8"?>
-<!--
+<?xml version="1.0" encoding="utf-8"?><!--
   ~ Artcodes recognises a different marker scheme that allows the
   ~ creation of aesthetically pleasing, even beautiful, codes.
   ~ Copyright (C) 2013-2016  The University of Nottingham
@@ -18,50 +17,49 @@
   ~     along with this program.  If not, see <http://www.gnu.org/licenses/>.
   -->
 <menu xmlns:android="http://schemas.android.com/apk/res/android">
-    <item
-        android:id="@+id/nav_home"
-        android:checkable="true"
-        android:icon="@drawable/ic_photo_camera_black_24dp"
-        android:title="@string/nav_home"/>
+	<item
+		android:id="@+id/nav_home"
+		android:checkable="true"
+		android:icon="@drawable/ic_photo_camera_black_24dp"
+		android:title="@string/nav_home" />
 
-    <item
-        android:id="@+id/nav_recent"
-        android:checkable="true"
-        android:icon="@drawable/ic_history_black_24dp"
-        android:title="@string/nav_recent"/>
+	<item
+		android:id="@+id/nav_recent"
+		android:checkable="true"
+		android:icon="@drawable/ic_history_black_24dp"
+		android:title="@string/nav_recent" />
 
-    <item
-        android:id="@+id/nav_starred"
-        android:checkable="true"
-        android:icon="@drawable/ic_star_black_24dp"
-        android:title="@string/nav_starred"/>
+	<item
+		android:id="@+id/nav_starred"
+		android:checkable="true"
+		android:icon="@drawable/ic_star_black_24dp"
+		android:title="@string/nav_starred" />
 
-    <item
-        android:id="@+id/nav_features"
-        android:checkable="true"
-        android:icon="@drawable/ic_subject_black_24dp"
-        android:title="@string/nav_features"
-        android:visible="false"/>
+	<item
+		android:id="@+id/nav_features"
+		android:checkable="true"
+		android:icon="@drawable/ic_subject_black_24dp"
+		android:title="@string/nav_features"
+		android:visible="false" />
 
-    <item
-        android:id="@+id/nav_libraries"
-        android:title="@string/nav_libraries">
-        <menu>
-            <item
-                android:id="@+id/nav_addaccount"
-                android:icon="@drawable/ic_add_24dp"
-                android:title="@string/nav_addaccount"/>
-        </menu>
-    </item>
+	<item
+		android:id="@+id/nav_libraries"
+		android:title="@string/nav_libraries">
+		<menu>
+			<item
+				android:id="@+id/nav_addaccount"
+				android:icon="@drawable/ic_add_24dp"
+				android:title="@string/nav_addaccount" />
+		</menu>
+	</item>
 
 
-    <item
-        android:title="@string/about">
-        <menu>
-            <item
-                android:id="@+id/nav_about_artcodes"
-                android:icon="@drawable/ic_help_black_24dp"
-                android:title="@string/app_name"/>
-        </menu>
-    </item>
+	<item android:title="@string/about">
+		<menu>
+			<item
+				android:id="@+id/nav_about_artcodes"
+				android:icon="@drawable/ic_help_black_24dp"
+				android:title="@string/app_name" />
+		</menu>
+	</item>
 </menu>

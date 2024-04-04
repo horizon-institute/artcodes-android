@@ -88,18 +88,18 @@ public class NavigationActivity extends ArtcodeActivityBase implements
     private final ActivityResultLauncher<Intent> loginLauncher = registerForActivityResult(
             new ActivityResultContracts.StartActivityForResult(),
             result -> {
-                Log.i("RESULT", "" + result);
+                Log.i("RESULT", String.valueOf(result));
                 //if (result.getResultCode() == Activity.RESULT_OK) {
                 // There are no request codes
                 Intent data = result.getData();
 
-                Log.i("RESULT", "" + data);
+                Log.i("RESULT", String.valueOf(data));
                 if (data != null) {
                     final GoogleSignInResult signInResult = Auth.GoogleSignInApi.getSignInResultFromIntent(data);
-                    Log.i("RESULT", "" + signInResult);
+                    Log.i("RESULT", String.valueOf(signInResult));
                     if (signInResult != null) {
-                        Log.i("RESULT", "" + signInResult.getStatus());
-                        Log.i("RESULT", "" + signInResult.getSignInAccount());
+                        Log.i("RESULT", String.valueOf(signInResult.getStatus()));
+                        Log.i("RESULT", String.valueOf(signInResult.getSignInAccount()));
                         if (signInResult.getSignInAccount() != null) {
                             tryGoogleAccount(signInResult.getSignInAccount().getEmail(), signInResult.getSignInAccount().getDisplayName());
                         }
@@ -160,7 +160,7 @@ public class NavigationActivity extends ArtcodeActivityBase implements
 
     @Override
     public boolean onOptionsItemSelected(final MenuItem item) {
-        if (item.getItemId() == R.id.home) {
+        if (item.getItemId() == R.id.nav_home) {
             return drawerToggle.onOptionsItemSelected(item);
         }
         return super.onOptionsItemSelected(item);
@@ -378,7 +378,6 @@ public class NavigationActivity extends ArtcodeActivityBase implements
                 .addApi(Auth.GOOGLE_SIGN_IN_API, gso)
                 .build();
         apiClient.connect();
-
     }
 
     @Override
@@ -422,42 +421,28 @@ public class NavigationActivity extends ArtcodeActivityBase implements
 
     @SuppressLint("NonConstantResourceId")
     private void navigate(MenuItem item, boolean addToBackStack) {
-        switch (item.getItemId()) {
-            case R.id.nav_home:
-                navigate(new ExperienceRecommendFragment(), addToBackStack);
-                break;
-
-            case R.id.nav_starred:
-                navigate(new ExperienceStarFragment(), addToBackStack);
-                break;
-
-            case R.id.nav_features:
-                navigate(new FeatureListFragment(), addToBackStack);
-                break;
-
-            case R.id.nav_recent:
-                navigate(new ExperienceRecentFragment(), addToBackStack);
-                break;
-
-            case R.id.nav_about_artcodes:
-                startActivity(new Intent(this, AboutArtcodesActivity.class));
-                break;
-
-            case R.id.nav_addaccount:
-                selectAccount();
-                break;
-
-            default:
-                final List<Account> accounts = getServer().getAccounts();
-                if (item.getItemId() < accounts.size()) {
-                    final Account account = accounts.get(item.getItemId());
-                    Bundle bundle = new Bundle();
-                    bundle.putString("account", account.getId());
-                    final Fragment fragment = new ExperienceLibraryFragment();
-                    fragment.setArguments(bundle);
-                    navigate(fragment, addToBackStack);
-                }
-                break;
+        if(item.getItemId() == R.id.nav_home) {
+            navigate(new ExperienceRecommendFragment(), addToBackStack);
+        } else if(item.getItemId() == R.id.nav_starred) {
+            navigate(new ExperienceStarFragment(), addToBackStack);
+        } else if(item.getItemId() == R.id.nav_features) {
+            navigate(new FeatureListFragment(), addToBackStack);
+        } else if(item.getItemId() == R.id.nav_recent) {
+            navigate(new ExperienceRecentFragment(), addToBackStack);
+        } else if(item.getItemId() == R.id.nav_about_artcodes) {
+            startActivity(new Intent(this, AboutArtcodesActivity.class));
+        } else if(item.getItemId() == R.id.nav_addaccount) {
+            selectAccount();
+        } else {
+            final List<Account> accounts = getServer().getAccounts();
+            if (item.getItemId() < accounts.size()) {
+                final Account account = accounts.get(item.getItemId());
+                Bundle bundle = new Bundle();
+                bundle.putString("account", account.getId());
+                final Fragment fragment = new ExperienceLibraryFragment();
+                fragment.setArguments(bundle);
+                navigate(fragment, addToBackStack);
+            }
         }
     }
 }
