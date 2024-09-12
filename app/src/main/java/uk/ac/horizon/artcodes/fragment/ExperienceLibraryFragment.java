@@ -65,7 +65,7 @@ public class ExperienceLibraryFragment extends ArtcodeFragmentBase
 
 	@NonNull
 	@Override
-	public View onCreateView(LayoutInflater inflater, ViewGroup container, Bundle savedInstanceState)
+	public View onCreateView(@NonNull LayoutInflater inflater, ViewGroup container, Bundle savedInstanceState)
 	{
 		ListBinding binding = ListBinding.inflate(inflater, container, false);
 		adapter = new ExperienceSortedListAdapter(getActivity(), getServer());
@@ -79,10 +79,7 @@ public class ExperienceLibraryFragment extends ArtcodeFragmentBase
 		fab.setImageDrawable(getTintedDrawable(R.drawable.ic_add_24dp, Color.WHITE));
 		//fab.setBackgroundColor(ContextCompat.getColor(getContext(), R.color.apptheme_accent));
 		fab.setOnClickListener(v -> ExperienceEditActivity.start(getActivity(), new Experience(), account));
-		if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.LOLLIPOP)
-		{
-			fab.setElevation(4);
-		}
+		fab.setElevation(4);
 
 		final int spacing = getResources().getDimensionPixelSize(R.dimen.padding);
 		final FrameLayout.LayoutParams layoutParams = new FrameLayout.LayoutParams(ViewGroup.LayoutParams.WRAP_CONTENT, ViewGroup.LayoutParams.WRAP_CONTENT);

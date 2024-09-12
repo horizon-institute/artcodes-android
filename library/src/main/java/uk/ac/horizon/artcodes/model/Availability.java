@@ -19,98 +19,88 @@
 
 package uk.ac.horizon.artcodes.model;
 
-public class Availability
-{
-	private Double lat;
-	private Double lon;
-	private String name;
-	private Long start;
-	private Long end;
-	private String address;
+import java.util.Date;
 
-	public Availability()
-	{
+public class Availability {
+	private Date start;
+	private Date end;
+	private Location location;
+
+	public Availability() {
 
 	}
 
-	public String getAddress()
-	{
-		return address;
+	public String getAddress() {
+		if(location == null) {
+			return null;
+		}
+		return location.address;
 	}
 
-	public void setAddress(String address)
-	{
-		this.address = address;
+	public Long getEnd() {
+		if(end == null) {
+			return null;
+		}
+		return end.getTime();
 	}
 
-	public Long getEnd()
-	{
-		return end;
-	}
-
-	public void setEnd(Long end)
-	{
-		this.end = end;
+	public void setEnd(Long end) {
+		if(end != null) {
+			this.end = new Date(end);
+		} else {
+			this.end = null;
+		}
 		//notifyPropertyChanged(BR.end);
-		if (start != null && end != null && end < start)
-		{
+		if (start != null && end != null && end < start.getTime()) {
 			setStart(end);
 		}
 	}
 
-	public Double getLat()
-	{
-		return lat;
+	public Double getLat() {
+		if(location == null) {
+			return null;
+		}
+		return location.coordinates[1];
 	}
 
-	public void setLat(Double lat)
-	{
-		this.lat = lat;
+	public void setLocation(double lat, double lon, String name, String address) {
+		location = new Location("point", name, address, new Double[]{lon, lat});
 	}
 
-	public void setLat(double lat)
-	{
-		this.lat = lat;
+	public Double getLon() {
+		if(location == null) {
+			return null;
+		}
+		return location.coordinates[0];
 	}
 
-	public Double getLon()
-	{
-		return lon;
+	public String getName() {
+		if(location == null) {
+			return null;
+		}
+		return location.name;
 	}
 
-	public void setLon(Double lon)
-	{
-		this.lon = lon;
+	public Long getStart() {
+		if(start == null) {
+			return null;
+		}
+		return start.getTime();
 	}
 
-	public void setLon(double lon)
-	{
-		this.lon = lon;
-	}
-
-	public String getName()
-	{
-		return name;
-	}
-
-	public void setName(String name)
-	{
-		this.name = name;
-		//notifyPropertyChanged(BR.name);
-	}
-
-	public Long getStart()
-	{
-		return start;
-	}
-
-	public void setStart(Long start)
-	{
-		this.start = start;
+	public void setStart(Long start) {
+		if(start != null) {
+			this.start = new Date(start);
+		} else {
+			this.start = null;
+		}
 		//notifyPropertyChanged(BR.start);
-		if (start != null && end != null && end < start)
-		{
+		if (start != null && end != null && end.getTime() < start) {
 			setEnd(start);
 		}
+	}
+
+	public void clearLocation() {
+		location = null;
 	}
 }

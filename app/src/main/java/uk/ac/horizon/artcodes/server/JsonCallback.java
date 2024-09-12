@@ -27,15 +27,13 @@ import com.google.gson.Gson;
 import java.io.Reader;
 import java.lang.reflect.Type;
 
-public class JsonCallback<T> implements URILoaderCallback
-{
+public class JsonCallback<T> implements URILoaderCallback {
 	private final Handler mainHandler;
 	private final Gson gson;
 	private final LoadCallback<T> callback;
 	private final Type type;
 
-	public JsonCallback(Type type, Gson gson, Context context, LoadCallback<T> callback)
-	{
+	public JsonCallback(Type type, Gson gson, Context context, LoadCallback<T> callback) {
 		this.gson = gson;
 		mainHandler = new Handler(context.getMainLooper());
 		this.callback = callback;
@@ -43,23 +41,14 @@ public class JsonCallback<T> implements URILoaderCallback
 	}
 
 	@Override
-	public void onLoaded(Reader reader)
-	{
+	public void onLoaded(Reader reader) {
 		final T item = gson.fromJson(reader, type);
 		//Log.i("JSON", gson.toJson(item));
-		mainHandler.post(new Runnable()
-		{
-			@Override
-			public void run()
-			{
-				callback.loaded(item);
-			}
-		});
+		mainHandler.post(() -> callback.loaded(item));
 	}
 
 	@Override
-	public void onError(Exception e)
-	{
+	public void onError(Exception e) {
 		callback.error(e);
 	}
 }

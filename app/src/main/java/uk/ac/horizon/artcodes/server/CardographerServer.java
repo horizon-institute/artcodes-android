@@ -41,14 +41,16 @@ import uk.ac.horizon.artcodes.ExperienceParser;
 import uk.ac.horizon.artcodes.Features;
 import uk.ac.horizon.artcodes.R;
 import uk.ac.horizon.artcodes.account.Account;
-import uk.ac.horizon.artcodes.account.AppEngineAccount;
+import uk.ac.horizon.artcodes.account.CardographerAccount;
 import uk.ac.horizon.artcodes.account.LocalAccount;
 import uk.ac.horizon.artcodes.model.Action;
 import uk.ac.horizon.artcodes.model.Experience;
 import uk.ac.horizon.artcodes.model.ScanEvent;
 
-/** @noinspection UnstableApiUsage*/
-public class AppEngineServer implements ArtcodeServer {
+/**
+ * @noinspection UnstableApiUsage
+ */
+public class CardographerServer implements ArtcodeServer {
 	private static final String starred_tag = "starred";
 	private static final String recent_tag = "recent";
 	private static final String accounts_tag = "accounts";
@@ -57,8 +59,9 @@ public class AppEngineServer implements ArtcodeServer {
 	private final Gson gson;
 	private final LocalAccount localAccount;
 	private final List<Account> accounts = new ArrayList<>();
+	private final String urlRoot = "http://10.0.2.2:5173/";
 
-	public AppEngineServer(Context context) {
+	public CardographerServer(Context context) {
 		this.context = context;
 		this.gson = ExperienceParser.createGson(context);
 		final List<String> accountIDs = loadIDs(Account.class, accounts_tag);
@@ -83,7 +86,7 @@ public class AppEngineServer implements ArtcodeServer {
 	public Account createAccount(String id) {
 		if (id.startsWith(prefix)) {
 			String name = id.substring(prefix.length());
-			return new AppEngineAccount(context, name, gson);
+			return new CardographerAccount(context, name, urlRoot, gson);
 		} else if (id.equals("local")) {
 			if (Features.show_local.isEnabled(context)) {
 				return localAccount;
@@ -131,7 +134,11 @@ public class AppEngineServer implements ArtcodeServer {
 
 	@Override
 	public void loadExperience(final String id, final LoadCallback<Experience> callback) {
-		load(id, new JsonCallback<>(Experience.class, gson, context, callback));
+		String url = id;
+		if (!id.startsWith("http:") && !id.startsWith("https:")) {
+			url = urlRoot + id;
+		}
+		load(url, new JsonCallback<>(Experience.class, gson, context, callback));
 	}
 
 	@Override
@@ -141,13 +148,12 @@ public class AppEngineServer implements ArtcodeServer {
 
 	@Override
 	public void loadRecommended(final LoadCallback<Map<String, List<String>>> callback, Location location) {
-		String url = "https://aestheticodes.appspot.com/recommended";
+		String url = urlRoot + "recommended";
 		if (location != null) {
 			url = url + "?lat=" + location.getLatitude() + "&lon=" + location.getLongitude();
 		}
 
-		load(url, new JsonCallback<>(new TypeToken<Map<String, List<String>>>() {
-		}.getType(), gson, context, callback));
+		load(url, new JsonCallback<>(new TypeToken<Map<String, List<String>>>() {}.getType(),gson, context, callback));
 	}
 
 	@Override
@@ -187,7 +193,7 @@ public class AppEngineServer implements ArtcodeServer {
 
 					final Request request = new Request.Builder()
 							.post(body)
-							.url("https://aestheticodes.appspot.com/interaction")
+							.url(urlRoot + "interaction")
 							.header("Authorization", context.getString(R.string.oauth_client_id))
 							.header("User-Agent", Artcodes.userAgent)
 							.build();
@@ -210,7 +216,7 @@ public class AppEngineServer implements ArtcodeServer {
 
 	@Override
 	public void search(String query, LoadCallback<List<String>> callback) {
-		String url = Uri.parse("https://aestheticodes.appspot.com/search")
+		String url = Uri.parse(urlRoot + "search")
 				.buildUpon()
 				.appendQueryParameter("q", query)
 				.build().toString();
@@ -243,8 +249,7 @@ public class AppEngineServer implements ArtcodeServer {
 		SharedPreferences preferences = context.getSharedPreferences(clazz.getName(), Context.MODE_PRIVATE);
 		String jsonPreferences = preferences.getString(name, "[]");
 		Log.i("ids", name + " = " + jsonPreferences);
-		return gson.fromJson(jsonPreferences, new TypeToken<List<String>>() {
-		}.getType());
+		return gson.fromJson(jsonPreferences, new TypeToken<List<String>>() {}.getType());
 	}
 
 

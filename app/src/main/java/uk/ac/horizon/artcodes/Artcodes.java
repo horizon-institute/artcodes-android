@@ -25,8 +25,8 @@ import android.os.Build;
 import okhttp3.Cache;
 import okhttp3.OkHttpClient;
 import okhttp3.logging.HttpLoggingInterceptor;
-import uk.ac.horizon.artcodes.server.AppEngineServer;
 import uk.ac.horizon.artcodes.server.ArtcodeServer;
+import uk.ac.horizon.artcodes.server.CardographerServer;
 
 public final class Artcodes extends Application
 {
@@ -41,7 +41,8 @@ public final class Artcodes extends Application
 		super.onCreate();
 		Analytics.initialize(this);
 
-		server = new AppEngineServer(this);
+		server = new CardographerServer(this);
+		//server = new AppEngineServer(this);
 		if(httpClient == null)
 		{
 			HttpLoggingInterceptor logging = new HttpLoggingInterceptor();

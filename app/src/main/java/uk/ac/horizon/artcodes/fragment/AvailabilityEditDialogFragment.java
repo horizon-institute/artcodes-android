@@ -25,10 +25,12 @@ import android.app.Dialog;
 import android.content.DialogInterface;
 import android.content.Intent;
 import android.os.Bundle;
+
 import androidx.annotation.NonNull;
 import androidx.fragment.app.DialogFragment;
 import androidx.fragment.app.FragmentManager;
 import androidx.appcompat.app.AlertDialog;
+
 import android.view.View;
 import android.widget.DatePicker;
 
@@ -44,18 +46,15 @@ import uk.ac.horizon.artcodes.databinding.AvailabilityEditBinding;
 import uk.ac.horizon.artcodes.model.Availability;
 import uk.ac.horizon.artcodes.model.Experience;
 
-public class AvailabilityEditDialogFragment extends DialogFragment
-{
-	private interface DateListener
-	{
+public class AvailabilityEditDialogFragment extends DialogFragment {
+	private interface DateListener {
 		void dateSelected(Long timestamp);
 	}
 
 	private static final int PLACE_PICKER_REQUEST = 119;
 	private AvailabilityEditBinding binding;
 
-	static void show(FragmentManager fragmentManager, AvailabilityEditListFragment fragment, int num)
-	{
+	static void show(FragmentManager fragmentManager, AvailabilityEditListFragment fragment, int num) {
 		final AvailabilityEditDialogFragment dialog = new AvailabilityEditDialogFragment();
 		final Bundle args = new Bundle();
 		dialog.setTargetFragment(fragment, 1);
@@ -65,23 +64,16 @@ public class AvailabilityEditDialogFragment extends DialogFragment
 	}
 
 	@Override
-	public void onActivityResult(int requestCode, int resultCode, Intent data)
-	{
+	public void onActivityResult(int requestCode, int resultCode, Intent data) {
 		binding.availabilityLocationProgress.setVisibility(View.INVISIBLE);
 		binding.availabilityLocation.setVisibility(View.VISIBLE);
-		if (requestCode == PLACE_PICKER_REQUEST)
-		{
-			if (resultCode == Activity.RESULT_OK)
-			{
+		if (requestCode == PLACE_PICKER_REQUEST) {
+			if (resultCode == Activity.RESULT_OK) {
 				final Place place = PlacePicker.getPlace(getActivity(), data);
 				final int index = data.getIntExtra("availIndex", 0);
-				if (index >= 0)
-				{
+				if (index >= 0) {
 					final Availability availability = getExperience().getAvailabilities().get(index);
-					availability.setName(place.getName().toString());
-					availability.setAddress(place.getAddress().toString());
-					availability.setLat(place.getLatLng().latitude);
-					availability.setLon(place.getLatLng().longitude);
+					availability.setLocation(place.getLatLng().latitude, place.getLatLng().longitude, place.getName().toString(), place.getAddress().toString());
 				}
 			}
 		}
@@ -90,8 +82,7 @@ public class AvailabilityEditDialogFragment extends DialogFragment
 
 	@NonNull
 	@Override
-	public Dialog onCreateDialog(Bundle savedInstanceState) throws NullPointerException
-	{
+	public Dialog onCreateDialog(Bundle savedInstanceState) throws NullPointerException {
 		binding = AvailabilityEditBinding.inflate(getActivity().getLayoutInflater());
 		// Use the Builder class for convenient dialog construction
 		AlertDialog.Builder builder = new AlertDialog.Builder(getActivity());
@@ -99,40 +90,24 @@ public class AvailabilityEditDialogFragment extends DialogFragment
 
 		final Dialog dialog = builder.create();
 
-		binding.deleteButton.setOnClickListener(new View.OnClickListener()
-		{
-			@Override
-			public void onClick(View v)
-			{
-				if (getArguments().containsKey("availability"))
-				{
-					dialog.dismiss();
-					final int index = getArguments().getInt("availability");
-					if (getTargetFragment() instanceof AvailabilityEditListFragment)
-					{
-						((AvailabilityEditListFragment) getTargetFragment()).getAdapter().deleteAvailability(index);
-					}
-					else
-					{
-						getExperience().getAvailabilities().remove(index);
-					}
+		binding.deleteButton.setOnClickListener(v -> {
+			if (getArguments().containsKey("availability")) {
+				dialog.dismiss();
+				final int index = getArguments().getInt("availability");
+				if (getTargetFragment() instanceof AvailabilityEditListFragment) {
+					((AvailabilityEditListFragment) getTargetFragment()).getAdapter().deleteAvailability(index);
+				} else {
+					getExperience().getAvailabilities().remove(index);
 				}
 			}
 		});
 
-		binding.doneButton.setOnClickListener(new View.OnClickListener()
-		{
-			@Override
-			public void onClick(View v)
-			{
-				dialog.dismiss();
-				if (getArguments().containsKey("availability"))
-				{
-					final int index = getArguments().getInt("availability");
-					if (getTargetFragment() instanceof AvailabilityEditListFragment)
-					{
-						((AvailabilityEditListFragment) getTargetFragment()).getAdapter().availabilityUpdated(index);
-					}
+		binding.doneButton.setOnClickListener(v -> {
+			dialog.dismiss();
+			if (getArguments().containsKey("availability")) {
+				final int index = getArguments().getInt("availability");
+				if (getTargetFragment() instanceof AvailabilityEditListFragment) {
+					((AvailabilityEditListFragment) getTargetFragment()).getAdapter().availabilityUpdated(index);
 				}
 			}
 		});
@@ -141,66 +116,46 @@ public class AvailabilityEditDialogFragment extends DialogFragment
 	}
 
 	@Override
-	public void onResume()
-	{
+	public void onResume() {
 		super.onResume();
 		updateAvailability();
 	}
 
-	private void selectDate(Long timestamp, final DateListener listener)
-	{
+	private void selectDate(Long timestamp, final DateListener listener) {
 		final Calendar calendar = Calendar.getInstance();
-		if (timestamp != null)
-		{
+		if (timestamp != null) {
 			calendar.setTimeInMillis(timestamp);
-		}
-		else
-		{
+		} else {
 			calendar.setTimeInMillis(System.currentTimeMillis());
 		}
 		int mYear = calendar.get(Calendar.YEAR);
 		int mMonth = calendar.get(Calendar.MONTH);
 		int mDay = calendar.get(Calendar.DAY_OF_MONTH);
 
-		DatePickerDialog dialog = new DatePickerDialog(getActivity(), new DatePickerDialog.OnDateSetListener()
-		{
-			@Override
-			public void onDateSet(DatePicker view, int year, int monthOfYear, int dayOfMonth)
-			{
-				final Calendar calendar = Calendar.getInstance();
-				calendar.set(year, monthOfYear, dayOfMonth);
-				listener.dateSelected(calendar.getTimeInMillis());
-			}
+		DatePickerDialog dialog = new DatePickerDialog(getActivity(), (view, year, monthOfYear, dayOfMonth) -> {
+			final Calendar calendar1 = Calendar.getInstance();
+			calendar1.set(year, monthOfYear, dayOfMonth);
+			listener.dateSelected(calendar1.getTimeInMillis());
 		}, mYear, mMonth, mDay);
-		dialog.setButton(DatePickerDialog.BUTTON_NEUTRAL, getString(R.string.clear), new DialogInterface.OnClickListener()
-		{
-			@Override
-			public void onClick(DialogInterface dialog, int which)
-			{
-				dialog.dismiss();
-				listener.dateSelected(null);
-			}
+		dialog.setButton(DatePickerDialog.BUTTON_NEUTRAL, getString(R.string.clear), (dialog1, which) -> {
+			dialog1.dismiss();
+			listener.dateSelected(null);
 		});
 		dialog.show();
 	}
 
-	private Experience getExperience()
-	{
-		if (getActivity() instanceof ExperienceActivityBase)
-		{
+	private Experience getExperience() {
+		if (getActivity() instanceof ExperienceActivityBase) {
 			return ((ExperienceActivityBase) getActivity()).getExperience();
 		}
 		return null;
 	}
 
 	@NonNull
-	private Availability getAvailability() throws NullPointerException
-	{
+	private Availability getAvailability() throws NullPointerException {
 		Experience experience = getExperience();
-		if (experience != null)
-		{
-			if (getArguments().containsKey("availability"))
-			{
+		if (experience != null) {
+			if (getArguments().containsKey("availability")) {
 				int index = getArguments().getInt("availability");
 				return experience.getAvailabilities().get(index);
 			}
@@ -208,73 +163,28 @@ public class AvailabilityEditDialogFragment extends DialogFragment
 		throw new NullPointerException("Couldn't get action");
 	}
 
-	private void updateAvailability()
-	{
+	private void updateAvailability() {
 		final Availability availability = getAvailability();
 
 		binding.setAvailability(availability);
-		binding.availabilityStart.setOnClickListener(new View.OnClickListener()
-		{
-			@Override
-			public void onClick(View v)
-			{
-				selectDate(availability.getStart(), new DateListener()
-				{
-					@Override
-					public void dateSelected(Long timestamp)
-					{
-						availability.setStart(timestamp);
-					}
-				});
+		binding.availabilityStart.setOnClickListener(v -> selectDate(availability.getStart(), timestamp -> availability.setStart(timestamp)));
+		binding.availabilityEnd.setOnClickListener(v -> selectDate(availability.getEnd(), timestamp -> availability.setEnd(timestamp)));
+		binding.availabilityLocation.setOnClickListener(v -> {
+			try {
+				binding.availabilityLocationProgress.setVisibility(View.VISIBLE);
+				binding.availabilityLocation.setVisibility(View.INVISIBLE);
+				PlacePicker.IntentBuilder builder = new PlacePicker.IntentBuilder();
+				Intent intent = builder.build(getActivity());
+				intent.putExtra("availIndex", getExperience().getAvailabilities().indexOf(availability));
+				startActivityForResult(intent, PLACE_PICKER_REQUEST);
+			} catch (Exception e) {
+				Analytics.trackException(e);
+				binding.availabilityLocationProgress.setVisibility(View.INVISIBLE);
+				binding.availabilityLocation.setVisibility(View.VISIBLE);
 			}
 		});
-		binding.availabilityEnd.setOnClickListener(new View.OnClickListener()
-		{
-			@Override
-			public void onClick(View v)
-			{
-				selectDate(availability.getEnd(), new DateListener()
-				{
-					@Override
-					public void dateSelected(Long timestamp)
-					{
-						availability.setEnd(timestamp);
-					}
-				});
-			}
-		});
-		binding.availabilityLocation.setOnClickListener(new View.OnClickListener()
-		{
-			@Override
-			public void onClick(View v)
-			{
-				try
-				{
-					binding.availabilityLocationProgress.setVisibility(View.VISIBLE);
-					binding.availabilityLocation.setVisibility(View.INVISIBLE);
-					PlacePicker.IntentBuilder builder = new PlacePicker.IntentBuilder();
-					Intent intent = builder.build(getActivity());
-					intent.putExtra("availIndex", getExperience().getAvailabilities().indexOf(availability));
-					startActivityForResult(intent, PLACE_PICKER_REQUEST);
-				}
-				catch (Exception e)
-				{
-					Analytics.trackException(e);
-					binding.availabilityLocationProgress.setVisibility(View.INVISIBLE);
-					binding.availabilityLocation.setVisibility(View.VISIBLE);
-				}
-			}
-		});
-		binding.availabilityLocationClear.setOnClickListener(new View.OnClickListener()
-		{
-			@Override
-			public void onClick(View v)
-			{
-				availability.setName(null);
-				availability.setAddress(null);
-				availability.setLat(null);
-				availability.setLon(null);
-			}
+		binding.availabilityLocationClear.setOnClickListener(v -> {
+			availability.clearLocation();
 		});
 		//binding.setActionEditor(new ActionEditor(action));
 	}

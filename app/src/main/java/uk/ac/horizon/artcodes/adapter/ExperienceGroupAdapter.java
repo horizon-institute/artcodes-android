@@ -66,14 +66,13 @@ public class ExperienceGroupAdapter extends GridAdapter
 			else
 			{
 				final Experience existing = experiences.get(index);
+				experiences.append(index, experience);
 				if (existing == null)
 				{
-					experiences.append(index, experience);
 					adapter.notifyItemInserted(indexOf(experience));
 				}
 				else
 				{
-					experiences.append(index, experience);
 					adapter.notifyItemChanged(indexOf(experience));
 				}
 			}
@@ -109,18 +108,15 @@ public class ExperienceGroupAdapter extends GridAdapter
 				{
 					final int experienceIndex = index;
 					loadStarted();
-					server.loadExperience(uri, new LoadCallback<Experience>()
-					{
+					server.loadExperience(uri, new LoadCallback<>() {
 						@Override
-						public void loaded(final Experience experience)
-						{
+						public void loaded(final Experience experience) {
 							loadFinished();
 							add(experienceIndex, experience);
 						}
 
 						@Override
-						public void error(Throwable e)
-						{
+						public void error(Throwable e) {
 							Log.e("Artcodes", e.getMessage(), e);
 							showError(context.getString(R.string.connection_error));
 							loadFinished();
@@ -170,17 +166,14 @@ public class ExperienceGroupAdapter extends GridAdapter
 	public void bind(final int position, final ViewDataBinding binding)
 	{
 		Object item = getItemAt(position);
-		if (binding instanceof ExperienceCardBinding && item instanceof Experience)
+		if (binding instanceof ExperienceCardBinding experienceCardBinding && item instanceof Experience experience)
 		{
-			final Experience experience = (Experience) item;
-			final ExperienceCardBinding experienceCardBinding = (ExperienceCardBinding) binding;
-			experienceCardBinding.setExperience((Experience) item);
+			experienceCardBinding.setExperience(experience);
 			experienceCardBinding.getRoot().setOnClickListener(v -> ExperienceActivity.start(context, experience));
 			experienceCardBinding.scanButton.setOnClickListener(v -> ArtcodeActivity.start(context, experience));
 		}
-		else if (binding instanceof GroupHeaderBinding && item instanceof Group)
+		else if (binding instanceof GroupHeaderBinding && item instanceof Group group)
 		{
-			Group group = ((Group) item);
 			((GroupHeaderBinding) binding).title.setText(getStringResourceByName(context, group.name));
 			if (group.showMore())
 			{
@@ -320,11 +313,9 @@ public class ExperienceGroupAdapter extends GridAdapter
 
 	public LoadCallback<List<String>> getCallback(final String name, final View.OnClickListener clickListener)
 	{
-		return new LoadCallback<List<String>>()
-		{
+		return new LoadCallback<>() {
 			@Override
-			public void loaded(List<String> item)
-			{
+			public void loaded(List<String> item) {
 				Group group = getGroup(name);
 				group.setClickListener(clickListener);
 				group.setIds(item);
@@ -332,8 +323,7 @@ public class ExperienceGroupAdapter extends GridAdapter
 			}
 
 			@Override
-			public void error(Throwable e)
-			{
+			public void error(Throwable e) {
 				Log.e("Artcodes", e.getMessage(), e);
 				showError(context.getString(R.string.connection_error));
 				loadFinished();
@@ -343,13 +333,10 @@ public class ExperienceGroupAdapter extends GridAdapter
 
 	public LoadCallback<Map<String, List<String>>> getCallback()
 	{
-		return new LoadCallback<Map<String, List<String>>>()
-		{
+		return new LoadCallback<>() {
 			@Override
-			public void loaded(Map<String, List<String>> item)
-			{
-				for (String name : item.keySet())
-				{
+			public void loaded(Map<String, List<String>> item) {
+				for (String name : item.keySet()) {
 					Group group = getGroup(name);
 					group.setIds(item.get(name));
 				}
@@ -357,8 +344,7 @@ public class ExperienceGroupAdapter extends GridAdapter
 			}
 
 			@Override
-			public void error(Throwable e)
-			{
+			public void error(Throwable e) {
 				Log.e("Artcodes", e.getMessage(), e);
 				showError(context.getString(R.string.connection_error));
 				loadFinished();

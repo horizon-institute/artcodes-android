@@ -49,7 +49,7 @@ public class ExperienceRecommendFragment extends ArtcodeFragmentBase
 
 	@NonNull
 	@Override
-	public View onCreateView(final LayoutInflater inflater, ViewGroup container, Bundle savedInstanceState)
+	public View onCreateView(@NonNull final LayoutInflater inflater, ViewGroup container, Bundle savedInstanceState)
 	{
 		ListBinding binding = ListBinding.inflate(inflater, container, false);
 		adapter = new ExperienceGroupAdapter(getActivity(), getServer());
