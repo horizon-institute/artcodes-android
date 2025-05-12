@@ -50,7 +50,7 @@ public class ExperienceParser {
 			final TypeAdapter<Experience> delegate = gson.getDelegateAdapter(this, type);
 			final TypeAdapter<JsonElement> elementAdapter = gson.getAdapter(JsonElement.class);
 
-			return new TypeAdapter<Experience>() {
+			return new TypeAdapter<>() {
 				@Override
 				public Experience read(JsonReader in) throws IOException {
 					JsonElement tree = elementAdapter.read(in);
@@ -58,12 +58,6 @@ public class ExperienceParser {
 						JsonObject jsonObject = tree.getAsJsonObject();
 						if (jsonObject.has("threshold") && jsonObject.get("threshold").isJsonPrimitive()) {
 							jsonObject.remove("threshold");
-						}
-						if (jsonObject.has("id")) {
-							String id = jsonObject.get("id").getAsString();
-							if (!id.contains(":")) {
-								jsonObject.addProperty("id", "http://aestheticodes.appspot.com/experience/" + id);
-							}
 						}
 
 						if (!jsonObject.has("pipeline")) {

@@ -28,6 +28,7 @@
 		android:layout_width="match_parent"
 		android:layout_height="wrap_content"
 		android:background="@color/apptheme_primary"
+		android:fitsSystemWindows="true"
 		android:orientation="vertical">
 
 		<androidx.viewpager.widget.ViewPager
@@ -87,7 +88,7 @@
 				android:onClick="nextPage"
 				android:padding="16dp"
 				android:src="@drawable/ic_chevron_right_24dp"
-				android:tint="#FFF"/>
+				app:tint="#FFF"/>
 		</LinearLayout>
 	</LinearLayout>
 </layout>

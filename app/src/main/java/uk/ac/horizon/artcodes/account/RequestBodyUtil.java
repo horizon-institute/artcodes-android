@@ -23,6 +23,9 @@ import android.content.Context;
 import android.graphics.Bitmap;
 import android.graphics.BitmapFactory;
 import android.net.Uri;
+import android.util.Log;
+
+import androidx.annotation.NonNull;
 
 import com.google.common.hash.Hashing;
 import com.google.common.hash.HashingInputStream;
@@ -39,33 +42,29 @@ import okio.BufferedSink;
 import okio.Okio;
 import okio.Source;
 
-class RequestBodyUtil
-{
-	public static class ImageRequestBody extends RequestBody
-	{
+class RequestBodyUtil {
+	/**
+	 * @noinspection UnstableApiUsage
+	 */
+	public static class ImageRequestBody extends RequestBody {
 		private final Context context;
 		private final Uri uri;
 		private final int maxSize = 500;
 		private Bitmap bitmap;
 
-		private ImageRequestBody(Context context, Uri uri)
-		{
+		private ImageRequestBody(Context context, Uri uri) {
 			this.context = context;
 			this.uri = uri;
 		}
 
-		public String getHash() throws IOException
-		{
+		public String getHash() throws IOException {
 			bitmap = resizedBitmap();
-			if (bitmap == null)
-			{
+			if (bitmap == null) {
 				HashingInputStream inputStream = new HashingInputStream(Hashing.sha256(), getInputStream());
 				ByteStreams.copy(inputStream, ByteStreams.nullOutputStream());
 				inputStream.close();
 				return inputStream.hash().toString();
-			}
-			else
-			{
+			} else {
 				HashingOutputStream outputStream = new HashingOutputStream(Hashing.sha256(), ByteStreams.nullOutputStream());
 				bitmap.compress(Bitmap.CompressFormat.JPEG, 90, outputStream);
 				outputStream.close();
@@ -74,47 +73,35 @@ class RequestBodyUtil
 		}
 
 		@Override
-		public MediaType contentType()
-		{
-			if (bitmap == null)
-			{
+		public MediaType contentType() {
+			if (bitmap == null) {
 				return MediaType.parse("image/jpeg");
-			}
-			else
-			{
+			} else {
 				return MediaType.parse(context.getContentResolver().getType(uri));
 			}
 		}
 
 		@Override
-		public void writeTo(BufferedSink sink) throws IOException
-		{
-			if (bitmap != null)
-			{
+		public void writeTo(BufferedSink sink) throws IOException {
+			Log.w("ImageBody", "Writing");
+			if (bitmap != null) {
 				bitmap.compress(Bitmap.CompressFormat.JPEG, 90, sink.outputStream());
-			}
-			else
-			{
+			} else {
 				Source source = null;
-				try
-				{
+				try {
 					source = Okio.source(getInputStream());
 					sink.writeAll(source);
-				}
-				finally
-				{
+				} finally {
 					Util.closeQuietly(source);
 				}
 			}
 		}
 
-		private InputStream getInputStream() throws IOException
-		{
+		private InputStream getInputStream() throws IOException {
 			return context.getContentResolver().openInputStream(uri);
 		}
 
-		private Bitmap resizedBitmap() throws IOException
-		{
+		private Bitmap resizedBitmap() throws IOException {
 			BitmapFactory.Options o = new BitmapFactory.Options();
 			o.inJustDecodeBounds = true;
 			BitmapFactory.decodeStream(getInputStream(), null, o);
@@ -123,15 +110,13 @@ class RequestBodyUtil
 			int height_tmp = o.outHeight;
 			int scale = 1;
 
-			while (width_tmp > maxSize && height_tmp > maxSize)
-			{
+			while (width_tmp > maxSize && height_tmp > maxSize) {
 				width_tmp /= 2;
 				height_tmp /= 2;
 				scale *= 2;
 			}
 
-			if (scale != 1)
-			{
+			if (scale != 1) {
 				BitmapFactory.Options o2 = new BitmapFactory.Options();
 				o2.inSampleSize = scale;
 				return BitmapFactory.decodeStream(getInputStream(), null, o2);
@@ -140,45 +125,33 @@ class RequestBodyUtil
 		}
 	}
 
-	public static ImageRequestBody createImageBody(Context context, String uri)
-	{
+	public static ImageRequestBody createImageBody(Context context, String uri) {
 		return new ImageRequestBody(context, Uri.parse(uri));
 	}
 
-	public static RequestBody create(final MediaType mediaType, final InputStream inputStream)
-	{
-		return new RequestBody()
-		{
+	public static RequestBody create(final MediaType mediaType, final InputStream inputStream) {
+		return new RequestBody() {
 			@Override
-			public MediaType contentType()
-			{
+			public MediaType contentType() {
 				return mediaType;
 			}
 
 			@Override
-			public long contentLength()
-			{
-				try
-				{
+			public long contentLength() {
+				try {
 					return inputStream.available();
-				}
-				catch (IOException e)
-				{
+				} catch (IOException e) {
 					return 0;
 				}
 			}
 
 			@Override
-			public void writeTo(BufferedSink sink) throws IOException
-			{
+			public void writeTo(@NonNull BufferedSink sink) throws IOException {
 				Source source = null;
-				try
-				{
+				try {
 					source = Okio.source(inputStream);
 					sink.writeAll(source);
-				}
-				finally
-				{
+				} finally {
 					Util.closeQuietly(source);
 				}
 			}

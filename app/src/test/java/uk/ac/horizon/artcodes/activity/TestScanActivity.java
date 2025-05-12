@@ -25,7 +25,6 @@ import android.content.Intent;
 import android.net.Uri;
 import android.os.Bundle;
 import android.util.Log;
-import android.view.View;
 import android.widget.Button;
 import android.widget.LinearLayout;
 import android.widget.TextView;
@@ -39,72 +38,49 @@ import uk.ac.horizon.artcodes.Analytics;
 import uk.ac.horizon.artcodes.R;
 import uk.ac.horizon.artcodes.model.Experience;
 
-public class TestScanActivity extends Activity
-{
+public class TestScanActivity extends Activity {
 	private static final int SCAN_REQUEST = 113;
 	private TextView label;
 
 	@SuppressLint("SetTextI18n")
 	@Override
-	public void onCreate(Bundle savedInstanceState)
-	{
+	public void onCreate(Bundle savedInstanceState) {
 		super.onCreate(savedInstanceState);
 
 		LinearLayout layout = new LinearLayout(this);
 
 		Button button1 = new Button(this);
 		button1.setText("Scan Action");
-		button1.setOnClickListener(new View.OnClickListener()
-		{
-			@Override
-			public void onClick(View v)
-			{
-				Intent ai = new Intent("uk.ac.horizon.aestheticodes.SCAN");
-				ai.putExtra("experience", experienceToJson(createExperience()));
-				startActivityForResult(ai, SCAN_REQUEST);
-			}
+		button1.setOnClickListener(v -> {
+			Intent ai = new Intent("uk.ac.horizon.aestheticodes.SCAN");
+			ai.putExtra("experience", experienceToJson(createExperience()));
+			startActivityForResult(ai, SCAN_REQUEST);
 		});
 		layout.addView(button1);
 
 		Button button2 = new Button(this);
 		button2.setText("Scan URL");
-		button2.setOnClickListener(new View.OnClickListener()
-		{
-			@Override
-			public void onClick(View v)
-			{
-				try
-				{
-					Experience experience = createExperience();
-					experience.setCallback("http://aestheticodes.appspot.com/action/{code}");
-					String url = getString(R.string.artcode_scan_scheme) + ":" + URLEncoder.encode(experienceToJson(experience), "UTF-8");
-					Log.i("test", url);
-					startActivity(new Intent(Intent.ACTION_VIEW, Uri.parse(url)));
-				}
-				catch (Exception e)
-				{
-					Analytics.trackException(e);
-				}
+		button2.setOnClickListener(v -> {
+			try {
+				Experience experience = createExperience();
+				experience.setCallback("http://aestheticodes.appspot.com/action/{code}");
+				String url = /*getString(R.string.artcode_scan_scheme) +*/ "aestheticodes://scan?experience=" + ":" + URLEncoder.encode(experienceToJson(experience), "UTF-8");
+				Log.i("test", url);
+				startActivity(new Intent(Intent.ACTION_VIEW, Uri.parse(url)));
+			} catch (Exception e) {
+				Analytics.trackException(e);
 			}
 		});
 		layout.addView(button2);
 
 		Button button3 = new Button(this);
 		button3.setText("Add Experience");
-		button3.setOnClickListener(new View.OnClickListener()
-		{
-			@Override
-			public void onClick(View v)
-			{
-				try
-				{
-					String url = "https://aestheticodes.appspot.com/experience/b29f7f6a-7fdd-4a6d-bee3-3f27f77ef931.artcode";
-					startActivity(new Intent(Intent.ACTION_VIEW, Uri.parse(url)));
-				}
-				catch (Exception e)
-				{
-					Analytics.trackException(e);
-				}
+		button3.setOnClickListener(v -> {
+			try {
+				String url = "https://aestheticodes.appspot.com/experience/b29f7f6a-7fdd-4a6d-bee3-3f27f77ef931.artcode";
+				startActivity(new Intent(Intent.ACTION_VIEW, Uri.parse(url)));
+			} catch (Exception e) {
+				Analytics.trackException(e);
 			}
 		});
 		layout.addView(button3);
@@ -117,35 +93,26 @@ public class TestScanActivity extends Activity
 
 	@SuppressLint("SetTextI18n")
 	@Override
-	protected void onActivityResult(int requestCode, int resultCode, Intent data)
-	{
-		if (resultCode == Activity.RESULT_CANCELED)
-		{
+	protected void onActivityResult(int requestCode, int resultCode, Intent data) {
+		if (resultCode == Activity.RESULT_CANCELED) {
 			label.setText("scan cancelled");
-		}
-		else if (resultCode == Activity.RESULT_OK)
-		{
+		} else if (resultCode == Activity.RESULT_OK) {
 			String marker = data.getStringExtra("action");
-			if (marker == null)
-			{
+			if (marker == null) {
 				label.setText("scan result for null action");
-			}
-			else
-			{
+			} else {
 				label.setText("Found MarkerDisplay " + marker);
 			}
 		}
 	}
 
-	private Experience createExperience()
-	{
+	private Experience createExperience() {
 		Experience experience = new Experience();
 		experience.setName("Test");
 		return experience;
 	}
 
-	private String experienceToJson(Experience experience)
-	{
+	private String experienceToJson(Experience experience) {
 		final Gson gson = new GsonBuilder().create();
 		return gson.toJson(experience);
 	}

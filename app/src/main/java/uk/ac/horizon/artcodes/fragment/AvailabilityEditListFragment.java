@@ -21,11 +21,16 @@ package uk.ac.horizon.artcodes.fragment;
 
 import android.content.Context;
 import android.os.Bundle;
+
+import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
+
 import com.google.android.material.snackbar.Snackbar;
+
 import androidx.core.content.ContextCompat;
 import androidx.recyclerview.widget.RecyclerView;
 import androidx.recyclerview.widget.ItemTouchHelper;
+
 import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
@@ -42,109 +47,76 @@ import uk.ac.horizon.artcodes.databinding.ListBinding;
 import uk.ac.horizon.artcodes.model.Availability;
 import uk.ac.horizon.artcodes.ui.Bindings;
 
-public class AvailabilityEditListFragment extends ExperienceEditFragment
-{
-	class AvailabilityAdapter extends ListAdapter<AvailabilityBinding>
-	{
+public class AvailabilityEditListFragment extends ExperienceEditFragment {
+	class AvailabilityAdapter extends ListAdapter<AvailabilityBinding> {
 		private List<Availability> availabilities = new ArrayList<>();
 
-		private AvailabilityAdapter(Context context)
-		{
+		private AvailabilityAdapter(Context context) {
 			super(context);
 		}
 
-		private void setAvailabilities(List<Availability> availabilities)
-		{
+		private void setAvailabilities(List<Availability> availabilities) {
 			this.availabilities = availabilities;
 			adapter.notifyDataSetChanged();
 		}
 
 		@Override
-		public void bind(final int position, final AvailabilityBinding binding)
-		{
+		public void bind(final int position, final AvailabilityBinding binding) {
 			final Availability availability = availabilities.get(position);
 			binding.setAvailability(availability);
-			if (availability.getEnd() == null)
-			{
-				if (availability.getStart() == null)
-				{
-					if (availability.getName() != null)
-					{
+			if (availability.getEnd() == null) {
+				if (availability.getStart() == null) {
+					if (availability.getName() != null) {
 						binding.availabilityDesc.setText(getString(R.string.available_near, availability.getName()));
 						binding.availabilityIcon.setImageResource(R.drawable.ic_place_32dp);
-					}
-					else
-					{
+					} else {
 						binding.availabilityDesc.setText(R.string.available_public);
 						binding.availabilityIcon.setImageResource(R.drawable.ic_public_32dp);
 					}
-				}
-				else
-				{
-					if (availability.getName() != null)
-					{
+				} else {
+					if (availability.getName() != null) {
 						binding.availabilityDesc.setText(getString(R.string.available_from_near, Bindings.getDate(availability.getStart()), availability.getName()));
 						binding.availabilityIcon.setImageResource(R.drawable.ic_place_32dp);
-					}
-					else
-					{
+					} else {
 						binding.availabilityDesc.setText(getString(R.string.available_from, Bindings.getDate(availability.getStart())));
 						binding.availabilityIcon.setImageResource(R.drawable.ic_schedule_32dp);
 					}
 				}
-			}
-			else if (availability.getStart() == null)
-			{
-				if (availability.getName() != null)
-				{
+			} else if (availability.getStart() == null) {
+				if (availability.getName() != null) {
 					binding.availabilityDesc.setText(getString(R.string.available_to_near, Bindings.getDate(availability.getEnd()), availability.getName()));
 					binding.availabilityIcon.setImageResource(R.drawable.ic_place_32dp);
-				}
-				else
-				{
+				} else {
 					binding.availabilityDesc.setText(getString(R.string.available_to, Bindings.getDate(availability.getEnd())));
 					binding.availabilityIcon.setImageResource(R.drawable.ic_schedule_32dp);
 				}
-			}
-			else
-			{
-				if (availability.getName() != null)
-				{
+			} else {
+				if (availability.getName() != null) {
 					binding.availabilityDesc.setText(getString(R.string.available_between_near, Bindings.getDate(availability.getStart(), availability.getEnd()), availability.getName()));
 					binding.availabilityIcon.setImageResource(R.drawable.ic_place_32dp);
-				}
-				else
-				{
+				} else {
 					binding.availabilityDesc.setText(getString(R.string.available_between, Bindings.getDate(availability.getStart(), availability.getEnd())));
 					binding.availabilityIcon.setImageResource(R.drawable.ic_schedule_32dp);
 				}
 			}
 
-			binding.getRoot().setOnClickListener(new View.OnClickListener()
-			{
-				@Override
-				public void onClick(View v)
-				{
-					int index = getExperience().getAvailabilities().indexOf(availability);
-					AvailabilityEditDialogFragment.show(getFragmentManager(), AvailabilityEditListFragment.this, index);
-				}
+			binding.getRoot().setOnClickListener(v -> {
+				int index = getExperience().getAvailabilities().indexOf(availability);
+				AvailabilityEditDialogFragment.show(getFragmentManager(), AvailabilityEditListFragment.this, index);
 			});
 		}
 
 		@Override
-		public AvailabilityBinding createBinding(final ViewGroup parent, final int viewType)
-		{
+		public AvailabilityBinding createBinding(final ViewGroup parent, final int viewType) {
 			return AvailabilityBinding.inflate(LayoutInflater.from(parent.getContext()), parent, false);
 		}
 
 		@Override
-		public int getViewCount()
-		{
+		public int getViewCount() {
 			return availabilities.size();
 		}
 
-		private void addAvailability(final Availability availability)
-		{
+		private void addAvailability(final Availability availability) {
 			getExperience().getAvailabilities().add(availability);
 			int index = getExperience().getAvailabilities().size() - 1;
 			Log.i("Added", "Added Availability at " + index);
@@ -153,26 +125,19 @@ public class AvailabilityEditListFragment extends ExperienceEditFragment
 			AvailabilityEditDialogFragment.show(getFragmentManager(), AvailabilityEditListFragment.this, index);
 		}
 
-		void availabilityUpdated(final int index)
-		{
+		void availabilityUpdated(final int index) {
 			adapter.notifyItemChanged(index);
 		}
 
-		void deleteAvailability(final int index)
-		{
+		void deleteAvailability(final int index) {
 			final Availability availability = getExperience().getAvailabilities().get(index);
 			getExperience().getAvailabilities().remove(index);
 			adapter.notifyItemRemoved(index);
 			notifyPropertyChanged(BR.showError);
 			Snackbar.make(getView(), R.string.action_deleted, Snackbar.LENGTH_LONG)
-					.setAction(R.string.action_delete_undo, new View.OnClickListener()
-					{
-						@Override
-						public void onClick(View v)
-						{
-							getExperience().getAvailabilities().add(index, availability);
-							adapter.notifyItemInserted(index);
-						}
+					.setAction(R.string.action_delete_undo, v -> {
+						getExperience().getAvailabilities().add(index, availability);
+						adapter.notifyItemInserted(index);
 					})
 					.setActionTextColor(ContextCompat.getColor(getActivity(), R.color.apptheme_accent_light))
 					.show();
@@ -182,27 +147,23 @@ public class AvailabilityEditListFragment extends ExperienceEditFragment
 	private AvailabilityAdapter adapter;
 
 	@Override
-	public int getTitleResource()
-	{
+	public int getTitleResource() {
 		return R.string.fragment_availability;
 	}
 
 	@Override
-	public boolean displayAddFAB()
-	{
+	public boolean displayAddFAB() {
 		return true;
 	}
 
 	@Override
-	public void add()
-	{
+	public void add() {
 		adapter.addAvailability(new Availability());
 	}
 
 	@Nullable
 	@Override
-	public View onCreateView(LayoutInflater inflater, ViewGroup container, Bundle savedInstanceState)
-	{
+	public View onCreateView(@NonNull LayoutInflater inflater, ViewGroup container, Bundle savedInstanceState) {
 		ListBinding binding = ListBinding.inflate(inflater, container, false);
 		adapter = new AvailabilityAdapter(getActivity());
 		adapter.setEmptyIcon(R.drawable.ic_lock_black_144dp);
@@ -210,17 +171,14 @@ public class AvailabilityEditListFragment extends ExperienceEditFragment
 
 		binding.setAdapter(adapter);
 
-		ItemTouchHelper.SimpleCallback simpleItemTouchCallback = new ItemTouchHelper.SimpleCallback(0, ItemTouchHelper.LEFT | ItemTouchHelper.RIGHT)
-		{
+		ItemTouchHelper.SimpleCallback simpleItemTouchCallback = new ItemTouchHelper.SimpleCallback(0, ItemTouchHelper.LEFT | ItemTouchHelper.RIGHT) {
 			@Override
-			public boolean onMove(RecyclerView recyclerView, RecyclerView.ViewHolder viewHolder, RecyclerView.ViewHolder viewHolder1)
-			{
+			public boolean onMove(@NonNull RecyclerView recyclerView, RecyclerView.ViewHolder viewHolder, RecyclerView.ViewHolder viewHolder1) {
 				return false;
 			}
 
 			@Override
-			public void onSwiped(RecyclerView.ViewHolder viewHolder, int swipeDir)
-			{
+			public void onSwiped(RecyclerView.ViewHolder viewHolder, int swipeDir) {
 				adapter.deleteAvailability(viewHolder.getAdapterPosition());
 			}
 		};
@@ -231,14 +189,12 @@ public class AvailabilityEditListFragment extends ExperienceEditFragment
 	}
 
 	@Override
-	public void onResume()
-	{
+	public void onResume() {
 		super.onResume();
 		adapter.setAvailabilities(getExperience().getAvailabilities());
 	}
 
-	public AvailabilityAdapter getAdapter()
-	{
+	public AvailabilityAdapter getAdapter() {
 		return adapter;
 	}
 }

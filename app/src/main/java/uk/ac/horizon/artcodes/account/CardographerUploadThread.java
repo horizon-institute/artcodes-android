@@ -31,16 +31,16 @@ import java.io.FileWriter;
 import java.util.UUID;
 
 import okhttp3.MediaType;
+import okhttp3.MultipartBody;
 import okhttp3.Request;
 import okhttp3.RequestBody;
 import okhttp3.Response;
+import okio.Okio;
 import uk.ac.horizon.artcodes.Analytics;
 import uk.ac.horizon.artcodes.Artcodes;
 import uk.ac.horizon.artcodes.model.Experience;
 
 class CardographerUploadThread extends Thread {
-	private static final MediaType MEDIA_TYPE_JSON = MediaType.parse("application/json; charset=utf-8");
-
 	private final Experience experience;
 	private final Account.AccountProcessCallback saveCallback;
 	private final CardographerAccount account;
@@ -60,27 +60,44 @@ class CardographerUploadThread extends Thread {
 			final File tempFile = createTempFile(experience.getId());
 			saveTempExperience(tempFile, experience);
 
-			uploadImage(experience.getImage());
-			uploadImage(experience.getIcon());
-
-			saveTempExperience(tempFile, experience);
-
 			final Request.Builder builder = new Request.Builder();
-			if (experience.getId() != null && experience.getId().startsWith(account.getRootURL())) {
-				builder.url(experience.getId());
-				builder.put(RequestBody.create(account.getGson().toJson(experience), MEDIA_TYPE_JSON));
-			} else if (experience.getId() != null && experience.getId().startsWith(AppEngineAccount.appSavePrefix)) {
-				// Remove temp id for upload
-				final String id = experience.getId();
+			MultipartBody.Builder bodyBuilder = new MultipartBody.Builder();
+			bodyBuilder.setType(MultipartBody.FORM);
+			if (experience.getId() != null && experience.getId().startsWith(AppEngineAccount.appSavePrefix)) {
 				experience.setId(null);
-				builder.url(account.getRootURL());
-				builder.post(RequestBody.create(account.getGson().toJson(experience), MEDIA_TYPE_JSON));
-				experience.setId(id);
+			}
+			bodyBuilder.addFormDataPart("experience", account.getGson().toJson(experience));
+
+			if (experience.getImage() != null && experience.getImage().equals(experience.getIcon())) {
+				RequestBody body = uploadImage(experience.getImage());
+				if (body != null) {
+					bodyBuilder.addFormDataPart("image+icon", "image", body);
+					experience.setImage(null);
+					experience.setIcon(null);
+				}
 			} else {
-				builder.url(account.getRootURL());
-				builder.post(RequestBody.create(account.getGson().toJson(experience), MEDIA_TYPE_JSON));
+				RequestBody body = uploadImage(experience.getImage());
+				if (body != null) {
+					bodyBuilder.addFormDataPart("image", "image", body);
+					experience.setIcon(null);
+				}
+				RequestBody body2 = uploadImage(experience.getIcon());
+				if (body2 != null) {
+					bodyBuilder.addFormDataPart("icon", "icon", body2);
+					experience.setIcon(null);
+				}
+			}
+
+			if (experience.getId() != null) {
+				builder.url(account.getRootURL() + experience.getId());
+				builder.put(bodyBuilder.build());
+			} else {
+				builder.url(account.getRootURL() + "experience");
+				builder.post(bodyBuilder.build());
 			}
 			builder.headers(account.getHeaders());
+
+			Log.i("Upload", account.getGson().toJson(experience));
 
 			final Request request = builder.build();
 			final Response response = Artcodes.httpClient.newCall(request).execute();
@@ -150,45 +167,19 @@ class CardographerUploadThread extends Thread {
 		return new File(getDirectory(), UUID.randomUUID().toString());
 	}
 
-	private boolean exists(String url) throws Exception {
-		final Request request = new Request.Builder()
-				.url(url)
-				.head()
-				.build();
-		try (Response response = Artcodes.httpClient.newCall(request).execute()) {
-			return response.code() == 200;
-		}
-	}
-
-	private void uploadImage(String imageURI) {
+	private RequestBody uploadImage(String imageURI) {
 		if (imageURI != null && (imageURI.startsWith("file:") || imageURI.startsWith("content:"))) {
 			try {
-				final RequestBodyUtil.ImageRequestBody imageBody = RequestBodyUtil.createImageBody(account.getContext(), imageURI);
-				final String hash = imageBody.getHash();
-				final String url = account.getRootURL() + "/image/" + hash;
+				Uri uri = Uri.parse(imageURI);
+				String typeName = account.getContext().getContentResolver().getType(uri);
+				MediaType type = MediaType.parse(typeName);
+				byte[] data = Okio.buffer(Okio.source(account.getContext().getContentResolver().openInputStream(uri))).readByteArray();
 
-				if (!exists(url)) {
-					Request request = new Request.Builder()
-							.url(url)
-							.put(imageBody)
-							.headers(account.getHeaders())
-							.build();
-
-					Response response = Artcodes.httpClient.newCall(request).execute();
-					account.validateResponse(request, response);
-				}
-
-				if (imageURI.equals(experience.getImage())) {
-					experience.setImage(url);
-				}
-
-				if (imageURI.equals(experience.getIcon())) {
-					experience.setIcon(url);
-				}
-				Log.i("upload", imageURI + " is now " + url);
+				return RequestBody.create(data, type);
 			} catch (Exception e) {
 				Log.w("", e.getMessage(), e);
 			}
 		}
+		return null;
 	}
 }

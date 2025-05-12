@@ -32,6 +32,9 @@ import android.view.View;
 import androidx.annotation.NonNull;
 import androidx.appcompat.app.AlertDialog;
 import androidx.core.app.NavUtils;
+import androidx.core.graphics.Insets;
+import androidx.core.view.ViewCompat;
+import androidx.core.view.WindowInsetsCompat;
 import androidx.databinding.DataBindingUtil;
 import androidx.fragment.app.Fragment;
 import androidx.fragment.app.FragmentManager;
@@ -246,13 +249,26 @@ public class ExperienceEditActivity extends ExperienceActivityBase {
 
 		binding = DataBindingUtil.setContentView(this, R.layout.experience_edit);
 		adapter = new ExperienceEditPagerAdapter(getSupportFragmentManager());
+		ViewCompat.setOnApplyWindowInsetsListener(binding.getRoot(), (v, windowInsets) -> {
+			Insets insets = windowInsets.getInsets(WindowInsetsCompat.Type.systemBars());
+			// Apply the insets as a margin to the view. This solution sets only the
+			// bottom, left, and right dimensions, but you can apply whichever insets are
+			// appropriate to your layout. You can also update the view padding if that's
+			// more appropriate.
+			binding.toolbar.setPadding(binding.toolbar.getPaddingLeft(), insets.top, binding.toolbar.getPaddingRight(), binding.toolbar.getPaddingBottom());
+			binding.bottomBar.setPadding(binding.bottomBar.getPaddingLeft(), binding.bottomBar.getPaddingTop(), binding.bottomBar.getPaddingRight(), insets.bottom);
+
+			// Return CONSUMED if you don't want want the window insets to keep passing
+			// down to descendant views.
+			return WindowInsetsCompat.CONSUMED;
+		});
+
 		binding.viewpager.setAdapter(adapter);
 		binding.viewpager.addOnPageChangeListener(new ViewPager.OnPageChangeListener() {
 			@Override
 			public void onPageSelected(int position) {
 				Fragment fragment = adapter.getItem(position);
-				if (fragment instanceof ExperienceEditFragment) {
-					ExperienceEditFragment experienceEditFragment = (ExperienceEditFragment) fragment;
+				if (fragment instanceof ExperienceEditFragment experienceEditFragment) {
 					if (experienceEditFragment.displayAddFAB()) {
 						binding.add.show();
 					} else {
@@ -292,8 +308,7 @@ public class ExperienceEditActivity extends ExperienceActivityBase {
 		binding.add.setOnClickListener(v -> {
 			int position = binding.viewpager.getCurrentItem();
 			Fragment fragment = adapter.getItem(position);
-			if (fragment instanceof ExperienceEditFragment) {
-				ExperienceEditFragment experienceEditFragment = (ExperienceEditFragment) fragment;
+			if (fragment instanceof ExperienceEditFragment experienceEditFragment) {
 				if (experienceEditFragment.displayAddFAB()) {
 					experienceEditFragment.add();
 				}
@@ -314,7 +329,7 @@ public class ExperienceEditActivity extends ExperienceActivityBase {
 	}
 
 	@Override
-	protected void onSaveInstanceState(Bundle outState) {
+	protected void onSaveInstanceState(@NonNull Bundle outState) {
 		super.onSaveInstanceState(outState);
 
 		outState.putInt("tab", binding.viewpager.getCurrentItem());
@@ -326,17 +341,6 @@ public class ExperienceEditActivity extends ExperienceActivityBase {
 		intent.setClass(this, ExperienceActivity.class);
 		return intent;
 	}
-
-//	private void updateFragment()
-//	{
-//		int position = binding.viewpager.getCurrentItem();
-//		Fragment fragment = adapter.getItem(position);
-//		if (fragment instanceof ExperienceEditFragment)
-//		{
-//			ExperienceEditFragment experienceEditFragment = (ExperienceEditFragment) fragment;
-//			experienceEditFragment.update();
-//		}
-//	}
 
 	private void selectImage(int request_id) {
 		Intent intent = new Intent(Intent.ACTION_GET_CONTENT);

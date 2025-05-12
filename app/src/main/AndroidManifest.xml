@@ -160,5 +160,22 @@
 				android:name="android.support.PARENT_ACTIVITY"
 				android:value="uk.ac.horizon.artcodes.activity.NavigationActivity" />
 		</activity>
+
+		<activity
+			android:name="com.adevinta.leku.LocationPickerActivity"
+			android:label="@string/leku_title_activity_location_picker"
+			android:theme="@style/Theme.MaterialComponents.Light.NoActionBar"
+			android:exported="false"
+			android:windowSoftInputMode="adjustPan"
+			android:parentActivityName=".activity.ExperienceEditActivity">
+			<intent-filter>
+				<action android:name="android.intent.action.SEARCH" />
+			</intent-filter>
+			<meta-data android:name="android.app.searchable"
+				android:resource="@xml/leku_searchable" />
+			<meta-data
+				android:name="android.support.PARENT_ACTIVITY"
+				android:value=".activity.ExperienceEditActivity" />
+		</activity>
 	</application>
 </manifest>

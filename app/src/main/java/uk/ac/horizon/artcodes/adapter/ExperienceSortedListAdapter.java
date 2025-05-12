@@ -29,7 +29,6 @@ import com.google.common.collect.Ordering;
 
 import java.util.ArrayList;
 import java.util.Collections;
-import java.util.Comparator;
 import java.util.List;
 
 import uk.ac.horizon.artcodes.R;
@@ -46,26 +45,21 @@ public class ExperienceSortedListAdapter extends ExperienceAdapter
 	public ExperienceSortedListAdapter(Context context, ArtcodeServer server)
 	{
 		super(context, server);
-		experiences = new SortedList<>(Experience.class, new SortedListAdapterCallback<Experience>(adapter)
-		{
+		experiences = new SortedList<>(Experience.class, new SortedListAdapterCallback<>(adapter) {
 			@Override
-			public boolean areContentsTheSame(Experience oldItem, Experience newItem)
-			{
+			public boolean areContentsTheSame(Experience oldItem, Experience newItem) {
 				return oldItem.equals(newItem);
 			}
 
 			@Override
-			public boolean areItemsTheSame(Experience item1, Experience item2)
-			{
+			public boolean areItemsTheSame(Experience item1, Experience item2) {
 				return item1.equals(item2);
 			}
 
 			@Override
-			public int compare(Experience o1, Experience o2)
-			{
+			public int compare(Experience o1, Experience o2) {
 				int result = STRING_ORDERING.compare(o1.getName(), o2.getName());
-				if (result != 0)
-				{
+				if (result != 0) {
 					return result;
 				}
 				return STRING_ORDERING.compare(o1.getId(), o2.getId());
@@ -101,39 +95,29 @@ public class ExperienceSortedListAdapter extends ExperienceAdapter
 		{
 			loadStarted();
 
-			server.loadExperience(uri, new LoadCallback<Experience>()
-			{
+			server.loadExperience(uri, new LoadCallback<>() {
 				@Override
-				public void loaded(Experience experience)
-				{
-					synchronized (experiences)
-					{
+				public void loaded(Experience experience) {
+					synchronized (experiences) {
 						loadFinished();
-						if (batchUpdate)
-						{
+						if (batchUpdate) {
 							experiencesToBatchUpdate.add(experience);
-							if (++count[0] == items.size())
-							{
+							if (++count[0] == items.size()) {
 								addExperiences(experiencesToBatchUpdate);
 							}
-						}
-						else
-						{
+						} else {
 							addExperience(experience);
 						}
 					}
 				}
 
 				@Override
-				public void error(Throwable e)
-				{
-					synchronized (experiences)
-					{
+				public void error(Throwable e) {
+					synchronized (experiences) {
 						loadFinished();
 						showError(context.getString(R.string.connection_error));
 
-						if (batchUpdate && ++count[0] == items.size())
-						{
+						if (batchUpdate && ++count[0] == items.size()) {
 							addExperiences(experiencesToBatchUpdate);
 						}
 					}
@@ -146,33 +130,28 @@ public class ExperienceSortedListAdapter extends ExperienceAdapter
 
 	public void addExperience(final Experience experience)
 	{
-		runTask(new Runnable()
-		{
-			@Override
-			public void run()
+		runTask(() -> {
+			synchronized (experiences)
 			{
-				synchronized (experiences)
+				int index = -1;
+				for (int i = 0; i < experiences.size(); ++i)
 				{
-					int index = -1;
-					for (int i = 0; i < experiences.size(); ++i)
+					if (experience.equals(experiences.get(i)))
 					{
-						if (experience.equals(experiences.get(i)))
-						{
-							index = i;
-							break;
-						}
+						index = i;
+						break;
 					}
-					// experiences.indexOf(item) seems to be buggy.
-					if (index > -1)
-					{
-						// experiences.updateItemAt() is ignored if a.equals(b)
-						experiences.removeItemAt(index);
-						experiences.add(experience);
-					}
-					else
-					{
-						experiences.add(experience);
-					}
+				}
+				// experiences.indexOf(item) seems to be buggy.
+				if (index > -1)
+				{
+					// experiences.updateItemAt() is ignored if a.equals(b)
+					experiences.removeItemAt(index);
+					experiences.add(experience);
+				}
+				else
+				{
+					experiences.add(experience);
 				}
 			}
 		});
@@ -180,25 +159,13 @@ public class ExperienceSortedListAdapter extends ExperienceAdapter
 
 	public void addExperiences(final List<Experience> experiencesToAdd)
 	{
-		Collections.sort(experiencesToAdd, new Comparator<Experience>()
-		{
-			@Override
-			public int compare(Experience experience1, Experience experience2)
+		Collections.sort(experiencesToAdd, (experience1, experience2) -> (experience1.getName()==null ? "" : experience1.getName()).compareTo(experience2.getName()==null ? "" : experience2.getName()));
+		runTask(() -> {
+			synchronized (experiences)
 			{
-				return (experience1.getName()==null ? "" : experience1.getName()).compareTo(experience2.getName()==null ? "" : experience2.getName());
-			}
-		});
-		runTask(new Runnable()
-		{
-			@Override
-			public void run()
-			{
-				synchronized (experiences)
+				for (Experience experienceFromBatchUpdate : experiencesToAdd)
 				{
-					for (Experience experienceFromBatchUpdate : experiencesToAdd)
-					{
-						experiences.add(experienceFromBatchUpdate);
-					}
+					experiences.add(experienceFromBatchUpdate);
 				}
 			}
 		});
@@ -206,21 +173,16 @@ public class ExperienceSortedListAdapter extends ExperienceAdapter
 
 	public void removeExperiencesNotIn(final List<String> items)
 	{
-		runTask(new Runnable()
-		{
-			@Override
-			public void run()
+		runTask(() -> {
+			synchronized (experiences)
 			{
-				synchronized (experiences)
+				for (int i = 0; i < experiences.size(); ++i)
 				{
-					for (int i = 0; i < experiences.size(); ++i)
+					Experience e = experiences.get(i);
+					if (!items.contains(e.getId()))
 					{
-						Experience e = experiences.get(i);
-						if (!items.contains(e.getId()))
-						{
-							experiences.remove(e);
-							--i;
-						}
+						experiences.remove(e);
+						--i;
 					}
 				}
 			}

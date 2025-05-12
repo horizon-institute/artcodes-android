@@ -31,21 +31,21 @@ public class Availability {
 	}
 
 	public String getAddress() {
-		if(location == null) {
+		if (location == null) {
 			return null;
 		}
 		return location.address;
 	}
 
 	public Long getEnd() {
-		if(end == null) {
+		if (end == null) {
 			return null;
 		}
 		return end.getTime();
 	}
 
 	public void setEnd(Long end) {
-		if(end != null) {
+		if (end != null) {
 			this.end = new Date(end);
 		} else {
 			this.end = null;
@@ -57,39 +57,39 @@ public class Availability {
 	}
 
 	public Double getLat() {
-		if(location == null) {
+		if (location == null) {
 			return null;
 		}
 		return location.coordinates[1];
 	}
 
 	public void setLocation(double lat, double lon, String name, String address) {
-		location = new Location("point", name, address, new Double[]{lon, lat});
+		location = new Location(name, address, new Double[]{lon, lat});
 	}
 
 	public Double getLon() {
-		if(location == null) {
+		if (location == null) {
 			return null;
 		}
 		return location.coordinates[0];
 	}
 
 	public String getName() {
-		if(location == null) {
+		if (location == null) {
 			return null;
 		}
 		return location.name;
 	}
 
 	public Long getStart() {
-		if(start == null) {
+		if (start == null) {
 			return null;
 		}
 		return start.getTime();
 	}
 
 	public void setStart(Long start) {
-		if(start != null) {
+		if (start != null) {
 			this.start = new Date(start);
 		} else {
 			this.start = null;

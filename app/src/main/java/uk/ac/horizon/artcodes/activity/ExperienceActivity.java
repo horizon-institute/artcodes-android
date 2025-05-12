@@ -25,7 +25,6 @@ import android.content.Context;
 import android.content.Intent;
 import android.content.IntentFilter;
 import android.net.Uri;
-import android.os.Build;
 import android.os.Bundle;
 import android.text.Layout;
 import android.util.Log;
@@ -53,101 +52,76 @@ import uk.ac.horizon.artcodes.model.Experience;
 import uk.ac.horizon.artcodes.model.ScanEvent;
 import uk.ac.horizon.artcodes.server.LoadCallback;
 
-public class ExperienceActivity extends ExperienceActivityBase
-{
+public class ExperienceActivity extends ExperienceActivityBase {
 	private ExperienceBinding binding;
 	private Experience originalExperience;
 
-	public static void start(Context context, Experience experience)
-	{
+	public static void start(Context context, Experience experience) {
 		context.startActivity(intent(context, experience));
 	}
 
-	public static Intent intent(Context context, Experience experience)
-	{
+	public static Intent intent(Context context, Experience experience) {
 		Intent intent = new Intent(context, ExperienceActivity.class);
 		//intent.putExtra("experience", new Gson().toJson(experience));
 		StaticActivityMessage.experience = experience;
 		return intent;
 	}
 
-	public void openOriginalExperience(View view)
-	{
+	public void openOriginalExperience(View view) {
 		ExperienceActivity.start(this, originalExperience);
 	}
 
-	public void editExperience(View view)
-	{
+	public void editExperience(View view) {
 		Account account = getAccount();
-		if (account != null)
-		{
+		if (account != null) {
 			ExperienceEditActivity.start(this, getExperience(), account);
 		}
 	}
 
 	@Override
-	public void loaded(Experience experience)
-	{
+	public void loaded(Experience experience) {
 		super.loaded(experience);
 		binding.setExperience(experience);
 
-		binding.experienceDescription.getViewTreeObserver().addOnGlobalLayoutListener(new ViewTreeObserver.OnGlobalLayoutListener()
-		{
+		binding.experienceDescription.getViewTreeObserver().addOnGlobalLayoutListener(new ViewTreeObserver.OnGlobalLayoutListener() {
 			@Override
-			public void onGlobalLayout()
-			{
-				if (binding.experienceDescription.getLineCount() > 1)
-				{
-					if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.JELLY_BEAN)
-					{
-						binding.experienceDescription.getViewTreeObserver().removeOnGlobalLayoutListener(this);
-					}
+			public void onGlobalLayout() {
+				if (binding.experienceDescription.getLineCount() > 1) {
+					binding.experienceDescription.getViewTreeObserver().removeOnGlobalLayoutListener(this);
 					final Layout layout = binding.experienceDescription.getLayout();
-					if (layout != null)
-					{
+					if (layout != null) {
 						final int lines = layout.getLineCount();
 						int ellipsisCount = 0;
-						for (int index = 0; index < lines; index++)
-						{
+						for (int index = 0; index < lines; index++) {
 							ellipsisCount += layout.getEllipsisCount(index);
 						}
 
 						Log.i("Ellipsis", "Lines = " + lines + ", ellipsis = " + ellipsisCount);
-						if (ellipsisCount == 0)
-						{
+						if (ellipsisCount == 0) {
 							binding.experienceDescriptionMore.setVisibility(View.GONE);
-						}
-						else
-						{
+						} else {
 							final int lineChars = layout.getLineStart(1);
-							if (ellipsisCount < (lineChars * 2))
-							{
+							if (ellipsisCount < (lineChars * 2)) {
 								binding.experienceDescription.setMaxLines(Integer.MAX_VALUE);
 								binding.experienceDescriptionMore.setVisibility(View.GONE);
-							}
-							else
-							{
+							} else {
 								binding.experienceDescriptionMore.setVisibility(View.VISIBLE);
 							}
 						}
 					}
-				}
-				else
-				{
+				} else {
 					binding.experienceDescriptionMore.setVisibility(View.GONE);
 				}
 			}
 		});
 
 		binding.experienceLocations.removeAllViews();
-		for (final Availability availability : experience.getAvailabilities())
-		{
-			if (availability.getName() != null && availability.getLat() != null && availability.getLon() != null)
-			{
+		for (final Availability availability : experience.getAvailabilities()) {
+			if (availability.getName() != null && availability.getLat() != null && availability.getLon() != null) {
 				final LocationItemBinding locationBinding = LocationItemBinding.inflate(getLayoutInflater(), binding.experienceLocations, false);
 				locationBinding.setAvailability(availability);
 				locationBinding.getRoot().setOnClickListener(v -> {
-					final Uri gmmIntentUri = Uri.parse("geo:" + availability.getLat() + "," + availability.getLon());
+					final Uri gmmIntentUri = Uri.parse("geo:" + availability.getLat() + "," + availability.getLon() + "?q=" + availability.getAddress());
 					final Intent mapIntent = new Intent(Intent.ACTION_VIEW, gmmIntentUri);
 					mapIntent.setPackage("com.google.android.apps.maps");
 					startActivity(mapIntent);
@@ -156,34 +130,26 @@ public class ExperienceActivity extends ExperienceActivityBase
 			}
 		}
 
-		if (experience.getOriginalID() != null)
-		{
-			getServer().loadExperience(experience.getOriginalID(), new LoadCallback<Experience>()
-			{
+		if (experience.getOriginalID() != null) {
+			getServer().loadExperience(experience.getOriginalID(), new LoadCallback<>() {
 				@Override
-				public void loaded(Experience item)
-				{
+				public void loaded(Experience item) {
 					originalExperience = item;
 					binding.setOriginalExperience(item);
 				}
 
 				@Override
-				public void error(Throwable e)
-				{
+				public void error(Throwable e) {
 
 				}
 			});
 		}
 
-		if (updateActions())
-		{
-			LocalBroadcastManager.getInstance(this).registerReceiver(new BroadcastReceiver()
-			{
+		if (updateActions()) {
+			LocalBroadcastManager.getInstance(this).registerReceiver(new BroadcastReceiver() {
 				@Override
-				public void onReceive(Context context, Intent intent)
-				{
-					if (intent.hasExtra("experience"))
-					{
+				public void onReceive(Context context, Intent intent) {
+					if (intent.hasExtra("experience")) {
 						loaded(new Gson().fromJson(intent.getStringExtra("experience"), Experience.class));
 					}
 				}
@@ -192,44 +158,36 @@ public class ExperienceActivity extends ExperienceActivityBase
 		updateStarred();
 	}
 
-	public void readDescription(View view)
-	{
+	public void readDescription(View view) {
 		// TODO Animate
 		binding.experienceDescriptionMore.setVisibility(View.GONE);
 		binding.experienceDescription.setMaxLines(Integer.MAX_VALUE);
 		binding.scrollView.smoothScrollTo(0, binding.experienceDescription.getTop());
 	}
 
-	public void scanExperience(View view)
-	{
+	public void scanExperience(View view) {
 		ArtcodeActivity.start(this, getExperience());
 	}
 
-	public void shareExperience(View view)
-	{
+	public void shareExperience(View view) {
 		Analytics.logShare(getUri());
-		startActivity(ShareCompat.IntentBuilder.from(this)
+
+		startActivity(new ShareCompat.IntentBuilder(this)
 				.setType("text/plain")
 				.setText(getUri())
 				.setSubject(getExperience().getName())
 				.createChooserIntent());
 	}
 
-	public void starExperience(View view)
-	{
-		getServer().loadStarred(new LoadCallback<List<String>>()
-		{
+	public void starExperience(View view) {
+		getServer().loadStarred(new LoadCallback<>() {
 			@Override
-			public void loaded(List<String> starred)
-			{
-				if (starred.contains(getUri()))
-				{
+			public void loaded(List<String> starred) {
+				if (starred.contains(getUri())) {
 					Analytics.logUnstar(getUri());
 					starred.remove(getUri());
 					getServer().saveStarred(starred);
-				}
-				else
-				{
+				} else {
 					Analytics.logStar(getUri());
 					starred.add(getUri());
 					getServer().saveStarred(starred);
@@ -238,17 +196,14 @@ public class ExperienceActivity extends ExperienceActivityBase
 			}
 
 			@Override
-			public void error(Throwable e)
-			{
+			public void error(Throwable e) {
 				Analytics.trackException(e);
 			}
 		});
 	}
 
-	public void copyExperience(View view)
-	{
-		if (getExperience().getCanCopy() != null && !getExperience().getCanCopy())
-		{
+	public void copyExperience(View view) {
+		if (getExperience().getCanCopy() != null && !getExperience().getCanCopy()) {
 			return;
 		}
 
@@ -261,18 +216,15 @@ public class ExperienceActivity extends ExperienceActivityBase
 		builder.setView(linearLayout);
 		final Dialog dialog = builder.create();
 
-		for (final Account account : getServer().getAccounts())
-		{
-			if (!account.canEdit(getUri()))
-			{
+		for (final Account account : getServer().getAccounts()) {
+			if (!account.canEdit(getUri())) {
 				Log.i("copy", "Added " + account.getId());
 				AccountItemBinding binding = AccountItemBinding.inflate(getLayoutInflater(), linearLayout, false);
 				binding.setAccount(account);
 				binding.getRoot().setOnClickListener(v -> {
 					dialog.dismiss();
 					final Experience experience = getExperience();
-					if (experience.getId() != null && (experience.getId().startsWith("http://") || experience.getId().startsWith("https://")))
-					{
+					if (experience.getId() != null && (experience.getId().startsWith("http://") || experience.getId().startsWith("https://"))) {
 						experience.setOriginalID(experience.getId());
 					}
 					experience.setId(null);
@@ -288,57 +240,44 @@ public class ExperienceActivity extends ExperienceActivityBase
 		dialog.show();
 	}
 
-	public void startExperienceHistory(View view)
-	{
+	public void startExperienceHistory(View view) {
 		ExperienceHistoryActivity.start(this, getExperience());
 	}
 
 	@Override
-	protected void onCreate(Bundle savedInstanceState)
-	{
+	protected void onCreate(Bundle savedInstanceState) {
 		super.onCreate(savedInstanceState);
 
-		if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.JELLY_BEAN)
-		{
-			getWindow().getDecorView().setSystemUiVisibility(View.SYSTEM_UI_FLAG_LAYOUT_STABLE | View.SYSTEM_UI_FLAG_LAYOUT_FULLSCREEN);
-		}
+		getWindow().getDecorView().setSystemUiVisibility(View.SYSTEM_UI_FLAG_LAYOUT_STABLE | View.SYSTEM_UI_FLAG_LAYOUT_FULLSCREEN);
 
 		binding = DataBindingUtil.setContentView(this, R.layout.experience);
 
 		onNewIntent(getIntent());
 
 		setSupportActionBar(binding.toolbar);
-		if (getSupportActionBar() != null)
-		{
+		if (getSupportActionBar() != null) {
 			getSupportActionBar().setDisplayHomeAsUpEnabled(true);
 			getSupportActionBar().setDisplayShowTitleEnabled(false);
 		}
 	}
 
-	private boolean updateActions()
-	{
+	private boolean updateActions() {
 		boolean copiable = false;
 		boolean editable = false;
 		boolean saving = false;
-		for (Account account : getServer().getAccounts())
-		{
-			if (account.canEdit(getUri()))
-			{
+		for (Account account : getServer().getAccounts()) {
+			if (account.canEdit(getUri())) {
 				editable = true;
-			}
-			else
-			{
+			} else {
 				copiable = true;
 			}
 
-			if (account.isSaving(getUri()))
-			{
+			if (account.isSaving(getUri())) {
 				saving = true;
 			}
 		}
 
-		if (getExperience().getCanCopy() != null && !getExperience().getCanCopy())
-		{
+		if (getExperience().getCanCopy() != null && !getExperience().getCanCopy()) {
 			copiable = false;
 		}
 
@@ -351,52 +290,38 @@ public class ExperienceActivity extends ExperienceActivityBase
 		return saving;
 	}
 
-	private Account getAccount()
-	{
-		for (Account account : getServer().getAccounts())
-		{
-			if (account.canEdit(getUri()))
-			{
+	private Account getAccount() {
+		for (Account account : getServer().getAccounts()) {
+			if (account.canEdit(getUri())) {
 				return account;
 			}
 		}
 		return null;
 	}
 
-	private void setVisible(View view, boolean visible)
-	{
-		if (visible)
-		{
+	private void setVisible(View view, boolean visible) {
+		if (visible) {
 			view.setVisibility(View.VISIBLE);
-		}
-		else
-		{
+		} else {
 			view.setVisibility(View.GONE);
 		}
 	}
 
-	private void updateStarred()
-	{
-		getServer().loadStarred(new LoadCallback<List<String>>()
-		{
+	private void updateStarred() {
+		getServer().loadStarred(new LoadCallback<List<String>>() {
 			@Override
-			public void loaded(List<String> item)
-			{
-				if (item.contains(getUri()))
-				{
+			public void loaded(List<String> item) {
+				if (item.contains(getUri())) {
 					binding.starButton.setText(R.string.unstar);
 					binding.starButton.setCompoundDrawablesWithIntrinsicBounds(0, R.drawable.ic_star_black_24dp, 0, 0);
-				}
-				else
-				{
+				} else {
 					binding.starButton.setText(R.string.star);
 					binding.starButton.setCompoundDrawablesWithIntrinsicBounds(0, R.drawable.ic_star_border_black_24dp, 0, 0);
 				}
 			}
 
 			@Override
-			public void error(Throwable e)
-			{
+			public void error(Throwable e) {
 				Analytics.trackException(e);
 			}
 		});

@@ -7,8 +7,8 @@ public class Location {
 	final String address;
 	final Double[] coordinates;
 
-	public Location(String type, String name, String address, Double[] coordinates) {
-		this.type = type;
+	public Location(String name, String address, Double[] coordinates) {
+		this.type = "Point";
 		this.name = name;
 		this.address = address;
 		this.coordinates = coordinates;

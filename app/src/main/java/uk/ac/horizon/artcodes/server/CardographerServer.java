@@ -47,9 +47,6 @@ import uk.ac.horizon.artcodes.model.Action;
 import uk.ac.horizon.artcodes.model.Experience;
 import uk.ac.horizon.artcodes.model.ScanEvent;
 
-/**
- * @noinspection UnstableApiUsage
- */
 public class CardographerServer implements ArtcodeServer {
 	private static final String starred_tag = "starred";
 	private static final String recent_tag = "recent";

@@ -22,8 +22,8 @@ package uk.ac.horizon.artcodes.fragment;
 import android.app.Activity;
 import android.app.DatePickerDialog;
 import android.app.Dialog;
-import android.content.DialogInterface;
 import android.content.Intent;
+import android.location.Address;
 import android.os.Bundle;
 
 import androidx.annotation.NonNull;
@@ -32,10 +32,8 @@ import androidx.fragment.app.FragmentManager;
 import androidx.appcompat.app.AlertDialog;
 
 import android.view.View;
-import android.widget.DatePicker;
 
-import com.google.android.gms.location.places.Place;
-import com.google.android.gms.location.places.ui.PlacePicker;
+import com.adevinta.leku.LocationPickerActivity;
 
 import java.util.Calendar;
 
@@ -69,16 +67,17 @@ public class AvailabilityEditDialogFragment extends DialogFragment {
 		binding.availabilityLocation.setVisibility(View.VISIBLE);
 		if (requestCode == PLACE_PICKER_REQUEST) {
 			if (resultCode == Activity.RESULT_OK) {
-				final Place place = PlacePicker.getPlace(getActivity(), data);
 				final int index = data.getIntExtra("availIndex", 0);
 				if (index >= 0) {
+					Address fullAddress = data.getParcelableExtra("address");
 					final Availability availability = getExperience().getAvailabilities().get(index);
-					availability.setLocation(place.getLatLng().latitude, place.getLatLng().longitude, place.getName().toString(), place.getAddress().toString());
+					if (fullAddress != null) {
+						availability.setLocation(fullAddress.getLatitude(), fullAddress.getLongitude(), fullAddress.getFeatureName(), fullAddress.getAddressLine(0));
+					}
 				}
 			}
 		}
 	}
-
 
 	@NonNull
 	@Override
@@ -134,7 +133,7 @@ public class AvailabilityEditDialogFragment extends DialogFragment {
 
 		DatePickerDialog dialog = new DatePickerDialog(getActivity(), (view, year, monthOfYear, dayOfMonth) -> {
 			final Calendar calendar1 = Calendar.getInstance();
-			calendar1.set(year, monthOfYear, dayOfMonth);
+			calendar1.set(year, monthOfYear, dayOfMonth, 0, 0, 0);
 			listener.dateSelected(calendar1.getTimeInMillis());
 		}, mYear, mMonth, mDay);
 		dialog.setButton(DatePickerDialog.BUTTON_NEUTRAL, getString(R.string.clear), (dialog1, which) -> {
@@ -167,14 +166,25 @@ public class AvailabilityEditDialogFragment extends DialogFragment {
 		final Availability availability = getAvailability();
 
 		binding.setAvailability(availability);
-		binding.availabilityStart.setOnClickListener(v -> selectDate(availability.getStart(), timestamp -> availability.setStart(timestamp)));
-		binding.availabilityEnd.setOnClickListener(v -> selectDate(availability.getEnd(), timestamp -> availability.setEnd(timestamp)));
+		binding.availabilityStart.setOnClickListener(v -> selectDate(availability.getStart(), timestamp -> {
+			availability.setStart(timestamp);
+			updateAvailability();
+		}));
+		binding.availabilityEnd.setOnClickListener(v -> selectDate(availability.getEnd(), timestamp -> {
+			availability.setEnd(timestamp);
+			updateAvailability();
+		}));
 		binding.availabilityLocation.setOnClickListener(v -> {
 			try {
 				binding.availabilityLocationProgress.setVisibility(View.VISIBLE);
 				binding.availabilityLocation.setVisibility(View.INVISIBLE);
-				PlacePicker.IntentBuilder builder = new PlacePicker.IntentBuilder();
-				Intent intent = builder.build(getActivity());
+				LocationPickerActivity.Builder builder = new LocationPickerActivity.Builder(getActivity())
+						.withGeolocApiKey(getString(R.string.google_app_id));
+				if (availability.getLat() != null && availability.getLon() != null) {
+					builder.withLocation(availability.getLat(), availability.getLon());
+				}
+
+				Intent intent = builder.build();
 				intent.putExtra("availIndex", getExperience().getAvailabilities().indexOf(availability));
 				startActivityForResult(intent, PLACE_PICKER_REQUEST);
 			} catch (Exception e) {
