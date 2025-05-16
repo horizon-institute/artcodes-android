@@ -26,6 +26,8 @@ import android.util.Log;
 
 import androidx.localbroadcastmanager.content.LocalBroadcastManager;
 
+import com.google.gson.Gson;
+
 import java.io.File;
 import java.io.FileWriter;
 import java.util.UUID;
@@ -45,10 +47,16 @@ class CardographerUploadThread extends Thread {
 	private final Account.AccountProcessCallback saveCallback;
 	private final CardographerAccount account;
 	private boolean finished = false;
+	private final Context context;
+	private final Gson gson;
+	private final String rootURL;
 
-	CardographerUploadThread(CardographerAccount account, Experience experience, Account.AccountProcessCallback saveCallback) {
+	CardographerUploadThread(CardographerAccount account, Context context, Gson gson, String rootURL, Experience experience, Account.AccountProcessCallback saveCallback) {
 		this.account = account;
 		this.experience = experience;
+		this.gson = gson;
+		this.rootURL = rootURL;
+		this.context = context;
 		this.saveCallback = saveCallback;
 	}
 
@@ -66,48 +74,42 @@ class CardographerUploadThread extends Thread {
 			if (experience.getId() != null && experience.getId().startsWith(AppEngineAccount.appSavePrefix)) {
 				experience.setId(null);
 			}
-			bodyBuilder.addFormDataPart("experience", account.getGson().toJson(experience));
+			bodyBuilder.addFormDataPart("experience", gson.toJson(experience));
 
-			if (experience.getImage() != null && experience.getImage().equals(experience.getIcon())) {
-				RequestBody body = uploadImage(experience.getImage());
-				if (body != null) {
+			RequestBody body = uploadImage(experience.getImage());
+			if (body != null) {
+				if (experience.getImage() != null && experience.getImage().equals(experience.getIcon())) {
 					bodyBuilder.addFormDataPart("image+icon", "image", body);
 					experience.setImage(null);
 					experience.setIcon(null);
-				}
-			} else {
-				RequestBody body = uploadImage(experience.getImage());
-				if (body != null) {
+				} else {
 					bodyBuilder.addFormDataPart("image", "image", body);
-					experience.setIcon(null);
+					experience.setImage(null);
 				}
-				RequestBody body2 = uploadImage(experience.getIcon());
-				if (body2 != null) {
-					bodyBuilder.addFormDataPart("icon", "icon", body2);
-					experience.setIcon(null);
-				}
+			}
+			RequestBody body2 = uploadImage(experience.getIcon());
+			if (body2 != null) {
+				bodyBuilder.addFormDataPart("icon", "icon", body2);
+				experience.setIcon(null);
 			}
 
 			if (experience.getId() != null) {
-				builder.url(account.getRootURL() + experience.getId());
+				builder.url(rootURL + experience.getId());
 				builder.put(bodyBuilder.build());
 			} else {
-				builder.url(account.getRootURL() + "experience");
+				builder.url(rootURL + "experiences");
 				builder.post(bodyBuilder.build());
 			}
 			builder.headers(account.getHeaders());
-
-			Log.i("Upload", account.getGson().toJson(experience));
 
 			final Request request = builder.build();
 			final Response response = Artcodes.httpClient.newCall(request).execute();
 
 			account.validateResponse(request, response);
-			saved = account.getGson().fromJson(response.body().charStream(), Experience.class);
+			saved = gson.fromJson(response.body().charStream(), Experience.class);
 			response.body().close();
 
-			account.getContext()
-					.getSharedPreferences(Account.class.getName(), Context.MODE_PRIVATE)
+			context.getSharedPreferences(Account.class.getName(), Context.MODE_PRIVATE)
 					.edit()
 					.putString(saved.getId(), account.getId())
 					.apply();
@@ -116,8 +118,8 @@ class CardographerUploadThread extends Thread {
 				Log.w("upload", "Temp file not deleted");
 			}
 			Intent intent = new Intent(experience.getId());
-			intent.putExtra("experience", account.getGson().toJson(saved));
-			LocalBroadcastManager.getInstance(account.getContext()).sendBroadcast(intent);
+			intent.putExtra("experience", gson.toJson(saved));
+			LocalBroadcastManager.getInstance(context).sendBroadcast(intent);
 		} catch (Exception e) {
 			Analytics.trackException(e);
 			success = false;
@@ -140,7 +142,7 @@ class CardographerUploadThread extends Thread {
 		try {
 			if (file != null && file.canWrite()) {
 				FileWriter writer = new FileWriter(file);
-				account.getGson().toJson(experience, writer);
+				gson.toJson(experience, writer);
 				writer.flush();
 				writer.close();
 			}
@@ -150,12 +152,12 @@ class CardographerUploadThread extends Thread {
 	}
 
 	private File getDirectory() {
-		return account.getContext().getDir("experiences", Context.MODE_PRIVATE);
+		return context.getDir("experiences", Context.MODE_PRIVATE);
 	}
 
 	private File createTempFile(final String uri) {
 		if (uri != null) {
-			if (uri.startsWith(account.getRootURL())) {
+			if (uri.startsWith(rootURL)) {
 				String id = Uri.parse(uri).getLastPathSegment();
 				return new File(getDirectory(), id);
 			} else if (uri.startsWith(AppEngineAccount.appSavePrefix)) {
@@ -171,9 +173,9 @@ class CardographerUploadThread extends Thread {
 		if (imageURI != null && (imageURI.startsWith("file:") || imageURI.startsWith("content:"))) {
 			try {
 				Uri uri = Uri.parse(imageURI);
-				String typeName = account.getContext().getContentResolver().getType(uri);
+				String typeName = context.getContentResolver().getType(uri);
 				MediaType type = MediaType.parse(typeName);
-				byte[] data = Okio.buffer(Okio.source(account.getContext().getContentResolver().openInputStream(uri))).readByteArray();
+				byte[] data = Okio.buffer(Okio.source(context.getContentResolver().openInputStream(uri))).readByteArray();
 
 				return RequestBody.create(data, type);
 			} catch (Exception e) {

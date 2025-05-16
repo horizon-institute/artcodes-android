@@ -45,6 +45,7 @@ import okhttp3.Response;
 import uk.ac.horizon.artcodes.Analytics;
 import uk.ac.horizon.artcodes.Artcodes;
 import uk.ac.horizon.artcodes.model.Experience;
+import uk.ac.horizon.artcodes.server.CardographerServer;
 import uk.ac.horizon.artcodes.server.HTTPException;
 import uk.ac.horizon.artcodes.server.JsonCallback;
 import uk.ac.horizon.artcodes.server.LoadCallback;
@@ -56,18 +57,18 @@ public class CardographerAccount implements Account {
 
 	static final String appSavePrefix = "appSaveID:";
 
+	private final String name;
+	private final CardographerServer server;
 	private final Context context;
 	private final Gson gson;
-	private final String name;
-	private final String urlRoot;
 	private final android.accounts.Account account;
 	private final Map<String, CardographerUploadThread> uploadThreads = new HashMap<>();
 
-	public CardographerAccount(Context context, String name, String urlRoot, Gson gson) {
+	public CardographerAccount(CardographerServer server, Context context, Gson gson, String name) {
+		this.server = server;
 		this.context = context;
-		this.name = name;
 		this.gson = gson;
-		this.urlRoot = urlRoot;
+		this.name = name;
 		this.account = new android.accounts.Account(name, "com.google");
 	}
 
@@ -90,7 +91,7 @@ public class CardographerAccount implements Account {
 
 	@Override
 	public void loadLibrary(final LoadCallback<List<String>> callback) {
-		load(urlRoot + "experiences", new JsonCallback<>(new TypeToken<List<String>>() {
+		load(server.getRootURL() + "experiences", new JsonCallback<>(new TypeToken<List<String>>() {
 		}.getType(), gson, context, new LoadCallback<List<String>>() {
 			@Override
 			public void loaded(List<String> item) {
@@ -124,11 +125,11 @@ public class CardographerAccount implements Account {
 			return true;
 		}
 
-		if (uri.startsWith(urlRoot)) {
+		if (uri.startsWith(server.getRootURL())) {
 			new Thread(() -> {
 				try {
 					CacheControl cc;
-					if (numberOfExperiencesHasChangedHint && uri.equals(urlRoot + "experiences")) {
+					if (numberOfExperiencesHasChangedHint && uri.equals(server.getRootURL() + "experiences")) {
 						numberOfExperiencesHasChangedHint = false;
 						cc = CacheControl.FORCE_NETWORK;
 					} else if (experienceUrlsThatHaveChangedHint.containsKey(uri)) {
@@ -173,7 +174,7 @@ public class CardographerAccount implements Account {
 		} else {
 			this.experienceUrlsThatHaveChangedHint.put(experience.getId(), new Object());
 		}
-		CardographerUploadThread uploadThread = new CardographerUploadThread(this, experience, saveCallback);
+		CardographerUploadThread uploadThread = new CardographerUploadThread(this, context, gson, server.getRootURL(), experience, saveCallback);
 		uploadThreads.put(experience.getId(), uploadThread);
 		uploadThread.start();
 	}
@@ -195,14 +196,20 @@ public class CardographerAccount implements Account {
 		new Thread(() -> {
 			boolean success = true;
 			try {
+				String url = experience.getId();
+				if (!experience.getId().startsWith("http:") && !experience.getId().startsWith("https:")) {
+					url = server.getRootURL() + experience.getId();
+				}
 				final Request request = new Request.Builder()
 						.delete()
-						.url(experience.getId())
+						.url(url)
 						.headers(getHeaders())
 						.build();
 
+				Log.i("Delete", "Request " + request);
 				final Response response = Artcodes.httpClient.newCall(request).execute();
 				validateResponse(request, response);
+				server.removeID(experience.getId());
 			} catch (Exception e) {
 				success = false;
 				Analytics.trackException(e);
@@ -268,14 +275,6 @@ public class CardographerAccount implements Account {
 		return headers.build();
 	}
 
-	Gson getGson() {
-		return gson;
-	}
-
-	Context getContext() {
-		return context;
-	}
-
 	void validateResponse(Request request, Response response) throws IOException {
 		if (response.code() == 401) {
 			Log.w("", "Response " + response.code());
@@ -297,9 +296,5 @@ public class CardographerAccount implements Account {
 
 	private String getToken() throws IOException, GoogleAuthException {
 		return GoogleAuthUtil.getToken(context, account, "oauth2:email");
-	}
-
-	public String getRootURL() {
-		return urlRoot;
 	}
 }

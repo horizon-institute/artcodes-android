@@ -56,7 +56,7 @@ public class CardographerServer implements ArtcodeServer {
 	private final Gson gson;
 	private final LocalAccount localAccount;
 	private final List<Account> accounts = new ArrayList<>();
-	private final String urlRoot = "http://10.0.2.2:5173/";
+	private final String urlRoot = "https://cardographer.cs.nott.ac.uk/artcodes/";
 
 	public CardographerServer(Context context) {
 		this.context = context;
@@ -78,12 +78,13 @@ public class CardographerServer implements ArtcodeServer {
 				accounts.add(account);
 			}
 		}
+		Log.i("URL", urlRoot);
 	}
 
 	public Account createAccount(String id) {
 		if (id.startsWith(prefix)) {
 			String name = id.substring(prefix.length());
-			return new CardographerAccount(context, name, urlRoot, gson);
+			return new CardographerAccount(this, context, gson, name);
 		} else if (id.equals("local")) {
 			if (Features.show_local.isEnabled(context)) {
 				return localAccount;
@@ -254,5 +255,23 @@ public class CardographerServer implements ArtcodeServer {
 		SharedPreferences preferences = context.getSharedPreferences(clazz.getName(), Context.MODE_PRIVATE);
 		String jsonPreferences = gson.toJson(ids);
 		preferences.edit().putString(name, jsonPreferences).apply();
+	}
+
+	public String getRootURL() {
+		return urlRoot;
+	}
+
+	public void removeID(String id) {
+		List<String> recent = loadIDs(Experience.class, recent_tag);
+		if(recent.contains(id)) {
+			recent.remove(id);
+			saveIDs(Experience.class, recent_tag, recent);
+		}
+
+		List<String> starred = loadIDs(Experience.class, starred_tag);
+		if(starred.contains(id)) {
+			starred.remove(id);
+			saveIDs(Experience.class, starred_tag, starred);
+		}
 	}
 }

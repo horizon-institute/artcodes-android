@@ -24,6 +24,8 @@ import android.content.SharedPreferences;
 import android.net.Uri;
 import android.util.Log;
 
+import androidx.annotation.NonNull;
+
 import com.google.gson.Gson;
 
 import java.io.File;
@@ -54,6 +56,7 @@ public class LocalAccount implements Account
 		this.gson = gson;
 	}
 
+	@NonNull
 	@Override
 	public String toString()
 	{

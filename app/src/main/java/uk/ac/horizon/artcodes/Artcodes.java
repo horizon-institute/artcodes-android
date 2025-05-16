@@ -42,7 +42,6 @@ public final class Artcodes extends Application
 		Analytics.initialize(this);
 
 		server = new CardographerServer(this);
-		//server = new AppEngineServer(this);
 		if(httpClient == null)
 		{
 			HttpLoggingInterceptor logging = new HttpLoggingInterceptor();

@@ -31,15 +31,15 @@ dependencies {
 	}
 
 	implementation 'androidx.appcompat:appcompat:1.7.0'
-	implementation 'com.google.code.gson:gson:2.11.0'
-	implementation 'com.google.guava:guava:33.3.0-android'
-	api 'com.quickbirdstudios:opencv:4.5.3.0'
+	implementation 'com.google.code.gson:gson:2.13.1'
+	implementation 'com.google.guava:guava:33.4.8-android'
+	api 'org.opencv:opencv:4.11.0'
 	testImplementation 'junit:junit:4.13.2'
 }
 
 android {
 	namespace 'uk.ac.horizon.artcodes.scanner'
-	compileSdkVersion 35
+	compileSdkVersion 36
 
 	buildFeatures {
 		buildConfig true
@@ -48,7 +48,7 @@ android {
 
 	defaultConfig {
 		minSdkVersion 21
-		targetSdkVersion 35
+		targetSdkVersion 36
 	}
 
 	compileOptions {
