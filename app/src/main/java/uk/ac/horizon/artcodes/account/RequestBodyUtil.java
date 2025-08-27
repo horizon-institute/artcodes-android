@@ -31,13 +31,13 @@ import com.google.common.hash.Hashing;
 import com.google.common.hash.HashingInputStream;
 import com.google.common.hash.HashingOutputStream;
 import com.google.common.io.ByteStreams;
+import com.squareup.okhttp.internal.Util;
 
 import java.io.IOException;
 import java.io.InputStream;
 
 import okhttp3.MediaType;
 import okhttp3.RequestBody;
-import okhttp3.internal.Util;
 import okio.BufferedSink;
 import okio.Okio;
 import okio.Source;
@@ -82,7 +82,7 @@ class RequestBodyUtil {
 		}
 
 		@Override
-		public void writeTo(BufferedSink sink) throws IOException {
+		public void writeTo(@NonNull BufferedSink sink) throws IOException {
 			Log.w("ImageBody", "Writing");
 			if (bitmap != null) {
 				bitmap.compress(Bitmap.CompressFormat.JPEG, 90, sink.outputStream());

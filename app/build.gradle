@@ -22,18 +22,9 @@ apply plugin: 'com.android.application'
 apply plugin: 'com.google.gms.google-services'
 
 dependencies {
-	constraints {
-		implementation("org.jetbrains.kotlin:kotlin-stdlib-jdk7:1.8.0") {
-			because("kotlin-stdlib-jdk7 is now a part of kotlin-stdlib")
-		}
-		implementation("org.jetbrains.kotlin:kotlin-stdlib-jdk8:1.8.0") {
-			because("kotlin-stdlib-jdk8 is now a part of kotlin-stdlib")
-		}
-	}
-
 	implementation project(':library')
-	implementation 'androidx.appcompat:appcompat:1.7.0'
-	implementation 'androidx.browser:browser:1.8.0'
+	implementation 'androidx.appcompat:appcompat:1.7.1'
+	implementation 'androidx.browser:browser:1.9.0'
 	implementation 'androidx.cardview:cardview:1.0.0'
 	implementation 'androidx.palette:palette:1.0.0'
 	implementation 'androidx.recyclerview:recyclerview:1.4.0'
@@ -42,16 +33,16 @@ dependencies {
 	implementation 'com.adevinta.android:leku:11.1.4'
 
 	implementation 'com.google.android.gms:play-services-maps:19.2.0'
-	implementation 'com.google.android.gms:play-services-auth:21.3.0'
+	implementation 'com.google.android.gms:play-services-auth:21.4.0'
 	implementation 'com.google.android.libraries.places:places:3.5.0'
 	implementation 'com.google.android.material:material:1.12.0'
 	implementation 'com.google.code.gson:gson:2.13.1'
-	implementation 'com.google.firebase:firebase-analytics:22.4.0'
+	implementation 'com.google.firebase:firebase-analytics:23.0.0'
 	implementation 'com.google.guava:guava:33.4.8-android'
 
 	implementation 'com.squareup.picasso:picasso:2.71828'
-	implementation 'com.squareup.okhttp3:okhttp:4.12.0'
-	implementation('com.squareup.okhttp3:logging-interceptor:4.12.0')
+	implementation 'com.squareup.okhttp3:okhttp:5.1.0'
+	implementation('com.squareup.okhttp3:logging-interceptor:5.1.0')
 
 	implementation 'fr.avianey.com.viewpagerindicator:library:2.4.1.1@aar'
 	testImplementation 'junit:junit:4.13.2'
@@ -92,11 +83,11 @@ android {
 	defaultConfig {
 		applicationId "uk.ac.horizon.aestheticodes"
 		versionName '3.5.0'
-		versionCode 4000853
+		versionCode 4000861
 		minSdkVersion 21
 		targetSdkVersion 36
 		signingConfig signingConfigs.release
-		multiDexEnabled true
+		multiDexEnabled false
 	}
 
 	compileOptions {
